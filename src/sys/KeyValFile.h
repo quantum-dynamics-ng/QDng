@@ -1,7 +1,7 @@
 #ifndef KEYVALFILE_H
 #define KEYVALFILE_H
 
-#include "paramcontainer.h"
+#include "ParamContainer.h"
 
 #define MAX_LINE_LENGTH 2048
 

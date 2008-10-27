@@ -1,6 +1,7 @@
 #include "KeyValFile.h"
 #include "helpers.h"
 
+#include <fstream>
 namespace QDLIB {
    
    KeyValFile::KeyValFile() : _name(""), _pos(0) {}
