@@ -6,16 +6,15 @@
 namespace QDLIB {
 
 /**
- * Singleton version of QDClock.
+ * Singleton version for QDClock.
  *
  * This is intended to be used as global clock.
  * \author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
  */
-   class QDGlobalClock : public QDClock
+   class QDGlobalClock
    {
       private:
-	 static QDGlobalClock* _ref;
-	 
+	 static QDClock *_ref;
 	 /* Make sure that class is neither constructable nor destructable. */ 
 	 QDGlobalClock() {}
 	 QDGlobalClock(const QDGlobalClock &clock) {}
@@ -26,9 +25,10 @@ namespace QDLIB {
 	 /**
 	  * \return Pointer to singleton instance of QDGlobalClock.
 	  */
-	 static QDGlobalClock* Instance()
+	 static QDClock* Instance()
 	 {
-	    if (_ref == NULL){
+	    
+	    if (!_ref){
 	       _ref = new QDGlobalClock();
 	    }
 	    return _ref;
@@ -36,7 +36,7 @@ namespace QDLIB {
    
    };
    
-   QDGlobalClock* QDGlobalClock::_ref = NULL;
+  QDClock* QDGlobalClock::_ref = 0;
 }
 
 #endif

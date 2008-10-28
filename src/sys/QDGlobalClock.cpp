@@ -2,15 +2,6 @@
 
 namespace QDLIB {
 
-   QDGlobalClock::QDGlobalClock()
-   : QDClock()
-   {
-   }
-   
-   
-   QDGlobalClock::~QDGlobalClock()
-   {
-   }
-   
+
 
 }
