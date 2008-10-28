@@ -103,5 +103,6 @@ int main(int argc, char **argv)
    fileO >> &mat_in;
    cout << "\nRead from file: \n" << mat_in << endl;
    
+   /* Test the sum operator */
    
 }

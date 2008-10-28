@@ -46,7 +46,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libfft_la_LIBADD =
+libfft_la_DEPENDENCIES =
 am_libfft_la_OBJECTS = fft.lo
 libfft_la_OBJECTS = $(am_libfft_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -170,6 +170,7 @@ INCLUDES = -I$(top_srcdir)/src $(all_includes)
 METASOURCES = AUTO
 noinst_LTLIBRARIES = libfft.la
 libfft_la_SOURCES = fft.cpp
+libfft_la_LIBADD = -lfftw3
 all: all-am
 
 .SUFFIXES:
