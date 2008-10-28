@@ -53,7 +53,7 @@ namespace TNT {
     * Define an operation for dMat * cVec
     */
    template <class T>
-   inline Vector<dcomplex>& operator*(const Matrix<T> &A, const Vector<dcomplex> &B)
+   inline Vector<dcomplex> operator*(const Matrix<T> &A, const Vector<dcomplex> &B)
    {
       Subscript N = B.dim();
       Vector<dcomplex> r(N);
@@ -61,7 +61,7 @@ namespace TNT {
       for (int i=0; i<N; i++){
 	 r[i] = 0;
 	 for (int j=0; j<N; j++){
-            r[i] = A[i][j] * B[j];
+            r[i] += A[i][j] * B[j];
 	 }
       }
    

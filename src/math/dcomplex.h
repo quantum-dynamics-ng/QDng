@@ -33,9 +33,9 @@ namespace QDLIB {
     
     dcomplex() : _real(0), _imag(0) {}
     
-    dcomplex(const double real) _real(real), _imag(0)  {}
+    dcomplex(const double real): _real(real), _imag(0)  {}
   
-    dcomplex(const double real, const double imag) _real(real), _imag(imag)  {}
+    dcomplex(const double real, const double imag): _real(real), _imag(imag)  {}
   
     /** Complex conjugate. */
     inline dcomplex conj() const
