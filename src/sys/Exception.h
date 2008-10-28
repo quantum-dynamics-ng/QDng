@@ -3,7 +3,8 @@
 
 #include <string>
 
-#include "Paramcontainer.h"
+
+#include "ParamContainer.h"
 
 namespace QDLIB {
    
