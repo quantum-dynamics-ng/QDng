@@ -3,6 +3,7 @@ METASOURCES = AUTO
 include_HEADERS = Exception.h FileSet.h FileSingleDefs.h FileSingle.h Getopt.h\
 	helpers.h KeyValFile.h ParamContainer.h
 noinst_LTLIBRARIES = libtools.la
-libtools_la_SOURCES = Getopt.cpp KeyValFile.cpp ParamContainer.cpp Exception.h\
-	FileSingle.cpp FileSingle.cpp Getopt.cpp KeyValFile.cpp\
-	ParamContainer.cpp
+libtools_la_SOURCES = Getopt.cpp KeyValFile.cpp ParamContainer.cpp \
+	Exception.h	FileSingle.cpp FileSingle.cpp Getopt.cpp KeyValFile.cpp	ParamContainer.cpp QDClock.cpp \
+	QDGlobalClock.cpp
+noinst_HEADERS = QDClock.h QDGlobalClock.h
