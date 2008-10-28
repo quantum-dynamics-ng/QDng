@@ -25,6 +25,9 @@
       <terminal>false</terminal>
       <autocompile>true</autocompile>
       <envvars/>
+      <runarguments>
+        <test_WFLevel></test_WFLevel>
+      </runarguments>
     </run>
     <configurations>
       <optimized>
@@ -37,11 +40,19 @@
       <debug>
         <configargs>--enable-debug=full</configargs>
         <builddir>debug</builddir>
-        <ccompiler>GccOptions</ccompiler>
-        <cxxcompiler>GppOptions</cxxcompiler>
-        <f77compiler>G77Options</f77compiler>
+        <ccompiler>kdevgccoptions</ccompiler>
+        <cxxcompiler>kdevgppoptions</cxxcompiler>
+        <f77compiler>kdevg77options</f77compiler>
         <cflags>-O0 -g3</cflags>
         <envvars/>
+        <topsourcedir></topsourcedir>
+        <cppflags>-Isrc</cppflags>
+        <ldflags></ldflags>
+        <ccompilerbinary></ccompilerbinary>
+        <cxxcompilerbinary></cxxcompilerbinary>
+        <f77compilerbinary></f77compilerbinary>
+        <cxxflags>-I..</cxxflags>
+        <f77flags></f77flags>
       </debug>
     </configurations>
     <make>
@@ -164,7 +175,10 @@
       <hidepatterns>*.o,*.lo,CVS</hidepatterns>
       <hidenonprojectfiles>false</hidenonprojectfiles>
     </tree>
-    <groups/>
+    <groups>
+      <hidenonprojectfiles>false</hidenonprojectfiles>
+      <hidenonlocation>false</hidenonlocation>
+    </groups>
   </kdevfileview>
   <cppsupportpart>
     <filetemplates>
