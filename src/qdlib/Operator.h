@@ -175,7 +175,7 @@ namespace QDLIB {
        Subscript N;
    
        
-      if ( B.size() != A.num_cols() ) {
+       if ( B.size() != A.num_cols() || A.num_cols() != Psi->size() ) {
 	 throw( EIncompatible("num_cols != num_elements of vector") );
       }
 	  
@@ -206,7 +206,7 @@ namespace QDLIB {
 	 throw( EIncompatible("num_cols != num_rows of Matrices") );
       }
 	  
-      
+      cout << "Matrix Ok" << endl;
       AN = A->num_cols();
       BN = A->num_rows();
       

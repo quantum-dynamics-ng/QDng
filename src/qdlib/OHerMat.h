@@ -39,6 +39,7 @@ namespace QDLIB {
          
 	 /* Specific methods */
 	 OHerMat();
+	 OHerMat(int size);
 	 OHerMat(ParamContainer &params);
 	 ~OHerMat();
 	 

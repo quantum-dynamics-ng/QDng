@@ -27,7 +27,7 @@ namespace QDLIB {
    /**
     * Init with size of vector.
     */
-   WFLevel::WFLevel(int size)
+   WFLevel::WFLevel(int size) : _name("WFLevel")
    {
       _params.SetValue("size",  size);
       cVec::newsize(size);

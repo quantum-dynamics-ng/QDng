@@ -13,6 +13,15 @@ namespace QDLIB {
    
    OHerMat::OHerMat() : _name("OHermitianRealMatrix"), _X(NULL), _E(NULL) {}
    
+   /**
+    * Initialieses a size x size matrix.
+    */
+   OHerMat::OHerMat(int size) : _name("OHermitianRealMatrix"), _X(NULL), _E(NULL) 
+   {
+      _params.SetValue("size", size);
+      dMat::newsize(size,size);
+   }
+   
    OHerMat::OHerMat(ParamContainer &params) :Operator(params),  _name("OHermitianRealMatrix")
    {
       int size;
@@ -162,6 +171,7 @@ namespace QDLIB {
     */
    void OHerMat::Diag()
    {
+      throw ( Exception("Diag not implemented yet.") );
    }
    
    /**

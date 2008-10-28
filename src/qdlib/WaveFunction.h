@@ -2,7 +2,7 @@
 #define WAVEFUNCTION_H
 
 
-#include "sys/paramcontainer.h"
+#include "sys/ParamContainer.h"
 #include "math/typedefs.h"
 
 
@@ -97,8 +97,14 @@ namespace QDLIB {
 	  */
 	 virtual int ID() = 0;
 	    
-	 
+	 /**
+	  * Norm of the wave function.
+	  * 
+	  * \f$ N = \sqrt{ \langle \Psi | \Psi \rangle} \f$
+	  */
 	 virtual double Norm() = 0;
+	 
+	 
 	 virtual void Normalize() = 0;
       
 	 

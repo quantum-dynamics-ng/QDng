@@ -25,14 +25,8 @@ namespace QDLIB {
             FFT *fft;
 
       public:
-         WFGridSystem() :
-            _ndims(0),
-            _isKspace(false), _spacebuffer(NULL), fft(NULL)
-	 {
-	    for (int i=0; i < MAX_DIMS; i++){
-	       _dims[i] = 0;
-	    }
-	 }
+         WFGridSystem() ;
+ 
             
          ~WFGridSystem();
          

@@ -11,6 +11,7 @@ namespace QDLIB {
     * Abstract class to represent real number operators on a grid.
     */
    class OGridSystem : public Operator, public dVec
+   {
       private:
          int _ndims;
          int _dims[MAX_DIMS];

@@ -1,4 +1,4 @@
-#include "OGridSystem.h"
+#include "OGridsystem.h"
 
 namespace QDLIB {
    
