@@ -47,6 +47,10 @@ namespace QDLIB {
     * - C.Init(ParamContainer)
     * - string& C.Name()
     * 
+    * The class needs a base name and file suffix.
+    * In the case of binary or ASCII files a meta will be created
+    * carrying the information about its content.
+    * 
     * \todo implement ASCII+HDF5
     */
    template <class C>
@@ -118,8 +122,7 @@ namespace QDLIB {
    
    /**
     * Constructor with type initilisation.
-    * 
-    * 
+    *
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, bool Sequence) :
@@ -159,7 +162,7 @@ namespace QDLIB {
     * This holds for reading and writing.
     * Warning: For reading this means that the target object have to already be initialized (incl. correct size)
     * 
-    * \param drop if true meta data will be ignored.
+    * \param drop if true, meta data will be ignored.
     */
    template <class C>
    void FileSingle<C>::DropMeta(bool drop)
@@ -211,7 +214,7 @@ namespace QDLIB {
    }
    
    /**
-    * Set the filer sequence counter.
+    * Set the file sequence counter.
     */
    template <class C>
    void FileSingle<C>::Counter(int counter)
@@ -227,7 +230,7 @@ namespace QDLIB {
    {
       ParamContainer p;
       ofstream file;
-      string s;
+      string s();
       
       /* Write meta file. In a sequence only for the first file. */
       if (!_drop_meta || _counter > 0){
@@ -292,7 +295,7 @@ namespace QDLIB {
       }
             
       
-      cout << s << endl;
+  
       file.open(s.c_str(), ios::binary);
       if( ! file.is_open() ) throw ( EIOError("Can not open binary file for reading") );
       file.read((char*) data->begin(), data->sizeBytes());
