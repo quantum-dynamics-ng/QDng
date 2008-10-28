@@ -2,15 +2,16 @@
 #define FILESINGLEDEFS_H
 
 
-#include "FileSingleC.h"
+#include "FileSingle.h"
 
-#include 
+#include "qdlib/WaveFunction.h"
+#include "qdlib/OHerMat.h"
 
 
 
 namespace QDLIB {
-   typedef FileSingleC<WFLevel> FileWFLevel;
-   typedef FileSingleC<OHerMat> FileOHerMat;
+   typedef FileSingle<WFLevel> FileWF;
+   typedef FileSingle<OHerMat> FileOHerMat;
 }
 
 

@@ -38,8 +38,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/sys
-DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+DIST_COMMON = $(include_HEADERS) $(noinst_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -51,7 +51,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libtools_la_LIBADD =
 am_libtools_la_OBJECTS = Getopt.lo KeyValFile.lo ParamContainer.lo \
 	FileSingle.lo FileSingle.lo Getopt.lo KeyValFile.lo \
-	ParamContainer.lo
+	ParamContainer.lo QDClock.lo QDGlobalClock.lo
 libtools_la_OBJECTS = $(am_libtools_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -82,7 +82,7 @@ am__vpath_adj = case $$p in \
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(includedir)"
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(include_HEADERS)
+HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -193,10 +193,11 @@ include_HEADERS = Exception.h FileSet.h FileSingleDefs.h FileSingle.h Getopt.h\
 	helpers.h KeyValFile.h ParamContainer.h
 
 noinst_LTLIBRARIES = libtools.la
-libtools_la_SOURCES = Getopt.cpp KeyValFile.cpp ParamContainer.cpp Exception.h\
-	FileSingle.cpp FileSingle.cpp Getopt.cpp KeyValFile.cpp\
-	ParamContainer.cpp
+libtools_la_SOURCES = Getopt.cpp KeyValFile.cpp ParamContainer.cpp \
+	Exception.h	FileSingle.cpp FileSingle.cpp Getopt.cpp KeyValFile.cpp	ParamContainer.cpp QDClock.cpp \
+	QDGlobalClock.cpp
 
+noinst_HEADERS = QDClock.h QDGlobalClock.h
 all: all-am
 
 .SUFFIXES:
@@ -252,6 +253,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Getopt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyValFile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ParamContainer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/QDClock.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/QDGlobalClock.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

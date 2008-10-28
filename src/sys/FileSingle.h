@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "paramcontainer.h"
+#include "ParamContainer.h"
 #include "KeyValFile.h"
 #include "Exception.h"
 
@@ -12,10 +12,8 @@
 
 
 #define BINARY_WF_SUFFIX ".wf"
-#define BINARY_POT_SUFFIX ".pot"
 #define BINARY_O_SUFFIX ".op"
 
-#define ASCII_POT_SUFFIX ".apot"
 #define ASCII_WF_SUFFIX ".awf"
 #define ASCII_O_SUFFIX ".aop"
 
@@ -41,15 +39,15 @@ namespace QDLIB {
     * I/O base class for a single data file.
     * This is a template class which can handle all general
     * classes which support a basic interface, with at least
-    * the folowing methods:
+    * the following methods:
     * 
     * - T* C.begin()
     * - size_t C.sizeByte()
     * - ParamContainer& C.GetParams()
     * - C.Init(ParamContainer)
+    * - string& C.Name()
     * 
     * \todo implement ASCII+HDF5
-    * \todo merge this back to FileSingle
     */
    template <class C>
    class FileSingle {
@@ -65,20 +63,34 @@ namespace QDLIB {
       protected:
 	StorageType _type;
 	string _name;
+	string _suffix;
+	bool _sequence;
+	int _counter;
       public:
 	 FileSingle();
-	 FileSingle(const StorageType type);
-	 FileSingle(const StorageType type, const string name);
+	 FileSingle(const StorageType type, bool Sequence = false);
+	 FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence = false);
+	 
 	 
          void Format(const StorageType type);
          StorageType Format();
          
-	 void Name(const string name);
+	 void Name(const string &name);
          string Name();
          
+	 void Suffix(const string &suffix);
+	 
          void DropMeta(bool drop);
          bool DropMeta();
          
+	 
+	 void ActivateSequence();
+	
+	 void ResetCounter();
+         
+	 int Counter();
+	 void Counter(int counter);
+	 
          void ReadFile(C *data);
          void WriteFile(C *data);
 	
@@ -89,9 +101,9 @@ namespace QDLIB {
     * Operator for reading from file.
     */
    template <class C> 
-   void operator>>(FileSingle<C> file, C *in)
+   void operator>>(FileSingle<C> &file, C *in)
    {
-      file->WriteFile(in);
+      file.ReadFile(in);
    }
       
    
@@ -101,19 +113,24 @@ namespace QDLIB {
     * Default type is binary.
     */
    template <class C>
-   FileSingle<C>::FileSingle() : _type(binary) {}
+   FileSingle<C>::FileSingle() :
+	 _type(binary), _drop_meta(false),  _name("default"), _suffix(""), _sequence(false) {}
    
    /**
     * Constructor with type initilisation.
+    * 
+    * 
     */
    template <class C>
-   FileSingle<C>::FileSingle(const StorageType type): _type(type) {}
+   FileSingle<C>::FileSingle(const StorageType type, bool Sequence) :
+	 _type(type), _drop_meta(false), _name("default"), _suffix(""), _sequence(Sequence), _counter(0) {}
    
    /**
     * Constructor with type and name initilisation.
     */
    template <class C>
-   FileSingle<C>::FileSingle(const StorageType type, const string name): FileSingle(binary), _name(name) {}
+   FileSingle<C>::FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence) :
+	 _type(type), _name(name), _suffix(suffix), _sequence(Sequence), _counter(0){}
    
    
    /**
@@ -131,9 +148,75 @@ namespace QDLIB {
     * Set the file name.
     */
    template <class C>
-   void FileSingle<C>::Name(const string name)
+   void FileSingle<C>::Name(const string &name)
    {
       _name = name;
+   }
+   
+   /**
+    * Ignore meta data information.
+    * 
+    * This holds for reading and writing.
+    * Warning: For reading this means that the target object have to already be initialized (incl. correct size)
+    * 
+    * \param drop if true meta data will be ignored.
+    */
+   template <class C>
+   void FileSingle<C>::DropMeta(bool drop)
+   {
+      _drop_meta = drop;
+   }
+   
+   /**
+    * Ignore meta data information.
+    * \return true if meta data information is ignored.
+    */
+   template <class C>
+   bool FileSingle<C>::DropMeta()
+   {
+      return _drop_meta;
+   }
+   
+   /**
+    * Turns on writing an interpretion of counters in file name.
+    * 
+    * Appends a counter number to the file name.
+    * This makes it possible to read write whole a whole set of file
+    * without thinking about the file numbers.
+    * 
+    * If switch between reading and the writing the counter will not be reseted.
+    */
+   template <class C>
+   void FileSingle<C>::ActivateSequence()
+   {
+      _sequence = true;
+   }
+
+   /**
+    * Reset the file sequence counter.
+    */
+   template <class C>
+   void FileSingle<C>::ResetCounter()
+   {
+      _counter = 0;
+   }
+   
+   /**
+    * \return actual number of the file sequence counter.
+    */
+   template <class C>
+   int FileSingle<C>::Counter()
+   {
+      return _counter;
+   }
+   
+   /**
+    * Set the filer sequence counter.
+    */
+   template <class C>
+   void FileSingle<C>::Counter(int counter)
+   {
+      _counter = counter;
    }
    
    /**
@@ -146,24 +229,29 @@ namespace QDLIB {
       ofstream file;
       string s;
       
-      /* Write meta file */
-      if (!_drop_meta){
+      /* Write meta file. In a sequence only for the first file. */
+      if (!_drop_meta || _counter > 0){
+	 p = data->Params();
+	 p.SetValue("CLASS", data->Name() );
+	 
          KeyValFile meta_file(_name + METAFILE_SUFFIX);
-         if ( !meta_file.Write(data->GetParams()) ) EIOError("Can not write meta file");
+         if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
       }
+     
       
-      p = data->GetParams();
       
-      
-      /* Determine the suffix */
-      if ( typeid(WaveFunction) == typeid(data) ) {
-         s = _name + BINARY_WF_SUFFIX;
-      } else if ( typeid(Operator) == typeid(data) ) {
-         s = _name + BINARY_O_SUFFIX;
+      /* Build name */
+      if (_sequence) {
+	 stringstream ss;
+	 ss << _counter;
+	 s = _name + "_" + ss.str() + _suffix;
+	 _counter++;
+      } else {
+	 s = _name + _suffix;
       }
       
       /* Write binary data */
-      file.open(_name.c_str(), ofstream::binary);
+      file.open(s.c_str(), ofstream::binary);
       if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing") );
       file.write((char*) data->begin(), data->sizeBytes() );
       if( file.bad() ) throw( EIOError("Can not write binary file") );
@@ -186,24 +274,28 @@ namespace QDLIB {
          KeyValFile file(_name + METAFILE_SUFFIX);
          ParamContainer p;
          if ( !file.Parse(p) ) throw( EIOError("Can not read meta file") );
-         data.Init(p);
+         data->Init(p);
       }
       
       
       /* We need some parameters for reading */
-      if (data->sizeByte <= 0) throw( EParamProblem("Wrong size") ) ;
+      if (data->sizeBytes() <= 0) throw( EParamProblem("Wrong size") ) ;
       
-      /* Determine the suffix */
-      if ( typeid(WaveFunction) == typeid(data) ) {
-         s = _name + BINARY_WF_SUFFIX;
-      } else if ( typeid(Operator) == typeid(data) ) {
-         s = _name + BINARY_O_SUFFIX;
-      }      
+      /* Build file name */
+      if (_sequence) {
+	 stringstream ss;
+	 ss << _counter;
+	 s = _name + "_" + ss.str() + _suffix;
+	 _counter++;
+      } else {
+	 s = _name + _suffix;
+      }
+            
       
-      
-      file.open(s.c_str(), ifstream::binary);
+      cout << s << endl;
+      file.open(s.c_str(), ios::binary);
       if( ! file.is_open() ) throw ( EIOError("Can not open binary file for reading") );
-      file.read(data.begin(), data.sizeByte());
+      file.read((char*) data->begin(), data->sizeBytes());
       if( file.bad() ) throw( EIOError("Can not read binary file") );
       
    
@@ -218,13 +310,15 @@ namespace QDLIB {
    template <class C>
    void FileSingle<C>::WriteFile(C *data)
    {
-      switch(_type){
-         binary:
-               return _WriteFileBinary(data);
+      
+       switch(_type){
+         case binary:
+	       cout << "Writing now..." << endl;
+               _WriteFileBinary(data);
          break;
-	 ascii:
+	 case ascii:
                throw(Exception("ASCII Unsupported"));
-	 hdf5:
+	 case hdf5:
                throw(Exception("HDF5 Unsupported"));
       }
    }
@@ -239,12 +333,12 @@ namespace QDLIB {
          void FileSingle<C>::ReadFile(C *data)
    {
       switch(_type){
-         binary:
-               return _ReadFileBinary(data);
+         case binary:
+               _ReadFileBinary(data);
          break;
-	 ascii:
+	 case ascii:
                throw(Exception("ASCII Unsupported"));
-	 hdf5:
+	 case hdf5:
                throw(Exception("HDF5 Unsupported"));
       }
    }   

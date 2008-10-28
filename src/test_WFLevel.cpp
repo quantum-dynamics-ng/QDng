@@ -4,6 +4,7 @@
 #include "qdlib/WFLevel.h"
 #include "qdlib/OHerMat.h"
 
+#include "sys/FileSingleDefs.h"
 
 using namespace  std;
 using namespace  QDLIB;
@@ -64,4 +65,43 @@ int main(int argc, char **argv)
    cout << "Matrix * Vector (native types): " << mat_op * start_wf << endl;
    
    delete wf;
+   
+   /* File Writer test */
+   cout << "Write Vector" << endl;
+   FileWF file(binary, "Vector", BINARY_WF_SUFFIX);
+   file.ActivateSequence();
+   
+   file << &start_wf;
+   file << &start_wf;
+   cout << "Writing Completed" << endl;
+   
+   WFLevel read_wf;
+      
+   file.ResetCounter();
+   try{
+      file >>  &read_wf;
+      cout << "\nRead from file: \n" << read_wf << endl;
+      file >>  &read_wf;
+      cout << "\nRead from file: \n" << read_wf << endl;
+      
+   } catch (Exception e) {
+      cout <<  e.GetMessage() << endl;
+   }
+
+   
+   /* Operator Writer test */
+   cout << "Write Matrix" << endl;
+   
+   FileOHerMat fileO(binary, "Matrix", BINARY_O_SUFFIX);;
+   
+   fileO << &mat_op;
+	 
+   cout << "Writing Completed" << endl;
+   
+   OHerMat mat_in;
+   
+   fileO >> &mat_in;
+   cout << "\nRead from file: \n" << mat_in << endl;
+   
+   
 }

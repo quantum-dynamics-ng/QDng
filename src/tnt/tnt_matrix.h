@@ -185,7 +185,7 @@ class Matrix
     /**
      * Get Size in bytes.
      */
-    size_t sizeRaw() { return mn_ * sizeof(T); }
+    size_t sizeBytes() { return mn_ * sizeof(T); }
 
     operator T**(){ return  row_; }
     operator const T**() const { return row_; }
