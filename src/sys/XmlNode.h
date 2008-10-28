@@ -1,19 +1,48 @@
 #ifndef QDLIBXMLNODE_H
 #define QDLIBXMLNODE_H
 
-namespace QDLIB {
+#include <stack>
 
-/**
- * Represents a XML node.
- *
- * \author Markus Kowalewski
- */
-class XmlNode{
-   public:
-      XmlNode();
-   
-      ~XmlNode();
-   
+#include "libxml/parser.h"
+#ifndef LIBXML_TREE_ENABLED
+#error "LIBXML_TREE_ENABLED not enabled. I rely on that feature"
+#endif
+
+#include "ParamContainer.h"
+
+namespace QDLIB
+{
+
+   /**
+   * Represents a XML node.
+   *
+   * \author Markus Kowalewski
+   */
+
+   class XmlNode
+   {
+
+      private:
+         xmlNode *_cur_node;
+         stack<XmlNode*> _child_stack;
+	 stack<string*> _name_stack;
+	 stack<ParamContainer*> _attr_stack;
+      public:
+         XmlNode();
+
+         ~XmlNode();
+
+         void Init( xmlNode *node );
+         
+	 XmlNode* NextChild();
+	 bool EndChild();
+	 
+         void NextNode();
+	 bool EndNode();
+
+         string& Name();
+         ParamContainer& Attributes();
+
    };
 
 }

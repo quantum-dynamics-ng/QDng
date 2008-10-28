@@ -29,7 +29,7 @@ namespace QDLIB {
 	 {
 	    
 	    if (!_ref){
-	       _ref = new QDGlobalClock();
+	       _ref = new QDClock();
 	    }
 	    return _ref;
 	 }
