@@ -14,8 +14,13 @@ namespace QDLIB {
    {
       private:
 	 QDClock *_clock;
+	 
+      protected:
+	 bool forward;
+	 bool imaginary;
+
       public:
-	 OPropagator() : _clock(NULL) {}
+	 OPropagator() : _clock(NULL), forward(true), imaginary(false) {}
       
 	 ~OPropagator();
 	    
@@ -54,7 +59,30 @@ namespace QDLIB {
 	    return _clock;
 	 }
 	 
+	 /**
+	  * Set forward propagation.
+	  * 
+	  * This is the default behavior.
+	  */
+	 void Forward();
 	 
+	 /**
+	  * Set backward propagation.
+	  */
+	 void Backward();
+	 
+	 /**
+	  * Set propagation in imaginary time.
+	  */
+	 void ImaginaryTime();
+	 
+	 /**
+	  * Set propagation in real time.
+	  * 
+	  * Default behavior.
+	  */
+	 void RealTime();
+	
 	 
    };
 

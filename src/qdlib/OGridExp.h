@@ -13,7 +13,7 @@ namespace QDLIB {
       public:
          void ExpFactor(double d);
          void ExpFactor(dcomplex d);
-   }
+   };
    
    
    
