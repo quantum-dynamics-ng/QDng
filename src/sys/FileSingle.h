@@ -156,6 +156,12 @@ namespace QDLIB {
       _name = name;
    }
    
+   template <class C>
+   void FileSingle<C>::Suffix(const string &suffix)
+   {
+      _suffix = suffix;
+   }
+   
    /**
     * Ignore meta data information.
     * 
@@ -297,9 +303,17 @@ namespace QDLIB {
       
   
       file.open(s.c_str(), ios::binary);
-      if( ! file.is_open() ) throw ( EIOError("Can not open binary file for reading") );
+      if( file.fail() ) {
+	 cout << "can't open\n";
+	 throw ( EIOError("Can not open binary file for reading") );
+      }
       file.read((char*) data->begin(), data->sizeBytes());
-      if( file.bad() ) throw( EIOError("Can not read binary file") );
+       if( file.fail() || file.eof() ){
+	  cout << "can't read\n";
+	  throw( EIOError("Can not read binary file") );
+       }
+	  
+       file.close();
       
    
    }
@@ -331,6 +345,7 @@ namespace QDLIB {
     * 
     * \param data Data to save.
     * 
+    * \todo Add a check to meta data, for right class name
     */
    template <class C>
          void FileSingle<C>::ReadFile(C *data)

@@ -62,7 +62,7 @@ namespace QDLIB {
       if (_ndims == 0 || _ndims > MAX_DIMS)
          throw( EParamProblem("Dims not initialized or to large") );
 
-      if (_spacebuffer != NULL) _spacebuffer = new cVec(cVec::size());
+      if (_spacebuffer == NULL) _spacebuffer = new cVec(cVec::size());
       
       /* Initialize FFT */
       if (fft == NULL){
@@ -94,6 +94,7 @@ namespace QDLIB {
       _check_kspace();
 
       fft->forward();
+
       cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
       _isKspace = true;
       

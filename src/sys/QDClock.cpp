@@ -71,4 +71,15 @@ namespace QDLIB
       _step--;
       return *this;
    }
+   
+   /**
+    * Copy operator.
+    */
+   QDClock& QDClock::operator=(const QDClock &clock)
+   {
+      _dt = clock._dt;
+      _nsteps = clock._nsteps;
+      _step = clock._step;
+   }
+   
 }

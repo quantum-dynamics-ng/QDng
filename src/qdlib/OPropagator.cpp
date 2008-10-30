@@ -2,15 +2,6 @@
 
 namespace QDLIB {
 
-OPropagator::OPropagator()
- : Operator()
-{
-}
-
-
-OPropagator::~OPropagator()
-{
-}
 
 
 }

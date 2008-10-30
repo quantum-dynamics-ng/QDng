@@ -15,3 +15,8 @@ SUBDIRS = fft math qdlib sys
 test_WFGrid_SOURCES = test_WFGrid.cpp
 test_xml_SOURCES = test_xml.cpp
 test_xml_LDADD = $(top_builddir)/src/sys/libtools.la -lxml2 -lz -lm
+test_WFGrid_LDADD = $(top_builddir)/src/sys/libtools.la \
+	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la \
+	-lfftw3
+AM_CFLAGS = -Werror -pedantic -pedantic-errors
+AM_CXXFLAGS = -Werror -pedantic -pedantic-errors

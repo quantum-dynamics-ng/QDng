@@ -12,7 +12,6 @@ namespace QDLIB {
  */
 FFT::FFT(size_t N, dcomplex *in, dcomplex *out, bool oneway)
 {
-
    _planf = fftw_plan_dft_1d(N, (fftw_complex*) in, (fftw_complex*) out, FFTW_FORWARD, FFTW_ESTIMATE);
    if (!(_oneway = oneway)){
       _planb = fftw_plan_dft_1d(N, (fftw_complex*)  out, (fftw_complex*)  in, FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -77,7 +76,7 @@ FFT::FFT(int rank, const int *n, dcomplex *in, dcomplex *out, bool oneway)
 
 /**
  * 1D real-to-complex FFT.
- * TODO: Check if backward FFT is the same as c2r.
+ * \todo Check if backward FFT is the same as c2r.
  * 
  * \param N      Number of points.
  * \param in     Pointer to input.
@@ -102,7 +101,7 @@ FFT::FFT(size_t N, double *in, dcomplex *out, bool oneway)
 FFT::~FFT()
 {
 	fftw_destroy_plan(_planf);
-	if(_oneway) fftw_destroy_plan(_planb); 
+	if(!_oneway) fftw_destroy_plan(_planb); 
 }
 
 /**

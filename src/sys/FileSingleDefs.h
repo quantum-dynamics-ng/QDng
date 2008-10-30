@@ -5,12 +5,17 @@
 #include "FileSingle.h"
 
 #include "qdlib/WaveFunction.h"
+#include "qdlib/OGridsystem.h"
+
 #include "qdlib/OHerMat.h"
 
 
 
 namespace QDLIB {
-   typedef FileSingle<WFLevel> FileWF;
+   typedef FileSingle<WaveFunction> FileWF;
+   
+   typedef FileSingle<OGridSystem> FileOGrid;
+	 
    typedef FileSingle<OHerMat> FileOHerMat;
 }
 

@@ -47,7 +47,7 @@ namespace QDLIB {
 	  */
 	 void Clock(const QDClock *clock)
 	 {
-	    _clock = clock;
+	    *_clock = *clock;
 	 }
 	 
 	 

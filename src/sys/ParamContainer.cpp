@@ -275,7 +275,10 @@ namespace QDLIB {
     */
    ParamContainer& ParamContainer::operator=(ParamContainer &params)
    {
-      Params(params.Params());
+
+      _param_map = params._param_map;
+ 
+      _it = _param_map.begin();
       return *this;
    }
       

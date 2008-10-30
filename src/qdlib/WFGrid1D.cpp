@@ -19,21 +19,23 @@ namespace QDLIB {
       WFGridSystem::Dim(1);
       int *sizes = WFGridSystem::DimSizes();
       
-      
       _params = params;
-      
+            
       _params.GetValue("xmin", _xmin);
       _params.GetValue("xmax", _xmax);
       _params.GetValue("Nx", _Nx);
       
-      if (_Nx == 0) throw ( EParamProblem("Zero elemets grid defined") );
-      sizes[1] = _Nx;
+      if (_Nx == 0) throw ( EParamProblem("Zero elements grid defined") );
+      sizes[0] = _Nx;
       
       _dx = _xmax - _xmin;
       if (_dx == 0) throw ( EParamProblem("Zero length grid defined") );
       
-      _dx = (double(_Nx) - 1) / _dx;
+      _dp = (2*PI) / _dx;     // K-Space -> dp =  2pi / L
       
+      _dx = _dx / (double(_Nx) - 1) ;
+     
+
       cVec::newsize(_Nx);
    }
 
@@ -54,7 +56,11 @@ namespace QDLIB {
       for (int i=0; i < cVec::size(); i++){
          d += (*this)[i].conj() * (*this)[i];
       }
-      d *= _dx;
+      
+      if ( isKspace() ) /* k-Space - real space ? */
+	 d *= _dp;
+      else
+         d *= _dx;
       
       return d.real();
    }
@@ -81,9 +87,14 @@ namespace QDLIB {
       dcomplex d;
       
       for (int i=0; i < cVec::size(); i++){
-         d += (*this)[i].conj() * (*Psi)[i];
+         d += ((*this)[i]).conj() * (*Psi)[i];
       }
-      d *= _dx;
+      
+      if ( isKspace() ) /* k-Space - real space ? */
+	 d *= _dp;
+      else
+	 d *= _dx;
+      
       
       return d;
    }
@@ -98,8 +109,26 @@ namespace QDLIB {
    
    void WFGrid1D::Dx(double dx)
    {
+      _dp = _dx / (2*PI);     // K-Space -> delta p
       _dx = dx;
+      
    }
+   
+   double WFGrid1D::Dp()
+   {
+      return _dp;
+   }
+   
+   /**
+    * Set dp-Kspace length.
+    * 
+    * \todo think about. does it make sense? => make consistent.
+    */
+   void WFGrid1D::Dp(double dp)
+   {
+      _dp = dp;
+   }
+   
    
    double WFGrid1D::xmin()
    {
@@ -126,6 +155,11 @@ namespace QDLIB {
       return cVec::size();
    }
    
+   /**
+    * Resize the grid.
+    * 
+    * Old data will be deleted.
+    */
    void WFGrid1D::Nx(int nx)
    {
       cVec::newsize(nx);
@@ -136,10 +170,11 @@ namespace QDLIB {
     */
    WFGrid1D& WFGrid1D::operator=(WFGrid1D &Psi)
    {
-      _params = Psi.Params();
+      _params = Psi._params;
       Init(_params);
       
-      (cVec) *this = (cVec) Psi;
+      
+      *(cVec*) this = (cVec) Psi;
       
       return *this;
    }

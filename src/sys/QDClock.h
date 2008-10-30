@@ -29,6 +29,7 @@ namespace QDLIB
 	 
 	 QDClock& operator++();
 	 QDClock& operator--();
+	 QDClock& operator=(const QDClock &clock);
    };
 }
 

@@ -23,12 +23,12 @@ namespace QDLIB {
       ifstream file;
       
       file.open(_name.c_str());           // Open file
-      if (file.bad()) return false;
+      if (file.fail()) return false;
       
       
       while(!file.eof()){                     // Reading loop
 	 file.getline(line, MAX_LINE_LENGTH);
-	 if (file.bad()) return false;
+	 //if (file.fail()) return false;
 	 
 	 s.assign(line);
 	 
