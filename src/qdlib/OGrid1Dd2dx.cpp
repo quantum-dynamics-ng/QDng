@@ -44,12 +44,7 @@ namespace QDLIB {
    /**
     * Init the k-Space with \f$ -k^2 \f$.
     * 
-    * The original QD-MPI initializes the k-space grid with with values
-    * multiple of dk. This only works for when coordinate space grid has
-    * odd number of points. Otherwise you will have the k values are
-    * \f$ k = dk (n+\frac{1}{2}) \f$.
     * 
-    * \bug works only for even number of grid points
     * \todo Optimize k-space init loop, its a bit ugly
     */
    void OGrid1Dd2dx::InitKspace()
@@ -68,17 +63,18 @@ namespace QDLIB {
          
       double dp = (2*PI) / _L_last;    // Setup dp for kspace
      
-
+      /* We include all the factors in the k-space function => Do it only once */
+      /* The minus cancels with minus from -kx^2. */
+      /* 1/Nx due to unormalized FFT  */
+      double m = 0.5 / ( _mass * double(_Nx_last) );
+     
+      
       int i,j;
 	 
       for (i=(-(_Nx_last) / 2), j=0; j < _Nx_last / 2; i++, j++){ //run from [-p..+p]
-/*	 (*_kspace)[j] = -(double(j) * double(j)+double(j)) * dp * dp ;
-	(*_kspace)[_Nx_last - j - 1] = -(double(j)* double(j)+double(j)) * dp * dp ;*/
-	(*_kspace)[j] = -(double(j) * double(j) + double(j) + 0.25) * dp * dp ;
-	(*_kspace)[_Nx_last - j - 1] = -(double(j) * double(j) + double(j) + 0.25) * dp * dp ;
-      
+	 (*_kspace)[j] = (double(j) * double(j)) * dp * dp * m;
+	(*_kspace)[_Nx_last - j - 1] = (double(j+1)* double(j+1)) * dp * dp * m;
       }
-        cout << *_kspace;
     
    }
    
@@ -87,10 +83,8 @@ namespace QDLIB {
       if (PsiBra->size() != PsiKet->size()) throw ( EParamProblem("Bra and Ket vector doesn't have same size") );
       
       WaveFunction *opKet;
-      
       opKet =  (*this) * PsiKet;
-      
-      dcomplex d = (*PsiBra) * PsiKet;
+      dcomplex d = (*PsiBra) * opKet;
       
       delete opKet;
       
@@ -108,7 +102,6 @@ namespace QDLIB {
    WaveFunction* OGrid1Dd2dx::operator*(WaveFunction *Psi)
    {
       
-      double m = -1/(2 * _mass);
       WFGrid1D *opPsi, *ket;
       
       ket = dynamic_cast<WFGrid1D*> (Psi);
@@ -122,20 +115,12 @@ namespace QDLIB {
       
       opPsi = new WFGrid1D();    // New instance
       *opPsi = *ket; // Copy
-      
-//       cout << "m: "<< (*opPsi) << endl;
-//       opPsi->ToKspace();
-//       opPsi->ToXspace();
-//       cout << "m: "<< (*opPsi) << endl;
-      
+            
       opPsi->ToKspace();
-      
-
-      m /= double(_Nx_last);      // FFT is not normalized => foward + backward makes faktor Nx
-
+    
       for (int i=0; i < _kspace->size(); i++)
       {
-         (*opPsi)[i] *= (*_kspace)[i] * m;
+         (*opPsi)[i] *= (*_kspace)[i];
       }
       
       opPsi->ToXspace();
@@ -146,7 +131,6 @@ namespace QDLIB {
    
    WaveFunction* OGrid1Dd2dx::operator*=(WaveFunction *Psi)
    {
-      double m = -1/(2 *_mass);
       WFGrid1D  *ket;
       
       ket = dynamic_cast<WFGrid1D*> (Psi);
@@ -157,14 +141,12 @@ namespace QDLIB {
          _Nx_last = ket->size();
          InitKspace();
       }
-      
-      m /= double(_Nx_last)*double(_Nx_last);
-      
+     
       ket->ToKspace();
       
       for (int i=0; i < _kspace->size(); i++)
       {
-         (*ket)[i] *= (*_kspace)[i] * m;
+         (*ket)[i] *= (*_kspace)[i];
       }
        
       ket->ToXspace();

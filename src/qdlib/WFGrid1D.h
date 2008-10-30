@@ -19,7 +19,6 @@ namespace QDLIB {
    class WFGrid1D : public WFGridSystem
    {
       private:
-         ParamContainer _params;
          string _name;
          double _dx;
          double _l;

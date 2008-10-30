@@ -172,7 +172,7 @@ namespace QDLIB
 // 	 (*n)[i] = (*this)[i] * (*o)[i];
 //       }
 //       return n;
-      
+      return NULL;
    }
    
 }

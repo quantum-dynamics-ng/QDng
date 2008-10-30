@@ -84,7 +84,7 @@ namespace QDLIB {
 	 /**
 	  * Return the parameter set.
 	  */
-	 ParamContainer& Params() { return _params; };
+	 ParamContainer& Params() { return _params; }
 	 
 	 /**
 	  * Human readable identifier.

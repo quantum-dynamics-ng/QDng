@@ -3,6 +3,7 @@
 
 #include "WaveFunction.h"
 #include "sys/Exception.h"
+#include "sys/QDClock.h"
 
 namespace QDLIB {
 
@@ -36,9 +37,7 @@ namespace QDLIB {
    */
    class Operator
    {
-      private:
-         double _dt;
-         int _total_time;
+
       protected:
 	 ParamContainer _params;
 	 /**
@@ -46,6 +45,7 @@ namespace QDLIB {
 	  * Must be set by the implementing class.
 	  */
 	 bool _isTimedependent;
+	 QDClock *clock;
          
       public:
 	 /**
@@ -56,7 +56,7 @@ namespace QDLIB {
 	 /**
 	  * Standard constructor
 	  */
-	 Operator() :  _dt(0), _total_time(0), _isTimedependent(false){}
+	 Operator() :  _isTimedependent(false), clock(NULL){}
 	  
 	 /**
 	  * Constructor with full parameter set.
@@ -91,35 +91,17 @@ namespace QDLIB {
 	  */
 	 bool isTimeDep() { return _isTimedependent; }
          
-         /**
-          * Set the time step.
-          * 
-          * A time depenend operator will possibly need this.
-          */
-         void Dt(double dt) { _dt = dt; }
          
-         double Dt() { return _dt; }
+	 /**
+	  * Set the Clock of the operator.
+	  * 
+	  * Do this after everything is initialized and the operator tells that it is time dependent.
+	  */
+	 void Clock (QDClock *cl)
+	 {
+	    clock = cl;
+	 }
 	 
-         /**
-          * Next time step.
-          */
-         void StepForward() { _total_time++; }
-         
-         /**
-          * Step back in time.
-          */
-         void StepBackward() { _total_time--; }
-         
-         /**
-          * Set total time.
-          */
-         void TotalTime(int time) { _total_time = time; }
-         
-         /**
-          * Get the total time.
-          */
-         double TotalTime() { return  _total_time * _dt; }
-               
 	 /**
 	  * Complex Bra.Op.Ket value of two Wavefunctions.
 	  */

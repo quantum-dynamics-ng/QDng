@@ -278,6 +278,7 @@ namespace QDLIB {
 
       _param_map = params._param_map;
  
+      
       _it = _param_map.begin();
       return *this;
    }

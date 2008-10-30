@@ -12,9 +12,7 @@ namespace QDLIB {
    */
    class OPropagator : public Operator
    {
-      private:
-	 QDClock *_clock;
-	 
+
       protected:
 	 bool forward;
 	 bool imaginary;
@@ -41,14 +39,6 @@ namespace QDLIB {
 	  */
 	 virtual void AddNeeds(string &Key, Operator *O) = 0;
 	 
-	 
-	 /**
-	  * Set the clock of the propagator.
-	  */
-	 void Clock(const QDClock *clock)
-	 {
-	    *_clock = *clock;
-	 }
 	 
 	 
 	 /**

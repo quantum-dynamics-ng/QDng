@@ -24,6 +24,7 @@ namespace QDLIB {
       _params.GetValue("xmin", _xmin);
       _params.GetValue("xmax", _xmax);
       _params.GetValue("Nx", _Nx);
+
       
       if (_Nx == 0) throw ( EParamProblem("Zero elements grid defined") );
       sizes[0] = _Nx;
@@ -51,7 +52,7 @@ namespace QDLIB {
 	    	 
    double WFGrid1D::Norm()
    {
-      dcomplex d;
+      dcomplex d(0,0);
       
       for (int i=0; i < cVec::size(); i++){
          d += (*this)[i].conj() * (*this)[i];
@@ -74,7 +75,7 @@ namespace QDLIB {
    {
       
       _params =  Psi->Params();
-      
+            
       Init(_params);
       
       *(cVec*) this = (cVec) *Psi;
@@ -84,7 +85,7 @@ namespace QDLIB {
 	 
    dcomplex WFGrid1D::operator*(WaveFunction* Psi)
    {
-      dcomplex d;
+      dcomplex d(0,0);
       
       for (int i=0; i < cVec::size(); i++){
          d += ((*this)[i]).conj() * (*Psi)[i];
