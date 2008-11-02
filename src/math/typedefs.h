@@ -86,7 +86,70 @@ namespace QDLIB {
    typedef TNT::Matrix<dcomplex> cMat;
 
    
-
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElements(cVec &A, cVec &B)
+   {
+      int size = A.size();
+      
+      for (int i=0; i < size; i++)
+      {
+	A[i] *= B[i];
+      }
+   }
+   
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElements(dVec &A, dVec &B)
+   {
+      int size = A.size();
+      
+      for (int i=0; i < size; i++)
+      {
+	 A[i] *= B[i];
+      }
+   }
+   
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElements(cVec &A, dVec &B)
+   {
+      int size = A.size();
+      
+      for (int i=0; i < size; i++)
+      {
+	 A[i] *= B[i];
+      }
+   }
+   
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElements(dVec &A, cVec &B)
+   {
+      int size = A.size();
+      
+      for (int i=0; i < size; i++)
+      {
+	 A[i] *= B[i];
+      }
+   }
+   
 }
 
 

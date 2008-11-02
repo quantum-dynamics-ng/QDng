@@ -8,6 +8,10 @@ namespace QDLIB {
 
    /**
     * SPO propagator for GridSystem.
+    * 
+    * Relies on a OKSpace operator and a OGridSystem.
+    * 
+    * \todo optimize for imaginary time propagation (no need for complex exponentials).
     */
    class OSPO : public OPropagator
       {
@@ -16,7 +20,14 @@ namespace QDLIB {
 	    OKSpace *Tkin;
 	    OGridSystem *Vpot;
 	    cVec *expT;
-	    dVec *expV;
+	    cVec *expV;
+	    
+	    dcomplex cV, cT;
+	    double _last_time;
+	    
+	    void initV();
+	    void initT();
+	    
 	 public:
 	    OSPO();
 	 
@@ -26,6 +37,7 @@ namespace QDLIB {
 	     * Initialize the exponentials.
 	     */
 	    void InitExp();
+	    
 	    
 	    /* Interface implementation, Operator */
 	    virtual Operator* NewInstance();

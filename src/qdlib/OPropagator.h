@@ -16,7 +16,7 @@ namespace QDLIB {
       protected:
 	 bool forward;
 	 bool imaginary;
-
+         QDClock *clock;
       public:
 	 OPropagator() : _clock(NULL), forward(true), imaginary(false) {}
       
@@ -46,7 +46,7 @@ namespace QDLIB {
 	  */
 	 QDClock* Clock()
 	 {
-	    return _clock;
+	    return clock;
 	 }
 	 
 	 /**

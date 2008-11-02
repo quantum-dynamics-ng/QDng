@@ -150,6 +150,7 @@ namespace QDLIB {
     * Matrix-Vector Multiplication for Wavefunctions.
     * 
     * Error checking is done (check sizes).
+    * \todo find the right place.
     */
    template <class T, class U>
    void MatrixVectorMult(WaveFunction *Psi, const Matrix<T> &A, const Vector<U> &B)
@@ -177,6 +178,7 @@ namespace QDLIB {
     * Matrix-Matrix Multiplication for Operators.
     * 
     * Error checking is done for A and B but not for O(sizes).
+    * \todo find the right place.
     */
    template <class T, class U>
    void MatrixMatrixMult(Matrix<T> *O, const Matrix<T> *A, const Matrix<U> *B)
