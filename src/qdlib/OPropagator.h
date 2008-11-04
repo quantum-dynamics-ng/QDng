@@ -7,18 +7,30 @@
 namespace QDLIB {
 
    /**
-   * Abstract base class for propagators.
-   * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
-   */
+    * Abstract base class for propagators.
+    * 
+    * Represents a expansion/realisation for \f$ e^{c H dt}\f$.
+    * Where c can be configured for forward or backward propagation (sign of c)
+    * or propagation in real and imaginary time (c=i or c=1).
+    * 
+    * 
+    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
+    */
    class OPropagator : public Operator
    {
-
+      private:
+	 dcomplex _c0;
       protected:
+	 /** Indicates forward propagation. */
 	 bool forward;
+	 /** Indicates imaginary time propagation. */
 	 bool imaginary;
+	 /** Holds the clock of the propagator. */
          QDClock *clock;
       public:
-	 OPropagator() : _clock(NULL), forward(true), imaginary(false) {}
+	 OPropagator() : _c0(0,0), clock(NULL), forward(true), imaginary(false)
+	 {
+	 }
       
 	 ~OPropagator();
 	    
@@ -39,6 +51,19 @@ namespace QDLIB {
 	  */
 	 virtual void AddNeeds(string &Key, Operator *O) = 0;
 	 
+	 /**
+	  * This is used to init the propagator after changing the exponent.
+	  * (Clock, Forward, Backward, ImaginaryTime, RealTime, Exponent).
+	  */
+	 virtual ReInit() = 0;
+	 
+	 /**
+	  * Set propagators clock.
+	  */
+	 void Clock(QDClock* cl)
+	 {
+	    clock = cl;
+	 }
 	 
 	 
 	 /**
@@ -54,26 +79,72 @@ namespace QDLIB {
 	  * 
 	  * This is the default behavior.
 	  */
-	 void Forward();
+	 void Forward()
+	 {
+	    if (imaginary)
+	       _c0 = clock.Dt();
+	    else
+	       _c0 = I*clock.Dt();
+	    forward = true;
+	 }
 	 
 	 /**
 	  * Set backward propagation.
 	  */
-	 void Backward();
-	 
+	 void Backward()
+	 {
+	    if (imaginary)
+	       _c0 = -clock.Dt();
+	    else
+	       _c0 = -I*clock.Dt();
+	    forward = false;
+	 }
+	 	 
 	 /**
 	  * Set propagation in imaginary time.
 	  */
-	 void ImaginaryTime();
+	 void ImaginaryTime()
+	 {
+	    if (forward)
+	       _c0 = -clock.Dt();
+	    else
+	       _c0 = clock.Dt();
+	    imaginary = true;
+	 }
 	 
 	 /**
 	  * Set propagation in real time.
 	  * 
 	  * Default behavior.
 	  */
-	 void RealTime();
-	
+	 void RealTime()
+	 {
+	    if (forward)
+	       _c0 = -I*clock.Dt();
+	    else
+	       _c0 = I*clock.Dt();
+	    imaginary = false;
+	 }
 	 
+	
+	 /**
+	  * Set the exponent explicitly.
+	  * 
+	  * \f$ exp^{c H dt} \f$
+	  */
+	 void Exponent(dcomplex c)
+	 {
+	    _c0 = c;
+	 }
+	 
+ 	 /**
+	  * Get the exponent.
+	  */
+	 dcomplex Exponent()
+	 {
+	    return _c0;
+	 }
+
    };
 
 }

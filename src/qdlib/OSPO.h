@@ -17,27 +17,22 @@ namespace QDLIB {
       {
 	 private:
 	    string _name;
-	    OKSpace *Tkin;
-	    OGridSystem *Vpot;
-	    cVec *expT;
-	    cVec *expV;
+	    OKSpace *_Tkin;
+	    OGridSystem *_Vpot;
+	    cVec *_expT;
+	    cVec *_expV;
 	    
-	    dcomplex cV, cT;
+	    dcomplex _cV, _cT;
 	    double _last_time;
 	    
-	    void initV();
-	    void initT();
+	    void _initV();
+	    void _initT();
 	    
 	 public:
 	    OSPO();
 	 
 	    ~OSPO();
-	    
-	    /**
-	     * Initialize the exponentials.
-	     */
-	    void InitExp();
-	    
+	    	    
 	    
 	    /* Interface implementation, Operator */
 	    virtual Operator* NewInstance();
@@ -62,6 +57,8 @@ namespace QDLIB {
 	    virtual ParamContainer& TellNeeds();
 	 
 	    virtual void AddNeeds(string &Key, Operator *O);
+	    
+	    virtual ReInit();
 	 	    
       };
 

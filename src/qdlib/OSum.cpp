@@ -21,7 +21,7 @@ namespace QDLIB {
    /**
     * Access elements.
     * 
-    * Note this is read only. For assinging use Add()
+    * Note this is read only. For assingning use Add()
     */
    Operator* OSum::operator[](int i)
    {
