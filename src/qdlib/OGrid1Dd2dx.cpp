@@ -66,7 +66,7 @@ namespace QDLIB {
       /* We include all the factors in the k-space function => Do it only once */
       /* The minus cancels with minus from -kx^2. */
       /* 1/Nx due to unormalized FFT  */
-      double m = 0.5 / ( _mass * double(_Nx_last) );
+      double m = 0.5 / ( _mass  );
      
       
       int i,j;
@@ -120,7 +120,7 @@ namespace QDLIB {
     
       for (int i=0; i < _kspace->size(); i++)
       {
-         (*opPsi)[i] *= (*_kspace)[i];
+	 (*opPsi)[i] *= (*_kspace)[i] /double(_Nx_last);
       }
       
       opPsi->ToXspace();
@@ -146,7 +146,7 @@ namespace QDLIB {
       
       for (int i=0; i < _kspace->size(); i++)
       {
-         (*ket)[i] *= (*_kspace)[i];
+	 (*ket)[i] *= (*_kspace)[i]/double(_Nx_last);
       }
        
       ket->ToXspace();

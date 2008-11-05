@@ -7,4 +7,5 @@ libqd_la_SOURCES = ModuleLoader.cpp OGobbler.cpp OGrid1Dd2dx.cpp \
 noinst_HEADERS = ModuleLoader.h OGobbler.h OGrid1Dd2dx.h OGridDipole.h \
 	OGridPotential.h OGridsystem.h OHerMat.h OKSpace.h OPropagator.h OSPO.h OSum.h \
 	Operator.h WFGrid1D.h WFGridSystem.h WFLevel.h WaveFunction.h
-AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -Wall -O3 -march=opteron
+AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -Wall -ansi
+libqd_la_LIBADD = $(top_builddir)/src/math/libmath.la

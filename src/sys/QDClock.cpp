@@ -9,7 +9,7 @@ namespace QDLIB
    /**
     * \return lenght of time step.
     */
-   inline double QDClock::Dt()
+   double QDClock::Dt()
    {
       return _dt;
    }
@@ -25,7 +25,7 @@ namespace QDLIB
    /**
     * \return The actual system time.
     */
-   inline double QDClock::Time()
+   double QDClock::Time()
    {
       return _step * _dt;
    }
@@ -33,7 +33,7 @@ namespace QDLIB
    /**
     * \return number of actual time step.
     */
-   inline int QDClock::TimeStep()
+   int QDClock::TimeStep()
    {
       return _step;
    }
@@ -41,7 +41,7 @@ namespace QDLIB
    /**
     * \return number of time steps.
     */
-   inline int QDClock::Steps()
+   int QDClock::Steps()
    {
       return _nsteps;
    }

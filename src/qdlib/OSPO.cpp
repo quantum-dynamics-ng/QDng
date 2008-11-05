@@ -1,10 +1,11 @@
 #include "OSPO.h"
-#include "Exception.h"
+#include "sys/Exception.h"
+#include "WFGridSystem.h"
 
 namespace QDLIB {
 
    OSPO::OSPO()
-   : OPropagator(), _name("OSPO"), _Tkin(NULL), _Vpot(NULL), _expT(NULL), _expV(NULL),
+   : OPropagator(), _name("OSPO"), _Tkin(NULL), _Tkin_kspace(NULL), _Vpot(NULL), _expT(NULL), _expV(NULL),
 		 _cV(0,0), _cT(0,0), _last_time(0)
    {
    }
@@ -12,17 +13,36 @@ namespace QDLIB {
    
    OSPO::~OSPO()
    {
-      if (expT != NULL) delete _expT;
-      if (expV != NULL) delete _expV;
+      if (_expT != NULL) delete _expT;
+      if (_expV != NULL) delete _expV;
+   }
+   
+   /**
+    * Set the kinetic energy operator.
+    */
+   void OSPO::AddTkin( OKSpace *T )
+   {
+      _Tkin = T;
+   }
+
+   /**
+    * Set the potential energy operator.
+    */
+   void OSPO::AddVpot( OGridSystem *V )
+   {
+      _Vpot = V;
    }
    
    /** Init expT. */
    void OSPO::_InitT( )
    {
+      _Tkin_kspace = _Tkin->Kspace();
+      if (_Tkin_kspace == NULL)
+	 throw ( Exception("SPO got uninitialized KSpace") );
       
-      for (int i=0; i < Vpot->size(); i++)
+      for (int i=0; i < _Tkin_kspace->size(); i++)
       {
-	 expT[i] = cexp(Tkin[i] * _cT);
+	 (*_expT)[i] = cexpI( (*_Tkin_kspace)[i] * _cT._imag );
       }
    }
    
@@ -30,9 +50,9 @@ namespace QDLIB {
    void OSPO::_InitV( )
    {
       
-      for (int i=0; i < Vpot->size(); i++)
+      for (int i=0; i < _Vpot->size(); i++)
       {
-	 expV[i] = cexp(Vpot[i] * _cV);
+	 (*_expV)[i] = cexpI( (*_Vpot)[i] * _cV._imag);
       }
             
    }
@@ -45,18 +65,24 @@ namespace QDLIB {
       if (_Tkin == NULL || _Vpot == NULL)
 	 throw ( EParamProblem("Tkin or Vpot not initialized") );
       
-      if (_Vpot->size() != _Tkin->size())
+      if (_Tkin_kspace == NULL)
+	 _Tkin_kspace = _Tkin->Kspace();
+	 
+      if (_Vpot->size() != _Tkin_kspace->size())
 	 throw ( EParamProblem("Tkin and Vpot differ in size") );
       
       
       /* Init storage for exponentials */
       if (_expV == NULL) {
-	 _expV = new cVec(Vpot->size());
+	 _expV = new cVec(_Vpot->size());
+	 _expV->newsize(_Vpot->size());
       }
       if (_expT == NULL) {
-	 _expT = new cVec(Tkin->size());
+	 _expT = new cVec(_Tkin_kspace->size());
+	 _expT->newsize(_Tkin_kspace->size());
       }
       
+      cout << _cV << " " << _cT<< endl;
       _InitT();
       _InitV();
       
@@ -97,10 +123,10 @@ namespace QDLIB {
       WaveFunction *ket;
       WFGridSystem *psi;
       
-      if (_expT == NULL || _expV == NULL) InitExp();
-      if (_last_time != clock->TimeStep() && _Vpot->isTimeDependent()) /* Re-init Vpot if is time dep.*/
+      if (_expT == NULL || _expV == NULL) ReInit();
+      if (_last_time != clock->TimeStep() && _Vpot->isTimeDep()) /* Re-init Vpot if is time dep.*/
       {
-	 _last_time = clock->TimeStep;
+	 _last_time = clock->TimeStep();
 	 _InitV();
       }
       
@@ -109,13 +135,14 @@ namespace QDLIB {
       
       psi = dynamic_cast<WFGridSystem*>(ket);
       
-      MultElements(psi, _expV);
+      MultElements( *((cVec*) psi), *((dVec*) _expV));
+
       
       psi->ToKspace();
-      MultElements(psi, _expT);
+      MultElements( *((cVec*) psi), *((dVec*) _expV) );
       psi->ToXspace();
-      
-      MultElements(psi, _expV);
+      MultElements( *((cVec*) psi), 1/ double(psi->size()) );
+      MultElements( *((cVec*) psi), *((dVec*) _expV) );
       
       return psi;
    }
@@ -124,23 +151,27 @@ namespace QDLIB {
    {
       WFGridSystem *psi;
       
-      if (_expT == NULL || _expV == NULL) InitExp();
-      if (_last_time != clock->TimeStep() && _Vpot->isTimeDependent()) /* Re-init Vpot if is time dep.*/
+      if (_expT == NULL || _expV == NULL) ReInit();
+      if (_last_time != clock->TimeStep() && _Vpot->isTimeDep()) /* Re-init Vpot if is time dep.*/
       {  
-	 _last_time = clock->TimeStep;
+	 _last_time = clock->TimeStep();
 	 _InitV();
       }
       
       psi = dynamic_cast<WFGridSystem*>(Psi);
             
-      MultElements(psi, _expV);
-      
+      MultElements( *((cVec*) psi), *((cVec*) _expV) );
+      cout << "Norm-: " << Psi->Norm() << endl;
+/*      for (int i=0; i< psi->size(); i++)
+	 cout <<  cabs((*_expV)[i]) << endl;*/
       psi->ToKspace();
-      MultElements(psi, _expT);
+      MultElements( *((cVec*) psi), *((cVec*) _expT) );
+       MultElements( *((cVec*) psi), 1/ double(psi->size()) );
       psi->ToXspace();
       
-      MultElements(psi, _expV);
       
+      MultElements( *((cVec*) psi), *((cVec*) _expV) );
+      cout << endl;
       return psi;
    }
    
@@ -150,14 +181,16 @@ namespace QDLIB {
       
       org = dynamic_cast<OSPO*>(O);
 	    
-      *Tkin = org->Tkin;
-      *Vpot = org->Vpot;
+      *((Operator*) _Tkin) = (Operator*) org->_Tkin;
+      *((Operator*) _Vpot) = (Operator*) org->_Vpot;
 
-      *expT = org->expT;
-      *expV = org->expV;
+      *_expT = *(org->_expT);
+      *_expV = *(org->_expV);
       
-      *clock = org->clock;
+      *clock = *(org->clock);
       OPropagator::Exponent(org->Exponent());
+      
+      return this;
    }
    
    Operator * OSPO::operator *(Operator * O)
@@ -165,7 +198,22 @@ namespace QDLIB {
       throw ( EIncompatible("Can't apply the SPO to another operator") );
    }
 
+   
+   ParamContainer & OSPO::TellNeeds( )
+   {
+      return _params;
+   }
+
+   
+   void OSPO::AddNeeds( string & Key, Operator * O )
+   {
+   }
+
+   
 }
+
+
+
 
 
 

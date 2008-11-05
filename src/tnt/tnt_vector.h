@@ -154,7 +154,7 @@ class Vector
 
     // access
 
-    iterator begin() { return v_;}
+    T* begin() { return v_;}
     
     /**
      * Get Size in bytes.

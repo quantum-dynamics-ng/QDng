@@ -134,6 +134,21 @@ namespace QDLIB {
       }
    }
 
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElements(cVec &A, double c)
+   {
+      int size = A.size();
+      
+      for (int i=0; i < size; i++)
+      {
+	 A[i] *= c;
+      }
+   }
 }
 
 

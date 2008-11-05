@@ -1,8 +1,10 @@
 #ifndef QDLIBOSPO_H
 #define QDLIBOSPO_H
 
+#include "OKSpace.h"
 #include "OPropagator.h"
-#include "Exception.h"
+#include "OGridsystem.h"
+#include "sys/Exception.h"
 
 namespace QDLIB {
 
@@ -18,21 +20,25 @@ namespace QDLIB {
 	 private:
 	    string _name;
 	    OKSpace *_Tkin;
+	    dVec    *_Tkin_kspace;
 	    OGridSystem *_Vpot;
 	    cVec *_expT;
 	    cVec *_expV;
 	    
 	    dcomplex _cV, _cT;
-	    double _last_time;
+	    int _last_time;
 	    
-	    void _initV();
-	    void _initT();
+	    void _InitV();
+	    void _InitT();
 	    
 	 public:
 	    OSPO();
 	 
 	    ~OSPO();
 	    	    
+	    
+	    void AddTkin( OKSpace *T );
+	    void AddVpot( OGridSystem *V );
 	    
 	    /* Interface implementation, Operator */
 	    virtual Operator* NewInstance();
@@ -58,7 +64,7 @@ namespace QDLIB {
 	 
 	    virtual void AddNeeds(string &Key, Operator *O);
 	    
-	    virtual ReInit();
+	    virtual void ReInit();
 	 	    
       };
 

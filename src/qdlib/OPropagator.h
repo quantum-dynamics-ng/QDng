@@ -3,6 +3,7 @@
 
 #include "Operator.h"
 #include "sys/QDClock.h"
+#include "math/dcomplex.h"
 
 namespace QDLIB {
 
@@ -28,11 +29,11 @@ namespace QDLIB {
 	 /** Holds the clock of the propagator. */
          QDClock *clock;
       public:
-	 OPropagator() : _c0(0,0), clock(NULL), forward(true), imaginary(false)
+	 OPropagator() : _c0(0,0), forward(true), imaginary(false), clock(NULL)
 	 {
 	 }
       
-	 ~OPropagator();
+	 ~OPropagator() {}
 	    
 	 /**
 	 * Should return a ParameterContainer reference which contains some keywords.
@@ -55,7 +56,7 @@ namespace QDLIB {
 	  * This is used to init the propagator after changing the exponent.
 	  * (Clock, Forward, Backward, ImaginaryTime, RealTime, Exponent).
 	  */
-	 virtual ReInit() = 0;
+	 virtual void ReInit() = 0;
 	 
 	 /**
 	  * Set propagators clock.
@@ -82,9 +83,9 @@ namespace QDLIB {
 	 void Forward()
 	 {
 	    if (imaginary)
-	       _c0 = clock.Dt();
+	       _c0 = clock->Dt();
 	    else
-	       _c0 = I*clock.Dt();
+	       _c0 = I*clock->Dt();
 	    forward = true;
 	 }
 	 
@@ -94,9 +95,9 @@ namespace QDLIB {
 	 void Backward()
 	 {
 	    if (imaginary)
-	       _c0 = -clock.Dt();
+	       _c0 = -clock->Dt();
 	    else
-	       _c0 = -I*clock.Dt();
+	       _c0 = (-1)* I *clock->Dt();
 	    forward = false;
 	 }
 	 	 
@@ -106,9 +107,9 @@ namespace QDLIB {
 	 void ImaginaryTime()
 	 {
 	    if (forward)
-	       _c0 = -clock.Dt();
+	       _c0 = -clock->Dt();
 	    else
-	       _c0 = clock.Dt();
+	       _c0 = clock->Dt();
 	    imaginary = true;
 	 }
 	 
@@ -120,9 +121,9 @@ namespace QDLIB {
 	 void RealTime()
 	 {
 	    if (forward)
-	       _c0 = -I*clock.Dt();
+	       _c0 =  I * clock->Dt();
 	    else
-	       _c0 = I*clock.Dt();
+	       _c0 = (-1) * I * clock->Dt();
 	    imaginary = false;
 	 }
 	 

@@ -295,7 +295,7 @@ namespace QDLIB {
   }
   
 
-
+  extern Imaginary I;
 }
 
 #endif

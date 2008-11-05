@@ -1,7 +1,7 @@
 #ifndef QDLIBQDGLOBALCLOCK_H
 #define QDLIBQDGLOBALCLOCK_H
 
-#include <QDClock.h>
+#include "QDClock.h"
 
 namespace QDLIB {
 

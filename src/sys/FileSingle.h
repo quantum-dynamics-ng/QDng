@@ -236,7 +236,7 @@ namespace QDLIB {
    {
       ParamContainer p;
       ofstream file;
-      string s();
+      string s;
       
       /* Write meta file. In a sequence only for the first file. */
       if (!_drop_meta || _counter > 0){
@@ -330,7 +330,6 @@ namespace QDLIB {
       
        switch(_type){
          case binary:
-	       cout << "Writing now..." << endl;
                _WriteFileBinary(data);
          break;
 	 case ascii:
