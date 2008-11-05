@@ -140,14 +140,16 @@ namespace QDLIB {
       
       psi->ToKspace();
       MultElements( *((cVec*) psi), *((dVec*) _expV) );
+      MultElements( *((cVec*) psi), 1/ double(psi->size()) );
       psi->ToXspace();
+      
       MultElements( *((cVec*) psi), 1/ double(psi->size()) );
       MultElements( *((cVec*) psi), *((dVec*) _expV) );
       
       return psi;
    }
 
-   WaveFunction* OSPO::operator *=(WaveFunction * Psi)
+   WaveFunction* OSPO::operator *=(WaveFunction *Psi)
    {
       WFGridSystem *psi;
       
@@ -161,17 +163,14 @@ namespace QDLIB {
       psi = dynamic_cast<WFGridSystem*>(Psi);
             
       MultElements( *((cVec*) psi), *((cVec*) _expV) );
-      cout << "Norm-: " << Psi->Norm() << endl;
-/*      for (int i=0; i< psi->size(); i++)
-	 cout <<  cabs((*_expV)[i]) << endl;*/
+      
       psi->ToKspace();
       MultElements( *((cVec*) psi), *((cVec*) _expT) );
-       MultElements( *((cVec*) psi), 1/ double(psi->size()) );
+      MultElements( *((cVec*) psi), 1/ double(psi->size()) );
       psi->ToXspace();
       
-      
       MultElements( *((cVec*) psi), *((cVec*) _expV) );
-      cout << endl;
+   
       return psi;
    }
    
