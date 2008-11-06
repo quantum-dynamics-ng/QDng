@@ -38,6 +38,8 @@ namespace QDLIB
 	 virtual void Init(ParamContainer &params);
 	 
 	 virtual const string& Name();
+	 
+	 virtual void UpdateTime();
 
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	 

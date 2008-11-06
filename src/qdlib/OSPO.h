@@ -3,9 +3,10 @@
 
 #include "OKSpace.h"
 #include "OPropagator.h"
-#include "OGridsystem.h"
+#include "OGridSum.h"
 #include "sys/Exception.h"
 
+#include "WFGrid1D.h"
 namespace QDLIB {
 
    /**
@@ -14,14 +15,17 @@ namespace QDLIB {
     * Relies on a OKSpace operator and a OGridSystem.
     * 
     * \todo optimize for imaginary time propagation (no need for complex exponentials).
+    * \todo add support for complex k-Space operators.
     */
    class OSPO : public OPropagator
       {
 	 private:
 	    string _name;
+	    ParamContainer *_needs;
+	    
 	    OKSpace *_Tkin;
 	    dVec    *_Tkin_kspace;
-	    OGridSystem *_Vpot;
+	    OGridSum *_Vpot;
 	    cVec *_expT;
 	    cVec *_expV;
 	    
@@ -38,7 +42,9 @@ namespace QDLIB {
 	    	    
 	    
 	    void AddTkin( OKSpace *T );
-	    void AddVpot( OGridSystem *V );
+	    void AddVpot( OGridSum *V );
+	    
+	    WFGrid1D* operator *=(WFGrid1D *Psi);
 	    
 	    /* Interface implementation, Operator */
 	    virtual Operator* NewInstance();
@@ -47,6 +53,8 @@ namespace QDLIB {
 	    
 	    virtual const string& Name();
 			   
+	    virtual void UpdateTime();
+	    
 	    virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	    
 	    virtual double Expec(WaveFunction *Psi);

@@ -51,7 +51,7 @@ int main(int argc, char **argv)
       cout << "Setup clock:\n";
       
       clock = QDGlobalClock::Instance();
-      clock->Dt(10.0);
+      clock->Dt(5.0);
       clock->Steps(10000);
       
       cout << "Nt = " << clock->Steps() << ", dt = " << clock->Dt() << endl;
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
       cout << "Norm: " << LC.Norm() << endl;
       for (int i=0; i<clock->Steps(); i++){
          U *= &LC;
-// 	 cout << "Norm: " << LC.Norm() << endl;
+ 	 cout << "Norm: " << LC.Norm() << endl;
 // 	 fileWF << &LC;
       }
       

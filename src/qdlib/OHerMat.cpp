@@ -41,6 +41,8 @@ namespace QDLIB {
       return r;
    }
    
+   void OHerMat::UpdateTime() {}
+   
    /**
     * Initializer.
     */

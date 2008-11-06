@@ -40,7 +40,9 @@ namespace QDLIB {
    {
       return _name;
    }
- 
+   
+   void OGrid1Dd2dx::UpdateTime() {}
+   
    /**
     * Init the k-Space with \f$ -k^2 \f$.
     * 

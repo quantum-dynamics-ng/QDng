@@ -27,6 +27,7 @@ namespace QDLIB {
 	 virtual Operator* NewInstance();
 	 virtual void Init(ParamContainer &params);
 	 virtual const string& Name();
+	 virtual void UpdateTime();
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	 virtual double Expec(WaveFunction *Psi);
 	 virtual WaveFunction* operator*(WaveFunction *Psi);	 

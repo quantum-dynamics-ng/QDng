@@ -37,7 +37,8 @@ namespace QDLIB {
          virtual Operator* NewInstance();
 	 	 
          virtual void Init(ParamContainer &params);
-	
+	 
+	 virtual void UpdateTime();
 	 	 
          virtual const string& Name();
 	                

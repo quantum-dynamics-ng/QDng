@@ -86,6 +86,7 @@ namespace QDLIB
       return _name;
    }
 
+   void OGridPotential::UpdateTime(){}
    
    dcomplex OGridPotential::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
    {

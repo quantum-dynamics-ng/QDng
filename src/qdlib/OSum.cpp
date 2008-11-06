@@ -51,6 +51,7 @@ namespace QDLIB {
       }
       
       if (O->isTimeDep()) _isTimedependent = true;
+      O->Clock(clock);
       
       _O[_size] = O;
       _size++;
@@ -66,6 +67,14 @@ namespace QDLIB {
       return r;
    }
 	   
+   void OSum::UpdateTime()
+   {
+      for(int i=0; i < _size; i++){
+	 _O[i]->UpdateTime();
+      }     
+   }
+   
+   
    /**
     * We take can't take parameters.
     */

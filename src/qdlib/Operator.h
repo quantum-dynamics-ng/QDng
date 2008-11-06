@@ -91,7 +91,13 @@ namespace QDLIB {
 	  */
 	 bool isTimeDep() { return _isTimedependent; }
          
-         
+	 /**
+	  * Tell the operator to update to a new time step.
+	  * 
+	  * This is used to to tell the operator that it has to move to a new time step.
+	  */
+         virtual void UpdateTime() = 0;
+	 
 	 /**
 	  * Set the Clock of the operator.
 	  * 
