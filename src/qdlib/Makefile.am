@@ -8,5 +8,5 @@ noinst_HEADERS = OGrid1Dd2dx.h OGridDipole.h OGridPotential.h OGridsystem.h \
 				OHerMat.h OKSpace.h Operator.h OSum.h WaveFunction.h WFGrid1D.h WFGridSystem.h \
 				WFLevel.h OPropagator.h OGridPotential.h OSPO.h OGridSum.h
 
-libqd_la_LIBADD = $(top_builddir)/src/math/libmath.la
+
 AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -Wall -ansi

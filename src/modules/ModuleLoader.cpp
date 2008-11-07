@@ -21,16 +21,20 @@ namespace QDLIB {
       }
    }
    
-   bool QDLIB::ModuleLoader::_isLoaded( )
+   /**
+    * Check if a modules is already loaded.
+    */
+   bool ModuleLoader::_isLoaded( const string &name )
    {
-      return false;
+     if ( _mod_map.find(name) != _mod_map.end() ) return true;
+     else return false;
    }
 
    
    /**
     * Register a WF module.
     */
-   void ModuleLoader::_RegisterWF(void *handle, string &name)
+   void ModuleLoader::_RegisterWF(void *handle, const string &name)
    {
 
        
@@ -49,7 +53,7 @@ namespace QDLIB {
    /**
     * Register an operator module.
     */
-   void ModuleLoader::_RegisterOP(void *handle, string &name)
+   void ModuleLoader::_RegisterOP(void *handle, const string &name)
    {
     
       
@@ -67,12 +71,12 @@ namespace QDLIB {
    /**
     * Set the user-defined module search path.
     * 
-    * Only one path is allowed.
+    * Only one path is allowed. Must be an absolute path (not a relative!)
     */
-   void ModuleLoader::UserPath( string &path )
+   void ModuleLoader::UserPath( const string &path )
    {
       _user_path = path;
-      if ( path[path.size()-1] != '/')
+      if ( path[path.size()-1] != '/' && path.size() != 0 )
 	 _user_path += '/';
      
    }
@@ -86,24 +90,25 @@ namespace QDLIB {
     * 
     * \return A fresh, empty instance of the wf class.
     */
-   WaveFunction * ModuleLoader::LoadWF( string &name )
+   WaveFunction * ModuleLoader::LoadWF(const string &name )
    {
       void* handle;
       string s;
       
       
       /* is already loaded? */
-      if (_isLoaded()) {
+      if (_isLoaded(name)) {
 	 _mod_map[name].link_count++;
 	 return _mod_map[name].InstanceWF();
       }
 	 
       /* try user path */
       s = _user_path + name;
+   
       handle = dlopen(s.c_str(), RTLD_NOW );
       if ( handle != NULL )
       {
-	 _RegisterWF(handle, name);
+	 _RegisterWF(handle, s);
 	 return _mod_map[name].InstanceWF();
       }
       
@@ -114,7 +119,7 @@ namespace QDLIB {
 	 _RegisterWF(handle, name);
 	 return _mod_map[name].InstanceWF();
       } else {
-	 throw ( Exception("No module found") );
+	 throw ( Exception( dlerror() ) );
       }
       
    }
@@ -127,13 +132,13 @@ namespace QDLIB {
     * 
     * \return A fresh, empty instance of the operator class.
     */
-   Operator * ModuleLoader::LoadOp( string & name )
+   Operator * ModuleLoader::LoadOp(const string & name )
    {
       string s;
       void *handle;
       
       /* is already loaded? */
-      if (_isLoaded()) {
+      if (_isLoaded(name)) {
 	 _mod_map[name].link_count++;
 	 return _mod_map[name].InstanceOP();
       }
@@ -154,7 +159,7 @@ namespace QDLIB {
 	 _RegisterOP(handle, name);
 	 return _mod_map[name].InstanceOP();
       } else {
-	 throw ( Exception("No module found") );
+	 throw ( Exception( dlerror() ) );
       }
    }
 

@@ -12,6 +12,10 @@ namespace QDLIB {
    /**
     * Loader for dynamic linked objects.
     * 
+    * The Loader looks for the module in either in the path specified by UserPath
+    * or otherwise in a system library directory. Or you can specify it by the
+    * environment variable LD_LIBRARY_PATH.
+    * 
     * @author Markus Kowalewski
     */
    class ModuleLoader
@@ -30,23 +34,20 @@ namespace QDLIB {
 	 string _user_path;
 	 map<string, module> _mod_map;
 	 
-	 bool _isLoaded();
-	 void _RegisterWF(void *handle, string &name);
-	 void _RegisterOP(void *handle, string &name);
+	 bool _isLoaded( const string &name );
+	 void _RegisterWF(void *handle, const string &name);
+	 void _RegisterOP(void *handle, const string &name);
 	 
-	 class mod {
-	    public:
-	    static WaveFunction* InstanceWF();
-	 };
+
       public:
 	 ModuleLoader();
       
 	 ~ModuleLoader();
 	 
 	 
-	 void UserPath(string &path);
-	 WaveFunction* LoadWF(string &name);
-	 Operator* LoadOp(string &name);
+	 void UserPath(const string &path);
+	 WaveFunction* LoadWF(const string &name);
+	 Operator* LoadOp(const string &name);
       
    };
 

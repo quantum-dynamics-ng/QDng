@@ -79,10 +79,10 @@ int main(int argc, char **argv)
       
    file.ResetCounter();
    try{
-      file >>  &read_wf;
-      cout << "\nRead from file: \n" << read_wf << endl;
-      file >>  &read_wf;
-      cout << "\nRead from file: \n" << read_wf << endl;
+//       file >>  &read_wf;
+//       cout << "\nRead from file: \n" << read_wf << endl;
+//       file >>  &read_wf;
+//       cout << "\nRead from file: \n" << read_wf << endl;
       
    } catch (Exception e) {
       cout <<  e.GetMessage() << endl;

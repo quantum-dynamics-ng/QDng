@@ -58,7 +58,7 @@ int main(int argc, char **argv)
       
       U.Clock(clock);
       U.AddTkin( &d2dx );
-      U.AddVpot( &pot );
+//       U.AddVpot( &pot );
       
       
       
