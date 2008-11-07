@@ -23,7 +23,7 @@ namespace QDLIB {
    
    bool QDLIB::ModuleLoader::_isLoaded( )
    {
-      
+      return false;
    }
 
    
@@ -32,9 +32,9 @@ namespace QDLIB {
     */
    void ModuleLoader::_RegisterWF(void *handle, string &name)
    {
-      typedef void (*InstanceWF_t)(void);
-      
-      InstanceWF_t InstanceWF = (InstanceWF_t) dlsym(handle, "InstanceWF");
+
+       
+      instWF* InstanceWF = (instWF*) dlsym(handle, "InstanceWF");
 
       if (InstanceWF != NULL){
 	 _mod_map[name].InstanceWF = InstanceWF;
@@ -51,10 +51,10 @@ namespace QDLIB {
     */
    void ModuleLoader::_RegisterOP(void *handle, string &name)
    {
-      Operator* (*InstanceOP)(void) = NULL;
+    
       
-      InstanceWF = dlsym(handle, "InstanceWF");
-      if (InstanceWF != NULL){
+      instOP* InstanceOP = (instOP*) dlsym(handle, "InstanceOP");
+      if (InstanceOP != NULL){
 	 _mod_map[name].InstanceWF = NULL;
 	 _mod_map[name].InstanceOP = InstanceOP;
 	 _mod_map[name].link_count++;
@@ -104,7 +104,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterWF(handle, name);
-	 return _mod_map[name].InstanceWF;
+	 return _mod_map[name].InstanceWF();
       }
       
       /* try system path */
@@ -112,7 +112,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterWF(handle, name);
-	 return _mod_map[name].InstanceWF;
+	 return _mod_map[name].InstanceWF();
       } else {
 	 throw ( Exception("No module found") );
       }
@@ -129,6 +129,9 @@ namespace QDLIB {
     */
    Operator * ModuleLoader::LoadOp( string & name )
    {
+      string s;
+      void *handle;
+      
       /* is already loaded? */
       if (_isLoaded()) {
 	 _mod_map[name].link_count++;
@@ -141,7 +144,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);
-	 return _mod_map[name].InstanceOP;
+	 return _mod_map[name].InstanceOP();
       }
       
       /* try system path */
@@ -149,7 +152,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);
-	 return _mod_map[name].InstanceOP;
+	 return _mod_map[name].InstanceOP();
       } else {
 	 throw ( Exception("No module found") );
       }

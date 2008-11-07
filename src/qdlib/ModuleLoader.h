@@ -17,11 +17,14 @@ namespace QDLIB {
    class ModuleLoader
    {
       private:
+	 typedef WaveFunction* (instWF)();
+	 typedef Operator* (instOP)();
+	 
 	 struct module {
 	    void *handle;
 	    int link_count;
-	    WaveFunction* (*InstanceWF)(void);
-	    Operator* (*InstanceOP)(void);
+	    instWF* InstanceWF;
+	    instOP* InstanceOP;
 	 };
 	 
 	 string _user_path;
