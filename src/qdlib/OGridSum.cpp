@@ -110,6 +110,38 @@ namespace QDLIB {
       return Psi;
    }
    
+   Operator* OGridSum::operator =( Operator * O )
+   {
+      OGridSum *r;
+      
+      r = dynamic_cast<OGridSum*>(O);
+      
+      /* Copy the parent */
+      *((dVec*) this) = *r;
+      _isTimedependent = r->_isTimedependent;
+      
+      /* Copy the stuff of OGridSystem */
+      _ndims = r->_ndims;
+      for (int i=0; i < MAX_DIMS; i++)
+	 _dims[i] = r->_dims[i];
+            
+      /* copy our stuff */
+      _size = r->_size;
+      for (int i=0; i< MAX_OPS; i++)
+         _O[i] = r->_O[i];
+      _isUpTodate = r->_isUpTodate;
+      
+      return r;
+   }
+
+   Operator* OGridSum::operator *( Operator * O )
+   {
+      /** \todo implement OGridSum*O. How should this work? */
+      throw( EIncompatible("Can't apply to another operator") );
+      return O;
+   }
+
+   
    /**
     * Return an operator.
     */
@@ -154,6 +186,8 @@ namespace QDLIB {
    }
    
 }
+
+
 
 
 

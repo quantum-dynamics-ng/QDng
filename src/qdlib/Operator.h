@@ -7,13 +7,7 @@
 
 namespace QDLIB {
 
-  /**
-   * Basic classification for operators.
-   */
-  enum _OperatorType {differential, spatial, matrix, scalar};
-  typedef _OperatorType OperatorType;
-  
-  
+
    /**
    * Abstract operator class.
    * 

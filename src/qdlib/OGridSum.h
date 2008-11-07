@@ -11,7 +11,9 @@ namespace QDLIB {
     * Represents a sum of OGridSystem system operators.
     * 
     * Similar to OSum but much more efficient when used with grids.
-    * This is also need e.g. for the SPO to build the exponentials.
+    * Uses an internal dVec (from OGridSystem) for summing the Operators.
+    * 
+    * This is also needed e.g. for the SPO to build the exponentials.
     *
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
