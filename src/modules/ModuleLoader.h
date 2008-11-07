@@ -1,8 +1,8 @@
 #ifndef QDLIBMODULELOADER_H
 #define QDLIBMODULELOADER_H
 
-#include "WaveFunction.h"
-#include "Operator.h"
+#include "qdlib/WaveFunction.h"
+#include "qdlib/Operator.h"
 
 #define MOD_BASENAME_WF "QD-WF-"
 #define MOD_BASENAME_OP "QD-OP-"
