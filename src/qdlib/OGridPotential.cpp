@@ -5,14 +5,8 @@
 namespace QDLIB
 {
    OGridPotential::OGridPotential()
-      : OGridSystem(), _name("OGridPotential"), _ndims(0)
-   {
-      for (int i=0; i < MAX_DIMS; i++){
-	 _dims[i] = 0;
-         _xmin[i] = 0;
-	 _xmax[i] = 0;
-      }
-   }
+      : OGridSystem(), _name("OGridPotential")
+      {}
    
    
    OGridPotential::~OGridPotential()
@@ -48,7 +42,6 @@ namespace QDLIB
       OGridPotential *O;
       
       O = new OGridPotential();
-      O->Init(_params);
       
       return O;
    }
@@ -57,28 +50,40 @@ namespace QDLIB
    {
       string s;
       int size = 1;
+      int n;
+      double d;
       
       _params = params;
       
-      _params.GetValue( "dims", _ndims );
       
-      if ( _ndims > MAX_DIMS ) throw ( EOverflow("More than MAX_DIMS for Potential defined") );
+      _params.GetValue( "dims", n );
       
-      /* Get all the params from the ParmContainer */
+      if ( n > MAX_DIMS ) throw ( EOverflow("More than MAX_DIMS for Potential defined") );
+      GridSystem::Dims(n);
+      
+      /* Get all the params from the ParamContainer */
       int i=0;
       char c[256];
       sprintf (c, "%d", i);
       s = string("n") + string(c);
       while ( _params.isPresent(s) && i < _ndims){
-	 _params.GetValue( string("n") + string(c), _dims[i]);
-	 _params.GetValue( string("xmin") + string(c), _xmin[i]);
-	 _params.GetValue( string("xmax") + string(c), _xmax[i]);
-	 size *= _dims[i];
+	 _params.GetValue( string("n") + string(c), n);
+	 if ( n < 1 )
+	    throw ( EParamProblem("Zero points grid defined") );
+	 GridSystem::Sizes(i, n);
+	 
+	 _params.GetValue( string("xmin") + string(c), d);
+	 GridSystem::Xmin(i, d);
+	 _params.GetValue( string("xmax") + string(c), d);
+	 GridSystem::Xmax(i, d);
+	 if ( (GridSystem::Xmax(i) - GridSystem::Xmin(i))  <= 0)
+	    throw ( EParamProblem("Zero length grid defined") );
+
 	 i++;
 	 sprintf (c, "%d", i);
       }
 	 
-      dVec::newsize(size);
+      dVec::newsize(GridSystem::Size());
    }
 	 
    const string& OGridPotential::Name()
@@ -136,9 +141,13 @@ namespace QDLIB
    {
       OGridPotential *n = dynamic_cast<OGridPotential*> (this->NewInstance());
       
-      for (int i=0; i < size(); i++){
+      for (int i=0; i < size(); i++){  /* Copy vector */
 	 (*n)[i] = (*this)[i];
       }
+      
+      /* Copy Grid description */
+      (GridSystem) (*this) = *((GridSystem*) n);
+      
       return n;
    }
 	 

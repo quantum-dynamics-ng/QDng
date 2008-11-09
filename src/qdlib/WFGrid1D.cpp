@@ -68,7 +68,7 @@ namespace QDLIB {
    
    void WFGrid1D::Normalize()
    {
-      (*this) * Norm();
+      (*this) * (1/Norm());
    }
 
    WaveFunction* WFGrid1D::operator=(WaveFunction* Psi)

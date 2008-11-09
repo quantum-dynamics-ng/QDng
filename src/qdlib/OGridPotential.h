@@ -6,7 +6,7 @@
 namespace QDLIB
 {
    /**
-    * Class which represents an time independent Potential in arb. dimensions.
+    * Class which represents an time independent Potential in arbitrary dimensions.
     * 
     * Takes the parameters:
     * -dims
@@ -18,18 +18,11 @@ namespace QDLIB
    {
       private:
 	 string _name;
-	 int _ndims;
-	 int _dims[MAX_DIMS];
-	 double _xmin[MAX_DIMS];
-	 double _xmax[MAX_DIMS]; 
+
       public:
 	 OGridPotential();
    
 	 ~OGridPotential();
-	 
-	 int Dim();
-	 void Dims(int ndims);
-	 int* DimSizes();
 	 
 	 
 	 /* Interface implementation */

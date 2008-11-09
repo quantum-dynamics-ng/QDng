@@ -5,13 +5,8 @@
 namespace QDLIB {
          
    WFGridSystem::WFGridSystem() :
-      _ndims(0),
-      _isKspace(false), _spacebuffer(NULL), fft(NULL)
-   {
-      for (int i=0; i < MAX_DIMS; i++){
-	 _dims[i] = 0;
-      }
-   }
+	 _isKspace(false), _spacebuffer(NULL), fft(NULL)
+   {}
 	    
    WFGridSystem::~WFGridSystem()
    {
@@ -19,32 +14,6 @@ namespace QDLIB {
       if (_spacebuffer != NULL) delete _spacebuffer;
    }
    
-   /**
-    * Number of dimensions.
-    */
-   int WFGridSystem::Dim()
-   {
-      return _ndims;
-   }
-         
-   /**
-    * Number of dimensions.
-    * 
-    * Must be set by implementing class.
-    */
-   void WFGridSystem::Dim(int dims)
-   {
-      _ndims = dims;
-   }
-         
-   /**
-    * Sizes of dimensions.
-    * \return Pointer to array of dim sizes (take care of MAX_DIMS!).
-    */
-   int* WFGridSystem::DimSizes()
-   {
-      return _dims;
-   }
    
    /**
     * \return true if wave function is in Kspace representation.
@@ -115,7 +84,21 @@ namespace QDLIB {
       
    }
    
-   
+   /**
+    * Copy own content.
+    * 
+    * Should be used by derived classes to transfers the information correctly.
+    */
+   void WFGridSystem::operator =(WFGridSystem *G)
+   {
+      _isKspace = G._isKspace;
+      *((GridSystem*) this) = *((GridSystem*) G);
+      *((cVec*) this) = *((cVec*) G);
+   }
 
    
-} /* namespace QDLIB */ 
+} /* namespace QDLIB */
+
+
+
+

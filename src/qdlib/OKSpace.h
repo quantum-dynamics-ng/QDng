@@ -15,7 +15,7 @@ namespace QDLIB {
    class OKSpace: public Operator
    {
       protected:
-         /** diagonal form is stored here */
+         /** k-Space representation is stored here */
          dVec *_kspace;
       public:
          OKSpace() : _kspace(NULL) {}

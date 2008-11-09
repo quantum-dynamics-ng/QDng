@@ -2,6 +2,7 @@
 #define WFGRIDSYSTEM_H
 
 #include "WaveFunction.h"
+#include "GridSystem.h"
 #include "fft/fft.h"
 
 #define MAX_DIMS 8      /* Defines the maximum number of dimensions in a grid */
@@ -10,19 +11,19 @@ namespace QDLIB {
    
    /**
     * Abstract wave function class for grid systems.
+    * 
+    * 
+    * 
     */
-   class WFGridSystem : public WaveFunction
+   class WFGridSystem : public WaveFunction, public GridSystem
    {
       private:
-         int _ndims;
-         int _dims[MAX_DIMS];
-         
          bool _isKspace;
          cVec *_spacebuffer;  /* buffer for FFT*/
          
          void _check_kspace();
       protected:
-            FFT *fft;
+         FFT *fft;
 
       public:
          WFGridSystem() ;
@@ -30,19 +31,13 @@ namespace QDLIB {
             
          ~WFGridSystem();
          
-         int Dim();
-         
-         void Dim(int dims);
-         
-         int* DimSizes();
-         
          bool isKspace();
          
          void ToKspace();
          
          void ToXspace();
          
-
+	 void operator=(WFGridSystem *G);
 
          
    }; /* class WFGridSystem */

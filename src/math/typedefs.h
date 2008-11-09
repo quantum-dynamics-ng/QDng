@@ -4,6 +4,7 @@
 
 #include "dcomplex.h"
 #include "tnt/tnt.h"
+#include "tnt/VectorView.h"
 
 
 namespace TNT {
@@ -85,6 +86,12 @@ namespace QDLIB {
    /** TNT Matrix of dcomplex */
    typedef TNT::Matrix<dcomplex> cMat;
 
+   /** Multidimensional view on dVec */
+   typedef TNT::VectorView<double> dVecView;
+   
+   /** Multidimensional view on dVec */
+   typedef TNT::VectorView<dcomplex> cVecView;
+   
    
    /**
     * Multiply vectors by elements.

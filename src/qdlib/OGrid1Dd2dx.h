@@ -12,11 +12,6 @@ namespace QDLIB {
     * Where \f$ m \f$ is the reduced mass.
     * Compatible with WFGrid1D.
     * 
-    *  The original QD-MPI initializes the k-space grid with with values
-    * multiple of dk. This only works for when coordinate space grid has
-    * odd number of points. Otherwise you will have the k values are
-    * \f$ k = dk (n+\frac{1}{2}) \f$.
-    * 
     * Takes m as parameter.
     */
    class OGrid1Dd2dx : public OKSpace
