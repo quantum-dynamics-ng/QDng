@@ -41,6 +41,7 @@ typedef map<string,string> string_map;
 	 void Params(const string_map params);
          string_map& Params();
 	 
+	 bool GetValue(const string name, char *value);
 	 bool GetValue(const string name, string &value);
 	 bool GetValue(const string name, int &value);
 	 bool GetValue(const string name, long int &value);
@@ -53,6 +54,9 @@ typedef map<string,string> string_map;
 	 
 	 bool isPresent(string &name);
 	 
+	 void clear();
+	 
+	 void SetValue(const string name, const char *value);
 	 void SetValue(const string name, const string &value);
 	 void SetValue(const string name, const int &value);
 	 void SetValue(const string name, const long int &value);

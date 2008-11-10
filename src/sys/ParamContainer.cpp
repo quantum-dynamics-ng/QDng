@@ -1,3 +1,5 @@
+
+
 #include <sstream>
 
 #include "ParamContainer.h"
@@ -40,6 +42,28 @@ namespace QDLIB {
          _param_map = params;
    }
    
+   /**
+    * Get a string (Null terminated C-string.
+    * 
+    * No size checking is done! Use this variant with care.
+    * 
+    * \param name  Name of parameter
+    * \param value Refernze to value
+    * 
+    * \return true if value exist
+    * 
+    */
+   bool ParamContainer::GetValue(const string name, char *value)
+   {
+      if ( _param_map.find(name) != _param_map.end()){
+	 strcpy(value, _param_map[name].c_str());
+	 return true;
+      }
+      else {
+	 value = '\0';
+	 return false;
+      }
+   }
    
    /** 
    * Get a string.
@@ -181,6 +205,29 @@ namespace QDLIB {
 	 return true;
       else
 	 return false;
+   }
+   
+   /**
+    * Remove all parameters from the container.
+    */
+   void QDLIB::ParamContainer::clear( )
+   {
+      _param_map.clear();
+   }
+   
+   
+   /**
+    * Set a string value (Null terminated C-string).
+    * 
+    * If the the name exists, the value is simply replaced,
+    * if not a new entry will be added.
+    * 
+    * \param name Name of parameter
+    * \param value Referenze to value
+    */
+   void ParamContainer::SetValue(const string name, const char *value)
+   {
+      _param_map[name] = string(value);
    }
    
    /**

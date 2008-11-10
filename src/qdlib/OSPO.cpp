@@ -6,7 +6,7 @@
 namespace QDLIB {
 
    OSPO::OSPO()
-   : OPropagator(), _name("OSPO"), _Tkin(NULL), _Tkin_kspace(NULL), _Vpot(NULL), _expT(NULL), _expV(NULL),
+   : OPropagator(), _name("OSPO"), _needs(NULL), _Tkin(NULL), _Tkin_kspace(NULL), _Vpot(NULL), _expT(NULL), _expV(NULL),
 		 _cV(0,0), _cT(0,0), _last_time(0)
    {
    }

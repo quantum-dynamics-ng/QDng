@@ -33,7 +33,7 @@ namespace QDLIB {
       _params.GetValue("dt", dt);
       _params.GetValue("Nt", Nt);
       
-      if (_clock != NULL && (dt != clock->Dt() || Nt < clock->Steps()) )
+      if (_clock != NULL && ( dt != _clock->Dt() || Nt < _clock->Steps() ) )
 	 throw ( EParamProblem("Parameter values are different for laser and own clock!") );
       if (_clock == NULL) {
 	 _clock = new QDClock(Nt, dt);
@@ -56,12 +56,12 @@ namespace QDLIB {
     */
    dVec * Laser::PowerSpectrum()
    {
-      if (_spectrum == NULL) _spectrum = new cVec(clock->Steps());
-      if (_fft == NULL) _fft = new FFT(clock->Steps(), dVec::begin(), _spectrum->begin());
+      if (_spectrum == NULL) _spectrum = new cVec(_clock->Steps());
+      if (_fft == NULL) _fft = new FFT(_clock->Steps(), dVec::begin(), _spectrum->begin());
       
       _fft->forward();
       
-      dVec *power = new dVec(clock->Steps());
+      dVec *power = new dVec(_clock->Steps());
       for (int i=0; i < dVec::size(); i++){
 	 (*power)[i] = cabs((*_spectrum)[i]);
       }
@@ -75,8 +75,8 @@ namespace QDLIB {
     */
    cVec * Laser::Spectrum()
    {
-      if (_spectrum == NULL) _spectrum = new cVec(clock->Steps());
-      if (_fft == NULL) _fft = new FFT(clock->Steps(), dVec::begin(), _spectrum->begin());
+      if (_spectrum == NULL) _spectrum = new cVec(_clock->Steps());
+      if (_fft == NULL) _fft = new FFT(_clock->Steps(), dVec::begin(), _spectrum->begin());
       
       _fft->forward();
       

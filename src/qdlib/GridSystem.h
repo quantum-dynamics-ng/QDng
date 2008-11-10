@@ -1,7 +1,8 @@
 #ifndef QDLIBGRIDSYSTEM_H
 #define QDLIBGRIDSYSTEM_H
 
-#define MAX_DIMS 4
+/* Defines the maximum number of dimensions in a grid */
+#define MAX_DIMS 4 
 
 namespace QDLIB {
 
@@ -30,6 +31,8 @@ namespace QDLIB {
 	       
 	 int DimSizes(const int dim);
 	       
+	 int* DimSizes();
+	 
 	 int Size();
 	 
 	 void DimSizes(const int dim, const int size);
@@ -45,6 +48,10 @@ namespace QDLIB {
 	 double Dx (const int dim);
    
 	 void operator=(GridSystem &G);
+	 
+	 bool operator==(GridSystem &G);
+	 
+	 bool operator!=(GridSystem &G);
    };
 
 }

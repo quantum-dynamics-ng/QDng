@@ -21,17 +21,22 @@ namespace QDLIB {
     */
    void QDLIB::OGridSum::_Update( )
    {
+      
       _O[0]->UpdateTime();
       for (int i=0; i < dVec::size(); i++)      /* Loop over grid points, first operator */
-	 (*this)[i] = (*(_O[0]))[i];
+	 (*((dVec*) this))[i] = (*(_O[0]))[i];
+      
       
       int k;
-      for (k=1; k < _size; k++)             /* Loop over operators */
-	 _O[k]->UpdateTime();
-         for (int i=0; i < dVec::size(); i++)   /* Loop over grid points */
-	    (*this)[i] += (*(_O[k]))[i];
-      
+      if (_size > 1) {
+	 for (k=1; k < _size; k++)             /* Loop over operators */
+	    _O[k]->UpdateTime();
+	 cout << "size: " << _size << endl;
+	    for (int i=0; i < dVec::size(); i++)   /* Loop over grid points */
+	       (*this)[i] += (*(_O[k]))[i];
+      }
       _isUpTodate = true;
+      
    }
 
    Operator * OGridSum::NewInstance( )
@@ -62,7 +67,8 @@ namespace QDLIB {
       
       ket = *this * PsiKet;
       d = *PsiBra * ket;
-   
+      delete ket;
+      
       return d;
    }
 
@@ -112,26 +118,24 @@ namespace QDLIB {
    
    Operator* OGridSum::operator =( Operator * O )
    {
-      OGridSum *r;
+      OGridSum *org;
       
-      r = dynamic_cast<OGridSum*>(O);
+      org = dynamic_cast<OGridSum*>(O);
       
       /* Copy the parent */
-      *((dVec*) this) = *r;
-      _isTimedependent = r->_isTimedependent;
+      *((dVec*) this) = *org;
+      _isTimedependent = org->_isTimedependent;
       
       /* Copy the stuff of OGridSystem */
-      _ndims = r->_ndims;
-      for (int i=0; i < MAX_DIMS; i++)
-	 _dims[i] = r->_dims[i];
-            
-      /* copy our stuff */
-      _size = r->_size;
-      for (int i=0; i< MAX_OPS; i++)
-         _O[i] = r->_O[i];
-      _isUpTodate = r->_isUpTodate;
+      *((GridSystem*) this) = *((GridSystem*) org);
       
-      return r;
+      /* copy our stuff */
+      _size = org->_size;
+      for (int i=0; i< MAX_OPS; i++)
+         _O[i] = org->_O[i];
+      _isUpTodate = org->_isUpTodate;
+      
+      return this;
    }
 
    Operator* OGridSum::operator *( Operator * O )

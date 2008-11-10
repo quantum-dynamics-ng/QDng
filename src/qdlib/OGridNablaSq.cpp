@@ -5,8 +5,11 @@
 namespace QDLIB {
 
    OGridNablaSq::OGridNablaSq()
-   : OKSpace(), _name("OGridNablaSq"), _ndims(0), _dims(NULL)
+   : OKSpace(), _name("OGridNablaSq")
    {
+      for (int i=0; i < MAX_DIMS; i++){
+	 _mass[i] = -1;
+      }
    }
    
    
@@ -14,100 +17,188 @@ namespace QDLIB {
    {
    }
 
-
-}
-
 /**
- * Init K-Space in one dimension.
- * All factors are included in the kspace representation except FFT normalization.
- * 
- * \param mass reduced mass
+    * Init K-Space in one dimension.
+    * All factors are included in the kspace representation except FFT normalization.
+    * 
+    * \param mass reduced mass
  */
-dVec * QDLIB::OGridNablaSq::InitKspace1D(const double mass, const double length, const int Nx)
-{
+   dVec * OGridNablaSq::InitKspace1D(const double mass, const double length, const int Nx)
+   {
 
-   dVec *kspace;
+      dVec *kspace;
    
-   kspace = new dVec(Nx);
+      kspace = new dVec(Nx);
    
-   double dp = (2*PI) / length;    // Setup dp for kspace
-   dp *= dp;
+      double dp = (2*PI) / length;    // Setup dp for kspace
+      dp *= dp;   /* dp^2 */
    
-   /* We include all the factors in the k-space function => Do it only once */
-   /* The minus cancels with minus from -kx^2. */
-   dp *= 0.5 /  mass ;
+      /* We include all the factors in the k-space function => Do it only once */
+      /* The minus cancels with minus from -kx^2. */
+      dp *= 0.5 / mass ;
      
-   int i;
 	 
-   for (i=0; i < Nx / 2; i++){ //run from [-p..+p]
-      (*kspace)[i] = (double(i) * double(i)) * dp;
-      (*kspace)[Nx - i - 1] = (double(i+1)* double(i+1)) * dp;
+      for (int i=0; i < Nx / 2; i++){ //run from [-p..+p]
+	 (*kspace)[i] = (double(i) * double(i)) * dp;
+	 (*kspace)[Nx - i - 1] = (double(i+1) * double(i+1)) * dp;
+      }
+   
+      return kspace;
    }
+
+
+   Operator * OGridNablaSq::NewInstance()
+   {
+      OGridNablaSq *r;
    
-   return kspace;
-}
-
-
-Operator * QDLIB::OGridNablaSq::NewInstance()
-{
-   OGridNablaSq *r;
+      r = new OGridNablaSq();
    
-   r = new OGridNablaSq();
+      return r;
+   }
+
+   void OGridNablaSq::Init(ParamContainer & params)
+   {
+      int n;
+
+      
+      _params = params;
+      _params.GetValue( "dims", n);
    
-   return r;
-}
-
-void QDLIB::OGridNablaSq::Init(ParamContainer & params)
-{
-}
-
-const string & QDLIB::OGridNablaSq::Name()
-{
-   return _name;
-}
-
-void QDLIB::OGridNablaSq::UpdateTime()
-{
-}
-
-dcomplex QDLIB::OGridNablaSq::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-{
-}
-
-double QDLIB::OGridNablaSq::Expec(WaveFunction * Psi)
-{
-}
-
-WaveFunction * QDLIB::OGridNablaSq::operator *(WaveFunction * Psi)
-{
-}
-
-WaveFunction * QDLIB::OGridNablaSq::operator *=(WaveFunction * Psi)
-{
-}
-
-Operator * QDLIB::OGridNablaSq::operator =(Operator * O)
-{
-}
-
-Operator * QDLIB::OGridNablaSq::operator *(Operator * O)
-{
-}
-
-void QDLIB::OGridNablaSq::InitKspace()
-{
-   dVec *kspace1;
+      if (n < 1)
+	 throw ( EParamProblem ("Nabla operator needs at least one dimension") );
+      GridSystem::Dim(n);
+      
+      int i=0;
+      char c[256];
+      string s;
    
-   
-   dVecView view(*_kspace, _ndims, dims);
-   
-   for (int i=0; i < _ndims; i++){
-      if (_mass[i] != 0) {
-	 
-         kspace1 = InitKspace1D(mass[i], );
+      sprintf (c, "%d", i);
+      s = string("mass") + string(c);
+      while (_params.isPresent(s) && i < n){
+	 _params.GetValue( string("mass") + string(c), _mass[i]);
+	 if (_mass[i] == 0) throw ( EParamProblem ("Zero mass defined") );
+	 i++;
+	 sprintf (c, "%d", i);
+      }
+   }
+
+   const string & OGridNablaSq::Name()
+   {
+      return _name;
+   }
+
+   void OGridNablaSq::UpdateTime(){}
+
+   dcomplex OGridNablaSq::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
+   {
+      dcomplex c;
+      WaveFunction *opPsi;
+      
+      opPsi = *this * PsiKet;
+      c = *PsiBra * opPsi;
+      delete opPsi;
+      
+      return c;
+   }
+
+   double OGridNablaSq::Expec(WaveFunction * Psi)
+   {
+      dcomplex c;
+        
+      c = MatrixElement(Psi, Psi);
+      
+      return c.real();
+   }
+
+   WaveFunction * OGridNablaSq::operator *(WaveFunction *Psi)
+   {
+      WFGridSystem *opPsi, *ket;
+      WaveFunction *psi;
+      
+      
+      /* Copy */
+      ket = dynamic_cast<WFGridSystem*>(Psi);
+      if (*this != *((GridSystem*) ket) || _kspace == NULL) {  /* re-Init k-space ?*/
+	 *((GridSystem*) this) = *((GridSystem*) ket);
+	 InitKspace();
       }
       
+      psi =  Psi->NewInstance();
+      *psi = Psi;
+      
+      opPsi = dynamic_cast<WFGridSystem*>(psi);
+      
+      
+      
+      opPsi->ToKspace();
+      MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
+      opPsi->ToXspace();
+     
+      return opPsi;
    }
-}
 
+   WaveFunction * OGridNablaSq::operator *=(WaveFunction * Psi)
+   {
+      WFGridSystem *opPsi;
+      
+      opPsi = dynamic_cast<WFGridSystem*>(Psi);
+      if (*this != *((GridSystem*) opPsi)  || _kspace == NULL) {  /* re-Init k-space ?*/
+	 *((GridSystem*) this) = *((GridSystem*) opPsi);
+	 InitKspace();
+      }    
+      
+      opPsi->ToKspace();
+      MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
+      opPsi->ToXspace();
+      
+      return opPsi;
+   }
 
+   Operator * OGridNablaSq::operator =(Operator * O)
+   {
+      OGridNablaSq *org = dynamic_cast<OGridNablaSq*>(O);
+      
+      /* Copy parents */
+      *((GridSystem*) this) = *((GridSystem*) org);
+      _kspace = org->_kspace;
+      
+      for (int i=0; i < GridSystem::Dim(); i++){
+	 _mass[i] = org->_mass[i];
+      }
+      
+      return this;
+   }
+
+   Operator * OGridNablaSq::operator *(Operator * O)
+   {
+      throw ( EIncompatible("Can't apply OGridNablaSq to another operator") );
+      return O;
+   }
+
+   void OGridNablaSq::InitKspace()
+   {
+   
+      
+      if (GridSystem::Dim() == 0) throw ( EParamProblem("Missing GridSystem parameters") );
+   
+      dVec *kspace1;
+   
+      if (_kspace == NULL ) _kspace = new dVec(GridSystem::Size());
+      else _kspace->newsize(GridSystem::Size());
+      
+      
+      *_kspace = 0;
+      dVecView view(*_kspace, GridSystem::Dim(), GridSystem::DimSizes());
+   
+      /* Init k-space for every dimension */
+      for (int i=0; i < GridSystem::Dim(); i++){ 
+	 if (_mass[i] >= 0) {
+	    kspace1 = InitKspace1D(_mass[i], GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i) );
+	    view.ActiveDim(i);
+	    view += *kspace1;
+	    delete kspace1;
+	 }
+      }
+   }
+
+} /* namespace QDLIB */

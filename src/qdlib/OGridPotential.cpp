@@ -5,36 +5,13 @@
 namespace QDLIB
 {
    OGridPotential::OGridPotential()
-      : OGridSystem(), _name("OGridPotential")
+      : OGridSystem(), _name("OGridPotential"), _init(false)
       {}
    
    
    OGridPotential::~OGridPotential()
    {}
    
-   /**
-    * \return number of dimensions
-    */
-   int OGridPotential::Dim()
-   {
-      return _ndims;
-   }
-   
-   /**
-    * Set the number of dimensions.
-    */
-   void OGridPotential::Dims(int ndims)
-   {
-      _ndims = ndims;
-   }
-   
-   /**
-    * \return pointer to array of dimensions sizes.
-    */
-   int* OGridPotential::DimSizes()
-   {
-      return _dims;
-   }
    
    /* Interface implementation */
    Operator* OGridPotential::NewInstance()
@@ -49,28 +26,38 @@ namespace QDLIB
    void OGridPotential::Init(ParamContainer &params)
    {
       string s;
-      int size = 1;
       int n;
       double d;
-      
+
+
       _params = params;
       
       
       _params.GetValue( "dims", n );
+      _params.GetValue( "file", s );
+      if (n <= 0 && s.size() != 0 && !_init){
+	 _init = true;
+	 File()->Suffix(BINARY_O_SUFFIX);
+	 File()->Name(s);
+	 *( (FileOGrid*) File()) >> (OGridSystem*) this;
+	 _init = false;
+	 return;
+      }
+      
       
       if ( n > MAX_DIMS ) throw ( EOverflow("More than MAX_DIMS for Potential defined") );
-      GridSystem::Dims(n);
+      GridSystem::Dim(n);
       
       /* Get all the params from the ParamContainer */
       int i=0;
       char c[256];
       sprintf (c, "%d", i);
-      s = string("n") + string(c);
-      while ( _params.isPresent(s) && i < _ndims){
-	 _params.GetValue( string("n") + string(c), n);
+      s = string("N") + string(c);
+      while ( _params.isPresent(s) && i < GridSystem::Dim() ){
+	 _params.GetValue( string("N") + string(c), n);
 	 if ( n < 1 )
 	    throw ( EParamProblem("Zero points grid defined") );
-	 GridSystem::Sizes(i, n);
+	 GridSystem::DimSizes(i, n);
 	 
 	 _params.GetValue( string("xmin") + string(c), d);
 	 GridSystem::Xmin(i, d);
@@ -82,7 +69,7 @@ namespace QDLIB
 	 i++;
 	 sprintf (c, "%d", i);
       }
-	 
+      
       dVec::newsize(GridSystem::Size());
    }
 	 
@@ -91,7 +78,7 @@ namespace QDLIB
       return _name;
    }
 
-   void OGridPotential::UpdateTime(){}
+   void OGridPotential::UpdateTime(){/* We are not time dependend*/}
    
    dcomplex OGridPotential::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
    {

@@ -13,8 +13,6 @@
 
 namespace QDLIB {
    typedef FileSingle<WaveFunction> FileWF;
-   
-   typedef FileSingle<OGridSystem> FileOGrid;
 	 
    typedef FileSingle<OHerMat> FileOHerMat;
 }

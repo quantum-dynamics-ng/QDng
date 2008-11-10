@@ -1,7 +1,7 @@
 #ifndef QDLIBWFGRIDCARTESIAN_H
 #define QDLIBWFGRIDCARTESIAN_H
 
-#include <WFGridSystem.h>
+#include "WFGridSystem.h"
 
 namespace QDLIB {
 
@@ -25,7 +25,7 @@ namespace QDLIB {
 	       
 	       virtual const string& Name();
 	       
-	       virtual int ID(){};
+	       virtual int ID();
 		  
 	       virtual double Norm();
 	       

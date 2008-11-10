@@ -1,3 +1,5 @@
+
+#include <iostream>
 #include "GridSystem.h"
 
 namespace QDLIB {
@@ -48,6 +50,16 @@ namespace QDLIB {
    }
    
    /**
+    * Sizes of dimensions.
+    * 
+    * \return pointer to array with sizes.
+    */
+   int* GridSystem::DimSizes( )
+   {
+      return _dims;
+   }
+   
+   /**
     * Set the size of a dimension/coordinate.
     * 
     * \param dim Number of dimension
@@ -66,7 +78,7 @@ namespace QDLIB {
       int size=1;
       
       for (int i=0; i < _ndims; i++)
-	 size *= _dims[dim];
+	 size *= _dims[i];
       
       return size;
    }
@@ -89,7 +101,7 @@ namespace QDLIB {
    void GridSystem::Xmin(const int dim, const double xmin)
    {
       _xmin[dim] = xmin;
-      _dx[dim] = (_xmax[dim] - _xmin[dim])/(double(_dims[dim])-1); /* Update dx value */
+      _dx[dim] = (_xmax[dim] - _xmin[dim])/(double(_dims[dim]-1)); /* Update dx value */
    }
    
    /**
@@ -110,7 +122,7 @@ namespace QDLIB {
    void GridSystem::Xmax(const int dim, const double xmax)
    {
       _xmax[dim] = xmax;
-      _dx[dim] = (xmax - _xmin[dim])/(double(_dims[dim])-1);    /* Update dx value */
+      _dx[dim] = (xmax - _xmin[dim])/(double(_dims[dim]-1));    /* Update dx value */
    }
 
    /**
@@ -120,7 +132,7 @@ namespace QDLIB {
     */
    double GridSystem::Dx (const int dim)
    {
-      return _dims[dim];
+      return _dx[dim];
    }
    
    /**
@@ -135,10 +147,36 @@ namespace QDLIB {
 	 _dims[i] = G._dims[i];
 	 _xmin[i] = G._xmin[i];
 	 _xmax[i] = G._xmax[i];
-	 _dx[i] = _G.dx[i];
+	 _dx[i] = G._dx[i];
       }
    }
 
+   /**
+    * Comparison of grid parameters.
+    */
+   bool GridSystem::operator ==( GridSystem & G )
+   {
+      bool equal = true;
+      
+      for (int i=0; i < MAX_DIMS; i++)
+      {
+	 if (_dims[i] != G._dims[i]) equal = false;
+	 if (_xmin[i] != G._xmin[i]) equal = false;
+	 if (_xmax[i] != G._xmax[i]) equal = false;
+	 
+      }
+      return equal;
+   }
 
+   /**
+    * Comparison of grid parameters.
+    */
+   bool GridSystem::operator !=( GridSystem & G )
+   {
+      if ( *this == G ) return false;
+      else return true;
+   }
+   
 }
+
 

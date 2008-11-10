@@ -80,6 +80,7 @@ namespace QDLIB
       _dt = clock._dt;
       _nsteps = clock._nsteps;
       _step = clock._step;
+      return *this;
    }
    
 }

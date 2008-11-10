@@ -26,7 +26,7 @@ namespace QDLIB {
 	 string _name;
 	 double _mass[MAX_DIMS];
       protected:
-	 dVec* InitKspace1D(const double mass);
+	 dVec* InitKspace1D(const double mass, const double length, const int Nx);
       public:
 	 OGridNablaSq();
       

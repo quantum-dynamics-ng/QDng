@@ -10,4 +10,4 @@ noinst_HEADERS = GridSystem.h OGrid1Dd2dx.h OGridDipole.h OGridNablaSq.h \
 	WaveFunction.h
 
 
-AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -Wall -ansi
+AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -Wall -ansi -O3

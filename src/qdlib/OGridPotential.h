@@ -9,16 +9,17 @@ namespace QDLIB
     * Class which represents an time independent Potential in arbitrary dimensions.
     * 
     * Takes the parameters:
-    * -dims
-    * -n#
-    * -min#
-    * -max#
+    * -dims    Number of dims
+    * -n#      Number of points in dim #
+    * -min#    xmin
+    * -max#    xmax
+    * -file    Filename to load potential from (in this case, the other parameters can be empty)
     */
    class OGridPotential : public OGridSystem
    {
       private:
 	 string _name;
-
+         bool _init;    /* protect recursive init from deadlock */
       public:
 	 OGridPotential();
    

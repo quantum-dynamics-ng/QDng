@@ -118,7 +118,7 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle() :
-	 _type(binary), _drop_meta(false),  _name("default"), _suffix(""), _sequence(false) {}
+	 _drop_meta(false), _type(binary),  _name("default"), _suffix(""), _sequence(false) {}
    
    /**
     * Constructor with type initilisation.

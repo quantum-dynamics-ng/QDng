@@ -5,8 +5,6 @@
 #include "GridSystem.h"
 #include "fft/fft.h"
 
-#define MAX_DIMS 8      /* Defines the maximum number of dimensions in a grid */
-
 namespace QDLIB {
    
    /**
