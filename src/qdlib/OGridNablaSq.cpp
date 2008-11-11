@@ -74,11 +74,14 @@ namespace QDLIB {
    
       sprintf (c, "%d", i);
       s = string("mass") + string(c);
-      while (_params.isPresent(s) && i < n){
-	 _params.GetValue( string("mass") + string(c), _mass[i]);
-	 if (_mass[i] == 0) throw ( EParamProblem ("Zero mass defined") );
+      while (i < n){
+	 if ( _params.isPresent(s) ) {
+	    _params.GetValue( string("mass") + string(c), _mass[i]);
+	    if (_mass[i] == 0) throw ( EParamProblem ("Zero mass defined") );
+	 } else _mass[i] = -1;    /* Mark as -1 => don't build k-space */
 	 i++;
 	 sprintf (c, "%d", i);
+	 s = string("mass") + string(c);
       }
    }
 
@@ -127,13 +130,12 @@ namespace QDLIB {
       *psi = Psi;
       
       opPsi = dynamic_cast<WFGridSystem*>(psi);
-      
-      
-      
+   
       opPsi->ToKspace();
       MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
       opPsi->ToXspace();
-     
+      
+      
       return opPsi;
    }
 
@@ -175,6 +177,10 @@ namespace QDLIB {
       return O;
    }
 
+   /**
+    * \todo clean Vector view.
+    * \bug dimensions are inverse!?
+    */
    void OGridNablaSq::InitKspace()
    {
    
@@ -192,13 +198,20 @@ namespace QDLIB {
    
       /* Init k-space for every dimension */
       for (int i=0; i < GridSystem::Dim(); i++){ 
-	 if (_mass[i] >= 0) {
+	 if (_mass[i] > 0) {
 	    kspace1 = InitKspace1D(_mass[i], GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i) );
-	    view.ActiveDim(i);
+	    view.ActiveDim(GridSystem::Dim()-i-1);
 	    view += *kspace1;
 	    delete kspace1;
 	 }
       }
+//       for (int i=0; i < 256; i+=2){
+// 	 for (int j=0; j < 256; j+=2){
+// 	    cout <<  i << " " << j << " " << (*_kspace)[256*i+j] << endl;
+// 	 }
+//       }
+      
+      
    }
 
 } /* namespace QDLIB */

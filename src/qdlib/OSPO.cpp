@@ -84,8 +84,7 @@ namespace QDLIB {
 	 _expT = new cVec(_Tkin_kspace->size());
 	 _expT->newsize(_Tkin_kspace->size());
       }
-      
-      cout << _cV << " " << _cT<< endl;
+      cout << _cT << " " << _cV << endl;
       _InitT();
       _InitV();
       
@@ -138,6 +137,10 @@ namespace QDLIB {
       WaveFunction *ket;
       WFGridSystem *psi;
       
+      if (clock == NULL)
+	 throw ( EParamProblem("Propagator has no clock!") );
+
+      
       if (_expT == NULL || _expV == NULL) ReInit();
       if (_last_time != clock->TimeStep() && _Vpot->isTimeDep()) /* Re-init Vpot if is time dep.*/
       {
@@ -164,6 +167,9 @@ namespace QDLIB {
    WaveFunction* OSPO::operator *=(WaveFunction *Psi)
    {
       WFGridSystem *psi;
+      
+      if (clock == NULL)
+	 throw ( EParamProblem("Propagator has no clock!") );
       
       if (_expT == NULL || _expV == NULL) ReInit();
       if (_last_time != clock->TimeStep() && _Vpot->isTimeDep()) /* Re-init Vpot if is time dep.*/

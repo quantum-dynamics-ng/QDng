@@ -12,9 +12,9 @@ namespace QDLIB {
  */
 FFT::FFT(size_t N, dcomplex *in, dcomplex *out, bool oneway)
 {
-   _planf = fftw_plan_dft_1d(N, (fftw_complex*) in, (fftw_complex*) out, FFTW_FORWARD, FFTW_MEASURE);
+   _planf = fftw_plan_dft_1d(N, (fftw_complex*) in, (fftw_complex*) out, FFTW_FORWARD, FFTW_ESTIMATE);
    if (!(_oneway = oneway)){
-      _planb = fftw_plan_dft_1d(N, (fftw_complex*)  out, (fftw_complex*)  in, FFTW_BACKWARD, FFTW_MEASURE);
+      _planb = fftw_plan_dft_1d(N, (fftw_complex*)  out, (fftw_complex*)  in, FFTW_BACKWARD, FFTW_ESTIMATE);
    }
 }
 
@@ -30,9 +30,9 @@ FFT::FFT(size_t N, dcomplex *in, dcomplex *out, bool oneway)
  */
 FFT::FFT(size_t N1, size_t N2, dcomplex *in, dcomplex *out, bool oneway)
 {
-   _planf = fftw_plan_dft_2d(N1, N2, (fftw_complex*) in, (fftw_complex*) out, FFTW_FORWARD, FFTW_MEASURE);
+   _planf = fftw_plan_dft_2d(N1, N2, (fftw_complex*) in, (fftw_complex*) out, FFTW_FORWARD, FFTW_ESTIMATE);
    if (!(_oneway = oneway)){
-      _planb = fftw_plan_dft_2d(N1, N2, (fftw_complex*) out, (fftw_complex*) in,  FFTW_BACKWARD, FFTW_MEASURE);
+      _planb = fftw_plan_dft_2d(N1, N2, (fftw_complex*) out, (fftw_complex*) in,  FFTW_BACKWARD, FFTW_ESTIMATE);
    }
 }
 

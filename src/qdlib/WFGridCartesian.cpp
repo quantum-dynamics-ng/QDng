@@ -99,6 +99,7 @@ namespace QDLIB {
 //       ket = Psi->NewInstance();
 //       *ket = Psi;
    
+      
       for(int i=0; i < size(); i++){
 	 c += ((*this)[i]).conj() * (*Psi)[i];
       }
@@ -111,10 +112,12 @@ namespace QDLIB {
 	 }
 
       } else {
-	 for(int i=0; i < GridSystem::Dim(); i++)
+	 for(int i=0; i < GridSystem::Dim(); i++){
 	    c *= GridSystem::Dx(i);
+	 }
+	 
       }
-  
+      
       return c;
    }
 

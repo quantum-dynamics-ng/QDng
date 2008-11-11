@@ -33,6 +33,7 @@ namespace QDLIB {
 
       if (_spacebuffer == NULL) _spacebuffer = new cVec(cVec::size());
       
+      
       /* Initialize FFT */
       if (fft == NULL){
 	 switch(GridSystem::Dim()){
@@ -62,9 +63,9 @@ namespace QDLIB {
       if (_isKspace) return;
       
       _check_kspace();
-
+      
       fft->forward();
-
+      
       cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
       _isKspace = true;
       
