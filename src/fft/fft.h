@@ -18,9 +18,8 @@ namespace QDLIB {
    /**
     * Raw interface to the FFTW library.
     * 
-    * \todo Check if typecasting really works (dcomplex => fftw_complex)
-    * \todo Check if aligment of domplex array is fine
-    * \todo Check if the FFTW plan types are good & performant
+    * \todo Check if aligment of domplex array is fine (=> memalign)
+    * \todo Check if the FFTW plan types are good & performant (FFTW_MEASURE is fine!)
     */
    class FFT {
       private:

@@ -31,7 +31,7 @@ namespace QDLIB {
     /** Set imaginary part. */
     inline void imag(double d) {_imag = d;}
     
-    dcomplex() {}
+    inline dcomplex() {}
     
     dcomplex(const double real): _real(real), _imag(0)  {}
   
