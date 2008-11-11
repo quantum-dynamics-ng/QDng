@@ -33,26 +33,10 @@ namespace QDLIB {
 
       if (_spacebuffer == NULL) _spacebuffer = new cVec(cVec::size());
       
-      
       /* Initialize FFT */
       if (fft == NULL){
-	 switch(GridSystem::Dim()){
-            case 1:
-               fft = new FFT(cVec::size(), cVec::begin(), _spacebuffer->begin() );
-               break;
-            case 2:
-	       fft = new FFT(GridSystem::DimSizes(0), GridSystem::DimSizes(1) , cVec::begin(), _spacebuffer->begin() );
-               break;
-            case 3:
-	       fft = new FFT(GridSystem::DimSizes(0), GridSystem::DimSizes(1), GridSystem::DimSizes(2),
-			     cVec::begin(), _spacebuffer->begin() );
-               break;
-            default:
-               fft = new FFT(GridSystem::Dim(), GridSystem::DimSizes(), cVec::begin(), _spacebuffer->begin() );
-         }
-         
+	 fft = new FFT(*((GridSystem*) this), *((cVec*) this), *_spacebuffer);
       }
-      
    }
    
    /**
