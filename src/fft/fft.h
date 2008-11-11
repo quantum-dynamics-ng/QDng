@@ -30,13 +30,7 @@ namespace QDLIB {
 	 FFT(cVec &in, cVec &out, bool oneway = false);
 	 FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway = false);
 	 FFT(dVec &in, cVec &out, bool oneway = false);
-	 
-// 	 FFT(size_t N, dcomplex *in, dcomplex *out, bool oneway = false);
-// 	 FFT(size_t N1, size_t N2, dcomplex *in, dcomplex *out, bool oneway = false);
-// 	 FFT(size_t N1, size_t N2, size_t N3, dcomplex *in, dcomplex *out, bool oneway = false);
-// 	 FFT(int rank, const int *n, dcomplex *in, dcomplex *out, bool oneway = false);
-// 	 FFT(size_t N, double *in, dcomplex *out, bool oneway = false);
-	 
+	 	 
 	 ~FFT();
 	 void forward();	
 	 void backward();	

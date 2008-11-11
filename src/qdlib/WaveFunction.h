@@ -136,6 +136,20 @@ namespace QDLIB {
 	    return wf;
          }
          
+	 /** Multiply with complex number */
+	 WaveFunction* operator*=(const dcomplex d)
+	 {
+	    WaveFunction *wf;
+      
+	    wf = this->NewInstance();
+      
+	    for (int i=0; i < cVec::size(); i++){
+	       (*wf)[i] = (*this)[i] * d;
+	    }
+	    
+	    return wf;
+	 }
+	 
 	 /** Sum */
 	 WaveFunction* operator+(WaveFunction* Psi)
 	 {

@@ -107,9 +107,9 @@ namespace QDLIB {
 	 void ImaginaryTime()
 	 {
 	    if (forward)
-	       _c0 = -clock->Dt();
-	    else
 	       _c0 = clock->Dt();
+	    else
+	       _c0 = (-1) * clock->Dt();
 	    imaginary = true;
 	 }
 	 
@@ -121,9 +121,9 @@ namespace QDLIB {
 	 void RealTime()
 	 {
 	    if (forward)
-	       _c0 =  I * clock->Dt();
+	       _c0 =  (-1) * I * clock->Dt();
 	    else
-	       _c0 = (-1) * I * clock->Dt();
+	       _c0 =  I * clock->Dt();
 	    imaginary = false;
 	 }
 	 

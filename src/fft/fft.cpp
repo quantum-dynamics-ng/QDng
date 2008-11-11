@@ -35,9 +35,11 @@ namespace QDLIB {
       
       switch (grid.Dim()){
 	 case 1:  /* 1D */
-	    _planf = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(), (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+	    _planf = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) in.begin(),
+				      (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
 	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(), (fftw_complex*) in.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+	       _planb = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) out.begin(),
+					 (fftw_complex*) in.begin(), FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	    break;
 	 case 2: /* 2D */
@@ -53,7 +55,7 @@ namespace QDLIB {
 				    (fftw_complex*) in.begin(), (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);	
 	    if (!(_oneway = oneway)){
 	       _planb = fftw_plan_dft_3d(grid.DimSizes(0) , grid.DimSizes(1), grid.DimSizes(2),
-				       (fftw_complex*) out.begin(), (fftw_complex*) in.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+					 (fftw_complex*) out.begin(), (fftw_complex*) in.begin(), FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	    break;
 	 default: /* arb. dims */
@@ -61,7 +63,7 @@ namespace QDLIB {
 				 (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);	
 	    if (!(_oneway = oneway)){
 	       _planb = fftw_plan_dft(grid.Dim(), grid.DimSizes(), (fftw_complex*) out.begin(),
-				    (fftw_complex*) in.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+				      (fftw_complex*) in.begin(), FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	 
       } /* switch  */
