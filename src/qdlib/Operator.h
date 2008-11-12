@@ -109,6 +109,14 @@ namespace QDLIB {
 	 }
 	 
 	 /**
+          * \return The operators clock.
+	  */
+	 QDClock* Clock()
+	 {
+	    return clock;
+	 }
+
+	 /**
 	  * Complex Bra.Op.Ket value of two Wavefunctions.
 	  */
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet) = 0;

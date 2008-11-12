@@ -98,6 +98,8 @@ namespace QDLIB {
    void Laser::Clock(QDClock * clock)
    {
       _clock = clock;
+      _params.SetValue("dt", _clock->Dt());
+      _params.SetValue("Nt", _clock->Steps());
    }
 
    /**

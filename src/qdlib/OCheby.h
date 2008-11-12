@@ -10,7 +10,7 @@ namespace QDLIB
     * Chebychev Propagator for WaveFunctions.
     * 
     * Init parameters:
-    * \li order: desired order of recursion
+    * \li order: desired order of recursion, if left empty it's chosen automatically
     * 
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */

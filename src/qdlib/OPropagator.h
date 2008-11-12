@@ -26,8 +26,6 @@ namespace QDLIB {
 	 bool forward;
 	 /** Indicates imaginary time propagation. */
 	 bool imaginary;
-	 /** Holds the clock of the propagator. */
-         QDClock *clock;
       public:
 	 OPropagator() : _c0(0,0), forward(true), imaginary(false), clock(NULL)
 	 {
@@ -57,24 +55,8 @@ namespace QDLIB {
 	  * (Clock, Forward, Backward, ImaginaryTime, RealTime, Exponent).
 	  */
 	 virtual void ReInit() = 0;
-	 
-	 /**
-	  * Set propagators clock.
-	  */
-	 void Clock(QDClock* cl)
-	 {
-	    clock = cl;
-	 }
-	 
-	 
-	 /**
-	  * \return propagators clock.
-	  */
-	 QDClock* Clock()
-	 {
-	    return clock;
-	 }
-	 
+		 
+	 	 
 	 /**
 	  * Set forward propagation.
 	  * 
@@ -149,6 +131,13 @@ namespace QDLIB {
 	 /* This doesn't make sense with Propagators => define dummies. */
 	 virtual double Emax(){return 0;}
 	 virtual double Emin(){return 0;}
+	 
+	 OPropagator* operator=(OPropagator *P)
+	 {
+	    _c0 = P->_c0;
+	    forward = P->forward;
+	    imaginary = P->imaginary;
+	 }
    };
 
 }
