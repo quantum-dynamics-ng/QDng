@@ -81,6 +81,30 @@ namespace QDLIB {
       return d.real();
    }
 
+   double OGridSum::Emax()
+   {
+      if (_size == 0)
+	 throw ( EParamProblem("Sum Operator is empty") );
+      
+      double d = 0;
+      for (int i=0; i < _size; i++)
+	 d += _O[i]->Emax();
+      
+      return d;
+   }
+	 
+   double OGridSum::Emin()
+   {
+      if (_size == 0)
+	 throw ( EParamProblem("Sum Operator is empty") );
+      
+      double d = 0;
+      for (int i=0; i < _size; i++)
+	 d += _O[i]->Emin();
+      
+      return d;
+   }
+   
    WaveFunction * OGridSum::operator *( WaveFunction * Psi )
    {
       if (_size == 0)

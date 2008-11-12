@@ -33,14 +33,20 @@ namespace QDLIB {
    {
 
       protected:
+	 /**
+          * Parameter storage for the implementation.
+	  */
 	 ParamContainer _params;
 	 /**
 	  * Indicates time dependence of operator.
 	  * Must be set by the implementing class.
 	  */
 	 bool _isTimedependent;
+	 /**
+	  * The operators clock.
+	  * This is needed by time dependent operators.
+	  */
 	 QDClock *clock;
-         
       public:
 	 /**
           * Make class pure virtual
@@ -111,6 +117,18 @@ namespace QDLIB {
 	  * Expectation value.
 	  */
 	 virtual double Expec(WaveFunction *Psi) = 0;
+	 
+	 /**
+	  * Maximum energy of the operator.
+	  * This is used by e.g. by propagators for Hamiltonian scaling.
+	  */
+	 virtual double Emax() = 0;
+	 
+	 /**
+	  * Minimum energy of the operator.
+	  * This is used by e.g. by propagators for Hamiltonian scaling.
+	  */
+	 virtual double Emin() = 0;
 	 
 	 /**
 	  * Apply operator to wavefunction.

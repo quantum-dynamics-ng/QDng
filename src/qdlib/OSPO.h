@@ -58,7 +58,7 @@ namespace QDLIB {
 	    virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	    
 	    virtual double Expec(WaveFunction *Psi);
-	    
+	   	    
 	    virtual WaveFunction* operator*(WaveFunction *Psi);
 	    
 	    virtual WaveFunction* operator*=(WaveFunction *Psi);

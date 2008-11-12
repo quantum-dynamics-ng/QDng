@@ -92,6 +92,14 @@ namespace QDLIB {
    /** Multidimensional view on dVec */
    typedef TNT::VectorView<dcomplex> cVecView;
    
+     
+   extern double VecMin(dVec &v);
+   extern double VecMax(dVec &v);
+   
+   extern double Faculty (int arg);
+   
+   extern "C" { int dbesj_(double *x, double *alpha, int *n, double *coeffs, int *nz); }
+   extern int BesselJ0 (int n, double arg, dVec &coeffs);
    
    /**
     * Multiply vectors by elements.

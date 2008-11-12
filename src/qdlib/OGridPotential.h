@@ -39,6 +39,10 @@ namespace QDLIB
 	 
 	 virtual double Expec(WaveFunction *Psi);
 	 
+	 virtual double Emax();
+	 
+	 virtual double Emin();
+	 
 	 virtual WaveFunction* operator*(WaveFunction *Psi);
 	 
 	 virtual WaveFunction* operator*=(WaveFunction *Psi);

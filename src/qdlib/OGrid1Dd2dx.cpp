@@ -101,6 +101,21 @@ namespace QDLIB {
       return d.real();
    }
 	 
+   double OGrid1Dd2dx::Emax()
+   {
+      if (_Nx_last == 0) throw ( EParamProblem("Nabla operator not initalized") );
+      /* Calc Tmax on the Grid */
+      double T=0;
+      
+      T = 1/ ( _mass *  _Nx_last * _Nx_last);
+      return T;
+   }
+	 
+   double OGrid1Dd2dx::Emin()
+   {
+      return 0; /* Minimum kintic energy is zero */
+   }
+   
    WaveFunction* OGrid1Dd2dx::operator*(WaveFunction *Psi)
    {
       

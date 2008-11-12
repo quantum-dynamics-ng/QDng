@@ -113,6 +113,26 @@ namespace QDLIB {
       return MatrixElement(Psi, Psi).real();
    }
    
+   double OHerMat::Emax()
+   {      
+      double d = (*this)[0][0];
+      
+      for (int i=1; i < num_rows() ; i++)
+	 if ((*this)[0][0] > d) d = (*this)[0][0];
+	 
+      return d;
+   }
+	 
+   double OHerMat::Emin()
+   {      
+      double d = (*this)[0][0];
+      
+      for (int i=1; i < num_rows() ; i++)
+	 if ((*this)[0][0] < d) d = (*this)[0][0];
+      
+      return d;
+   }
+   
    /**
     * Matrix-Vector multiplication.
     * 

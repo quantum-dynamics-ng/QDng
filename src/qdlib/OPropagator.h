@@ -85,7 +85,7 @@ namespace QDLIB {
 	    if (imaginary)
 	       _c0 = clock->Dt();
 	    else
-	       _c0 = I*clock->Dt();
+	       _c0 = (-1)*I*clock->Dt();
 	    forward = true;
 	 }
 	 
@@ -133,7 +133,7 @@ namespace QDLIB {
 	  * 
 	  * \f$ exp^{c H dt} \f$
 	  */
-	 void Exponent(dcomplex c)
+	 inline void Exponent(dcomplex c)
 	 {
 	    _c0 = c;
 	 }
@@ -141,11 +141,14 @@ namespace QDLIB {
  	 /**
 	  * Get the exponent.
 	  */
-	 dcomplex Exponent()
+	 inline dcomplex Exponent()
 	 {
 	    return _c0;
 	 }
 
+	 /* This doesn't make sense with Propagators => define dummies. */
+	 virtual double Emax(){return 0;}
+	 virtual double Emin(){return 0;}
    };
 
 }

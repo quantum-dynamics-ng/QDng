@@ -107,6 +107,31 @@ namespace QDLIB {
       return d.real();
    }
    
+   double OSum::Emax()
+   {
+      if (_size == 0)
+	 throw ( EParamProblem("Sum Operator is empty") );
+      
+      double d = 0;
+      for (int i=0; i < _size; i++)
+	 d += _O[i]->Emax();
+      
+      return d;
+   }
+	 
+   double OSum::Emin()
+   {
+      if (_size == 0)
+	 throw ( EParamProblem("Sum Operator is empty") );
+      
+      double d = 0;
+      for (int i=0; i < _size; i++)
+	 d += _O[i]->Emin();
+      
+      return d;
+   }
+   
+   
    WaveFunction* OSum::operator*(WaveFunction *Psi)
    {
       WaveFunction *sum;

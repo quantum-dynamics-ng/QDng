@@ -17,12 +17,12 @@ namespace QDLIB {
    {
    }
 
-/**
+   /**
     * Init K-Space in one dimension.
     * All factors are included in the kspace representation except FFT normalization.
     * 
     * \param mass reduced mass
- */
+    */
    dVec * OGridNablaSq::InitKspace1D(const double mass, const double length, const int Nx)
    {
 
@@ -113,6 +113,22 @@ namespace QDLIB {
       return c.real();
    }
 
+   double OGridNablaSq::Emax()
+   {
+      if (GridSystem::Dim() == 0) throw ( EParamProblem("Nabla operator not initalized") );
+      /* Calc Tmax on the Grid */
+      double T=0;
+      for (int i=0; i < GridSystem::Dim(); i++)
+	 T += 1/ ( _mass[i] *  GridSystem::Dx(i) * GridSystem::Dx(i));
+      T *= ( M_PI*M_PI / 2 );
+      return T;
+   }
+	 
+   double OGridNablaSq::Emin()
+   {
+      return 0; /* Minimum kintic energy is zero */
+   }
+   
    WaveFunction * OGridNablaSq::operator *(WaveFunction *Psi)
    {
       WFGridSystem *opPsi, *ket;
@@ -205,11 +221,6 @@ namespace QDLIB {
 	    delete kspace1;
 	 }
       }
-//       for (int i=0; i < 256; i+=2){
-// 	 for (int j=0; j < 256; j+=2){
-// 	    cout <<  i << " " << j << " " << (*_kspace)[256*i+j] << endl;
-// 	 }
-//       }
       
       
    }
