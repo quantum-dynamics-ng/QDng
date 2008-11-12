@@ -5,8 +5,8 @@ AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 noinst_PROGRAMS = dVecMinMax
 dVecMinMax_SOURCES = dVecMinMax.cpp main.cpp TestMathFunctions.cpp
 dVecMinMax_LDFLAGS = ../$(top_builddir)/src/cppunit/lib/libcppunit.a
-dVecMinMax_LDADD = $(top_builddir)/src/math/libmath.la -lg2c -lslatec -llapack \
-	-lblas -ldl
+dVecMinMax_LDADD = $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/slatec/libdbesj.la $(top_builddir)/src/slatec/libblasbasic.la -lg2c -ldl
 
 noinst_HEADERS = TestMathFunctions.h
 
