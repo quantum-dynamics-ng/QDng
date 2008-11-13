@@ -105,6 +105,16 @@ namespace QDLIB
    }
    
    	 
+   double QDLIB::OGridPotential::Emax( )
+   {
+      return VecMax( *((dVec*) this) );
+   }
+
+   double QDLIB::OGridPotential::Emin( )
+   {
+      return VecMin( *((dVec*) this) );
+   }
+   
    WaveFunction* OGridPotential::operator*(WaveFunction *Psi)
    {
       if (Psi->size() != size())
@@ -178,5 +188,7 @@ namespace QDLIB
    }
    
 }
+
+
 
 

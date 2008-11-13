@@ -52,7 +52,8 @@ typedef map<string,string> string_map;
 	 void ResetPosition();
 	 bool GetNextValue(string &name, string &value);
 	 
-	 bool isPresent(string &name);
+	 bool isPresent(const string &name);
+	 bool isPresent(const char *name);	 
 	 
 	 void clear();
 	 

@@ -1,4 +1,4 @@
-#include "Exception.h"
+#include "sys/Exception.h"
 #include "OCheby.h"
 
 namespace QDLIB
@@ -23,10 +23,11 @@ namespace QDLIB
    
    void OCheby::Init( ParamContainer & params )
    {
-      if (_params.isPresent() ){
-	 _params.GetValue("order", order);
-	 if (order < 1) throw ( EParamProblem("Chebychev recursion order invalid") );
-      } else order = 0;
+      _params = params;
+      if (_params.isPresent(string("order")) ){
+	 _params.GetValue("order", _order);
+	 if (_order < 1) throw ( EParamProblem("Chebychev recursion order invalid") );
+      } else _order = 0;
    }
 
    const string & OCheby::Name( )
@@ -47,11 +48,11 @@ namespace QDLIB
 
    WaveFunction * OCheby::operator *( WaveFunction * Psi )
    {
-      WaveFunction ket0, ket1, ket2;
+      WaveFunction *ket0, *ket1, *ket2;
       
       /* \phi_0 and \phi_1 are fixed */
       ket0 = Psi->NewInstance();
-      *ket0 = 1;
+      *((cVec*) ket0) = dcomplex(0,0);
       ket1 = *_hamilton * Psi;
       ket2 = Psi->NewInstance();
       
@@ -64,20 +65,23 @@ namespace QDLIB
 	 *ket0 = ket1;
 	 *ket1 = ket2;
       } 
+      return ket2;
    }
 
    WaveFunction * OCheby::operator *=( WaveFunction * Psi )
    {
+      return Psi;
    }
 
    Operator * OCheby::operator =( Operator * O )
    {
+
       OCheby *P;
       
       P = dynamic_cast<OCheby*>(O);
       
       /* Copy parents */
-      *((Progagator*) this) = (Progagator*) P;
+      *((OPropagator*) this) = (OPropagator*) P;
       _isTimedependent = P->_isTimedependent;
       _params = P->_params;
       clock = P->clock;
@@ -89,6 +93,7 @@ namespace QDLIB
       Rdelta = P->Rdelta;
       Gmin = P->Gmin;
       
+      return this;
    }
 
    Operator * OCheby::operator *( Operator * O )
@@ -98,10 +103,10 @@ namespace QDLIB
    }
 
    ParamContainer & OCheby::TellNeeds( )
-   {
+   {      
       ParamContainer *p = new ParamContainer();
       
-      p->SetValue("Hamiltonian", 0);
+      p->SetValue("hamiltonian", 0);
       
       return *p;
    }
@@ -109,7 +114,8 @@ namespace QDLIB
    
    void OCheby::AddNeeds( string & Key, Operator * O )
    {
-      if (Key == "Hamiltonian") _hamilton = O;
+      if (Key == "hamiltonian") _hamilton = O;
+      else throw ( EParamProblem("Unknown operator key") );
    }
 
    
@@ -124,21 +130,21 @@ namespace QDLIB
       Gmin =  _hamilton->Emin();
       
       /* Recursion order */
-      if (order > 0 && order < int(10 * clock->Dt() * Rdelta) )
+      if (_order > 0 && _order < int(10 * clock->Dt() * Rdelta) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
       
-      if (order = 0)
-	 order = int(10 * clock->Dt() * Rdelta);
+      if (_order == 0)
+	 _order = int(10 * clock->Dt() * Rdelta);
       
-      _params.SetValue("order", order);
+      _params.SetValue("order", _order);
       
       /* Setup coefficients */
       dVec bessel;
-      BesselJ0(order, Rdelta * clock->Dt(), bessel);
+      BesselJ0(_order, (Rdelta * clock->Dt()), bessel);
       
-      _coeff.newsize(order);
+      _coeff.newsize(_order);
       _coeff[0] = cexpI(Rdelta + Gmin) * bessel[0];
-      for (int i=1; i < _coeff->size(); i++){
+      for (int i=1; i < _coeff.size(); i++){
 	 _coeff[i] = 2.0 * cexpI(Rdelta + Gmin) * bessel[0];
       }
 

@@ -27,7 +27,7 @@ namespace QDLIB {
 	 /** Indicates imaginary time propagation. */
 	 bool imaginary;
       public:
-	 OPropagator() : _c0(0,0), forward(true), imaginary(false), clock(NULL)
+	 OPropagator() : _c0(0,0), forward(true), imaginary(false)
 	 {
 	 }
       
@@ -137,6 +137,8 @@ namespace QDLIB {
 	    _c0 = P->_c0;
 	    forward = P->forward;
 	    imaginary = P->imaginary;
+	    
+	    return this;
 	 }
    };
 

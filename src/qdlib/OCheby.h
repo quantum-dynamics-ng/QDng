@@ -18,7 +18,7 @@ namespace QDLIB
    {
       private:
 	 string _name;
-	 Operator _hamilton;   /* The Hamiltonian */
+	 Operator *_hamilton;   /* The Hamiltonian */
 	 int _order;           /* Recursion depth */
 	 cVec _coeff;         /* Coefficients including the Bessel functions at k'th order */
 	 double Rdelta;        /* Energy range of the hamiltonian */
@@ -33,7 +33,9 @@ namespace QDLIB
          virtual void Init(ParamContainer &params);
 	 
 	 virtual const string& Name();
-	                
+	 
+	 virtual void UpdateTime(){ if (_hamilton != NULL) _hamilton->UpdateTime(); }
+	 
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	 
 	 virtual double Expec(WaveFunction *Psi);

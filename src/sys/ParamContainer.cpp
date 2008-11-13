@@ -199,13 +199,27 @@ namespace QDLIB {
     * 
     * \return true if value is there.
     */
-   bool ParamContainer::isPresent(string &name)
+   bool ParamContainer::isPresent(const string &name)
    {
       if ( _param_map.find(name) != _param_map.end() )
 	 return true;
       else
 	 return false;
    }
+   
+   /**
+    * Check if a value is in the container.
+    * 
+    * \return true if value is there.
+    */
+   bool ParamContainer::isPresent(const char *name)
+   {
+      if ( _param_map.find(string(name)) != _param_map.end() )
+	 return true;
+      else
+	 return false;
+   }
+
    
    /**
     * Remove all parameters from the container.
