@@ -7,6 +7,13 @@ namespace QDLIB {
 
    /**
     * WaveFunction on cartesian grid.
+    * 
+    * Takes the following parameters:
+    * \li dims
+    * \li N#
+    * \li xmin#
+    * \li xmax#
+    * 
     *  @author Markus Kowalewski
     */
    class WFGridCartesian : public WFGridSystem

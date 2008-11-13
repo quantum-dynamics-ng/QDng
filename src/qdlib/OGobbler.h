@@ -1,19 +1,36 @@
 #ifndef QDLIBOGOBBLER_H
 #define QDLIBOGOBBLER_H
 
-#include <OKSpace.h>
+#include "OGridsystem.h"
 
 namespace QDLIB {
 
    /**
     * Gobbler operator which works with Butter-worth filter functions.
+    * 
+    * You have to specify the cut-off x-values. in the n'th dimension.
+    * 
+    * Gobbler takes the following parameters:
+    * \li dims    Number of dimensions.
+    * \li rp#     a "right pass" leaving everything on the right hand side (larger x values).
+    * \li lp#     a "left pass"  leaving everything on the left hand side (smaller x values).
+    * \li order   filter order. determines the cutoff sharpness.
+    * 
+    * \todo TEST
+    * 
     * @author Markus Kowalewski
     */
    class OGobbler : public OGridSystem
    {
       private:
 	 string _name;
-	 int _dims[MAX_DIMS];
+	 bool _lp[MAX_DIMS];    /* build left pass for dim */
+	 double _lpx[MAX_DIMS];  /* cut-off center */
+	 bool _rp[MAX_DIMS];    /* build right pass for dim */
+	 double _rpx[MAX_DIMS];  /* cut-off center */
+	 int _order;           /* filter order */
+	 
+	 void _Init(GridSystem *Psi);
       public:
 	 OGobbler();
       
