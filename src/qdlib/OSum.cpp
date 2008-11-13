@@ -142,7 +142,7 @@ namespace QDLIB {
       
       for (int i=0; i < _size; i++)
       {
-	*sum += *(_O[i]) * Psi; 
+	*sum += *(_O[i]) * Psi;
       }
      
       return sum;

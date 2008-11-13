@@ -1,17 +1,22 @@
 #include "sys/Exception.h"
 #include "OCheby.h"
 
+
 namespace QDLIB
 {
 
    OCheby::OCheby()
       : OPropagator(), _name("OCheby"), _hamilton(NULL),
-      _order(0), _coeff(0), Rdelta(0.0), Gmin(0)
+      _order(0), _coeff(0), Rdelta(0.0), Gmin(0), ket0(NULL), ket1(NULL), ket2(NULL)
    {}
 
 
    OCheby::~OCheby()
-   {}
+   {
+      if (ket0 != NULL) delete ket0;
+      if (ket1 != NULL) delete ket1;
+      if (ket2 != NULL) delete ket2;
+   }
 
 
    Operator * OCheby::NewInstance( )
@@ -48,24 +53,44 @@ namespace QDLIB
 
    WaveFunction * OCheby::operator *( WaveFunction * Psi )
    {
-      WaveFunction *ket0, *ket1, *ket2;
+      WaveFunction *r;
+      
+      if (ket0 == NULL) ket0 = Psi->NewInstance();
+      if (ket1 == NULL) ket1 = Psi->NewInstance();
+      if (ket2 == NULL) ket2 = Psi->NewInstance();
+      
+      r = Psi->NewInstance();
+      *((cVec*) r) = dcomplex(0,0);
       
       /* \phi_0 and \phi_1 are fixed */
-      ket0 = Psi->NewInstance();
-      *((cVec*) ket0) = dcomplex(0,0);
-      ket1 = *_hamilton * Psi;
-      ket2 = Psi->NewInstance();
+      *ket0 = Psi;
+      *ket0 *= _exp;
       
-      /* Recursion */
-      for(int i=0; i <= _order; i++) {
+      *ket1 = *_hamilton * Psi;
+      *ket1 *= _exp;
+      
+      /* Operator recursion loop */
+      for(int i=2; i < _order; i++) {
+	 /* 2 X \phi_i-1 + \phi_i-2 */
 	 *ket2 = *_hamilton * ket1;
-	 *ket2 *= 2; /* x coeff  */
+	 *ket2 *= 2 * _exp;
 	 *ket2 += *ket0;
 	 
+	 /* multiply by coefficients of the series expansion and add up to the result*/
+	 *ket0 *= _coeff[i-2];
+	 *r += ket0;
+	 
+	 /* shift back by one */
 	 *ket0 = ket1;
 	 *ket1 = ket2;
       } 
-      return ket2;
+      /* multiply the last two coefficients of the series expansion */
+      *ket0 *= _coeff[_order-2];
+      *r += ket0;
+      *ket1 *= _coeff[_order-1];
+      *r += ket1;
+
+      return r;
    }
 
    WaveFunction * OCheby::operator *=( WaveFunction * Psi )
@@ -130,23 +155,40 @@ namespace QDLIB
       Gmin =  _hamilton->Emin();
       
       /* Recursion order */
-      if (_order > 0 && _order < int(10 * clock->Dt() * Rdelta) )
+      if (_order > 0 && _order < 10 * int(clock->Dt() * Rdelta) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
       
       if (_order == 0)
-	 _order = int(10 * clock->Dt() * Rdelta);
+	 _order = 10 * int(clock->Dt() * Rdelta);
       
       _params.SetValue("order", _order);
       
-      /* Setup coefficients */
+      /* Check for convergence of the Bessel series */
       dVec bessel;
+      int k = 10;
       BesselJ0(_order, (Rdelta * clock->Dt()), bessel);
+      while ( abs(bessel[_order - 1] - bessel[_order - 2] ) > BESSEL_DELTA && _order < BESSEL_MAX_ORDER) {
+	 k++;
+	 _order = k * int(clock->Dt() * Rdelta);
+	 BesselJ0(_order, (Rdelta * clock->Dt()), bessel);
+      }
+	 
+      if (_order >= BESSEL_MAX_ORDER)
+	 throw ( EParamProblem ("Maximum recursion order reached. Choose a smaller time step or set the order manually") );
       
+      /* Setup coefficients */
       _coeff.newsize(_order);
       _coeff[0] = cexpI(Rdelta + Gmin) * bessel[0];
       for (int i=1; i < _coeff.size(); i++){
 	 _coeff[i] = 2.0 * cexpI(Rdelta + Gmin) * bessel[0];
       }
+      
+      _exp  = OPropagator::Exponent() / Rdelta;
+      
+      /* Remove WF buffers => new operator type  needs new WF type */
+      if (ket0 != NULL) delete ket0;
+      if (ket1 != NULL) delete ket1;
+      if (ket2 != NULL) delete ket2;
 
    }
 

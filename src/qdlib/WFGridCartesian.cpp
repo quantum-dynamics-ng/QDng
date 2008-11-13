@@ -54,6 +54,9 @@ namespace QDLIB {
 	 i++;
 	 sprintf (c, "%d", i);
       }
+      
+
+
 	 
       cVec::newsize(GridSystem::Size());
    }
@@ -102,6 +105,7 @@ namespace QDLIB {
       
       for(int i=0; i < size(); i++){
 	 c += ((*this)[i]).conj() * (*Psi)[i];
+// 	 cout << c << " " << ((*this)[i]).conj() << " " << (*Psi)[i] << endl;
       }
    
       /* k-space has different Norm! */

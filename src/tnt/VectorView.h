@@ -10,7 +10,7 @@ namespace TNT
     * a single coordinate in the array.
     * 
     * The order in the dimension numbering is x,y,z,...
-    * That fastest varing index has the lowest number.
+    * that the fastest varing index has the lowest number.
     */
    template <class T>
    class VectorView
@@ -38,6 +38,10 @@ namespace TNT
    
    /**
     * Initialize the view with all information about the vector.
+    * 
+    * \param vec The vector to look at
+    * \param ndims number of dimensions
+    * \param dims  array with number of points in each direction
     */
    template <class T>
 	 VectorView<T>::VectorView(Vector<T> &vec, int ndims, int *dims) : _adim(0)
@@ -69,6 +73,8 @@ namespace TNT
    
    /**
     * Activate the dimension to work on.
+    * 
+    * This needs to be done bevor using the other methods of the class.
     */
    template <class T>
 	 void VectorView<T>::ActiveDim(int dim)
@@ -145,7 +151,7 @@ namespace TNT
 
    
    /**
-    * Multiply a vector with  the active dimension.
+    * Multiply a vector with the active dimension.
     */
    template <class T>
 	 inline void VectorView<T>::operator*=(const Vector<T> &vec)

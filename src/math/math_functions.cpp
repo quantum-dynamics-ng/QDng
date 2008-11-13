@@ -49,7 +49,7 @@ namespace QDLIB {
    /**
     * Bessel function of first kind with initial order zero.
     * 
-    * \f$ J_n^{\alpha}(x) \text{with} \alpha=0 \f$
+    * \f$ J_n^{\alpha}(x) with \alpha=0 \f$
     * 
     * \param n order of the bessel function
     * \param arg the x value

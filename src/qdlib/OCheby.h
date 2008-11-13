@@ -3,6 +3,10 @@
 
 #include "OPropagator.h"
 
+#define BESSEL_DELTA 1e-30       /* Upper limit for convergence of the Bessel series convergence */
+#define BESSEL_MAX_ORDER 1e5     /* Maximum recursion order to used (by automatic determination) */
+
+
 namespace QDLIB
 {
 
@@ -20,9 +24,11 @@ namespace QDLIB
 	 string _name;
 	 Operator *_hamilton;   /* The Hamiltonian */
 	 int _order;           /* Recursion depth */
-	 cVec _coeff;         /* Coefficients including the Bessel functions at k'th order */
+	 cVec _coeff;          /* Coefficients including the Bessel functions at k'th order */
+	 dcomplex _exp;        /* Scaled exponent:  e.g. -i*dt/Rdelta */
 	 double Rdelta;        /* Energy range of the hamiltonian */
 	 double Gmin;          /* Energy offset of the hamiltonian */
+         WaveFunction *ket0, *ket1, *ket2;
       public:
          OCheby();
          ~OCheby();

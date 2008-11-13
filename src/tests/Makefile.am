@@ -3,10 +3,12 @@ INCLUDES = -I$(top_srcdir)/src \
 METASOURCES = AUTO
 AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 
-noinst_HEADERS = TestMathFunctions.h TestCheby.h
+noinst_HEADERS = TestMathFunctions.h TestCheby.h WFGridHarmonic.h \
+	OGridHarmonic.h TestViews.h
 
 noinst_PROGRAMS = runtest
-runtest_SOURCES = dVecMinMax.cpp main.cpp TestMathFunctions.cpp TestCheby.cpp
+runtest_SOURCES = dVecMinMax.cpp main.cpp TestMathFunctions.cpp TestCheby.cpp \
+	WFGridHarmonic.cpp OGridHarmonic.cpp TestViews.cpp
 runtest_LDFLAGS = ../$(top_builddir)/src/cppunit/lib/libcppunit.a
 runtest_LDADD = $(top_builddir)/src/qdlib/libqd.la \
 	$(top_builddir)/src/sys/libtools.la $(top_builddir)/src/math/libmath.la \

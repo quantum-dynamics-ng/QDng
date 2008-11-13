@@ -345,4 +345,19 @@ namespace QDLIB {
    }
       
    
+   /**
+    * ASCII output for ParamContainers.
+    */
+   std::ostream& operator<<(std::ostream &s, ParamContainer &p)
+   {
+      string key, value;
+      
+      p.ResetPosition();
+      while ( p.GetNextValue( key, value ) ){
+	 s << key << " = " << value << std::endl;
+      }
+      return s;
+   }
+   
+   
 } /* namespace QDLIB */

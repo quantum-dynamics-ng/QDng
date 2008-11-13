@@ -68,6 +68,13 @@ typedef map<string,string> string_map;
 
    }; /* class ParamContainer */
 
+   
+   /**
+    * ASCII output for ParamContainers.
+    */
+   std::ostream& operator<<(std::ostream &s, ParamContainer &p);
+   
+   
 } /* namespace QDLIB */
 
 #endif /* #ifndef PARAMCONTAINER_H */
