@@ -167,7 +167,7 @@ namespace QDLIB
       
       /* Energy range & offset */
       Rdelta = (_hamilton->Emax() - _hamilton->Emin()) *  clock->Dt() / 2;
-      Gmin =  _hamilton->Emin() *  clock->Dt();
+      Gmin =  _hamilton->Emin() * clock->Dt();
       
       /* Recursion order */
       if (_order > 0 && _order <= int(5 * Rdelta) )
@@ -204,7 +204,7 @@ namespace QDLIB
       for (int i=1; i < _coeff.size(); i++){
 	 _coeff[i] = 2.0 * cexpI((Rdelta + Gmin)) * bessel[i];
       }
-//       cout << _coeff; 
+       cout << bessel; 
 //       _exp = 1/Rdelta;
       _exp  = OPropagator::Exponent() / Rdelta;
       cout << OPropagator::Exponent();
