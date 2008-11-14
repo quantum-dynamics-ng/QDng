@@ -47,14 +47,20 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdbesj_la_LIBADD =
-am_libdbesj_la_OBJECTS = d1mach.lo dasyjy.lo dbesj.lo djairy.lo \
-	fdump.lo i1mach.lo j4save.lo xercnt.lo xerhlt.lo xermsg.lo \
-	xerprn.lo xersve.lo xgetua.lo
+am_libdbesj_la_OBJECTS = dasyjy.lo dbesj.lo djairy.lo
 libdbesj_la_OBJECTS = $(am_libdbesj_la_OBJECTS)
 libslatec_common_la_LIBADD =
 am_libslatec_common_la_OBJECTS = dlngam.lo d9lgmc.lo dgamma.lo \
-	dcsevl.lo dgamlm.lo initds.lo
+	dcsevl.lo dgamlm.lo initds.lo dgamln.lo d1mach.lo fdump.lo \
+	i1mach.lo j4save.lo lsame.lo xercnt.lo xerhlt.lo xermsg.lo \
+	xerprn.lo xersve.lo xgetua.lo
 libslatec_common_la_OBJECTS = $(am_libslatec_common_la_OBJECTS)
+libzbesj_la_LIBADD =
+am_libzbesj_la_OBJECTS = zabs.lo zacai.lo zairy.lo zasyi.lo zbesj.lo \
+	zbinu.lo zbknu.lo zbuni.lo zdiv.lo zexp.lo zkscl.lo zlog.lo \
+	zmlri.lo zmlt.lo zrati.lo zs1s2.lo zseri.lo zshch.lo zsqrt.lo \
+	zuchk.lo zunhj.lo zuni1.lo zuni2.lo zunik.lo zuoik.lo zwrsk.lo
+libzbesj_la_OBJECTS = $(am_libzbesj_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
 LTF77COMPILE = $(LIBTOOL) --tag=F77 --mode=compile $(F77) $(AM_FFLAGS) \
@@ -62,8 +68,10 @@ LTF77COMPILE = $(LIBTOOL) --tag=F77 --mode=compile $(F77) $(AM_FFLAGS) \
 F77LD = $(F77)
 F77LINK = $(LIBTOOL) --tag=F77 --mode=link $(F77LD) $(AM_FFLAGS) \
 	$(FFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libdbesj_la_SOURCES) $(libslatec_common_la_SOURCES)
-DIST_SOURCES = $(libdbesj_la_SOURCES) $(libslatec_common_la_SOURCES)
+SOURCES = $(libdbesj_la_SOURCES) $(libslatec_common_la_SOURCES) \
+	$(libzbesj_la_SOURCES)
+DIST_SOURCES = $(libdbesj_la_SOURCES) $(libslatec_common_la_SOURCES) \
+	$(libzbesj_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -170,12 +178,15 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 $(all_includes)
 METASOURCES = AUTO
-noinst_LTLIBRARIES = libdbesj.la libslatec_common.la
-libdbesj_la_SOURCES = d1mach.f dasyjy.f dbesj.f djairy.f fdump.f i1mach.f \
-	j4save.f xercnt.f xerhlt.f xermsg.f xerprn.f xersve.f xgetua.f
-
+noinst_LTLIBRARIES = libdbesj.la libslatec_common.la libzbesj.la
+libdbesj_la_SOURCES = dasyjy.f dbesj.f djairy.f
 libslatec_common_la_SOURCES = dlngam.f d9lgmc.f dgamma.f dcsevl.f dgamlm.f \
-	initds.f
+		initds.f dgamln.f d1mach.f fdump.f i1mach.f j4save.f lsame.f xercnt.f xerhlt.f \
+	xermsg.f xerprn.f xersve.f xgetua.f
+
+libzbesj_la_SOURCES = zabs.f zacai.f zairy.f zasyi.f zbesj.f zbinu.f zbknu.f \
+	zbuni.f zdiv.f zexp.f zkscl.f zlog.f zmlri.f zmlt.f zrati.f zs1s2.f zseri.f \
+	zshch.f zsqrt.f zuchk.f zunhj.f zuni1.f zuni2.f zunik.f zuoik.f zwrsk.f
 
 all: all-am
 
@@ -223,6 +234,8 @@ libdbesj.la: $(libdbesj_la_OBJECTS) $(libdbesj_la_DEPENDENCIES)
 	$(F77LINK)  $(libdbesj_la_LDFLAGS) $(libdbesj_la_OBJECTS) $(libdbesj_la_LIBADD) $(LIBS)
 libslatec_common.la: $(libslatec_common_la_OBJECTS) $(libslatec_common_la_DEPENDENCIES) 
 	$(F77LINK)  $(libslatec_common_la_LDFLAGS) $(libslatec_common_la_OBJECTS) $(libslatec_common_la_LIBADD) $(LIBS)
+libzbesj.la: $(libzbesj_la_OBJECTS) $(libzbesj_la_DEPENDENCIES) 
+	$(F77LINK)  $(libzbesj_la_LDFLAGS) $(libzbesj_la_OBJECTS) $(libzbesj_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

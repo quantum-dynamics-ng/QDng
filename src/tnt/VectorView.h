@@ -10,7 +10,7 @@ namespace TNT
     * a single coordinate in the array.
     * 
     * The order in the dimension numbering is x,y,z,...
-    * that the fastest varing index has the lowest number.
+    * that the fastest varing index has the highest number.
     */
    template <class T>
    class VectorView
@@ -62,12 +62,12 @@ namespace TNT
       for(int i=0; i < _ndims; i++){
 	 if (_view[i] != NULL) {
 	    for (int j=0; j < _dims[i]; j++){ /* Loop over points in dim */
-	       delete _view[i][j];
+	       delete[] _view[i][j];
 	    }
-	    delete _view[i];
+	    delete[] _view[i];
 	 }
       }
-      delete _view;
+      delete[] _view;
       
    }
    

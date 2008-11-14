@@ -4,7 +4,7 @@
 
 #include "sys/ParamContainer.h"
 #include "math/typedefs.h"
-
+#include "sys/Exception.h"
 
 
 
@@ -139,15 +139,12 @@ namespace QDLIB {
 	 /** Multiply with complex number */
 	 WaveFunction* operator*=(const dcomplex d)
 	 {
-	    WaveFunction *wf;
-      
-	    wf = this->NewInstance();
       
 	    for (int i=0; i < cVec::size(); i++){
-	       (*wf)[i] = (*this)[i] * d;
+	       (*this)[i] *= d;
 	    }
 	    
-	    return wf;
+	    return this;
 	 }
 	 
 	 /** Sum */
@@ -167,8 +164,9 @@ namespace QDLIB {
 	 /** Sum */
 	 WaveFunction* operator+=(WaveFunction* Psi)
 	 {
+	    if (cVec::size() != Psi->size()) throw ( EParamProblem("Grids differ in size") );
             for (int i=0; i < cVec::size(); i++){
-               (*(cVec*)this)[i] += (*Psi)[i];
+	       (*(cVec*)this)[i] += (*(cVec*) Psi)[i];
 	    }
 	    return this;
 	    

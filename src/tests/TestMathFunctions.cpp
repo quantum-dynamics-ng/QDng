@@ -56,7 +56,9 @@ void TestMathFunctions::BesselCheck( )
    cout << bessel << endl;
    cout << coeff << endl;*/
    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, coeff[coeff.size()-1], 1e-30 );
-   CPPUNIT_ASSERT( QDLIB::BesselJ0(40,100, coeff) < 10);
+   int err = QDLIB::BesselJ0(200,100, coeff);
+//    cout << coeff;
+   CPPUNIT_ASSERT_MESSAGE("Error in Bessel function",  err == 0);
    
 }
 

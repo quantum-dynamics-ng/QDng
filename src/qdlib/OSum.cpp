@@ -91,11 +91,13 @@ namespace QDLIB {
    dcomplex OSum::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
    {
       WaveFunction  *out;
-         
-      out = PsiKet->NewInstance();
-      *out =  (*this) * PsiKet;
+      dcomplex d;
+     
+      out =  (*this) * PsiKet;
+      d = *PsiBra * out;
+      delete out;
       
-      return *PsiBra * out;
+      return d;
    }
    
    double OSum::Expec(WaveFunction *Psi)
@@ -131,10 +133,12 @@ namespace QDLIB {
       return d;
    }
    
-   
+   /**
+    * \todo find a an efficient way to avoid to much deletes.
+    */
    WaveFunction* OSum::operator*(WaveFunction *Psi)
    {
-      WaveFunction *sum;
+      WaveFunction *sum, *op;
       
       
       sum = Psi->NewInstance();
@@ -142,7 +146,9 @@ namespace QDLIB {
       
       for (int i=0; i < _size; i++)
       {
-	*sum += *(_O[i]) * Psi;
+	op = *(_O[i]) * Psi;
+	*sum += op;
+	delete op;
       }
      
       return sum;
@@ -150,7 +156,7 @@ namespace QDLIB {
    
    WaveFunction* OSum::operator*=(WaveFunction *Psi)
    {
-      WaveFunction *ket;
+      WaveFunction *ket, *op;
       
       ket = Psi->NewInstance();
      
@@ -159,8 +165,13 @@ namespace QDLIB {
       
       for (int i=0; i < _size; i++)
       {
-	*Psi +=  *(_O[i]) * ket;
+	op =  *(_O[i]) * ket;
+	*Psi +=  op;
+	delete op;
       }
+      
+      delete ket;
+      
       return Psi;
    }
    

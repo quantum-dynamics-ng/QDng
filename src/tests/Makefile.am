@@ -7,10 +7,9 @@ noinst_HEADERS = TestMathFunctions.h TestCheby.h WFGridHarmonic.h \
 	OGridHarmonic.h TestViews.h
 
 noinst_PROGRAMS = runtest
-runtest_SOURCES = dVecMinMax.cpp main.cpp TestMathFunctions.cpp TestCheby.cpp \
-	WFGridHarmonic.cpp OGridHarmonic.cpp TestViews.cpp
+runtest_SOURCES = dVecMinMax.cpp TestViews.cpp main.cpp TestMathFunctions.cpp TestCheby.cpp \
+	WFGridHarmonic.cpp OGridHarmonic.cpp 
 runtest_LDFLAGS = ../$(top_builddir)/src/cppunit/lib/libcppunit.a
 runtest_LDADD = $(top_builddir)/src/qdlib/libqd.la \
-	$(top_builddir)/src/sys/libtools.la $(top_builddir)/src/math/libmath.la \
-	$(top_builddir)/src/slatec/libdbesj.la $(top_builddir)/src/slatec/libslatec_common.la \
-	$(top_builddir)/src/fft/libfft.la -lfftw3 -lg2c -lblas -llapack -ldl
+	$(top_builddir)/src/sys/libtools.la $(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la \
+	-lfftw3 -lg2c -lslatec -lblas -llapack -ldl

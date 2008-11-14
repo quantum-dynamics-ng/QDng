@@ -142,8 +142,10 @@ namespace QDLIB {
    WaveFunction * OGobbler::operator *(WaveFunction * Psi)
    {
       WFGridSystem *ket;
+      WaveFunction *psi;
       
-      *ket = dynamic_cast<WFGridSystem*>(Psi);
+      psi = Psi->NewInstance();
+      ket = dynamic_cast<WFGridSystem*>(psi);
       
       if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init(ket);
       
@@ -155,8 +157,10 @@ namespace QDLIB {
    WaveFunction * OGobbler::operator *=(WaveFunction * Psi)
    {
       WFGridSystem *ket;
+      WaveFunction *psi;
       
-      ket = dynamic_cast<WFGridSystem*>(Psi);
+      psi = Psi->NewInstance();
+      ket = dynamic_cast<WFGridSystem*>(psi);
       
       if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init((GridSystem*) ket);
       

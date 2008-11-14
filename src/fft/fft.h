@@ -25,6 +25,7 @@ namespace QDLIB {
       private:
 	 fftw_plan _planf;
 	 fftw_plan _planb;
+	 int *_dims;
 	 bool _oneway;
       public:
 	 FFT(cVec &in, cVec &out, bool oneway = false);

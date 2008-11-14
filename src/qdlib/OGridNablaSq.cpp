@@ -30,7 +30,7 @@ namespace QDLIB {
    
       kspace = new dVec(Nx);
    
-      double dp = (2*PI) / length;    // Setup dp for kspace
+      double dp = (2*M_PI) / length;    // Setup dp for kspace
       dp *= dp;   /* dp^2 */
    
       /* We include all the factors in the k-space function => Do it only once */
@@ -126,7 +126,7 @@ namespace QDLIB {
 	 
    double OGridNablaSq::Emin()
    {
-      return 0; /* Minimum kintic energy is zero */
+      return 0; /* Minimum kinetic energy is zero */
    }
    
    WaveFunction * OGridNablaSq::operator *(WaveFunction *Psi)
@@ -195,7 +195,7 @@ namespace QDLIB {
 
    /**
     * \todo clean Vector view.
-    * \bug dimensions are inverse!?
+    * \bug dimensions are inverse => x is the fastest!
     */
    void OGridNablaSq::InitKspace()
    {

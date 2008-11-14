@@ -19,6 +19,11 @@ namespace QDLIB
    }
 
 
+   int QDLIB::OCheby::Recursion( )
+   {
+      return _order;
+   } 
+   
    Operator * OCheby::NewInstance( )
    {
       OCheby *r;
@@ -63,23 +68,28 @@ namespace QDLIB
       *((cVec*) r) = dcomplex(0,0);
       
       /* \phi_0 and \phi_1 are fixed */
-      *ket0 = Psi;
-      *ket0 *= _exp;
+      *ket0 =  Psi;
+//       *ket0 *= _coeff[0];
       
-      *ket1 = *_hamilton * Psi;
+      *ket1 = Psi;
       *ket1 *= _exp;
+      *_hamilton *= ket1;
+//       *ket1 *= _coeff[1];
+      
       
       /* Operator recursion loop */
       for(int i=2; i < _order; i++) {
 	 /* 2 X \phi_i-1 + \phi_i-2 */
-	 *ket2 = *_hamilton * ket1;
+	 *ket2 = ket1;
 	 *ket2 *= 2 * _exp;
-	 *ket2 += *ket0;
+	 *_hamilton *= ket2;
+	 *ket2 += ket0;
+// 	 *ket2 *= _coeff[i];
 	 
 	 /* multiply by coefficients of the series expansion and add up to the result*/
 	 *ket0 *= _coeff[i-2];
 	 *r += ket0;
-	 
+	 cout << r->Norm() << endl;
 	 /* shift back by one */
 	 *ket0 = ket1;
 	 *ket1 = ket2;
@@ -149,42 +159,56 @@ namespace QDLIB
       
       if (_hamilton == NULL)
 	 throw ( EParamProblem("Chebychev Progagator is missing a hamiltonian") );
+      if (clock == NULL)
+	 throw ( EParamProblem("Chebychev Progagator is missing a clock") );
+      if (clock->Dt() == 0)
+	 throw ( EParamProblem("No time step defined") );
+      
       
       /* Energy range & offset */
-      Rdelta = _hamilton->Emax() - _hamilton->Emin();
-      Gmin =  _hamilton->Emin();
+      Rdelta = (_hamilton->Emax() - _hamilton->Emin()) *  clock->Dt() / 2;
+      Gmin =  _hamilton->Emin() *  clock->Dt();
       
       /* Recursion order */
-      if (_order > 0 && _order < 10 * int(clock->Dt() * Rdelta) )
+      if (_order > 0 && _order <= int(5 * Rdelta) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
       
-      if (_order == 0)
-	 _order = 10 * int(clock->Dt() * Rdelta);
       
-      _params.SetValue("order", _order);
+      if (_order <= 0)
+	 _order =  int(2*Rdelta);
+      
+      if (_order < 10) _order=10;
+      
+      cout << endl << "Dt: " << clock->Dt() << endl;
+      cout << endl << "Rdelta: " << Rdelta << endl;
+      cout << endl << "initial order: " <<_order << endl;
+      
       
       /* Check for convergence of the Bessel series */
       dVec bessel;
-      int k = 10;
-      BesselJ0(_order, (Rdelta * clock->Dt()), bessel);
+    
+      BesselJ0(_order, Rdelta , bessel);
       while ( abs(bessel[_order - 1] - bessel[_order - 2] ) > BESSEL_DELTA && _order < BESSEL_MAX_ORDER) {
-	 k++;
-	 _order = k * int(clock->Dt() * Rdelta);
-	 BesselJ0(_order, (Rdelta * clock->Dt()), bessel);
+	 _order += 2;
+	 BesselJ0(_order, Rdelta , bessel);
       }
-	 
+	
       if (_order >= BESSEL_MAX_ORDER)
 	 throw ( EParamProblem ("Maximum recursion order reached. Choose a smaller time step or set the order manually") );
       
+      _params.SetValue("order", _order);
+      
       /* Setup coefficients */
       _coeff.newsize(_order);
-      _coeff[0] = cexpI(Rdelta + Gmin) * bessel[0];
+      _coeff[0] = cexpI((Rdelta + Gmin)) * bessel[0];
       for (int i=1; i < _coeff.size(); i++){
-	 _coeff[i] = 2.0 * cexpI(Rdelta + Gmin) * bessel[0];
+	 _coeff[i] = 2.0 * cexpI((Rdelta + Gmin)) * bessel[i];
       }
-      
+//       cout << _coeff; 
+//       _exp = 1/Rdelta;
       _exp  = OPropagator::Exponent() / Rdelta;
-      
+      cout << OPropagator::Exponent();
+      std::cout << _exp;
       /* Remove WF buffers => new operator type  needs new WF type */
       if (ket0 != NULL) delete ket0;
       if (ket1 != NULL) delete ket1;
@@ -192,7 +216,7 @@ namespace QDLIB
 
    }
 
-} /* namespace QDLIB */
+}/* namespace QDLIB */
 
 
 
