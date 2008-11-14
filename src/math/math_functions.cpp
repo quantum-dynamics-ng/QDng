@@ -76,7 +76,7 @@ namespace QDLIB {
       
       /* make it real */
       for (int i=0; i < n; i++){
-	 coeffs[i] = sqrt( bRe[i] * bRe[i] + bIm[i] * bIm[i]);
+	 coeffs[i] = bRe[i];
       }
       if (nz > 0) cout << "\n\n*** Bessel underflow warning : " << nz << "\n";
       switch (ierr) {

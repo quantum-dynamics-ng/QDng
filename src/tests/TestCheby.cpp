@@ -156,7 +156,7 @@ void TestCheby::Propagation1D( )
    p.SetValue( "mass0", 1800);
    p.SetValue( "k0", .3363139634);
    
-   clock.Dt( 20 );
+   clock.Dt( 5 );
    clock.Steps( 2 );
    
    T.Init(p);
@@ -168,14 +168,19 @@ void TestCheby::Propagation1D( )
    
    CPPUNIT_ASSERT_EQUAL(2, H.Size());
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Groundstate energy", 0.006834491398, H.Expec( &psi), 1e-2);
+
    /* Init Cheby  */
    p.clear();
+//:   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Init cheby with order", p.SetValue("order", 500));
    CPPUNIT_ASSERT_NO_THROW(U.Init(p));
    s = "hamiltonian";
    U.AddNeeds(s, (Operator*) &H);
    U.Clock( &clock );
    U.Forward();
-   CPPUNIT_ASSERT_NO_THROW(U.ReInit());
+ //  CPPUNIT_ASSERT_NO_THROW_MESSAGE("Init cheby with order", U.ReInit());
+
+   try {U.ReInit(); } catch (Exception e) { cout << e.GetMessage() << endl; throw; }
+
    CPPUNIT_ASSERT(U.Recursion() > 1);
    cout << endl << "Recursion order: " << U.Recursion() << endl;
    
@@ -185,7 +190,7 @@ void TestCheby::Propagation1D( )
    cout << endl << "Recursion order: " << U.Recursion() << endl;
    
    /* Check Norm and energy */
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of Norm", 1.0, phi->Norm(), 1e-15);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of Norm", 1.0, phi->Norm(), 1e-10);
    
    delete phi;
 }
