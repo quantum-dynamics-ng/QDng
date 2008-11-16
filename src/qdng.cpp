@@ -1,5 +1,3 @@
-
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -7,11 +5,24 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
+#include "sys/Getopt.h"
+#include "sys/XmlParser.h"
 
-int main(int argc, char *argv[])
+using namespace std;
+using namespace QDLIB;
+
+int main(int argc, char **argv)
 {
-  cout << "Hello, world!" << endl;
+
+   Getopt cmdline;
+   
+   cmdline.SetDescription("QD next generation");
+   cmdline.SetHelp('h', "Show help");
+   cmdline.ReadArgs(argc, argv);
+   if (!cmdline.CheckOptions() ){
+      cmdline.ShowHelp();
+      exit(1);
+   }
 
   return EXIT_SUCCESS;
 }

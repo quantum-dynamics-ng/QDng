@@ -37,10 +37,17 @@ namespace QDLIB {
       /* The minus cancels with minus from -kx^2. */
       dp *= 0.5 / mass ;
      
-	 
-      for (int i=0; i < Nx / 2; i++){ //run from [-p..+p]
-	 (*kspace)[i] = (double(i) * double(i)) * dp;
-	 (*kspace)[Nx - i - 1] = (double(i+1) * double(i+1)) * dp;
+      if (Nx % 2 == 0){ /* even + odd grid points */
+	 for (int i=0; i < Nx / 2; i++){ //run from [-p..+p]
+	    (*kspace)[i] = (double(i) * double(i)) * dp;
+	    (*kspace)[Nx - i - 1] = (double(i+1) * double(i+1)) * dp;
+	 }
+      } else {
+	 (*kspace)[0] = 0; 
+	 for (int i=1; i < (Nx+1) / 2; i++){ //run from [-p..+p]
+	    (*kspace)[i] = (double(i) * double(i)) * dp;
+	    (*kspace)[Nx - i] = (double(i+1) * double(i+1)) * dp;
+	 }
       }
    
       return kspace;

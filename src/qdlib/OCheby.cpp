@@ -19,6 +19,9 @@ namespace QDLIB
    }
 
 
+   /**
+    * Ask for the actual order of the recursion.
+    */
    int QDLIB::OCheby::Recursion( )
    {
       return _order;
@@ -59,6 +62,7 @@ namespace QDLIB
    WaveFunction * OCheby::operator *( WaveFunction * Psi )
    {
       WaveFunction *r;
+      WaveFunction *swap;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
@@ -90,9 +94,11 @@ namespace QDLIB
 	 *ket0 *= _coeff[i-2];
 	 *r += ket0;
 	 cout << r->Norm() << endl;
-	 /* shift back by one */
-	 *ket0 = ket1;
-	 *ket1 = ket2;
+	 /* shift back by one - use pointers instead of copy */
+	 swap = ket0;
+	 ket0 = ket1;
+	 ket1 = ket2;
+	 ket2 = swap;
       } 
       /* multiply the last two coefficients of the series expansion */
       *ket0 *= _coeff[_order-2];
@@ -105,6 +111,49 @@ namespace QDLIB
 
    WaveFunction * OCheby::operator *=( WaveFunction * Psi )
    {
+      WaveFunction *swap;
+      WaveFunction *ket0_buf;
+      
+      if (ket0 == NULL) ket0 = Psi->NewInstance();
+      if (ket1 == NULL) ket1 = Psi->NewInstance();
+      if (ket2 == NULL) ket2 = Psi->NewInstance();
+    
+      /* \phi_0 and \phi_1 are fixed */
+      *ket0 =  Psi;
+//       *ket0 *= _coeff[0];
+      
+      *ket1 = Psi;
+      *ket1 *= _exp;
+      *_hamilton *= ket1;
+//       *ket1 *= _coeff[1];
+      
+      *((cVec*) Psi) = dcomplex(0,0);  /* init with zero, will be our result */
+      
+      /* Operator recursion loop */
+      for(int i=2; i < _order; i++) {
+	 /* 2 X \phi_i-1 + \phi_i-2 */
+	 *ket2 = ket1;
+	 *ket2 *= 2 * _exp;
+	 *_hamilton *= ket2;
+	 *ket2 += ket0;
+// 	 *ket2 *= _coeff[i];
+	 
+	 /* multiply by coefficients of the series expansion and add up to the result*/
+	 *ket0 *= _coeff[i-2];
+	 *Psi += ket0;
+	 cout << r->Norm() << endl;
+	 /* shift back by one - use pointers instead of copy */
+	 swap = ket0;
+	 ket0 = ket1;
+	 ket1 = ket2;
+	 ket2 = swap;
+      } 
+      /* multiply the last two coefficients of the series expansion */
+      *ket0 *= _coeff[_order-2];
+      *Psi += ket0;
+      *ket1 *= _coeff[_order-1];
+      *Psi += ket1;
+
       return Psi;
    }
 
@@ -177,7 +226,7 @@ namespace QDLIB
       if (_order <= 0)
 	 _order =  int(2*Rdelta);
       
-      if (_order < 10) _order=10;
+      if (_order < 15) _order=15;
       
       cout << endl << "Dt: " << clock->Dt() << endl;
       cout << endl << "Rdelta: " << Rdelta << endl;

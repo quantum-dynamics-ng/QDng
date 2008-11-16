@@ -16,6 +16,7 @@ namespace QDLIB
     * Init parameters:
     * \li order: desired order of recursion, if left empty it's chosen automatically
     * 
+    * \todo implement imaginary time propagation.
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
    class OCheby : public OPropagator
