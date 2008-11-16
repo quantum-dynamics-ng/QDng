@@ -37,14 +37,16 @@ Getopt::Getopt(int argc, char **argv, char *optdef)
 void Getopt::ParseArgs(int argc, char **argv, const char *optdef)
 {
   _argc = argc;
+  _argv = argv;
   int i;
-  opterr = 0;
+  opterr = 0;        /* Supress errors about unknown parameters */
   basename = argv[0];
    while ( (i = getopt(argc, argv, optdef)) != -1){
      char a = (char) i;
-     if ( a != '?') {
+     if ( a != '?' && optarg != NULL) {
        value_map[a] = optarg;
-     }
+     } else if (a != '?' && optarg == NULL)
+	value_map[a] = "-";
    }
 }
 
@@ -64,7 +66,7 @@ void Getopt::ParseArgs(int argc, char **argv, const char *optdef)
 void Getopt::ReadArgs(int argc, char **argv)
 {
   string s;
-  
+ 
   s.clear();
   for (map<char, string>::iterator it = help_map.begin(); it != help_map.end(); it++){
     if ( parameter_map[(*it).first].empty() ){
@@ -122,15 +124,15 @@ void Getopt::SetHelp(const char letter, const string &parameter, bool required, 
 /**
  * Show help on stderr.
  * 
- * If the defines PROJEKT_NAME and VERSION_STRING are defined they are shown.
+ * If the defines PACKAGE_NAME and PACKAGE_VERSION are defined they are shown.
  */
 void Getopt::ShowHelp()
 {
   /* Header */
-#ifdef PROJEKT_NAME
-  cerr << endl << PROJEKT_NAME;
-#ifdef VERSION_STRING
-  cerr << " - " << VERSION_STRING << endl;
+#ifdef PACKAGE_NAME
+   cerr << endl << PACKAGE_NAME;
+#ifdef PACKAGE_VERSION
+   cerr << " - " << PACKAGE_VERSION << endl;
 #endif
 #endif
   cerr << endl;
@@ -207,10 +209,10 @@ bool Getopt::GetOption(char letter)
  */
 void Getopt::GetOption(char letter, char &value)
 {
-  if ( value_map.find(letter) != value_map.end())
+   if (!value_map[letter].empty())
     value = value_map[letter][0];
   else 
-    value = '\0';
+     value = default_map[letter][0];;
 }
 
 /**
@@ -220,7 +222,10 @@ void Getopt::GetOption(char letter, char &value)
  */
 void Getopt::GetOption(char letter, int &value)
 {
-  sscanf( value_map[letter].c_str(), "%d", &value);
+   if (!value_map[letter].empty())
+      sscanf( value_map[letter].c_str(), "%d", &value);
+   else 
+      sscanf( default_map[letter].c_str(), "%d", &value);
 }
 
 /**
@@ -230,7 +235,10 @@ void Getopt::GetOption(char letter, int &value)
  */
 void Getopt::GetOption(char letter, double &value)
 {
-  sscanf( value_map[letter].c_str(), "%lf", &value);
+   if (!value_map[letter].empty())
+      sscanf( value_map[letter].c_str(), "%lf", &value);
+   else
+      sscanf( default_map[letter].c_str(), "%lf", &value);
 }
 
 /**
@@ -240,9 +248,46 @@ void Getopt::GetOption(char letter, double &value)
  */
 void Getopt::GetOption(char letter, string &value)
 {
-  value = value_map[letter];
+   if (!value_map[letter].empty())
+      value = value_map[letter];
+   else
+      value = default_map[letter];
 }
 
 } /* namespace QDLIB */
 
+
+
+/**
+ * Get a non-option string from the commandline.
+ * 
+ * \param number the index of the non-option string. starting with zero.
+ * \param value  destination for the value
+ * \param len    Maximum reserved space of value.
+ */
+bool QDLIB::Getopt::GetNonOption(int number, char *value, int len)
+{
+   if (_argc > (value_map.size() + 1) && (value_map.size() + number) < _argc ){
+      strncpy(value, _argv[value_map.size() + 1 + number], len);
+      return true;
+   } else return false;
+   
+}
+
+
+/**
+ * Get a non-option string from the commandline.
+ * 
+ * \param number the index of the non-option string. starting with zero.
+ * \param value  destination for the value
+ * \param len    Maximum reserved space of value.
+ */
+bool QDLIB::Getopt::GetNonOption(int number, string &value)
+{
+   if (_argc > (value_map.size() + 1) && ((unsigned int) optind + number) < _argc ){
+      value = _argv[optind + number];
+      return true;
+   } else return false;
+   
+}
 

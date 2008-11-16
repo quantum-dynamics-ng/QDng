@@ -37,10 +37,8 @@ namespace QDLIB {
     *  \li Parse the commandline (ReadArgs)
     *  \li Check if somethings missing (CheckOptions)
     * 
-    * \todo some error handling for wrong options, etc., missing options ...
-    * \todo some handling for non-options commandline parameters
+    * \todo some error handling for wrong options.
     * \todo maybe some different output device (other than stderr)?
-    * \bug Default values doesn't work
     */
    class Getopt {
      private:    
@@ -48,7 +46,8 @@ namespace QDLIB {
        map<char, string> value_map, help_map, parameter_map, default_map;
        map<char, bool> req_map;
        string basename;
-       int _argc;
+       unsigned int _argc;
+       char **_argv;
        string _description;
        
        void ParseArgs(int argc, char **argv, const char *optdef);
@@ -71,6 +70,9 @@ namespace QDLIB {
        void GetOption(char letter, int &value);
        void GetOption(char letter, double &value);
        void GetOption(char letter, string &value);
+       
+       bool GetNonOption(int number, char *value, int len);
+       bool GetNonOption(int number, string &value);
    };
 
 } /* namespace QDLIB */
