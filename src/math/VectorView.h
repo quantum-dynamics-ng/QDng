@@ -46,13 +46,13 @@ namespace QDLIB
    template <class T>
 	 VectorView<T>::VectorView(Vector<T> &vec, int ndims, int *dims) : _adim(0)
    {
-      if (vec->strides() > 1){
+      if (vec.strides() > 1){
 	 cout << "!!!WARNING: VectorView doesn't work with strided vectors!!!" << endl;
 	 _ndims = 0;
 	 _dims = 0;
 	 return;
       }
-      _v = vec.begin();
+      _v = vec.begin(0);
       _ndims = ndims;
       _dims = dims;
       

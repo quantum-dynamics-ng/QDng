@@ -20,3 +20,7 @@ libqdng_la_LIBADD = $(top_builddir)/src/sys/libtools.la \
 	$(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la
 
+bin_PROGRAMS = qdng
+qdng_SOURCES = ProgPropa.cpp qdng.cpp
+qdng_LDADD = $(top_builddir)/src/sys/libtools.la -lxml2
+noinst_HEADERS = ProgPropa.h

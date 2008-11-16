@@ -15,5 +15,5 @@ runtest_LDADD = $(top_builddir)/src/fft/libfft.la \
 Getopt_SOURCES = TestGetopt.cpp main.cpp
 Getopt_LDADD = $(top_builddir)/src/sys/libtools.la -lcppunit
 bin_PROGRAMS = StridedVector
-StridedVector_SOURCES = TestStridedVector.cpp main.cpp
+StridedVector_SOURCES = TestStridedVector.cpp TestViews.cpp main.cpp
 StridedVector_LDADD = $(top_builddir)/src/math/libmath.la -lcppunit

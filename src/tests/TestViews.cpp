@@ -19,9 +19,13 @@ void TestViews::complexSize( )
 
 void TestViews::dView( )
 {
+   dvec.newsize(27);
+   
    int dims[] = {3,3,3};
    dVecView view (dvec, 3, dims);
    dVec init(3);
+   
+   
    
    init[0] = -1;
    init[1] = 0;
@@ -29,7 +33,12 @@ void TestViews::dView( )
    view.ActiveDim(0);
    
    
-//    CPPUNIT_ASSERT_DOUBLES_EQUAL(  );
+   view = init;
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-1, dvec[0], 1e-18  );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(0, dvec[1], 1e-18  );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(1, dvec[2], 1e-18  );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-1, dvec[3], 1e-18  );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(0, dvec[4], 1e-18  );
    
 }
 
