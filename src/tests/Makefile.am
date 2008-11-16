@@ -3,7 +3,7 @@ METASOURCES = AUTO
 AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 
 noinst_HEADERS = OGridHarmonic.h Test.h TestCheby.h TestGetopt.h TestLogger.h \
-	TestMathFunctions.h TestViews.h WFGridHarmonic.h
+	TestMathFunctions.h TestStridedVector.h TestViews.h WFGridHarmonic.h
 
 noinst_PROGRAMS = Getopt logger runtest
 runtest_SOURCES = dVecMinMax.cpp TestViews.cpp main.cpp TestMathFunctions.cpp TestCheby.cpp \
@@ -14,3 +14,6 @@ runtest_LDADD = $(top_builddir)/src/fft/libfft.la \
 	-lcppunit -lblas -ldl -lfftw3 -lg2c -llapack -lslatec
 Getopt_SOURCES = TestGetopt.cpp main.cpp
 Getopt_LDADD = $(top_builddir)/src/sys/libtools.la -lcppunit
+bin_PROGRAMS = StridedVector
+StridedVector_SOURCES = TestStridedVector.cpp main.cpp
+StridedVector_LDADD = $(top_builddir)/src/math/libmath.la -lcppunit

@@ -1,10 +1,21 @@
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
+/**
+ * Counter/index integer
+ * 
+ * This should be used for all indices.
+ * Helps us to avoid potential size problems
+ * 
+ */
+namespace QDLIB {
+   typedef  int lint;
+}
 
+#include "Vector.h"
 #include "dcomplex.h"
 #include "tnt/tnt.h"
-#include "tnt/VectorView.h"
+#include "VectorView.h"
 
 
 namespace TNT {
@@ -74,11 +85,11 @@ namespace TNT {
 
 namespace QDLIB {
 
-   /** TNT Vector of doubles */
-   typedef TNT::Vector<double> dVec;
+   /** Variant of TNT Vector of doubles */
+   typedef QDLIB::Vector<double> dVec;
    
-   /** TNT Vector of dcomplex */
-   typedef TNT::Vector<dcomplex> cVec;
+   /** Variant of TNT Vector of dcomplex */
+   typedef QDLIB::Vector<dcomplex> cVec;
 
    /** TNT Matrix of doubles */
    typedef TNT::Matrix<double> dMat;
@@ -87,10 +98,10 @@ namespace QDLIB {
    typedef TNT::Matrix<dcomplex> cMat;
 
    /** Multidimensional view on dVec */
-   typedef TNT::VectorView<double> dVecView;
+   typedef QDLIB::VectorView<double> dVecView;
    
    /** Multidimensional view on dVec */
-   typedef TNT::VectorView<dcomplex> cVecView;
+   typedef QDLIB::VectorView<dcomplex> cVecView;
    
      
    extern double VecMin(dVec &v);
@@ -122,16 +133,25 @@ namespace QDLIB {
    /**
     * Multiply vectors by elements.
     * 
-    * You strongly to encouraged to use this, since all optimizations and
+    * You strongly encouraged to use this, since all optimizations and
     * parallelistation will be done here.
     */
    inline void MultElements(dVec *A, dVec *B)
    {
-      int size = A->size();
+      lint size = A->lsize();
+      lint strides = A->strides();
       
-      for (int i=0; i < size; i++)
-      {
-	 (*A)[i] *= (*B)[i];
+      double *a;
+      double *b;
+      
+      lint s;
+      for (s=0; s < strides; s++)
+	 a = A->begin(s);
+         b = B->begin(s);
+	 for (lint i=0; i < size; i++){
+	 {
+	    a[i] *= b[i];
+	 }
       }
    }
    
@@ -143,11 +163,21 @@ namespace QDLIB {
     */
    inline void MultElements(cVec *A, dVec *B)
    {
-      int size = A->size();
+      lint size = A->lsize();
+      lint strides = A->strides();
       
-      for (int i=0; i < size; i++)
-      {
-	 (*A)[i] *= (*B)[i];
+      dcomplex *a;
+      double *b;
+      
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+         b = B->begin(s);
+	 for (lint i=0; i < size; i++)
+	 {
+	    a[i] *= b[i];
+	 }
       }
    }
 
@@ -191,7 +221,8 @@ namespace QDLIB {
     */
    inline void MultElements(cVec *A, double c)
    {
-      int size = A->size();
+      int size = A->lsize();
+      
       
       for (int i=0; i < size; i++)
       {
