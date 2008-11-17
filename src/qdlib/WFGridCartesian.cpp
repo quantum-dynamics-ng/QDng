@@ -112,7 +112,7 @@ namespace QDLIB {
       if (isKspace())
       {
 	 for(int i=0; i < GridSystem::Dim(); i++){
-	    c *= 2*PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i)) ;
+	    c *= 2*M_PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i)) ;
 	 }
 
       } else {

@@ -63,7 +63,7 @@ namespace QDLIB {
          _kspace->newsize(_Nx_last);
       }
          
-      double dp = (2*PI) / _L_last;    // Setup dp for kspace
+      double dp = (2*M_PI) / _L_last;    // Setup dp for kspace
      
       /* We include all the factors in the k-space function => Do it only once */
       /* The minus cancels with minus from -kx^2. */

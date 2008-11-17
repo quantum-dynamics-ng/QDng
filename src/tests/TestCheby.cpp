@@ -147,6 +147,7 @@ void TestCheby::Propagation1D( )
    string s;
    string name;
    WaveFunction *phi;
+   double energy;
    
    /* System parameters */
    p.SetValue( "dims", 1);
@@ -166,8 +167,11 @@ void TestCheby::Propagation1D( )
    H.Add(&T);
    H.Add(&Vh);
    
+   
    CPPUNIT_ASSERT_EQUAL(2, H.Size());
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Groundstate energy", 0.006834491398, H.Expec( &psi), 1e-2);
+   
+   energy = H.Expec( &psi);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Groundstate energy", 0.006834491398, energy, 1e-2);
 
    /* Init Cheby  */
    p.clear();
@@ -191,7 +195,13 @@ void TestCheby::Propagation1D( )
    
    /* Check Norm and energy */
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of Norm", 1.0, phi->Norm(), 1e-10);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of energy", energy , H.Expec(phi), 1e-10);
    
+   
+   /* Check the *= operator */
+   CPPUNIT_ASSERT_NO_THROW( U *= phi );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of Norm (*=)", 1.0, phi->Norm(), 1e-10);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of energy (*=)", energy , H.Expec(phi), 1e-10);
    delete phi;
 }
 

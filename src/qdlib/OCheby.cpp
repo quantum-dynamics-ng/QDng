@@ -112,7 +112,6 @@ namespace QDLIB
    WaveFunction * OCheby::operator *=( WaveFunction * Psi )
    {
       WaveFunction *swap;
-      WaveFunction *ket0_buf;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
@@ -141,7 +140,6 @@ namespace QDLIB
 	 /* multiply by coefficients of the series expansion and add up to the result*/
 	 *ket0 *= _coeff[i-2];
 	 *Psi += ket0;
-	 cout << r->Norm() << endl;
 	 /* shift back by one - use pointers instead of copy */
 	 swap = ket0;
 	 ket0 = ket1;

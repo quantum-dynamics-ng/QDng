@@ -13,9 +13,9 @@ namespace QDLIB {
    */
    FFT::FFT(cVec &in, cVec &out, bool oneway) : _dims(NULL)
    {
-      _planf = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(), (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+      _planf = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
       if (!(_oneway = oneway)){
-	 _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(), (fftw_complex*) in.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+	 _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
       }
       
    }
@@ -35,27 +35,27 @@ namespace QDLIB {
       
       switch (grid.Dim()){
 	 case 1:  /* 1D */
-	    _planf = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) in.begin(),
-				      (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+	    _planf = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) in.begin(0),
+				      (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
 	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) out.begin(),
-					 (fftw_complex*) in.begin(), FFTW_BACKWARD, FFTW_ESTIMATE);
+	       _planb = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) out.begin(0),
+					 (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	    break;
 	 case 2: /* 2D */
-	    _planf = fftw_plan_dft_2d(grid.DimSizes(1) , grid.DimSizes(0), (fftw_complex*) in.begin(),
-				    (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);
+	    _planf = fftw_plan_dft_2d(grid.DimSizes(1) , grid.DimSizes(0), (fftw_complex*) in.begin(0),
+				    (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
 	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_2d(grid.DimSizes(1) , grid.DimSizes(0), (fftw_complex*) out.begin(),
-				       (fftw_complex*) in.begin(),  FFTW_BACKWARD, FFTW_ESTIMATE);
+	       _planb = fftw_plan_dft_2d(grid.DimSizes(1) , grid.DimSizes(0), (fftw_complex*) out.begin(0),
+				       (fftw_complex*) in.begin(0),  FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	    break;
 	 case 3: /* 3D */
 	    _planf = fftw_plan_dft_3d(grid.DimSizes(2) , grid.DimSizes(1), grid.DimSizes(0),
-				    (fftw_complex*) in.begin(), (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);	
+				    (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);	
 	    if (!(_oneway = oneway)){
 	       _planb = fftw_plan_dft_3d(grid.DimSizes(2) , grid.DimSizes(1), grid.DimSizes(0),
-					 (fftw_complex*) out.begin(), (fftw_complex*) in.begin(), FFTW_BACKWARD, FFTW_ESTIMATE);
+					 (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	    break;
 	 default: /* arb. dims */
@@ -63,11 +63,11 @@ namespace QDLIB {
 	    for (int i=0; i < grid.Dim(); i++){
 	       _dims[grid.Dim() - i - 1] = grid.DimSizes(i);
 	    }
-	    _planf = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) in.begin(),
-				 (fftw_complex*) out.begin(), FFTW_FORWARD, FFTW_ESTIMATE);	
+	    _planf = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) in.begin(0),
+				 (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);	
 	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) out.begin(),
-				      (fftw_complex*) in.begin(), FFTW_BACKWARD, FFTW_ESTIMATE);
+	       _planb = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) out.begin(0),
+				      (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	 
       } /* switch  */
@@ -85,9 +85,9 @@ namespace QDLIB {
    */
    FFT::FFT(dVec &in, cVec &out, bool oneway) : _dims(NULL)
    {
-      _planf = fftw_plan_dft_r2c_1d(in.size(), in.begin(), (fftw_complex*) out.begin(), FFTW_ESTIMATE);	
+      _planf = fftw_plan_dft_r2c_1d(in.size(), in.begin(0), (fftw_complex*) out.begin(0), FFTW_ESTIMATE);	
       if (!(_oneway = oneway)){
-	 _planb = fftw_plan_dft_c2r_1d(in.size(), (fftw_complex*) out.begin(), in.begin(), FFTW_ESTIMATE);
+	 _planb = fftw_plan_dft_c2r_1d(in.size(), (fftw_complex*) out.begin(0), in.begin(0), FFTW_ESTIMATE);
       }
    }
       

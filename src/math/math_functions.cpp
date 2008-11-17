@@ -72,7 +72,7 @@ namespace QDLIB {
       bRe.newsize(n);
       bIm.newsize(n);
 //       (ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)
-      zbesj_(&arg, &argIm, &alpha, &kode, &n, (double*) bRe.begin(), (double*) bIm.begin(), &nz, &ierr);
+      zbesj_(&arg, &argIm, &alpha, &kode, &n, (double*) bRe.begin(0), (double*) bIm.begin(0), &nz, &ierr);
       
       /* make it real */
       for (int i=0; i < n; i++){

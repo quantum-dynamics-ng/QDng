@@ -32,7 +32,7 @@ namespace QDLIB {
       _dx = _xmax - _xmin;
       if (_dx == 0) throw ( EParamProblem("Zero length grid defined") );
       
-      _dp = (2*PI) / _dx;     // K-Space -> dp =  2pi / L
+      _dp = (2*M_PI) / _dx;     // K-Space -> dp =  2pi / L
       
       _dx = _dx / (double(_Nx) - 1) ;
      
@@ -68,7 +68,7 @@ namespace QDLIB {
    
    void WFGrid1D::Normalize()
    {
-      (*this) * (1/Norm());
+      (*this) *= (1/Norm());
    }
 
    WaveFunction* WFGrid1D::operator=(WaveFunction* Psi)
@@ -110,7 +110,7 @@ namespace QDLIB {
    
    void WFGrid1D::Dx(double dx)
    {
-      _dp = _dx / (2*PI);     // K-Space -> delta p
+      _dp = _dx / (2*M_PI);     // K-Space -> delta p
       _dx = dx;
       
    }

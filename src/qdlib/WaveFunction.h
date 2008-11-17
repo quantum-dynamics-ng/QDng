@@ -10,38 +10,7 @@
 
 
 
-namespace QDLIB {
-  
-   /**
-    * Identifies the basic type of the wave function.
-    * 
-    */
-   enum WFType
-   {  /** vector format. */
-      vector, 
-      /** grid DVR representation. */
-      grid 
-   };
-      
-   /**
-    * \struct WFDesc
-    * General description of wave function content
-    */
-//    typedef struct _wfdesc {
-//       /** System ID / wf ID */
-//       int id;
-//       /** basic wave function type */
-//       WFType type;
-//       /** number of dimensions.
-//        * May have different meaning for grid / vector types
-//        */
-//       int num_dims;
-//       /** Size of each dimension.
-//        * number of elements defined by num_dims.
-//        */
-//       int dims[MAX_DIMS];
-//    } WFDesc;
-// 	 
+namespace QDLIB { 
    /**
     * Abstract Wavefunction class.
     * 
@@ -91,12 +60,7 @@ namespace QDLIB {
 	  * \return Name of the implementet wave function
 	  */
 	 virtual const string& Name() = 0;
-	 
-	 /**
-	  * Should return a unique ID which idenfies the wave function.
-	  */
-	 virtual int ID() = 0;
-	    
+	 	    
 	 /**
 	  * Norm of the wave function.
 	  * 

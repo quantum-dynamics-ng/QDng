@@ -37,6 +37,7 @@ int main(int argc, char **argv)
       
       rnodes = XMLfile.Root();
       
+      /* Loop over program nodes */
       while (rnodes.EndNode()) {
 	 progname = rnodes.Name();
 	 
@@ -48,10 +49,11 @@ int main(int argc, char **argv)
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
 	 } else if (progname == "oct") {
 	    throw ( EParamProblem ("OCT not implementet yet") );
+	 } else if (progname == "densmat") {
+	    throw ( EParamProblem ("Density matrix propagation not implementet yet") );
 	 } else {
 	    throw ( EParamProblem ("Programm type not known") );
 	 }
-	 
 	 
 	 rnodes.NextNode();
       }

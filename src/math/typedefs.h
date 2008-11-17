@@ -141,8 +141,8 @@ namespace QDLIB {
       lint size = A->lsize();
       lint strides = A->strides();
       
-      double *a;
-      double *b;
+      double *a=NULL;
+      double *b=NULL;
       
       lint s;
       for (s=0; s < strides; s++)

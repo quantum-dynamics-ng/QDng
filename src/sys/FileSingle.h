@@ -262,8 +262,11 @@ namespace QDLIB {
       /* Write binary data */
       file.open(s.c_str(), ofstream::binary);
       if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing") );
-      file.write((char*) data->begin(), data->sizeBytes() );
-      if( file.bad() ) throw( EIOError("Can not write binary file") );
+      /* Write multiple strides */
+      for(int i=0; i < data->strides(); i++){
+         file.write((char*) data->begin(i), data->sizeBytes() );
+         if( file.bad() ) throw( EIOError("Can not write binary file") );
+      }
       
    
    }
@@ -307,11 +310,13 @@ namespace QDLIB {
 	 cout << "can't open\n";
 	 throw ( EIOError("Can not open binary file for reading") );
       }
-      file.read((char*) data->begin(), data->sizeBytes());
-       if( file.fail() || file.eof() ){
-	  cout << "can't read\n";
-	  throw( EIOError("Can not read binary file") );
-       }
+      /* Read multiple strides */
+      for(int i=0; i < data->strides(); i++){
+	 file.read((char*) data->begin(), data->sizeBytes());
+	 if( file.fail() || file.eof() ){
+	    throw( EIOError("Can not read binary file") );
+	 }
+      }
 	  
        file.close();
       

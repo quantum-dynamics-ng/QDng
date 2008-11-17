@@ -71,6 +71,7 @@ class Vector
     size_type nstrides_;
     size_type stride_size_;
     
+    bool isRef_;
     // internal helper function to create the array
     // of row pointers
 
@@ -101,6 +102,14 @@ class Vector
             v_[s][i] = v[s][i];
     }
 
+    void copy(const T *v)
+    {
+       for (lint s=0; s < nstrides_; s++)
+	  for (lint i=0; i< stride_size_; i++)
+	     v_[s][i] = v[i];
+    }
+
+    
     void set(const T& val)
     {
        for (lint s=0; s < nstrides_; s++){
@@ -120,7 +129,7 @@ class Vector
        for (lint s=0; s < nstrides_; s++){
  	  if (v_[s] != NULL){
 	     delete [] v_[s];
-	     v_[s] == NULL;
+	     v_[s] = NULL;
  	  }
        }
     }
@@ -130,9 +139,9 @@ class Vector
        /**
         * Inject the pointer of a vector into a stride.
         * 
-        * Use with extreme care. All pointer will be destroyed in the destructor.
-        * Otherwise if you destroy the original instance data in the strides
-        * will be no longer valid!
+        * Use with extreme care. 
+        * If you destroy the original instance data in the strides
+        * it will be no longer valid!
         * 
         * \param vec    The vector to inject
         * \param source The source stride in vec
@@ -140,8 +149,15 @@ class Vector
         */
        bool StrideRef(Vector<T> &vec, lint source, lint dest = 0)
        {
-	  if ( dest > nstrides_ || vec.size() != stride_size_ || source > vec.strides() )
+	  if ( isRef_  && vec.stride_size_ != stride_size_ )
 	     return false;
+	  
+	  if (!isRef_){
+	     if (dest >= TNT_MAX_STRIDES) return false;
+	     destroy();
+	     if (nstrides_ < dest) nstrides_ = dest + 1;
+	     stride_size_ = vec.stride_size_;
+	  }
 	
 	  v_[dest] = vec.v_[source];
 	  
@@ -192,7 +208,7 @@ class Vector
     // destructor
     ~Vector() 
     {
-        destroy();
+       if (!isRef_) destroy();   /* Only destroy data if it's our own*/
     }
 
     // constructors
@@ -206,22 +222,28 @@ class Vector
     }
 
     
-    Vector(const Vector<T> &A) : n_(0), nstrides_(1), stride_size_(0)
+    Vector(const Vector<T> &A) : n_(0), nstrides_(1), stride_size_(0), isRef_(false)
     {
        initialize(A.n_, A.nstrides_);
         copy(A.v_);
     }
 
-    Vector(lint N, const T& value = T()) : n_(0), nstrides_(1), stride_size_(0)
+    Vector(lint N, const T& value = T()) : n_(0), nstrides_(1), stride_size_(0), isRef_(false)
     {
         initialize(N, nstrides_);
         set(value);
     }
 
-    Vector(lint N, const T** v) :  n_(0), nstrides_(1), stride_size_(0)
+    Vector(lint N, lint strides, const T** v) :  n_(N), nstrides_(strides), stride_size_(0), isRef_(false)
     {
-        initialize(N, nstrides_);
+        initialize(N, strides);
         copy(v);
+    }
+
+    Vector(lint N, const T* v) :  n_(0), nstrides_(1), stride_size_(0), isRef_(false)
+    {
+       initialize(N, nstrides_);
+       copy(v);
     }
 
 
@@ -232,8 +254,9 @@ class Vector
     {
         if (n_ == N) return *this;
 
-        destroy();
+        if (!isRef_) destroy();
         initialize(N, 1);
+	isRef_ = false;
 
         return *this;
     }
@@ -267,7 +290,7 @@ class Vector
 	   /* no need to re-alloc */
             copy(A.v_);
 	} else {
-            destroy();
+            if (!isRef_) destroy();
             initialize(A.n_, A.nstrides_);
             copy(A.v_);
         }
