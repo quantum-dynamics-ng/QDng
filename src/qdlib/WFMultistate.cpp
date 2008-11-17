@@ -68,6 +68,11 @@ namespace QDLIB
    {
       WFMultistate *r = new WFMultistate();
       
+      if (_size > 0){
+	 for (int i=0; i < _size; i++)
+	    r->Add(_states[i]->NewInstance());
+      }
+      
      return r;
    }
 

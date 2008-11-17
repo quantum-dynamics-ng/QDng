@@ -4,10 +4,24 @@
 
 namespace QDLIB {
 
+   /* Static member initalisation */
+   ModuleLoader*  ModuleLoader::_ref=0;
+   
    ModuleLoader::ModuleLoader() : _user_path("~/qdmods/")
    {
    }
    
+   /**
+    * Get an instance of the singleton.
+    */
+   ModuleLoader * QDLIB::ModuleLoader::Instance( )
+   {
+      if (_ref == NULL){
+	 _ref = new ModuleLoader();
+      }
+      
+      return _ref;
+   }
    
    ModuleLoader::~ModuleLoader()
    {
@@ -19,6 +33,7 @@ namespace QDLIB {
 	 dlclose( it->second.handle );
 	 it++;
       }
+      delete _ref;
    }
    
    /**
@@ -166,6 +181,8 @@ namespace QDLIB {
 
 
 }
+
+
 
 
 

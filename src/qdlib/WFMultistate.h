@@ -1,7 +1,7 @@
 #ifndef QDLIBWFMULTISTATE_H
 #define QDLIBWFMULTISTATE_H
 
-#include <WaveFunction.h>
+#include "WaveFunction.h"
 
 #define QD_MAX_STATES 16
 

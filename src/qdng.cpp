@@ -9,7 +9,10 @@
 #include "sys/Getopt.h"
 #include "sys/XmlParser.h"
 
+#include "modules/ModuleLoader.h"
+
 #include "ProgPropa.h"
+
 
 using namespace std;
 using namespace QDLIB;
@@ -24,13 +27,24 @@ int main(int argc, char **argv)
    XmlNode   rnodes;
    string progname;
    
+   ModuleLoader *mods = ModuleLoader::Instance();
+   
    cmdline.SetDescription("QD next generation");
+   cmdline.SetHelp( 'm', "module path", false,
+		    "User defined path to the wave function and operator modules", "");
    cmdline.ReadArgs(argc, argv);
+//    cmdline.CheckOptions();
    
    /* This is the global try-catch block */
    try {
       if(! cmdline.GetNonOption(0, fname) )
 	 throw ( EParamProblem ("No input file given") );
+      
+      /* Provide a user path for module loading */
+      if (cmdline.GetOption('m')){
+	 cmdline.GetOption('m', fname);
+	 mods->UserPath( fname );
+      }
       
       /* Open input file and check programm nodes */
       XMLfile.Parse(fname);
@@ -43,8 +57,8 @@ int main(int argc, char **argv)
 	 
 	 if (progname == "propa"){
 	    ProgPropa propa(rnodes);
-	    propa.Run();
 	    cout << "*** Run Propagation\n\n";
+	    propa.Run();
 	 } else if (progname == "eigen") {
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
 	 } else if (progname == "oct") {

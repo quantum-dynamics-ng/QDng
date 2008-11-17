@@ -1,3 +1,5 @@
+
+
 #include "XmlNode.h"
 
 namespace QDLIB {
@@ -81,6 +83,25 @@ namespace QDLIB {
 	 return false;
       else
 	 return true;
+   }
+   
+   /**
+    * Find a named element in the same level.
+    */
+   XmlNode * QDLIB::XmlNode::FindNode( const string & name )
+   {
+      xmlNode *buf = _cur_node;
+      XmlNode *r = NULL;
+      
+      while ( buf != NULL ){
+	 if (name == (char*) buf->name ) {
+	    r = new XmlNode();
+	    r->_cur_node = buf;
+	    break;
+	 }  
+	 buf = buf->next;
+      }
+      return r;
    }
    
    /**

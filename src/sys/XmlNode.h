@@ -14,11 +14,13 @@ namespace QDLIB
 {
 
    /**
-   * Represents a XML node.
-   *
-   * \author Markus Kowalewski
-   */
-
+    * Represents a XML node.
+    *
+    * All the functions generating new child notes register it.
+    * Thus all the generatetd nodes will be destroyed in the destructor.
+    * 
+    * \author Markus Kowalewski
+    */
    class XmlNode
    {
 
@@ -40,6 +42,8 @@ namespace QDLIB
          void NextNode();
 	 bool EndNode();
 
+	 XmlNode* FindNode( const string &name);
+	 
          string& Name();
          ParamContainer& Attributes();
 

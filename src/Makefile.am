@@ -22,5 +22,6 @@ libqdng_la_LIBADD = $(top_builddir)/src/sys/libtools.la \
 
 bin_PROGRAMS = qdng
 qdng_SOURCES = ProgPropa.cpp qdng.cpp
-qdng_LDADD = $(top_builddir)/src/sys/libtools.la -lxml2
+qdng_LDADD = $(top_builddir)/src/sys/libtools.la \
+	$(top_builddir)/src/modules/libModuleLoader.a $(top_builddir)/src/qdlib/libqd.la -lxml2
 noinst_HEADERS = ProgPropa.h
