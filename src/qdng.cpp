@@ -37,14 +37,19 @@ int main(int argc, char **argv)
    
    /* This is the global try-catch block */
    try {
-      if(! cmdline.GetNonOption(0, fname) )
-	 throw ( EParamProblem ("No input file given") );
       
       /* Provide a user path for module loading */
       if (cmdline.GetOption('m')){
 	 cmdline.GetOption('m', fname);
+	 cout << fname << endl;
 	 mods->UserPath( fname );
       }
+      
+      
+      if(! cmdline.GetNonOption(0, fname) )
+	 throw ( EParamProblem ("No input file given") );
+      
+
       
       /* Open input file and check programm nodes */
       XMLfile.Parse(fname);
@@ -57,7 +62,7 @@ int main(int argc, char **argv)
 	 
 	 if (progname == "propa"){
 	    ProgPropa propa(rnodes);
-	    cout << "*** Run Propagation\n\n";
+	    cout << "*** Run Propagation ***\n\n";
 	    propa.Run();
 	 } else if (progname == "eigen") {
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );

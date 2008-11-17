@@ -15,9 +15,16 @@ namespace QDLIB {
     * This is the main module for a propagagation run.
     * 
     * XmlNode Attributes:
-    * \li dt      time step
-    * \li steps   number of time steps
+    * \li dt      time step, (a negative time step means backward propagagation) [required]
+    * \li steps   number of time steps [required]
     * \li wcycle  number of step to make until a wf will be written and the reporter will analyze.
+    * 
+    * printing options:
+    * \li norm    yes/no  print norm in the report.
+    * \li energy  yes/no  print the Energy in the report.
+    * \li proj0   yes/no  print the projection against in the initial wave function.
+    * \li spectrum   filename  if given a the projection against the inital wavefunction is turned on.
+    *                          The power spectrum of the propagagation will be written.
     * 
     * @author Markus Kowalewski
     */
