@@ -1,8 +1,5 @@
 #include <iostream>
-
 #include "Getopt.h"
-
-
 
 
 namespace QDLIB {
