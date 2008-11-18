@@ -50,20 +50,20 @@ namespace QDLIB
    
       /* Write header */
       if (_step == 0){
-	 _specbuf.newsize(clock->Steps());
-	 cout << "Time Step\tTime[au]";
+// 	 _specbuf.newsize(clock->Steps());
+	 cout << "Step\tTime[au]\t";
 	 if (_norm) cout << "\tNorm";
 	 if (_proj0) cout << "\t<Psi0|PsiT>";
 	 if (_energy) cout << "\tEnergy[au]";
 	 cout << endl;
       }
-   
+      _step++;
       /* Write time */
-      cout << clock->TimeStep() << "\t" << clock->Time();
+      cout << clock->TimeStep() << "\t" << clock->Time()<< "\t";
    
       /* Norm */
       if (_norm){
-	 cout << "\t" << *Psi * Psi;
+	 cout << "\t" << Psi->Norm();
       } 
    
       /* projection and spectrum */

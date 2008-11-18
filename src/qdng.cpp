@@ -13,7 +13,6 @@
 
 #include "ProgPropa.h"
 
-
 using namespace std;
 using namespace QDLIB;
 
@@ -62,7 +61,7 @@ int main(int argc, char **argv)
 	 
 	 if (progname == "propa"){
 	    ProgPropa propa(rnodes);
-	    cout << "\t\t\t*** Run Propagation ***\n\n";
+	    cout << "\n\t\t\t*** Run Propagation ***\n\n";
 	    propa.Run();
 	 } else if (progname == "eigen") {
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
@@ -78,8 +77,8 @@ int main(int argc, char **argv)
       }
       
    } catch (Exception e) {
-      cerr << "A problematic error occured:\n\t";
-      cerr << e.GetMessage() << endl;
+      cerr << "\n\n\t!!!A problematic error occured:\n\t";
+      cerr << e.GetMessage() << "\n\n\n";
    }
   
   delete mods;

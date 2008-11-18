@@ -37,6 +37,7 @@ namespace QDLIB {
 	 Reporter _reporter;
 	 
 	 OPropagator *_U;
+	 Operator *_H;
 	 
 	 void _InitParams();
 	 void _InitSumOperator();

@@ -1,6 +1,8 @@
 #include "modules/ModuleLoader.h"
+
 #include "ProgPropa.h"
 
+#include "sys/FileSingleDefs.h"
 
 #include "qdlib/OSum.h"
 #include "qdlib/OGridSum.h"
@@ -46,7 +48,9 @@ namespace QDLIB {
 	 OSum *sum = new OSum();
 	 while (child->EndNode()){
 	    osub = _LoadOperatorChain( child );
-// 	    sum->Add( osub );
+	    if (osub == NULL)
+	       throw ( EParamProblem("Can't load operator") );
+ 	    sum->Add( osub );
 	    child->NextNode();
 	 }
 	 return sum;	 
@@ -56,7 +60,9 @@ namespace QDLIB {
 	 OGridSum *sum = new OGridSum;
 	 while (child->EndNode()){
 	    osub = _LoadOperatorChain( child );
-// 	    sum->Add( osub );
+	    if (osub == NULL)
+	       throw ( EParamProblem("Can't load operator") );	    
+ 	    sum->Add( dynamic_cast<OGridSystem*>(osub) );
 	    child->NextNode();
 	 }
 	 return sum;
@@ -71,9 +77,10 @@ namespace QDLIB {
 	 }
 	 return matrix;
       } else { 
-	 //O = mods->LoadOp( name );
+	 O = mods->LoadOp( name );
 	 cout << "Loading: " << name << endl;
-	 //O->Init(pm);
+	 cout << pm;
+	 O->Init(pm);
       }
       return O;
       
@@ -101,18 +108,28 @@ namespace QDLIB {
       pm.GetValue( "name", name );
       
       if (name == "Multistate"){
-	 cout << "Loading Multistate: " << name << endl;
 	 child = WFNode->NextChild();
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
 	 while (child->EndNode()){
 	    wfsub = _LoadWaveFunctionChain( child );
-// 	    sum->Add( osub );
+	    multi->Add( wfsub );
 	    child->NextNode();
 	 }
-	 return multi;	
+	 return multi;
       } else {
-	 cout << "Loading: " << name << endl;
+	 
+	 WF = mods->LoadWF( name );
+	 if (WF == NULL)
+	    throw ( EParamProblem("WaveFunction module loading failed") );
+	 
+	 pm.GetValue( "file", name );
+	 FileWF file;
+	 file.Suffix(BINARY_WF_SUFFIX);
+	 file.Name(name);
+	 cout << "WF from file: " << name << endl;
+	 file >> WF;
+	 
       }
       return WF;
    }
@@ -181,6 +198,8 @@ namespace QDLIB {
    void ProgPropa::_LoadPropagator( XmlNode *Unode )
    {
       ModuleLoader* mods = ModuleLoader::Instance();
+      QDClock *clock = QDGlobalClock::Instance();
+      
       ParamContainer pm, needs;
       string name, s;
       
@@ -194,28 +213,27 @@ namespace QDLIB {
       pm.GetValue("name", name);
       
       /* Load the module */
-      //_U = dynamic_cast<OPropagator*> mods->LoadOp( name );
-      cout << "Loading: " << name << endl;
+      _U = dynamic_cast<OPropagator*>(mods->LoadOp( name ));
       
       /* Initialize */
-      //_U->Init( *pm );
-      // needs = _U->TellNeeds();
-      needs.SetValue( "hamilton", "" ); //DBG
+      _U->Init( pm );
+      needs = _U->TellNeeds();
       needs.ResetPosition();
       
       
       XmlNode *child = Unode->NextChild();
       XmlNode *ops;
       
+      /* Search for needs and add it */
       while (needs.GetNextValue( name, s )){
-	 cout << "propagator wants: " << name << endl;
 	 ops = child->FindNode( name );
 	 if ( ops == NULL )
-	    throw ( EParamProblem ("Can't find an operator for the propagtion") );
-	 _LoadOperatorChain( ops );
+	    throw ( EParamProblem ("Can't find an operator for the propagation") );
+	 _H = _LoadOperatorChain( ops );
 	 delete ops;
+	 _U->AddNeeds( name, _H );
       }
-      
+
       
    }
 
@@ -249,6 +267,27 @@ namespace QDLIB {
       
       Psi = _LoadWaveFunctionChain( section );
       delete section;
+      
+      QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
+      
+      /* Give the reporter module what it needs */
+      _reporter.PsiInitial( Psi );
+      _reporter.Hamilton( _H );
+      
+      /* Make sure our hamiltonian is initalized */
+      _H->Expec(Psi);
+      
+      /* Let the Propagator do it's initalisation */
+      _U->Clock( clock );
+      _U->Forward();
+      _U->ReInit();
+      
+      /* The propagation loop */
+      for (lint i=0; i < clock->Steps(); i++){
+	 if (clock->TimeStep() % _wcycle == 0)  _reporter.Analyze( Psi );
+	*_U *= Psi;
+	++(*clock);
+      }
    }
 
 }

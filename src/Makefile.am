@@ -22,7 +22,7 @@ libqdng_la_LIBADD = $(top_builddir)/src/sys/libtools.la \
 
 bin_PROGRAMS = qdng
 qdng_SOURCES = ProgPropa.cpp qdng.cpp Reporter.cpp
-qdng_LDADD = $(top_builddir)/src/sys/libtools.la \
-	$(top_builddir)/src/modules/libModuleLoader.a $(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la \
-	$(top_builddir)/src/fft/libfft.la -lfftw3 -lxml2
+qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
+	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/sys/libtools.la $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/fft/libfft.la -lg2c -lslatec -llapack -lblas -lfftw3 -lxml2
 noinst_HEADERS = ProgPropa.h Reporter.h

@@ -21,18 +21,7 @@
 
 namespace QDLIB {
 
-   /**
-    * Defines the disk storage type of the data.
-    */
-   enum StorageType
-   {
-      /** unformated raw binary file */
-      binary,
-      /** human readable ascii format */
-      ascii,
-      /** HDF5 specific format */
-      hdf5
-   };
+
 
    
    /**
@@ -55,6 +44,19 @@ namespace QDLIB {
     */
    template <class C>
    class FileSingle {
+      public:
+	 /**
+          * Defines the disk storage type of the data.
+	  */
+	 enum StorageType
+	 {
+	    /** unformated raw binary file */
+	    binary,
+	    /** human readable ascii format */
+	    ascii,
+	    /** HDF5 specific format */
+	    hdf5
+	 };
       private:
          bool _drop_meta;      // Ignore metadata
          void _WriteFileBinary(C *data);
@@ -71,6 +73,7 @@ namespace QDLIB {
 	bool _sequence;
 	int _counter;
       public:
+	 	 
 	 FileSingle();
 	 FileSingle(const StorageType type, bool Sequence = false);
 	 FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence = false);
@@ -121,7 +124,7 @@ namespace QDLIB {
 	 _drop_meta(false), _type(binary),  _name("default"), _suffix(""), _sequence(false) {}
    
    /**
-    * Constructor with type initilisation.
+    * Constructor with type initialisation.
     *
     */
    template <class C>
@@ -129,7 +132,7 @@ namespace QDLIB {
 	 _type(type), _drop_meta(false), _name("default"), _suffix(""), _sequence(Sequence), _counter(0) {}
    
    /**
-    * Constructor with type and name initilisation.
+    * Constructor with type and name initialisation.
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence) :
@@ -289,7 +292,6 @@ namespace QDLIB {
          data->Init(p);
       }
       
-      
       /* We need some parameters for reading */
       if (data->sizeBytes() <= 0) throw( EParamProblem("Wrong size") ) ;
       
@@ -302,17 +304,16 @@ namespace QDLIB {
       } else {
 	 s = _name + _suffix;
       }
-            
       
-  
       file.open(s.c_str(), ios::binary);
       if( file.fail() ) {
 	 cout << "can't open\n";
 	 throw ( EIOError("Can not open binary file for reading") );
       }
+      
       /* Read multiple strides */
       for(int i=0; i < data->strides(); i++){
-	 file.read((char*) data->begin(), data->sizeBytes());
+	 file.read((char*) data->begin(i), data->sizeBytes());
 	 if( file.fail() || file.eof() ){
 	    throw( EIOError("Can not read binary file") );
 	 }

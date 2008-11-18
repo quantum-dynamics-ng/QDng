@@ -1,6 +1,6 @@
 #include <dlfcn.h>
 #include "ModuleLoader.h"
-
+#include "qdlib/InternalMods.h"
 
 namespace QDLIB {
 
@@ -36,7 +36,7 @@ namespace QDLIB {
       
       /* Unload the modules */
       it = _mod_map.begin();
-      while (it != _mod_map.end() ){
+      while (it != _mod_map.end() && it->second.handle != NULL){
 	 dlclose( it->second.handle );
 	 it++;
       }
@@ -51,6 +51,30 @@ namespace QDLIB {
      else return false;
    }
 
+   /**
+    * Load an compiled in WF module.
+    * 
+    * \return true if compiled in module was found
+    */
+   bool ModuleLoader::_InternalWF(const string &name)
+   {
+      void* handle;
+      string s;
+      
+      s = INTERNAL_BASENAME_WF + name;
+      instWF* InstanceWF = InternalWF(s);
+      
+      if (InstanceWF != NULL){
+	 _mod_map[name].InstanceWF = InstanceWF;
+	 _mod_map[name].InstanceOP = NULL;
+	 _mod_map[name].link_count++;
+	 _mod_map[name].handle = handle;
+	 return true;
+      } else {
+	 return false;
+      }
+      
+   }
    
    /**
     * Register a WF module.
@@ -69,6 +93,32 @@ namespace QDLIB {
       } else {
 	 throw ( Exception("Invalid WaveFunction module") );
       }
+   }
+   
+   
+      /**
+    * Load an compiled in WF module.
+    * 
+    * \return true if compiled in module was found
+       */
+   bool ModuleLoader::_InternalOP(const string &name)
+   {
+      string s;
+      
+      
+      s = INTERNAL_BASENAME_OP + name;
+      instOP* InstanceOP = InternalOP(s);
+      
+      if (InstanceOP != NULL){
+	 _mod_map[name].InstanceWF = NULL;
+	 _mod_map[name].InstanceOP = InstanceOP;
+	 _mod_map[name].link_count++;
+	 _mod_map[name].handle = NULL;
+	 return true;
+      } else {
+	 return false;
+      }
+      
    }
    
    /**
@@ -123,8 +173,13 @@ namespace QDLIB {
 	 return _mod_map[name].InstanceWF();
       }
 	 
+      /* try compiled in module */
+      if (_InternalWF(name)){
+	 return _mod_map[name].InstanceWF();
+      }
+      
       /* try user path */
-      s = _user_path + name;
+      s = _user_path + MOD_BASENAME_WF + name;
    
       handle = dlopen(s.c_str(), RTLD_NOW );
       if ( handle != NULL )
@@ -134,7 +189,8 @@ namespace QDLIB {
       }
       
       /* try system path */
-      handle = dlopen(name.c_str(), RTLD_NOW );
+      s = MOD_BASENAME_WF + name;
+      handle = dlopen(s.c_str(), RTLD_NOW );
       if ( handle != NULL )
       {
 	 _RegisterWF(handle, name);
@@ -164,8 +220,14 @@ namespace QDLIB {
 	 return _mod_map[name].InstanceOP();
       }
 	 
+      /* try compiled in module */
+      if (_InternalOP(name)){
+	 return _mod_map[name].InstanceOP();
+      }
+      
+      
       /* try user path */
-      s = _user_path + name;
+      s = _user_path + MOD_BASENAME_OP + name;
       handle = dlopen(s.c_str(), RTLD_NOW );
       if ( handle != NULL )
       {
@@ -174,7 +236,8 @@ namespace QDLIB {
       }
       
       /* try system path */
-      handle = dlopen(name.c_str(), RTLD_NOW );
+      s = MOD_BASENAME_OP + name;
+      handle = dlopen(s.c_str(), RTLD_NOW );
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);

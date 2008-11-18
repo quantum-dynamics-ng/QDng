@@ -1,12 +1,12 @@
-#include "qdlib/WFGrid1D.h"
+#include "qdlib/.h"
 
 using namespace QDLIB;
 
 extern "C" {
    WaveFunction* InstanceWF()
    {
-      WFGrid1D *p;
-      p = new WFGrid1D ();
+      WF *p;
+      p = new WF ();
       return p;
    }
 }
