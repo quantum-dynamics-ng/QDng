@@ -7,8 +7,9 @@ namespace QDLIB {
    /* Static member initalisation */
    ModuleLoader*  ModuleLoader::_ref=0;
    
-   ModuleLoader::ModuleLoader() : _user_path("~/qdmods/")
+   ModuleLoader::ModuleLoader() : _user_path()
    {
+      _user_path = "~/qdmods/";
    }
    
    /**
@@ -23,6 +24,12 @@ namespace QDLIB {
       return _ref;
    }
    
+   /** 
+    * Although it's a singleton it should be destructable.
+    * 
+    * Module unloading is done here.
+    */
+
    ModuleLoader::~ModuleLoader()
    {
       map<string, module>::iterator it;
@@ -33,7 +40,6 @@ namespace QDLIB {
 	 dlclose( it->second.handle );
 	 it++;
       }
-      delete _ref;
    }
    
    /**

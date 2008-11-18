@@ -1,77 +1,135 @@
 #include "Reporter.h"
+#include "sys/QDGlobalClock.h"
+#include "fft/fft.h"
 
 namespace QDLIB
 {
 
    Reporter::Reporter() :
 	 _norm(true), _energy(false), _proj0(false), _spectrum(false),
-         _psi0(NULL), _specname(), _rfile(), _specbuf(NULL), _step(0)
+         _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
    {}
 
 
    Reporter::~Reporter()
-   {}
-}
-
-/**
- * Set the wavefunction a time zero.
- * 
- * This is only needed if proj0 or spectrum is turned on.
- * 
- */
-void QDLIB::Reporter::PsiInitial( WaveFunction * Psi )
-{
-   _psi0 = Psi->NewInstance();
-   *_psi0 = Psi;
-}
-
-void QDLIB::Reporter::Analyze( WaveFunction * Psi )
-{
-   QDClock *clock = QDGlobalClock->Instance();
-   dcomplex proj;
+   {
+      if (_psi0 != NULL) delete _psi0;
+   }
    
-   /* Write header */
-   if (_step == 0){
-      _specbuf.newsize(clock->Steps());
-      cout << "Time Step\tTime[au]";
-      if (_norm) cout << "\tNorm";
-      if (_proj) cout << "\t<Psi0|PsiT>";
-      if (_energy) cout << "\tEnergy[au]";
+   
+   /**
+    * Set the wavefunction a time zero.
+    * 
+    * This is only needed if proj0 or spectrum is turned on.
+    * 
+    * 
+    * \param Psi The wave function a t=0 (copied & delete by reporter)
+    */
+   void Reporter::PsiInitial( WaveFunction * Psi )
+   {
+      _psi0 = Psi->NewInstance();
+      *_psi0 = Psi;
+   }
+
+   /**
+    * Set the hamiltonian needed for the energy calculation.
+    */
+   void Reporter::Hamilton(Operator *H)
+   {
+      _H = H;
+   }
+   
+   
+   /**
+    * Run the analyzer.
+    */
+   void Reporter::Analyze( WaveFunction * Psi )
+   {
+      QDClock *clock = QDGlobalClock::Instance();
+      dcomplex proj;
+   
+      /* Write header */
+      if (_step == 0){
+	 _specbuf.newsize(clock->Steps());
+	 cout << "Time Step\tTime[au]";
+	 if (_norm) cout << "\tNorm";
+	 if (_proj0) cout << "\t<Psi0|PsiT>";
+	 if (_energy) cout << "\tEnergy[au]";
+	 cout << endl;
+      }
+   
+      /* Write time */
+      cout << clock->TimeStep() << "\t" << clock->Time();
+   
+      /* Norm */
+      if (_norm){
+	 cout << "\t" << *Psi * Psi;
+      } 
+   
+      /* projection and spectrum */
+      if (_proj0){
+	 proj = *_psi0 * Psi;
+	 cout << "\t" << proj;
+      
+	 if (_spectrum)
+	 {
+	    _specbuf[_step] = proj;
+	 }
+      }
+   
+      /* Energy */
+      if (_energy)
+      {
+	 cout << "\t" << _H->Expec(Psi);
+      }
+   
       cout << endl;
    }
-   
-   /* Write time */
-   cout << clock->TimeStep() << "\t" << clock->Time();
-   
-   /* Norm */
-   if (_norm){
-      cout << "\t" << *Psi * Psi;
-   } 
-   
-   /* projection and spectrum */
-   if (_proj){
-      proj = *_psi0 * Psi;
-      cout << "\t" << proj;
+
+   /**
+    * Finish the report at the end of a propagation.
+    * 
+    * The autocorrellation is spectrum is done here.
+    */
+   void Reporter::Finalize( )
+   {
+      QDClock *clock = QDGlobalClock::Instance();
       
-      if (_spectrum)
-      {
-	 _specbuf[_step] = proj;
+      cout << "\n\n" << clock->Steps() << " step done (" << clock->Steps() *  clock->Dt() << " au)\n";
+      
+      if (_spectrum){
+	 cVec out(_specbuf.size());
+	 FFT fftw(_specbuf, out, true);
+	 ofstream ofile;
+	 
+	 
+	 try {
+	  ofile.open(_specname.c_str());
+	  if (!ofile.is_open()) throw;
+	  
+	  for (lint i=0; i < out.size(); i++){
+	     cout << i << "\t" << cabs(out[i]) << endl;
+	  }
+	  ofile.close();
+	     
+	 }  catch (...)
+	 {cout << "!!! Can't write auto correlation spectrum\n\n";}
+	  
       }
    }
+
    
-   /* Energy */
-   if (_energy)
+   /**
+    * Set the name of the spectrum file.
+    */
+   void Reporter::Spectrum( const string & name )
    {
-      cout << "\t" << _H.Expec(Psi);
+      _specname = name;
+      _spectrum = true;
+      _proj0 = true;
    }
-   
-   cout << endl;
+
+
 }
 
-void QDLIB::Reporter::Spectrum( const string & name )
-{
-   _specname = name;
-   _spectrum = true;
-   _proj0 = true;
-}
 

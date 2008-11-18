@@ -44,9 +44,11 @@ namespace QDLIB {
 
 	 ModuleLoader();
 	 ModuleLoader(ModuleLoader &m){}
-	 ~ModuleLoader();
+	 
       public:
 
+	 ~ModuleLoader();
+	 
 	 static ModuleLoader* Instance();
 	 
 	 void UserPath(const string &path);

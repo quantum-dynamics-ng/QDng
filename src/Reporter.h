@@ -2,6 +2,7 @@
 #define QDLIBREPORTER_H
 
 #include "qdlib/WaveFunction.h"
+#include "qdlib/Operator.h"
 
 namespace QDLIB
 {
@@ -20,6 +21,7 @@ namespace QDLIB
 	 bool _spectrum;
 	 
 	 WaveFunction *_psi0;
+	 Operator *_H;
 	 string _specname;
 	 ofstream _rfile;
 	 cVec _specbuf;
@@ -31,18 +33,29 @@ namespace QDLIB
          ~Reporter();
 	 
 	 void PsiInitial(WaveFunction* Psi);
+	 void Hamilton(Operator *H);
+	       
 	 void Analyze(WaveFunction* Psi);
+	 void Finalize();
 	 
+	 /** Report norm */
 	 bool Norm() const { return _norm; }
+	 /** Report norm */
 	 void Norm(bool on) { _norm = on; }
 	 
+	 /** Report energy */
 	 bool Energy() const { return _energy; }
+	 /** Report energy */
 	 void Energy(bool on){ _energy = on; };
 	 
+	 /** Autocorellation */
 	 bool Proj0() const { return _proj0; }
+	 /** Autocorellation */
 	 void Proj0(bool on) { _proj0 = on; }
 	 
+	 /** Auto correllation spectrum on?*/
 	 bool Spectrum() const { return _spectrum; }
+	 /** File name of auto correllation spectrum. Turns it on automatically */
 	 void Spectrum(const string &name);
    };
 

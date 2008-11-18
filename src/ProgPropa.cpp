@@ -6,6 +6,7 @@
 #include "qdlib/OGridSum.h"
 #include "qdlib/OGridsystem.h"
 #include "qdlib/OMultistate.h"
+#include "qdlib/WFMultistate.h"
 
 namespace QDLIB {
 
@@ -76,23 +77,60 @@ namespace QDLIB {
       }
       return O;
       
+
+      
+
    }
 
 
+   /**
+    * Load all Wave functions from the input.
+    * 
+    * This method also recognizes Multistate. Works recursive
+    * 
+    */
+   WaveFunction * QDLIB::ProgPropa::_LoadWaveFunctionChain( XmlNode * WFNode )
+   {
+      ModuleLoader* mods = ModuleLoader::Instance();
+      ParamContainer pm;
+      string name;
+      WaveFunction *WF=NULL;
+      XmlNode *child;
+      
+      pm = WFNode->Attributes();
+      pm.GetValue( "name", name );
+      
+      if (name == "Multistate"){
+	 cout << "Loading Multistate: " << name << endl;
+	 child = WFNode->NextChild();
+	 WaveFunction *wfsub;
+	 WFMultistate *multi = new WFMultistate();
+	 while (child->EndNode()){
+	    wfsub = _LoadWaveFunctionChain( child );
+// 	    sum->Add( osub );
+	    child->NextNode();
+	 }
+	 return multi;	
+      } else {
+	 cout << "Loading: " << name << endl;
+      }
+      return WF;
+   }
+   
    
    /**
-    * Init all the global propa values needed.
+    * Init all the global propa values needed including the reporter values.
     */
    void ProgPropa::_InitParams()
    {
-      QDClock *clock = QDGlobalClock::Instance();
+      QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       ParamContainer attr;
    
       attr = _propaNode.Attributes();
    
       double dt;
       int steps;
-   
+      string s;
    
       /* Init the clock */
       attr.GetValue("dt", dt);
@@ -112,6 +150,29 @@ namespace QDLIB {
 	 if ( steps < 1)
 	    throw ( EParamProblem ("Write cycle less than one defined") );
       }
+      
+      /* Check the reporter values */
+      if ( attr.isPresent("norm") ) {
+	 attr.GetValue("norm", s);
+	 if (s == "yes") _reporter.Norm( true );
+	 else _reporter.Norm( false );
+      }
+      if ( attr.isPresent("energy") ) {
+	 attr.GetValue("energy", s);
+	 if (s == "yes") _reporter.Energy( true );
+	 else _reporter.Energy(  false );
+      }
+      if ( attr.isPresent("proj0") ) {
+	 attr.GetValue("proj0", s);
+	 if (s == "yes") _reporter.Proj0( true );
+	 else _reporter.Proj0( false );
+      }
+      if ( attr.isPresent("spectrum") ) {
+	 attr.GetValue("spectrum", s);
+	 _reporter.Spectrum( s );
+      }
+
+      
    }
 
    /**
@@ -180,9 +241,19 @@ namespace QDLIB {
       delete section;
       
       
+      /* Load the initial Wavefunction */
+      WaveFunction *Psi;
+      section = _ContentNodes->FindNode( "wf" );
+      if (section == NULL)
+	 throw ( EParamProblem ("No inital wave function found") );
+      
+      Psi = _LoadWaveFunctionChain( section );
+      delete section;
    }
 
 }
+
+
 
 
 

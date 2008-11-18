@@ -4,8 +4,8 @@
 #include "sys/Exception.h"
 #include "sys/XmlNode.h"
 #include "sys/QDGlobalClock.h"
-
 #include "qdlib/OPropagator.h"
+#include "Reporter.h"
 
 #define DEFAULT_WRITE_CYCLE 10
 
@@ -34,12 +34,16 @@ namespace QDLIB {
 	 XmlNode *_ContentNodes;
  
 	 int _wcycle;     /* Write and analyze rate */
+	 Reporter _reporter;
 	 
 	 OPropagator *_U;
 	 
 	 void _InitParams();
 	 void _InitSumOperator();
+	 
 	 Operator* _LoadOperatorChain( XmlNode *Onode );
+	 WaveFunction* _LoadWaveFunctionChain( XmlNode *WFNode );
+	 
 	 void _LoadPropagator( XmlNode *Unode );
       public:
 	 ProgPropa(XmlNode &PropaNode);

@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	 
 	 if (progname == "propa"){
 	    ProgPropa propa(rnodes);
-	    cout << "*** Run Propagation ***\n\n";
+	    cout << "\t\t\t*** Run Propagation ***\n\n";
 	    propa.Run();
 	 } else if (progname == "eigen") {
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
@@ -81,6 +81,7 @@ int main(int argc, char **argv)
       cerr << "A problematic error occured:\n\t";
       cerr << e.GetMessage() << endl;
    }
-
+  
+  delete mods;
   return EXIT_SUCCESS;
 }
