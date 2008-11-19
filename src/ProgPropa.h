@@ -8,6 +8,7 @@
 #include "Reporter.h"
 
 #define DEFAULT_WRITE_CYCLE 10
+#define DEFAULT_BASENAME "WF"
 
 namespace QDLIB {
 
@@ -18,6 +19,7 @@ namespace QDLIB {
     * \li dt      time step, (a negative time step means backward propagagation) [required]
     * \li steps   number of time steps [required]
     * \li wcycle  number of step to make until a wf will be written and the reporter will analyze.
+    * \li fname   basename for the propagated files.
     * 
     * printing options:
     * \li norm    yes/no  print norm in the report.
@@ -35,6 +37,7 @@ namespace QDLIB {
  
 	 int _wcycle;     /* Write and analyze rate */
 	 Reporter _reporter;
+	 string _fname;
 	 
 	 OPropagator *_U;
 	 Operator *_H;
@@ -42,10 +45,6 @@ namespace QDLIB {
 	 void _InitParams();
 	 void _InitSumOperator();
 	 
-	 Operator* _LoadOperatorChain( XmlNode *Onode );
-	 WaveFunction* _LoadWaveFunctionChain( XmlNode *WFNode );
-	 
-	 void _LoadPropagator( XmlNode *Unode );
       public:
 	 ProgPropa(XmlNode &PropaNode);
 	 ~ProgPropa();

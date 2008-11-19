@@ -220,16 +220,44 @@ namespace QDLIB {
     * parallelistation will be done here.
     */
    inline void MultElements(cVec *A, double c)
-   {
-      int size = A->lsize();
+   {      
+      lint size = A->lsize();
+      lint strides = A->strides();
       
+      dcomplex *a;
       
-      for (int i=0; i < size; i++)
-      {
-	 (*A)[i] *= c;
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 for (lint i=0; i < size; i++)
+	 {
+	    a[i] *= c;
+	 }
       }
    }
    
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElements(cVec *A, dcomplex c)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+      
+      dcomplex *a;
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 for (lint i=0; i < size; i++)
+	 {
+	    a[i] *= c;
+	 }
+      }
+   }
    
 }
 

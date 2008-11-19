@@ -53,12 +53,12 @@ namespace QDLIB
       return dcomplex(0,0); /* Doesn't make sense */
    }
    
-   
    double OCheby::Expec( WaveFunction * Psi )
    {
       return 0; /* Doesn't make sense */
    }
 
+   
    WaveFunction * OCheby::operator *( WaveFunction * Psi )
    {
       WaveFunction *r;
@@ -132,13 +132,13 @@ namespace QDLIB
       for(int i=2; i < _order; i++) {
 	 /* 2 X \phi_i-1 + \phi_i-2 */
 	 *ket2 = ket1;
-	 *ket2 *= 2 * _exp;
+	 MultElements(ket2, 2 * _exp);
 	 *_hamilton *= ket2;
 	 *ket2 += ket0;
 // 	 *ket2 *= _coeff[i];
 	 
 	 /* multiply by coefficients of the series expansion and add up to the result*/
-	 *ket0 *= _coeff[i-2];
+	 MultElements(ket0, _coeff[i-2]);
 	 *Psi += ket0;
 	 /* shift back by one - use pointers instead of copy */
 	 swap = ket0;
@@ -216,34 +216,38 @@ namespace QDLIB
       Rdelta = (_hamilton->Emax() - _hamilton->Emin()) *  clock->Dt() / 2;
       Gmin =  _hamilton->Emin() * clock->Dt();
       
-      /* Recursion order */
-      if (_order > 0 && _order <= int(5 * Rdelta) )
-	 throw ( EParamProblem("Chebychev recursion order is to small") );
-      
       
       if (_order <= 0)
 	 _order =  int(2*Rdelta);
       
       if (_order < 15) _order=15;
-      
-      cout << endl << "Dt: " << clock->Dt() << endl;
-      cout << endl << "Rdelta: " << Rdelta << endl;
-      cout << endl << "initial order: " <<_order << endl;
-      
-      
+
       /* Check for convergence of the Bessel series */
       dVec bessel;
-    
-      BesselJ0(_order, Rdelta , bessel);
-      while ( abs(bessel[_order - 1] - bessel[_order - 2] ) > BESSEL_DELTA && _order < BESSEL_MAX_ORDER) {
-	 _order += 2;
+      
+      if ( _params.isPresent("scaling") && _params.isPresent("order")){
+	  _params.GetValue("scaling", Rdelta);
+	  Rdelta *=  clock->Dt() / 2;
+	  _params.GetValue("order", _order);
+	  BesselJ0(_order, Rdelta , bessel);
+      } else {
 	 BesselJ0(_order, Rdelta , bessel);
+	 while ( abs(bessel[_order - 1] - bessel[_order - 2] ) > BESSEL_DELTA && _order < BESSEL_MAX_ORDER) {
+	    _order += 2;
+	    BesselJ0(_order, Rdelta , bessel);
+	 }
       }
 	
+      /* Recursion order */
+      if (_order > 0 && _order <= int(2 * Rdelta) )
+	 throw ( EParamProblem("Chebychev recursion order is to small") );
+      
       if (_order >= BESSEL_MAX_ORDER)
 	 throw ( EParamProblem ("Maximum recursion order reached. Choose a smaller time step or set the order manually") );
       
       _params.SetValue("order", _order);
+      _params.SetValue("scaling", Rdelta /  clock->Dt() * 2);
+      _params.SetValue("offset", Gmin);
       
       /* Setup coefficients */
       _coeff.newsize(_order);
@@ -251,11 +255,10 @@ namespace QDLIB
       for (int i=1; i < _coeff.size(); i++){
 	 _coeff[i] = 2.0 * cexpI((Rdelta + Gmin)) * bessel[i];
       }
-       cout << bessel; 
-//       _exp = 1/Rdelta;
       _exp  = OPropagator::Exponent() / Rdelta;
-      cout << OPropagator::Exponent();
-      std::cout << _exp;
+      _params.SetValue("exponent Re", _exp.real());
+      _params.SetValue("exponent Im", _exp.imag());
+      
       /* Remove WF buffers => new operator type  needs new WF type */
       if (ket0 != NULL) delete ket0;
       if (ket1 != NULL) delete ket1;
@@ -263,7 +266,7 @@ namespace QDLIB
 
    }
 
-}/* namespace QDLIB */
+} /* namespace QDLIB */
 
 
 

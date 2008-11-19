@@ -15,6 +15,7 @@ namespace QDLIB
    class Reporter
    {
       private:
+	 lint _wcycle;
 	 bool _norm;
 	 bool _energy;
 	 bool _proj0;
@@ -37,6 +38,9 @@ namespace QDLIB
 	       
 	 void Analyze(WaveFunction* Psi);
 	 void Finalize();
+	 
+	 /** Write every n-steps*/
+	 void WriteCycle(lint wcycle){ _wcycle = wcycle; }
 	 
 	 /** Report norm */
 	 bool Norm() const { return _norm; }

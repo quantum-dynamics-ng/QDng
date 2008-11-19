@@ -6,6 +6,9 @@ namespace QDLIB {
 
    OSum::~OSum()
    {
+      for(int i=0; i < _size; i++){
+	 delete _O[i];
+      }
    }
    
    /**

@@ -1,10 +1,12 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
+#include <iostream>
 #include <string>
 
-
 #include "ParamContainer.h"
+
+
 
 namespace QDLIB {
    
@@ -23,6 +25,10 @@ namespace QDLIB {
          Exception(){}
          Exception(const char *message) : _message(message) {}
             
+	 void SetMessage(const string &message)
+	 {
+	    _message = message;
+	 }
          
          string& GetMessage()
          {
@@ -55,6 +61,7 @@ namespace QDLIB {
    {
       private:
          ParamContainer _params;
+
       public:
          EParamProblem(const char *message) :  Exception(message){}
          /**
@@ -70,6 +77,14 @@ namespace QDLIB {
           * \param message Additional message about the problem.
           */
          EParamProblem(ParamContainer &missing, const char *message) : Exception(message), _params(missing)  {}
+	 
+	 EParamProblem(const char *message, const string &reason);
+
+	 EParamProblem(const char *message, const double reason);
+	 
+	 EParamProblem(const char *message, const int reason);
+	 
+
    };
    
    /**

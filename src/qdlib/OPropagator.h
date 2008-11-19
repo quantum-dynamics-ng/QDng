@@ -38,7 +38,7 @@ namespace QDLIB {
 	 * 
 	 * This keywords are thougt to distinguish between different parts
 	 * of the Hamilton. Only the keys are important. The values can be empty.
-	  * The rest of the parameters are done as usual with Init().
+	 * The rest of the parameters are done as usual with Init().
 	 */
 	 virtual ParamContainer& TellNeeds() = 0;
 	 
@@ -51,11 +51,18 @@ namespace QDLIB {
 	 virtual void AddNeeds(string &Key, Operator *O) = 0;
 	 
 	 /**
-	  * This is used to init the propagator after changing the exponent.
-	  * (Clock, Forward, Backward, ImaginaryTime, RealTime, Exponent).
+ 	  * This is used to init the propagator after changing the exponent.
+ 	  * (Clock, Forward, Backward, ImaginaryTime, RealTime, Exponent).
 	  */
 	 virtual void ReInit() = 0;
-		 
+
+	 
+	 virtual void Clock(QDClock *cl)
+	 {
+	    clock = cl;
+	    if (clock->Dt() > 0) forward = true;
+	    _c0 = (-1)*I*clock->Dt();
+	 }
 	 	 
 	 /**
 	  * Set forward propagation.
@@ -134,6 +141,7 @@ namespace QDLIB {
 	 
 	 OPropagator* operator=(OPropagator *P)
 	 {
+	    clock = P->clock;
 	    _c0 = P->_c0;
 	    forward = P->forward;
 	    imaginary = P->imaginary;

@@ -19,7 +19,7 @@ namespace QDLIB {
     * Interface to the FFTW library.
     * 
     * \todo Check if aligment of domplex array is fine (=> memalign)
-    * \todo Check if the FFTW plan types are good & performant (FFTW_MEASURE is fine!)
+    * \todo Improve the FFTW planing (FFTW_MEASURE is fine! wisdoms etc.)
     */
    class FFT {
       private:

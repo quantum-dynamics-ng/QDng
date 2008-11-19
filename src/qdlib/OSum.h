@@ -14,7 +14,7 @@ namespace QDLIB {
     * 
     * \f$ O_{sum} = \sum_i^{Size} \hat O_i \f$
     * 
-    * All Operator objects will be destroyed.
+    * All Operator objects will be destructed.
     */
    class OSum: public Operator {
       private:

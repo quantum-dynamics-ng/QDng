@@ -3,7 +3,7 @@
 
 #include "OPropagator.h"
 
-#define BESSEL_DELTA 1e-40       /* Upper limit for convergence of the Bessel series convergence */
+#define BESSEL_DELTA 1e-30       /* Upper limit for convergence of the Bessel series convergence */
 #define BESSEL_MAX_ORDER 1e3     /* Maximum recursion order to used (by automatic determination) */
 
 
@@ -14,7 +14,8 @@ namespace QDLIB
     * Chebychev Propagator for WaveFunctions.
     * 
     * Init parameters:
-    * \li order: desired order of recursion, if left empty it's chosen automatically
+    * \li order   desired order of recursion, if left empty it's chosen automatically.
+    * \li scaling The scaling of the Hamiltonian. Can only be used in combination with order.
     * 
     * \todo implement imaginary time propagation.
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
@@ -61,7 +62,7 @@ namespace QDLIB
 	 virtual ParamContainer& TellNeeds();
 	 
 	 virtual void AddNeeds(string &Key, Operator *O);
-	    
+	 
 	 virtual void ReInit();
 
    };

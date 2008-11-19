@@ -1,3 +1,5 @@
+
+
 #include "OSPO.h"
 #include "sys/Exception.h"
 #include "WFGridSystem.h"
@@ -6,8 +8,8 @@
 namespace QDLIB {
 
    OSPO::OSPO()
-   : OPropagator(), _name("OSPO"), _needs(NULL), _Tkin(NULL), _Tkin_kspace(NULL), _Vpot(NULL), _expT(NULL), _expV(NULL),
-		 _cV(0,0), _cT(0,0), _last_time(0)
+      : OPropagator(), _name("OSPO"), _needs(NULL), _Tkin(NULL), _Tkin_kspace(NULL), _Vpot(NULL),
+      _expT(NULL), _expV(NULL), _cV(0,0), _cT(0,0), _last_time(0)
    {
    }
    
@@ -19,6 +21,7 @@ namespace QDLIB {
       if (_needs != NULL) delete _needs;
    }
    
+   
    /**
     * Set the kinetic energy operator.
     */
@@ -27,6 +30,7 @@ namespace QDLIB {
       _Tkin = T;
    }
 
+   
    /**
     * Set the potential energy operator.
     */
@@ -34,6 +38,7 @@ namespace QDLIB {
    {
       _Vpot = V;
    }
+   
    
    /** Init expT. */
    void OSPO::_InitT( )
@@ -48,6 +53,7 @@ namespace QDLIB {
       }
    }
    
+   
    /** Init expV. */
    void OSPO::_InitV( )
    {
@@ -58,6 +64,7 @@ namespace QDLIB {
       }
             
    }
+   
    
    void OSPO::ReInit( )
    {
@@ -91,7 +98,6 @@ namespace QDLIB {
    }
 
 
-   
    Operator * OSPO::NewInstance( )
    {
       OSPO *O = new OSPO();
@@ -101,14 +107,17 @@ namespace QDLIB {
       return O;
    }
 
+   
    void QDLIB::OSPO::Init( ParamContainer & params )
    {
    }
  
+   
    const string& OSPO::Name( )
    {
       return _name;
    }
+   
    
    void OSPO::UpdateTime( )
    {
@@ -122,15 +131,18 @@ namespace QDLIB {
       _Vpot->UpdateTime();
    }
    
+   
    dcomplex OSPO::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
       throw ( EIncompatible("Sorry the SPO can't calculate a matrix element") );
    }
 
+   
    double OSPO::Expec(WaveFunction *Psi)
    {
       throw ( EIncompatible("Sorry the SPO can't calculate an expectation value") );
    }
+   
    
    WaveFunction* OSPO::operator *( WaveFunction * Psi )
    {
@@ -164,6 +176,7 @@ namespace QDLIB {
       return psi;
    }
 
+   
    WaveFunction* OSPO::operator *=(WaveFunction *Psi)
    {
       WFGridSystem *psi;
@@ -191,6 +204,7 @@ namespace QDLIB {
       return psi;
    }
    
+   
    WFGrid1D* OSPO::operator *=(WFGrid1D *Psi)
    {
             
@@ -212,6 +226,7 @@ namespace QDLIB {
       return Psi;
    }   
    
+   
    Operator * OSPO::operator =(Operator * O)
    {
       OSPO *org;
@@ -229,6 +244,7 @@ namespace QDLIB {
       
       return this;
    }
+   
    
    Operator * OSPO::operator *(Operator * O)
    {
@@ -264,6 +280,8 @@ namespace QDLIB {
       
    }
 
+  
+   
    
 }
 

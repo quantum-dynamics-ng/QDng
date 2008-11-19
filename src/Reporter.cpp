@@ -6,7 +6,7 @@ namespace QDLIB
 {
 
    Reporter::Reporter() :
-	 _norm(true), _energy(false), _proj0(false), _spectrum(false),
+	 _wcycle(10), _norm(true), _energy(false), _proj0(false), _spectrum(false),
          _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
    {}
 
@@ -48,28 +48,34 @@ namespace QDLIB
       QDClock *clock = QDGlobalClock::Instance();
       dcomplex proj;
    
+       
+      
       /* Write header */
       if (_step == 0){
 // 	 _specbuf.newsize(clock->Steps());
-	 cout << "Step\tTime[au]\t";
+	 cout << "Step\tTime[au]";
 	 if (_norm) cout << "\tNorm";
 	 if (_proj0) cout << "\t<Psi0|PsiT>";
 	 if (_energy) cout << "\tEnergy[au]";
 	 cout << endl;
       }
+      if (clock->TimeStep() % _wcycle != 0) return;
       _step++;
+      
       /* Write time */
-      cout << clock->TimeStep() << "\t" << clock->Time()<< "\t";
+      cout.precision(1);
+      cout << clock->TimeStep() << "\t" << fixed << clock->Time()<< "\t";
    
       /* Norm */
       if (_norm){
-	 cout << "\t" << Psi->Norm();
+	 cout.precision(8);
+	 cout << "\t" << fixed << Psi->Norm();
       } 
    
       /* projection and spectrum */
       if (_proj0){
 	 proj = *_psi0 * Psi;
-	 cout << "\t" << proj;
+	 cout << "\t\t" << proj;
       
 	 if (_spectrum)
 	 {
@@ -80,7 +86,7 @@ namespace QDLIB
       /* Energy */
       if (_energy)
       {
-	 cout << "\t" << _H->Expec(Psi);
+	 cout << "\t\t" << _H->Expec(Psi);
       }
    
       cout << endl;

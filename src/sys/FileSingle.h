@@ -121,7 +121,7 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle() :
-	 _drop_meta(false), _type(binary),  _name("default"), _suffix(""), _sequence(false) {}
+	 _drop_meta(false), _type(binary),  _name("default"), _suffix(""), _sequence(false),  _counter(0) {}
    
    /**
     * Constructor with type initialisation.
@@ -159,6 +159,11 @@ namespace QDLIB {
       _name = name;
    }
    
+   /**
+    * Set the file name suffix.
+    * 
+    * Is appended to all file names.
+    */
    template <class C>
    void FileSingle<C>::Suffix(const string &suffix)
    {
