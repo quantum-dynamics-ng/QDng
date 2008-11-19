@@ -8,7 +8,7 @@ namespace QDLIB {
 
    ProgPropa::ProgPropa(XmlNode & PropaNode) :
 	 _propaNode(PropaNode), _ContentNodes(NULL),
-	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _U(NULL)
+	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _U(NULL), _H(NULL)
    {
    }
    
@@ -62,6 +62,7 @@ namespace QDLIB {
       cout << "Propagation parameters:\n\n";
       cout << "\tNumber of steps: " <<  clock->Steps() << endl;
       cout.precision(2); cout << "\tTime step: " << fixed << clock->Dt() << endl;
+      cout.precision(2); cout << "\tOverall time: " << fixed << clock->Steps() * clock->Dt() << endl;
       cout << "\tBasename for wave function output: " << _fname << endl;
       cout.precision(6); cout << scientific;
       
@@ -131,7 +132,7 @@ namespace QDLIB {
       
       /* Make sure our hamiltonian is initalized */
       _H->Expec(Psi);
-      cout << "DBG\n";
+
       /* Let the Propagator do it's initalisation */
       _H->UpdateTime();
       _U->Clock( clock );

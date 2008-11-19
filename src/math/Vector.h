@@ -213,7 +213,7 @@ class Vector
 
     // constructors
 
-    Vector() : n_(0), nstrides_(1), stride_size_(0)
+    Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false)
     {
        for(lint i=0; i < TNT_MAX_STRIDES; i++)
        {

@@ -29,11 +29,21 @@ namespace QDLIB
       _exp = OPropagator::Exponent();
       /* First order back step */
       
-      *_ham *= Psi;
-      *Psi *= _exp;
-      *Psi += _psi_last;
+      *_ham *= _psi_last;
+      *_psi_last *= (-1)*_exp / 2;
+      *_psi_last += Psi;
       
-      _psi_last->Normalize();
+      WaveFunction *psi = Psi->NewInstance();
+      
+      *psi = Psi;
+      
+      *_ham *= psi;
+      *psi *= _exp / 2;
+      *psi += Psi;
+
+      *Psi = psi;
+      
+      delete psi;
       _isUpToDate = true;
    }
 
@@ -83,12 +93,18 @@ namespace QDLIB
    {
       if ( !_isUpToDate ) _Init(Psi);
       
-      *_ham *= Psi;
-      *Psi *= 2*_exp;
-      *Psi += _psi_last;
+      WaveFunction *psi = Psi->NewInstance();
+     
+      
+      *_ham *= psi;
+      *psi *= 2*_exp;
+      *psi += _psi_last;
       
       *_psi_last = Psi;
       
+      *Psi = psi;
+      
+      delete psi;
       return Psi;
    }
 
@@ -105,11 +121,20 @@ namespace QDLIB
    ParamContainer & OSOD::TellNeeds( )
    {
       ParamContainer *p = new ParamContainer();
+      
+      p->SetValue( "hamiltonian", "");
+      
       return *p;
    }
 
    void OSOD::AddNeeds( string & Key, Operator * O )
    {
+      if (Key == "hamiltonian")
+      {
+	 _ham = O;
+      } else {
+	 throw ( EParamProblem ("Not a valid operator for the SOD", Key) );
+      }
    }
 
    void OSOD::ReInit( )

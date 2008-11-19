@@ -25,7 +25,7 @@ namespace QDLIB {
 	    
 	    OKSpace *_Tkin;
 	    dVec    *_Tkin_kspace;
-	    OGridSum *_Vpot;
+	    OGridSystem *_Vpot;
 	    cVec *_expT;
 	    cVec *_expV;
 	    
@@ -42,7 +42,7 @@ namespace QDLIB {
 	    	    
 	    
 	    void AddTkin( OKSpace *T );
-	    void AddVpot( OGridSum *V );
+	    void AddVpot( OGridSystem *V );
 	    
 	    WFGrid1D* operator *=(WFGrid1D *Psi);
 	    

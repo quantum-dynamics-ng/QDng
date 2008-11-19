@@ -34,7 +34,7 @@ namespace QDLIB {
    /**
     * Set the potential energy operator.
     */
-   void OSPO::AddVpot( OGridSum *V )
+   void OSPO::AddVpot( OGridSystem *V )
    {
       _Vpot = V;
    }
@@ -70,6 +70,7 @@ namespace QDLIB {
    {
       _cV = OPropagator::Exponent()/2;
       _cT = OPropagator::Exponent();
+      
       
       /* Check if everythings complete */
       if (_Tkin == NULL || _Vpot == NULL)
@@ -267,15 +268,23 @@ namespace QDLIB {
    
    void OSPO::AddNeeds( string &Key, Operator *O )
    {
-      if (Key != "Tkin" || Key != "Vpot" )
+      if (Key != "Tkin" && Key != "Vpot" )
 	 throw ( EParamProblem("SPO only knows Tkin or Vpot") );
       
       if (Key == "Tkin") {
 	 _Tkin = dynamic_cast<OKSpace*>(O);
+	 if (_Tkin == NULL)
+	    throw ( EParamProblem("Tkin is invalid") );
       }
       
       if (Key == "Vpot") {
 	 _Vpot = dynamic_cast<OGridSum*>(O);
+	 if (_Vpot == NULL){
+	    _Vpot = dynamic_cast<OGridSystem*>(O);
+	 } else {
+	    throw ( EParamProblem("Vpot is invalid") );
+	 }
+	 
       }
       
    }
