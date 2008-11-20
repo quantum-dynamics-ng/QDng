@@ -22,10 +22,18 @@ namespace QDLIB
    /**
     * Ask for the actual order of the recursion.
     */
-   int QDLIB::OCheby::Recursion( )
+   int OCheby::Recursion( )
    {
       return _order;
    } 
+   
+   /**
+    * Add a hamiltonian.
+    */
+   void OCheby::Hamiltonian(Operator *H)
+   {
+      _hamilton = H;
+   }
    
    Operator * OCheby::NewInstance( )
    {
@@ -127,12 +135,12 @@ namespace QDLIB
 //       *ket1 *= _coeff[1];
       
       *((cVec*) Psi) = dcomplex(0,0);  /* init with zero, will be our result */
-      
+      cout << "Recursion\n";
       /* Operator recursion loop */
       for(int i=2; i < _order; i++) {
 	 /* 2 X \phi_i-1 + \phi_i-2 */
 	 *ket2 = ket1;
-	 MultElements(ket2, 2 * _exp);
+ 	 *ket2 *= 2 * _exp;
 	 *_hamilton *= ket2;
 	 *ket2 += ket0;
 // 	 *ket2 *= _coeff[i];
@@ -140,6 +148,7 @@ namespace QDLIB
 	 /* multiply by coefficients of the series expansion and add up to the result*/
 	 MultElements(ket0, _coeff[i-2]);
 	 *Psi += ket0;
+	 cout << i << "\tNorm: " <<   _coeff[i-2] << " " <<ket2->Norm() << " " <<  ket0->Norm() << " " <<  Psi->Norm() << endl;
 	 /* shift back by one - use pointers instead of copy */
 	 swap = ket0;
 	 ket0 = ket1;
@@ -251,9 +260,9 @@ namespace QDLIB
       
       /* Setup coefficients */
       _coeff.newsize(_order);
-      _coeff[0] = cexpI((Rdelta + Gmin)) * bessel[0];
+       _coeff[0] = cexpI(-1*(Rdelta + Gmin)) * bessel[0];
       for (int i=1; i < _coeff.size(); i++){
-	 _coeff[i] = 2.0 * cexpI((Rdelta + Gmin)) * bessel[i];
+	 _coeff[i] = 2.0 * cexpI(-1*(Rdelta + Gmin)) * bessel[i];
       }
       _exp  = OPropagator::Exponent() / Rdelta;
       _params.SetValue("exponent Re", _exp.real());

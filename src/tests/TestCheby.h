@@ -16,6 +16,7 @@ class TestCheby : public CPPUNIT_NS::TestFixture {
    CPPUNIT_TEST_SUITE( TestCheby );
    CPPUNIT_TEST( Init );
    CPPUNIT_TEST( HarmonicGroundstate1D );
+   CPPUNIT_TEST( NablaStability1D );
    CPPUNIT_TEST( HarmonicGroundstate2D );
    CPPUNIT_TEST( Propagation1D );
    CPPUNIT_TEST( Functions );
@@ -29,6 +30,7 @@ class TestCheby : public CPPUNIT_NS::TestFixture {
 	 
       void Init();
       void HarmonicGroundstate1D();
+      void NablaStability1D();
       void HarmonicGroundstate2D();
       void Functions();
       void Propagation1D();

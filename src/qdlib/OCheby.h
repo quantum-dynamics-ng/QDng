@@ -37,6 +37,8 @@ namespace QDLIB
 	 
 	 int Recursion();
 	 
+	 void Hamiltonian(Operator *H);
+	 
 	 /* Interface implementation */
 	 virtual Operator* NewInstance();
 	 	 

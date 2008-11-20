@@ -1,5 +1,7 @@
 #include "OSOD.h"
 
+#include "OCheby.h"
+
 namespace QDLIB
 {
 
@@ -22,28 +24,18 @@ namespace QDLIB
       
       if (_ham == NULL) throw ( EParamProblem("Hamiltonian for SOD not initialized") );
       if (_psi_last == NULL) _psi_last = Psi->NewInstance();
+     
       
-      *_psi_last = Psi;
+      _exp = (-1)*OPropagator::Exponent();
+      OCheby U;
       
+      U.Clock( clock );
+      U.Hamiltonian( _ham );
+      U.ReInit();
+      
+      *_psi_last = U * Psi;
       
       _exp = OPropagator::Exponent();
-      /* First order back step */
-      
-      *_ham *= _psi_last;
-      *_psi_last *= (-1)*_exp / 2;
-      *_psi_last += Psi;
-      
-      WaveFunction *psi = Psi->NewInstance();
-      
-      *psi = Psi;
-      
-      *_ham *= psi;
-      *psi *= _exp / 2;
-      *psi += Psi;
-
-      *Psi = psi;
-      
-      delete psi;
       _isUpToDate = true;
    }
 
@@ -95,6 +87,7 @@ namespace QDLIB
       
       WaveFunction *psi = Psi->NewInstance();
      
+      cout << _exp << endl;
       
       *_ham *= psi;
       *psi *= 2*_exp;
@@ -102,9 +95,11 @@ namespace QDLIB
       
       *_psi_last = Psi;
       
+      
       *Psi = psi;
       
       delete psi;
+     
       return Psi;
    }
 

@@ -39,10 +39,10 @@ namespace QDLIB {
       switch (grid.Dim()){
 	 case 1:  /* 1D */
 	    _planf = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) in.begin(0),
-				      (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);
+				      (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
 	    if (!(_oneway = oneway)){
 	       _planb = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) out.begin(0),
-					 (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_MEASURE);
+					 (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_ESTIMATE);
 	    }
 	    break;
 	 case 2: /* 2D */

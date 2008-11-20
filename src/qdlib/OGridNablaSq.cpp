@@ -156,8 +156,9 @@ namespace QDLIB {
    
       opPsi->ToKspace();
       MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
+//       MultElements((cVec*) opPsi, _kspace);
       opPsi->ToXspace();
-      
+
       
       return opPsi;
    }

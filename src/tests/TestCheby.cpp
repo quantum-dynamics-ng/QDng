@@ -61,6 +61,10 @@ void TestCheby::HarmonicGroundstate1D( )
    
 }
 
+
+
+
+
 void TestCheby::HarmonicGroundstate2D( )
 {
    ParamContainer p;
@@ -104,7 +108,7 @@ void TestCheby::HarmonicGroundstate2D( )
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Potential energy",0.006834491398  , Vh.Expec( &psi), 5e-5);
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Groundstate energy", 0.01366898280, H.Expec( &psi), 5e-5);
    
-   
+  
 }
 
 void TestCheby::Init( )
@@ -205,9 +209,48 @@ void TestCheby::Propagation1D( )
    delete phi;
 }
 
+
+void TestCheby::NablaStability1D( )
+{
+   ParamContainer p;
+   QDClock clock;
+   string s;
+   string name;
+   WaveFunction *phi;
+   double energy;
+   
+   /* System parameters */
+   p.SetValue( "dims", 1);
+   p.SetValue( "N0", 64);
+   p.SetValue( "xmin0", -1);
+   p.SetValue( "xmax0", 1);
+   p.SetValue( "mass0", 1800);
+   p.SetValue( "k0", .3363139634);
+   
+   clock.Dt( 5 );
+   clock.Steps( 2 );
+   
+   T.Init(p);
+   Vh.Init(p);
+   psi.Init(p);
+   
+   H.Add(&T);
+   H.Add(&Vh);
+   
+   for (int i=0; i < 100; i++){
+      H *= &psi;
+      cout << psi.Norm() << endl;
+   }
+   CPPUNIT_ASSERT_MESSAGE ("Norm greater than one", psi.Norm() < 1);
+  
+}
+
+
 void TestCheby::Propagation2D( )
 {
 }
+
+
 
 
 
