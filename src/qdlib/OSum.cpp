@@ -8,6 +8,7 @@ namespace QDLIB {
    {
       for(int i=0; i < _size; i++){
 	 delete _O[i];
+	 delete _WFbuf[i];
       }
    }
    
@@ -18,6 +19,7 @@ namespace QDLIB {
    {
       for(int i=0; i < MAX_OPS; i++){
 	 _O[i] = NULL;
+	 _WFbuf[i] = NULL;
       }
    }
    
@@ -141,17 +143,20 @@ namespace QDLIB {
     */
    WaveFunction* OSum::operator*(WaveFunction *Psi)
    {
-      WaveFunction *sum, *op;
+      WaveFunction *sum;
       
+      for(int i=0; i < _size; i++){
+	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
+	 _WFbuf[i] = Psi; 
+      }
       
       sum = Psi->NewInstance();
       *((cVec*) sum) = dcomplex(0,0);
       
       for (int i=0; i < _size; i++)
       {
-	op = *(_O[i]) * Psi;
-	*sum += op;
-	delete op;
+	*(_O[i]) *= _WFbuf[i];
+	*sum += _WFbuf[i];
       }
      
       return sum;
@@ -159,21 +164,19 @@ namespace QDLIB {
    
    WaveFunction* OSum::operator*=(WaveFunction *Psi)
    {
-      WaveFunction *ket, *op;
       
-      ket = Psi->NewInstance();
-     
-      *ket = Psi;    // Copy
+      for(int i=0; i < _size; i++){
+	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
+	 _WFbuf[i] = Psi; 
+      }
+      
       *((cVec*) Psi) = dcomplex(0,0); // Init with zeroes
       
       for (int i=0; i < _size; i++)
       {
-	op =  *(_O[i]) * ket;
-	*Psi +=  op;
-	delete op;
+	 *(_O[i]) *= _WFbuf[i];
+	 *Psi +=  _WFbuf[i];
       }
-      
-      delete ket;
       
       return Psi;
    }

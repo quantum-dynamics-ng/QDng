@@ -21,6 +21,7 @@ namespace QDLIB {
 	 string _name;
          int _size;
          Operator* _O[MAX_OPS];
+	 WaveFunction* _WFbuf[MAX_OPS];    /* Use a buffer for wfs, to get rid of much mallocs */
       public:
          
          ~OSum();
