@@ -49,7 +49,9 @@ namespace QDLIB {
 	    (*kspace)[Nx - i] = (double(i+1) * double(i+1)) * dp;
 	 }
       }
-   
+      
+      cout << *kspace;
+      
       return kspace;
    }
 

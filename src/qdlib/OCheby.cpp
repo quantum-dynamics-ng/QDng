@@ -117,50 +117,71 @@ namespace QDLIB
       return r;
    }
 
+   
+
+   void OCheby::_Recursion( WaveFunction * psi0, WaveFunction * psi1, WaveFunction * Hpsi1, WaveFunction *Psi, int n )
+   {
+      *Hpsi1 = psi1;       /* 1/R * H * Psi */
+      *Hpsi1 *= 1/Rdelta;
+      *_hamilton *= Hpsi1;
+      
+      *ket2 = psi0;
+      *Hpsi1 *= 2*_exp;
+      *ket2 += Hpsi1;
+      
+      *psi0 = ket2;
+      
+      *ket2 *= _coeff[n];
+      *Psi += ket2;
+      
+      cout << "\tNorm ket2, psi: " << ket2->Norm() << " " <<  Psi->Norm() << endl; 
+      
+   }
+   
    WaveFunction * OCheby::operator *=( WaveFunction * Psi )
    {
-      WaveFunction *swap;
+      WaveFunction *psi, *buf;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
       if (ket2 == NULL) ket2 = Psi->NewInstance();
     
-      /* \phi_0 and \phi_1 are fixed */
-      *ket0 =  Psi;
-//       *ket0 *= _coeff[0];
-      
-      *ket1 = Psi;
-      *ket1 *= _exp;
-      *_hamilton *= ket1;
-//       *ket1 *= _coeff[1];
-      
-      *((cVec*) Psi) = dcomplex(0,0);  /* init with zero, will be our result */
-      cout << "Recursion\n";
-      /* Operator recursion loop */
-      for(int i=2; i < _order; i++) {
-	 /* 2 X \phi_i-1 + \phi_i-2 */
-	 *ket2 = ket1;
- 	 *ket2 *= 2 * _exp;
-	 *_hamilton *= ket2;
-	 *ket2 += ket0;
-// 	 *ket2 *= _coeff[i];
-	 
-	 /* multiply by coefficients of the series expansion and add up to the result*/
-	 MultElements(ket0, _coeff[i-2]);
-	 *Psi += ket0;
-	 cout << i << "\tNorm: " <<   _coeff[i-2] << " " <<ket2->Norm() << " " <<  ket0->Norm() << " " <<  Psi->Norm() << endl;
-	 /* shift back by one - use pointers instead of copy */
-	 swap = ket0;
-	 ket0 = ket1;
-	 ket1 = ket2;
-	 ket2 = swap;
-      } 
-      /* multiply the last two coefficients of the series expansion */
-      *ket0 *= _coeff[_order-2];
-      *Psi += ket0;
-      *ket1 *= _coeff[_order-1];
-      *Psi += ket1;
 
+      psi = Psi->NewInstance();
+      buf = Psi->NewInstance();
+      
+      *psi = Psi;
+      
+      /* \phi_0 and \phi_1 are fixed */
+      
+      *ket0 = psi;
+      
+      *ket1 = psi;
+      *ket1 *= 1/Rdelta;
+      *_hamilton *= ket1;
+      *ket1 *=  _exp;
+      cout << "ket1: " << (*ket1)[127] << endl;
+      
+      *psi *= _coeff[0];
+     
+      *buf = ket1;
+      *buf *= _coeff[1];
+      
+      *psi += buf;
+      
+      int i=2;
+      while (i < _order){
+	 _Recursion(ket0, ket1, buf, psi, i);
+	 i++;
+	 if(!(i < _order)) break;
+	 _Recursion(ket1, ket0, buf, psi, i);
+	 i++;
+      }
+      
+      *Psi = psi;
+      delete psi;
+      delete buf;
+      /* multiply the last two coefficients of the series expansion */
       return Psi;
    }
 
@@ -222,8 +243,8 @@ namespace QDLIB
       
       
       /* Energy range & offset */
-      Rdelta = (_hamilton->Emax() - _hamilton->Emin()) *  clock->Dt() / 2;
-      Gmin =  _hamilton->Emin() * clock->Dt();
+      Rdelta = (_hamilton->Emax() - _hamilton->Emin())/ 2;
+      Gmin =  _hamilton->Emin();
       
       
       if (_order <= 0)
@@ -236,14 +257,13 @@ namespace QDLIB
       
       if ( _params.isPresent("scaling") && _params.isPresent("order")){
 	  _params.GetValue("scaling", Rdelta);
-	  Rdelta *=  clock->Dt() / 2;
 	  _params.GetValue("order", _order);
-	  BesselJ0(_order, Rdelta , bessel);
+	  BesselJ0(_order, Rdelta * clock->Dt(), bessel);
       } else {
-	 BesselJ0(_order, Rdelta , bessel);
+	 BesselJ0(_order, Rdelta * clock->Dt(), bessel);
 	 while ( abs(bessel[_order - 1] - bessel[_order - 2] ) > BESSEL_DELTA && _order < BESSEL_MAX_ORDER) {
 	    _order += 2;
-	    BesselJ0(_order, Rdelta , bessel);
+	    BesselJ0(_order, Rdelta * clock->Dt(), bessel);
 	 }
       }
 	
@@ -254,17 +274,24 @@ namespace QDLIB
       if (_order >= BESSEL_MAX_ORDER)
 	 throw ( EParamProblem ("Maximum recursion order reached. Choose a smaller time step or set the order manually") );
       
+      
+      
       _params.SetValue("order", _order);
-      _params.SetValue("scaling", Rdelta /  clock->Dt() * 2);
+      _params.SetValue("scaling", Rdelta);
       _params.SetValue("offset", Gmin);
       
       /* Setup coefficients */
       _coeff.newsize(_order);
-       _coeff[0] = cexpI(-1*(Rdelta + Gmin)) * bessel[0];
+      _coeff[0] = cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin)) * bessel[0];
+      cout << "exponentReal" << cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin));
       for (int i=1; i < _coeff.size(); i++){
-	 _coeff[i] = 2.0 * cexpI(-1*(Rdelta + Gmin)) * bessel[i];
+	 _coeff[i] = 2.0 * cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin)) * bessel[i];
       }
-      _exp  = OPropagator::Exponent() / Rdelta;
+      
+      cout << "Bessel :\n" << bessel;
+      cout << "exp_clock: "<<OPropagator::Exponent().imag() << endl;
+      
+      _exp  = OPropagator::Exponent()/clock->Dt();
       _params.SetValue("exponent Re", _exp.real());
       _params.SetValue("exponent Im", _exp.imag());
       

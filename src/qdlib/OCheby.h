@@ -31,6 +31,8 @@ namespace QDLIB
 	 double Rdelta;        /* Energy range of the hamiltonian */
 	 double Gmin;          /* Energy offset of the hamiltonian */
          WaveFunction *ket0, *ket1, *ket2;
+	 
+	 void _Recursion(WaveFunction *psi0, WaveFunction *psi1, WaveFunction *Hpsi1, WaveFunction *Psi, int n);
       public:
          OCheby();
          ~OCheby();

@@ -147,7 +147,7 @@ namespace QDLIB {
       
       for(int i=0; i < _size; i++){
 	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
-	 _WFbuf[i] = Psi; 
+	 *_WFbuf[i] = Psi; 
       }
       
       sum = Psi->NewInstance();
@@ -167,7 +167,7 @@ namespace QDLIB {
       
       for(int i=0; i < _size; i++){
 	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
-	 _WFbuf[i] = Psi; 
+	 *_WFbuf[i] = Psi; 
       }
       
       *((cVec*) Psi) = dcomplex(0,0); // Init with zeroes
