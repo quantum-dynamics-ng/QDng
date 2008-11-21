@@ -54,10 +54,11 @@ namespace QDLIB {
     * \param n order of the bessel function
     * \param arg the x value
     * \param coeffs values of the sum evaluation
+    * \param zeroes Number of coeficients set to zero due to underun
     * 
-    * \return Number of underflows to zero
+    * \return Slatec error code. Should be zero.
     */
-   int BesselJ0 (int n, double arg, dVec &coeffs)
+   int BesselJ0 (int n, double arg, dVec &coeffs, int &zeroes)
    {
       double alpha =0;
       double argIm =0;
@@ -69,16 +70,11 @@ namespace QDLIB {
       if (n==0) return -1;
       
       coeffs.newsize(n);
-      bRe.newsize(n);
       bIm.newsize(n);
 //       (ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)
-      zbesj_(&arg, &argIm, &alpha, &kode, &n, (double*) bRe.begin(0), (double*) bIm.begin(0), &nz, &ierr);
+      zbesj_(&arg, &argIm, &alpha, &kode, &n, (double*) coeffs.begin(0), (double*) bIm.begin(0), &zeroes, &ierr);
       
-      /* make it real */
-      for (int i=0; i < n; i++){
-	 coeffs[i] = bRe[i];
-      }
-      if (nz > 0) cout << "\n\n*** Bessel underflow warning : " << nz << "\n";
+      //if (nz > 0) cout << "\n\n*** Bessel underflow warning : " << nz << "\n";
       switch (ierr) {
 	 case 0: break;
 	 case 1:

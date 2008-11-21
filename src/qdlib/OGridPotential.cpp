@@ -43,11 +43,13 @@ namespace QDLIB
 	 bool set_zero=false;
 	 if (_params.isPresent("setzero")) set_zero = true;
 	 *( (FileOGrid*) File()) >> (OGridSystem*) this; /* Read potential */
-	 cout << "Level grid to zero\n";
-	 double min = Emin();
-	 for (lint i=0; i < size(); i++){
-	    (*this)[i] -= min;
-	    (*this)[i] -= 8.18784;
+	 
+	 /* Put grid minimum to zero */
+	 if (set_zero){
+	    double min = Emin();
+	    for (lint i=0; i < size(); i++){
+	       (*this)[i] -= min;
+	    }
 	 }
 	 
 /*	 for (int i=0; i < 256; i+=2){

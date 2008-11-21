@@ -156,7 +156,7 @@ namespace QDLIB
       *_hamilton *= ket1;
       *ket1 *=  _exp;
       
-      *psi *= _coeff[0];
+      *Psi *= _coeff[0];
      
       *buf = ket1;
       *buf *= _coeff[1];
@@ -240,34 +240,39 @@ namespace QDLIB
       
       /* This is an estimate for the recursion depth */
       if (_order <= 0)
-	 _order =  int(5 * Rdelta * clock->Dt());  
+	 _order =  int(5 * Rdelta * clock->Dt());
       
       if (_order < 10) _order=10;
 
       /* Check for convergence of the Bessel series */
       dVec bessel;
+      int zeroes=0;
       
-      if ( _params.isPresent("scaling") && _params.isPresent("order")){
-	  _params.GetValue("scaling", Rdelta);
-	  _params.GetValue("order", _order);
-	  BesselJ0(_order, Rdelta * clock->Dt(), bessel);
-      } else {
-	 BesselJ0(_order, Rdelta * clock->Dt(), bessel);
-	 while ( abs(bessel[_order - 1] - bessel[_order - 2] ) > BESSEL_DELTA && _order < BESSEL_MAX_ORDER) {
-	    _order += 2;
-	    BesselJ0(_order, Rdelta * clock->Dt(), bessel);
-	 }
+      /* Manual scaling, very dangerous*/
+      if (_params.isPresent("scaling")) _params.GetValue("scaling", Rdelta);
+      /* Manual choice of recursion depth */
+      if (_params.isPresent("order")) _params.GetValue("order", Rdelta);
+      
+      if ( BesselJ0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
+	 throw ( EOverflow("Error while calculating Bessel coefficients") );
+      
+      _order -= zeroes;
+      int i=2;
+      /* Check how much is needed for series convergence */
+      while ( i < _order && abs(bessel[i - 1] - bessel[i - 2] ) > BESSEL_DELTA) {
+	 i++;
       }
+      _order = i;
+      
 	
       /* Recursion order */
-      if (_order > 0 && _order <= int(2 * Rdelta) )
+      if (_order > 0 && _order <= int(Rdelta * clock-Dt()) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
       
       if (_order >= BESSEL_MAX_ORDER)
 	 throw ( EParamProblem ("Maximum recursion order reached. Choose a smaller time step or set the order manually") );
       
-      
-      
+     
       _params.SetValue("order", _order);
       _params.SetValue("scaling", Rdelta);
       _params.SetValue("offset", Gmin);
