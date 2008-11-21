@@ -140,46 +140,38 @@ namespace QDLIB
    
    WaveFunction * OCheby::operator *=( WaveFunction * Psi )
    {
-      WaveFunction *psi, *buf;
+      WaveFunction *buf;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
       if (ket2 == NULL) ket2 = Psi->NewInstance();
     
-
-      psi = Psi->NewInstance();
       buf = Psi->NewInstance();
       
-      *psi = Psi;
+     
+      *ket0 = Psi;   /* phi_0 */
       
-      /* \phi_0 and \phi_1 are fixed */
-      
-      *ket0 = psi;
-      
-      *ket1 = psi;
+      *ket1 = Psi;
       *ket1 *= 1/Rdelta;
       *_hamilton *= ket1;
       *ket1 *=  _exp;
-      cout << "ket1: " << (*ket1)[127] << endl;
       
       *psi *= _coeff[0];
      
       *buf = ket1;
       *buf *= _coeff[1];
       
-      *psi += buf;
+      *Psi += buf;
       
       int i=2;
       while (i < _order){
-	 _Recursion(ket0, ket1, buf, psi, i);
+	 _Recursion(ket0, ket1, buf, Psi, i);
 	 i++;
 	 if(!(i < _order)) break;
-	 _Recursion(ket1, ket0, buf, psi, i);
+	 _Recursion(ket1, ket0, buf, Psi, i);
 	 i++;
       }
       
-      *Psi = psi;
-      delete psi;
       delete buf;
       /* multiply the last two coefficients of the series expansion */
       return Psi;
@@ -246,11 +238,11 @@ namespace QDLIB
       Rdelta = (_hamilton->Emax() - _hamilton->Emin())/ 2;
       Gmin =  _hamilton->Emin();
       
-      
+      /* This is an estimate for the recursion depth */
       if (_order <= 0)
-	 _order =  int(2*Rdelta);
+	 _order =  int(5 * Rdelta * clock->Dt());  
       
-      if (_order < 15) _order=15;
+      if (_order < 10) _order=10;
 
       /* Check for convergence of the Bessel series */
       dVec bessel;
@@ -288,8 +280,8 @@ namespace QDLIB
 	 _coeff[i] = 2.0 * cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin)) * bessel[i];
       }
       
-      cout << "Bessel :\n" << bessel;
-      cout << "exp_clock: "<<OPropagator::Exponent().imag() << endl;
+//       cout << "Bessel :\n" << bessel;
+//       cout << "exp_clock: "<<OPropagator::Exponent().imag() << endl;
       
       _exp  = OPropagator::Exponent()/clock->Dt();
       _params.SetValue("exponent Re", _exp.real());

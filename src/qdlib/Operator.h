@@ -47,6 +47,12 @@ namespace QDLIB {
 	  * This is needed by time dependent operators.
 	  */
 	 QDClock *clock;
+	 
+	 /**
+	  * The operators offset.
+	  * for e.g. by the Cheby.
+	  */
+	 double offset;
       public:
 	 /**
           * Make class pure virtual
@@ -162,8 +168,26 @@ namespace QDLIB {
 	  */
 	 virtual Operator* operator*(Operator* O) = 0;
    
-         
+	 /**
+	  * Change the Operators offset.
+	  * 
+	  * This is not a usual +=. It sets the value, no addup!
+	  */
+//          virtual Operator operator+=(const double d) = 0;
+// 	 {
+// 	    offset = d;
+// 	 }
       
+	 /**
+	  * Change the Operators offset.
+	  * 
+	  * This is not a usual +=. It sets the value, no addup!
+	  */
+// 	 virtual Operator operator-=(const double d) = 0;
+// 	 {
+// 	    offset = -1*d;
+// 	 }
+
          
          
    }; /* class Operator */

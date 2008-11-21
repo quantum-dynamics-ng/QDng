@@ -50,8 +50,6 @@ namespace QDLIB {
 	 }
       }
       
-      cout << *kspace;
-      
       return kspace;
    }
 

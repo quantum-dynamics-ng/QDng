@@ -4,7 +4,7 @@
 #include "OPropagator.h"
 
 #define BESSEL_DELTA 1e-30       /* Upper limit for convergence of the Bessel series convergence */
-#define BESSEL_MAX_ORDER 1e3     /* Maximum recursion order to used (by automatic determination) */
+#define BESSEL_MAX_ORDER 1e6     /* Maximum recursion order to used (by automatic determination) */
 
 
 namespace QDLIB
