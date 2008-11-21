@@ -202,6 +202,28 @@ namespace QDLIB {
    }
 	    
    
+   Operator* QDLIB::OSum::operator +=(const double d)
+   {
+      for (int i=0; i < _size; i++)
+	 *(_O[i]) += d;
+      return this;
+   }
+
+   Operator* QDLIB::OSum::operator -=(const double d)
+   {
+      for (int i=0; i < _size; i++)
+	 *(_O[i]) -= d;
+      return this;
+   }
+
+   Operator* QDLIB::OSum::operator *=(const double d)
+   {
+      for (int i=0; i < _size; i++)
+	 *(_O[i]) *= d;
+      return this;
+   }
+
    
 } /* namespace QDLIB */
+
 

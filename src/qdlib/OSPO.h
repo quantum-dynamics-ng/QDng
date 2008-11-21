@@ -6,7 +6,7 @@
 #include "OGridSum.h"
 #include "sys/Exception.h"
 
-#include "WFGrid1D.h"
+
 namespace QDLIB {
 
    /**
@@ -43,8 +43,7 @@ namespace QDLIB {
 	    
 	    void AddTkin( OKSpace *T );
 	    void AddVpot( OGridSystem *V );
-	    
-	    WFGrid1D* operator *=(WFGrid1D *Psi);
+	   
 	    
 	    /* Interface implementation, Operator */
 	    virtual Operator* NewInstance();

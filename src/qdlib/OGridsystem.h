@@ -17,21 +17,21 @@ namespace QDLIB {
    {
       public:
 	 typedef FileSingle<OGridSystem> FileOGrid;
-	 
-	 OGridSystem() : _file(NULL) {}
-	 ~OGridSystem()
-	 {
-	    if (_file != NULL) delete _file;
-	 }
-	 
-	 inline FileOGrid* File()
-	 {
-	    if (_file == NULL) _file = new FileOGrid();
-	    return _file;
-	 }
       private:
 	 FileOGrid *_file;
-	       
+	 
+      public:
+	 
+	 OGridSystem();
+	 ~OGridSystem();
+	 
+	 FileOGrid* File();
+	 
+	 virtual Operator* operator+=(const double d);
+
+	 virtual Operator* operator-=(const double d);
+
+	 virtual Operator* operator*=(const double d);
    };
 
    

@@ -206,28 +206,6 @@ namespace QDLIB {
    }
    
    
-   WFGrid1D* OSPO::operator *=(WFGrid1D *Psi)
-   {
-            
-      if (_expT == NULL || _expV == NULL) ReInit();
-      if (_last_time != clock->TimeStep() && _Vpot->isTimeDep()) /* Re-init Vpot if is time dep.*/
-      {  
-	 _last_time = clock->TimeStep();
-	 _InitV();
-      }
-            
-      MultElements( (cVec*) Psi, _expV );
-      
-      Psi->ToKspace();
-      MultElements( (cVec*) Psi,  _expT, 1/ double(Psi->size()) );
-      Psi->ToXspace();
-      
-      MultElements( (cVec*) Psi,  _expV );
-   
-      return Psi;
-   }   
-   
-   
    Operator * OSPO::operator =(Operator * O)
    {
       OSPO *org;

@@ -49,6 +49,11 @@ namespace QDLIB
 	 
 	 virtual Operator* operator*(Operator* O);
 
+	 virtual Operator* operator+=(const double d);
+
+	 virtual Operator* operator-=(const double d);
+
+	 virtual Operator* operator*=(const double d);
    };
 
 }

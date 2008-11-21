@@ -114,6 +114,42 @@ namespace QDLIB
       return O;
    }
 
-}
+   
+   Operator* OMultistate::operator +=(const double d)
+   {
+      lint size = num_rows();
+      for (lint i=0; i < size; i++){
+	 for (lint j=0; j < size; j++){
+	    *((*this)[i][j]) += d;
+	 }
+      }
+      return this;
+   }
+
+   Operator* OMultistate::operator -=(const double d)
+   {
+      lint size = num_rows();
+      for (lint i=0; i < size; i++){
+	 for (lint j=0; j < size; j++){
+	    *((*this)[i][j]) -= d;
+	 }
+      }
+      return this;
+   }
+
+   Operator* OMultistate::operator *=(const double d)
+   {
+      lint size = num_rows();
+      for (lint i=0; i < size; i++){
+	 for (lint j=0; j < size; j++){
+	    *((*this)[i][j]) *= d;
+	 }
+      }
+      return this;
+   }
+
+} /* namespace QDLIB */
+
+
 
 

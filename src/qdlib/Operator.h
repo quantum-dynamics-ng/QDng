@@ -24,8 +24,9 @@ namespace QDLIB {
    * //Initialize O & WF with specific types.
    * ...
    * WF2 = (*O) * WF1;
-   * WF2 = (*O) * ((*O) * WF1);  <-- The brackets are important to conserve the right order
-   * ...
+   * WF2 = (*O) * ((*O) * WF1);  <-- Don't do this, causes memory leaks
+   * 
+   * *O *= WF1;    Apply the operator in-place. Much faster.
    * \endcode
    * 
    */
@@ -48,11 +49,6 @@ namespace QDLIB {
 	  */
 	 QDClock *clock;
 	 
-	 /**
-	  * The operators offset.
-	  * for e.g. by the Cheby.
-	  */
-	 double offset;
       public:
 	 /**
           * Make class pure virtual
@@ -173,20 +169,19 @@ namespace QDLIB {
 	  * 
 	  * This is not a usual +=. It sets the value, no addup!
 	  */
-//          virtual Operator operator+=(const double d) = 0;
-// 	 {
-// 	    offset = d;
-// 	 }
+          virtual Operator* operator+=(const double d) = 0;
+
       
 	 /**
 	  * Change the Operators offset.
 	  * 
-	  * This is not a usual +=. It sets the value, no addup!
 	  */
-// 	 virtual Operator operator-=(const double d) = 0;
-// 	 {
-// 	    offset = -1*d;
-// 	 }
+ 	 virtual Operator* operator-=(const double d) = 0;
+
+ 	 /**
+	  * Scale the Operator.
+	  */
+	 virtual Operator* operator*=(const double d) = 0;
 
          
          

@@ -266,7 +266,7 @@ namespace QDLIB
       
 	
       /* Recursion order */
-      if (_order > 0 && _order <= int(Rdelta * clock-Dt()) )
+      if (_order > 0 && _order <= int(Rdelta * clock->Dt()) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
       
       if (_order >= BESSEL_MAX_ORDER)
