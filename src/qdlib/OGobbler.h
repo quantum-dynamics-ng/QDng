@@ -15,6 +15,7 @@ namespace QDLIB {
     * \li rp#     a "right pass" leaving everything on the right hand side (larger x values).
     * \li lp#     a "left pass"  leaving everything on the left hand side (smaller x values).
     * \li order   filter order. determines the cutoff sharpness.
+    * \li nip     If present use the gobbler as negative imaginary potential.
     * 
     * \todo TEST
     * 
@@ -29,6 +30,7 @@ namespace QDLIB {
 	 bool _rp[MAX_DIMS];    /* build right pass for dim */
 	 double _rpx[MAX_DIMS];  /* cut-off center */
 	 int _order;           /* filter order */
+	 bool _nip;            /* Negative imaginary potential */
 	 
 	 void _Init(GridSystem *Psi);
       public:

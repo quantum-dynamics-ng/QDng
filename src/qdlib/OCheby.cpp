@@ -122,7 +122,6 @@ namespace QDLIB
    void OCheby::_Recursion( WaveFunction * psi0, WaveFunction * psi1, WaveFunction * Hpsi1, WaveFunction *Psi, int n )
    {
       *Hpsi1 = psi1;       /* 1/R * H * Psi */
-      *Hpsi1 *= 1/Rdelta;
       *_hamilton *= Hpsi1;
       
       *ket2 = psi0;
@@ -152,7 +151,6 @@ namespace QDLIB
       *ket0 = Psi;   /* phi_0 */
       
       *ket1 = Psi;
-      *ket1 *= 1/Rdelta;
       *_hamilton *= ket1;
       *ket1 *=  _exp;
       
@@ -246,18 +244,19 @@ namespace QDLIB
       
       if (_order < 10) _order=10;
 
-      /* Check for convergence of the Bessel series */
+      /* Prepare the coefficients */
       dVec bessel;
       int zeroes=0;
       
-      /* Manual scaling, very dangerous*/
+      /* Manual scaling, very dangerous */
       if (_params.isPresent("scaling")) _params.GetValue("scaling", Rdelta);
       /* Manual choice of recursion depth */
-      if (_params.isPresent("order")) _params.GetValue("order", Rdelta);
+      if (_params.isPresent("order")) _params.GetValue("order", _order);
       
       if ( BesselJ0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
 	 throw ( EOverflow("Error while calculating Bessel coefficients") );
       
+      /* Remove tailing zeroes (from underflow) */
       _order -= zeroes;
       int i=2;
       /* Check how much is needed for series convergence */
@@ -267,14 +266,14 @@ namespace QDLIB
       _order = i;
       
 	
-      /* Recursion order */
+      /* Check Recursion order */
       if (_order > 0 && _order <= int(Rdelta * clock->Dt()) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
+            
+      /* Scale the Hamiltonian */
+      _hamilton->Offset( -1*(Rdelta+Gmin) );
+      _hamilton->Scale( 1/Rdelta );
       
-      if (_order >= BESSEL_MAX_ORDER)
-	 throw ( EParamProblem ("Maximum recursion order reached. Choose a smaller time step or set the order manually") );
-      
-     
       _params.SetValue("order", _order);
       _params.SetValue("scaling", Rdelta);
       _params.SetValue("offset", Gmin);

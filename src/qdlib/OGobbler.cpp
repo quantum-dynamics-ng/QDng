@@ -6,7 +6,7 @@
 namespace QDLIB {
 
    OGobbler::OGobbler()
-      : OGridSystem(), _name("OGobbler"), _order(0)
+      : OGridSystem(), _name("OGobbler"), _order(0), _nip(false)
    {
       for (int i=0; i < MAX_DIMS; i++){
 	 _lp[i] = false;
@@ -105,6 +105,10 @@ namespace QDLIB {
 	 i++;
 	 sprintf (c, "%d", i);
       }
+      
+      /* negative imaginary potential */
+      if (_params.isPresent("nip")) _nip = true;
+      else _nip = false;
    }
    
    Operator * OGobbler::NewInstance()
@@ -151,7 +155,10 @@ namespace QDLIB {
       
       if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init(ket);
       
-      MultElements( (cVec*) ket, (dVec*) this);
+      if (_nip) 
+	 MultElements( (cVec*) ket, (dVec*) this, dcomplex(0,-1));
+      else 
+         MultElements( (cVec*) ket, (dVec*) this);
       
       return ket;
    }
@@ -169,7 +176,10 @@ namespace QDLIB {
       
       if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init((GridSystem*) ket);
       
-      MultElements( (cVec*) ket, (dVec*) this);
+      if (_nip)
+         MultElements( (cVec*) ket, (dVec*) this, dcomplex(0,-1));
+      else
+         MultElements( (cVec*) ket, (dVec*) this);
       
       return ket;
       
