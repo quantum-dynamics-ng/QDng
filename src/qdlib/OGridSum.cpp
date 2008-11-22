@@ -145,6 +145,8 @@ namespace QDLIB {
       OGridSum *org;
       
       org = dynamic_cast<OGridSum*>(O);
+      if (org == NULL)
+	 throw ( EIncompatible("O is not of type OGridSum", O->Name()) );
       
       /* Copy the parent */
       *((dVec*) this) = *org;
@@ -169,25 +171,18 @@ namespace QDLIB {
       return O;
    }
 
-   Operator* OGridSum::operator +=(const double d)
+   Operator* OGridSum::Offset(const double d)
    {
       for (int i=0; i < _size; i++)
-	 *(_O[i]) += d;
-      return this;
-   }
-
-   Operator* OGridSum::operator -=(const double d)
-   {
-      for (int i=0; i < _size; i++)
-         *(_O[i]) -= d;
+	 _O[i]->Offset(d);
       return this;
    }
 
    
-   Operator* OGridSum::operator *=(const double d)
+   Operator* OGridSum::Scale(const double d)
    {
       for (int i=0; i < _size; i++)
-         *(_O[i]) *= d;
+         _O[i]->Scale(d);
       return this;
    }
 

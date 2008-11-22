@@ -7,7 +7,6 @@
 #include "ParamContainer.h"
 
 
-
 namespace QDLIB {
    
    /**
@@ -51,7 +50,10 @@ namespace QDLIB {
    class EIncompatible : public Exception
    {
       public:
-         EIncompatible(const char *message) : Exception(message) {}
+	 EIncompatible(const char *message) : Exception(message) {}
+	 
+	 EIncompatible(const char *message, const string &name);
+	 EIncompatible(const char *message, const string &name1, const string &name2);
    };
    
    /**

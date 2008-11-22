@@ -167,25 +167,19 @@ namespace QDLIB {
 	 /**
 	  * Change the Operators offset.
 	  * 
-	  * This is not a usual +=. It sets the value, no addup!
 	  */
-          virtual Operator* operator+=(const double d) = 0;
-
-      
-	 /**
-	  * Change the Operators offset.
-	  * 
-	  */
- 	 virtual Operator* operator-=(const double d) = 0;
+          virtual Operator* Offset(const double d) = 0;
 
  	 /**
 	  * Scale the Operator.
 	  */
-	 virtual Operator* operator*=(const double d) = 0;
+	 virtual Operator* Scale(const double d) = 0;
 
          
          
    }; /* class Operator */
+
+   
 
    
    
@@ -200,13 +194,16 @@ namespace QDLIB {
    template <class T, class U>
    void MatrixVectorMult(WaveFunction *Psi, const Matrix<T> &A, const Vector<U> &B)
    {
-       Subscript N;
+      Subscript N;
    
        
-       if ( B.size() != A.num_cols() || A.num_cols() != Psi->size() ) {
+      if ( B.size() != A.num_cols() || A.num_cols() != Psi->size() ) {
 	 throw( EIncompatible("num_cols != num_elements of vector") );
       }
 	  
+      if (Psi == NULL)
+	 throw ( EIncompatible("Invalid Psi in Mat * Vec") );
+      
       N = B.size();
 
       for (int i=0; i<N; i++){

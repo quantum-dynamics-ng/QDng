@@ -187,6 +187,8 @@ namespace QDLIB {
       OSum *r;
       
       r = dynamic_cast<OSum*> (O);
+      if (r == NULL)
+	 throw( EIncompatible ("Incompatible in Assginment", this->Name(), O->Name() ) );
       
       r->_size = _size;
       for (int i=0; i < _size; i++){
@@ -202,24 +204,17 @@ namespace QDLIB {
    }
 	    
    
-   Operator* QDLIB::OSum::operator +=(const double d)
+   Operator* QDLIB::OSum::Offset(const double d)
    {
       for (int i=0; i < _size; i++)
-	 *(_O[i]) += d;
+	 _O[i]->Offset(d);
       return this;
    }
 
-   Operator* QDLIB::OSum::operator -=(const double d)
+   Operator* QDLIB::OSum::Scale(const double d)
    {
       for (int i=0; i < _size; i++)
-	 *(_O[i]) -= d;
-      return this;
-   }
-
-   Operator* QDLIB::OSum::operator *=(const double d)
-   {
-      for (int i=0; i < _size; i++)
-	 *(_O[i]) *= d;
+	 _O[i]->Scale(d);
       return this;
    }
 

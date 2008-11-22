@@ -150,13 +150,10 @@ namespace QDLIB {
 	 }
 	 
 	 /** We don't do offsetting. */
-	 virtual Operator* operator+=(const double d){return this;}
-
-	 /** We don't do offsetting. */
-	 virtual Operator* operator-=(const double d){return this;}
+	 virtual Operator* Offset(const double d){return this;}
 
 	 /** We don't scale. */
-	 virtual Operator* operator*=(const double d){return this;}
+	 virtual Operator* Scale(const double d){return this;}
    };
 
 }

@@ -264,27 +264,27 @@ class Matrix
 
 
     /** 
-				Change size of matrix to MxN, reallocating memory if necessary.
-				<p>
-				NOTE: This operations occurs in place, i.e. when resizing to 
-				a new matrix, original matrix elements
-				are <b>NOT</b> retained.  Instead, one must explicit create
-				a new matrix of this size and manually copy the elements, e.g.
-				<pre>
+      Change size of matrix to MxN, reallocating memory if necessary.
+      <p>
+      NOTE: This operations occurs in place, i.e. when resizing to 
+      a new matrix, original matrix elements
+      are <b>NOT</b> retained.  Instead, one must explicit create
+      a new matrix of this size and manually copy the elements, e.g.
+      <pre>
 
-				Matrix double B(M, N);
+      Matrix double B(M, N);
 
-				int 	min_M = M < A.num_rows() ? M : A.num_rows();
-				int 	min_N = N < A.num_cols() ? N : A.num_cols();
-				for (int i=1; i<=min_M; i++)
-					for (int j=1; j<=min_N; j++)
-						B(i,j) = A(i,j);
+      int 	min_M = M < A.num_rows() ? M : A.num_rows();
+      int 	min_N = N < A.num_cols() ? N : A.num_cols();
+      for (int i=1; i<=min_M; i++)
+	       for (int j=1; j<=min_N; j++)
+		     B(i,j) = A(i,j);
 
-				A.destroy();
-				</pre>
+      A.destroy();
+      </pre>
 
-				@param M  the number of rows of new size.
-				@param N	the number of columns of new size.
+      @param M  the number of rows of new size.
+      @param N	the number of columns of new size.
     */
     Matrix<T>& newsize(Subscript M, Subscript N)
     {

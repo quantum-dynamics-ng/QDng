@@ -146,6 +146,8 @@ namespace QDLIB {
       
       psi = Psi->NewInstance();
       ket = dynamic_cast<WFGridSystem*>(psi);
+      if (ket == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
       
       if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init(ket);
       
@@ -161,6 +163,9 @@ namespace QDLIB {
       
       psi = Psi->NewInstance();
       ket = dynamic_cast<WFGridSystem*>(psi);
+      if (ket == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+      
       
       if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init((GridSystem*) ket);
       
@@ -185,6 +190,9 @@ namespace QDLIB {
       OGridSystem *op;
       
       op = dynamic_cast<OGridSystem*>(O);
+      if (op == NULL)
+	 throw ( EIncompatible("O is not of type OGridSystem", O->Name()) );
+      
       
       if ( *((GridSystem*) this) != *((GridSystem*) op) ) _Init( (GridSystem*) op);
       

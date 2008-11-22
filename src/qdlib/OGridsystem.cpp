@@ -18,7 +18,7 @@ namespace QDLIB {
       return _file;
    }
 
-   Operator* OGridSystem::operator +=(const double d)
+   Operator* OGridSystem::Offset(const double d)
    {
       for(lint i=0; i < lsize(); i++){
 	 (*this)[i] += d;
@@ -26,15 +26,8 @@ namespace QDLIB {
       return this;
    }
 
-   Operator* OGridSystem::operator -=(const double d)
-   {
-      for(lint i=0; i < lsize(); i++){
-	 (*this)[i] -= d;
-      }
-      return this;
-   }
 
-   Operator* OGridSystem::operator *=(const double d)
+   Operator* OGridSystem::Scale(const double d)
    {
       MultElements( (dVec*) this, d );
       return this;

@@ -79,9 +79,11 @@ namespace QDLIB
       if ( num_rows() != num_cols() )
 	 throw (EParamProblem ("Matrix of operators is not rectangualar") );
       
-      /* copy */
       psi = dynamic_cast<WFMultistate*>(Psi->NewInstance());
       org = dynamic_cast<WFMultistate*>(Psi);
+      if (psi == NULL || org == NULL)
+	 throw ( EIncompatible("Psi is not of type WFMultistate", Psi->Name()) );
+      
       *((cVec*) psi) = dcomplex(0.0);
    
       lint size = psi->Size();
@@ -115,34 +117,23 @@ namespace QDLIB
    }
 
    
-   Operator* OMultistate::operator +=(const double d)
+   Operator* OMultistate::Offset(const double d)
    {
       lint size = num_rows();
       for (lint i=0; i < size; i++){
 	 for (lint j=0; j < size; j++){
-	    *((*this)[i][j]) += d;
+	    (*this)[i][j]->Offset(d);
 	 }
       }
       return this;
    }
 
-   Operator* OMultistate::operator -=(const double d)
+   Operator* OMultistate::Scale(const double d)
    {
       lint size = num_rows();
       for (lint i=0; i < size; i++){
 	 for (lint j=0; j < size; j++){
-	    *((*this)[i][j]) -= d;
-	 }
-      }
-      return this;
-   }
-
-   Operator* OMultistate::operator *=(const double d)
-   {
-      lint size = num_rows();
-      for (lint i=0; i < size; i++){
-	 for (lint j=0; j < size; j++){
-	    *((*this)[i][j]) *= d;
+	    (*this)[i][j]->Scale(d);
 	 }
       }
       return this;

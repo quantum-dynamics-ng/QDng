@@ -143,7 +143,11 @@ namespace QDLIB {
       
       
       /* Copy */
-      ket = dynamic_cast<WFGridSystem*>(Psi);
+     ket = dynamic_cast<WFGridSystem*>(Psi);
+     if (ket == NULL)
+	throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+
+     
       if (*this != *((GridSystem*) ket) || _kspace == NULL) {  /* re-Init k-space ?*/
 	 *((GridSystem*) this) = *((GridSystem*) ket);
 	 InitKspace();
@@ -153,7 +157,10 @@ namespace QDLIB {
       *psi = Psi;
       
       opPsi = dynamic_cast<WFGridSystem*>(psi);
-   
+      if (opPsi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+
+      
       opPsi->ToKspace();
       MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
 //       MultElements((cVec*) opPsi, _kspace);
@@ -168,6 +175,10 @@ namespace QDLIB {
       WFGridSystem *opPsi;
       
       opPsi = dynamic_cast<WFGridSystem*>(Psi);
+      if (opPsi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+
+      
       if (*this != *((GridSystem*) opPsi)  || _kspace == NULL) {  /* re-Init k-space ?*/
 	 *((GridSystem*) this) = *((GridSystem*) opPsi);
 	 InitKspace();
@@ -183,6 +194,10 @@ namespace QDLIB {
    Operator * OGridNablaSq::operator =(Operator * O)
    {
       OGridNablaSq *org = dynamic_cast<OGridNablaSq*>(O);
+      
+      if (org == NULL)
+	 throw ( EIncompatible("O is not of type OGridNablaSq", O->Name()) );
+
       
       /* Copy parents */
       *((GridSystem*) this) = *((GridSystem*) org);

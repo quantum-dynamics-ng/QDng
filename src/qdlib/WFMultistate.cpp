@@ -109,6 +109,9 @@ namespace QDLIB
       WFMultistate *psi = dynamic_cast<WFMultistate*>(Psi);
       WaveFunction *add;
       
+      if (psi == NULL)
+	 throw( EIncompatible("Incompatible in assignment", this->Name(), Psi->Name()) ) ;
+      
       _destroy(); /* remove old conent */
       
       for(lint i=0; i < psi->_size; i++){

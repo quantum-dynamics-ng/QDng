@@ -212,22 +212,15 @@ namespace QDLIB {
       return result;
    }
    
-   Operator * QDLIB::OHerMat::operator +=(const double d)
+   Operator * QDLIB::OHerMat::Offset(const double d)
    {
       for (int i=0; i < num_rows() ; i++)
 	 (*this)[i][i] += d;
       return this;
    }
 
-   Operator * QDLIB::OHerMat::operator -=(const double d)
-   {
-      for (int i=0; i < num_rows() ; i++)
-	 (*this)[i][i] -= d;
-      return this;
 
-   }
-
-   Operator * QDLIB::OHerMat::operator *=(const double d)
+   Operator * QDLIB::OHerMat::Scale(const double d)
    {
       for (int i=0; i < num_rows() ; i++)
 	 for (int j=0; j < num_cols() ; j++)

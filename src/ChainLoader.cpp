@@ -45,12 +45,15 @@ namespace QDLIB
       } else if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
 	 Operator *osub;
+	 OGridSystem *gsub;
 	 OGridSum *sum = new OGridSum;
 	 while (child->EndNode()){
 	    osub = LoadOperatorChain( child );
 	    if (osub == NULL)
-	       throw ( EParamProblem("Can't load operator") );	    
-	    sum->Add( dynamic_cast<OGridSystem*>(osub) );
+	       throw ( EParamProblem("Can't load operator") );
+	    if ( (gsub = dynamic_cast<OGridSystem*>(osub) ) == NULL )
+	       throw ( EIncompatible("Tried to load into GridSum"), osub->Name() );
+	    sum->Add( gsub );
 	    child->NextNode();
 	 }
 	 return sum;
@@ -147,10 +150,12 @@ namespace QDLIB
       pm.GetValue("name", name);
       
       /* Load the module */
-      U = dynamic_cast<OPropagator*>(mods->LoadOp( name ));
+      h = mods->LoadOp( name );
+      U = dynamic_cast<OPropagator*>(h);
+      if (U == NULL)
+         throw ( EIncompatible("This is not a propagator", h->Name()) );
       
-      if(U == NULL)
-	 throw (EParamProblem ("Propagator loading failed") );
+      h = NULL;
       
       /* Initialize */
       U->Init( pm );

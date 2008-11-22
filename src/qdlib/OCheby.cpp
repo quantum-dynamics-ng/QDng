@@ -183,6 +183,8 @@ namespace QDLIB
       OCheby *P;
       
       P = dynamic_cast<OCheby*>(O);
+      if (P == NULL)
+	 throw ( EIncompatible("Incompat in copy", this->Name(), O->Name()) );
       
       /* Copy parents */
       *((OPropagator*) this) = (OPropagator*) P;

@@ -165,6 +165,8 @@ namespace QDLIB {
       *ket = Psi;       // Copy
       
       psi = dynamic_cast<WFGridSystem*>(ket);
+      if (psi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
       
       MultElements( (cVec*) psi, _expV);
       
@@ -194,6 +196,9 @@ namespace QDLIB {
       
       psi = dynamic_cast<WFGridSystem*>(Psi);
             
+      if (psi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+      
       MultElements( (cVec*) psi, _expV );
       
       psi->ToKspace();
@@ -212,6 +217,9 @@ namespace QDLIB {
       
       org = dynamic_cast<OSPO*>(O);
 	    
+      if (org == NULL)
+	 throw ( EIncompatible("Incompatible Assignment", this->Name(), O->Name()) );
+      
       *((Operator*) _Tkin) = (Operator*) org->_Tkin;
       *((Operator*) _Vpot) = (Operator*) org->_Vpot;
 
@@ -252,7 +260,7 @@ namespace QDLIB {
       if (Key == "Tkin") {
 	 _Tkin = dynamic_cast<OKSpace*>(O);
 	 if (_Tkin == NULL)
-	    throw ( EParamProblem("Tkin is invalid") );
+	    throw ( EParamProblem("Tkin is invalid", O->Name()) );
       }
       
       if (Key == "Vpot") {
@@ -260,7 +268,7 @@ namespace QDLIB {
 	 if (_Vpot == NULL){
 	    _Vpot = dynamic_cast<OGridSystem*>(O);
 	 } else {
-	    throw ( EParamProblem("Vpot is invalid") );
+	    throw ( EParamProblem("Vpot is invalid", O->Name()) );
 	 }
 	 
       }
@@ -271,16 +279,4 @@ namespace QDLIB {
    
    
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

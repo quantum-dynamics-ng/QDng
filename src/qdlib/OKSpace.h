@@ -43,12 +43,12 @@ namespace QDLIB {
          virtual void InitKspace() = 0;
 	 
 	 /** We don't do offsetting. */
-	 virtual Operator* operator+=(const double d){return this;}
+	 virtual Operator* Offset(const double d){return this;}
 
 	 /** We don't do offsetting. */
 	 virtual Operator* operator-=(const double d){return this;};
 
-	 virtual Operator* operator*=(const double d)
+	 virtual Operator* Scale(const double d)
 	 {
 	    MultElements(_kspace, d);
 	    return this;
