@@ -80,7 +80,8 @@ namespace QDLIB
    /**
     * Load all wave functions from the input.
     * 
-    * This method also recognizes Multistate. Works recursive
+    * This method also recognizes Multistate, LC (Linear combination).
+    * Works recursive.
     * 
     */
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode )
@@ -100,11 +101,34 @@ namespace QDLIB
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
 	 while (child->EndNode()){
-// 	    wfsub = LoadWaveFunctionChain( child );
+ 	    wfsub = LoadWaveFunctionChain( child );
 	    multi->Add( wfsub );
 	    child->NextNode();
 	 }
 	 return multi;
+      } else if (name == "LC"){
+	 cout << "Build linear combination from wave functions:" << endl;
+	 child = WFNode->NextChild();
+	 WaveFunction *wfadd;
+	 double coeff;
+	 ParamContainer pm_child;
+	 while (child->EndNode()){
+	    wfadd = LoadWaveFunctionChain( child );
+	    pm_child = child->Attributes();
+	    if (WF == NULL){
+	       WF = wfadd->NewInstance();
+	       *((cVec*) WF) = dcomplex(0,0);
+	    }
+	    if (pm_child.isPresent("coeff")){
+	       pm_child.GetValue("coeff", coeff);
+	       *wfadd *= coeff;
+	    }
+	    *WF += wfadd;
+	    delete wfadd;
+	    child->NextNode();
+	 }
+	 if ( pm.isPresent("normalize") ) WF->Normalize();
+	 return WF; 
       } else {
 	 
 	 WF = mods->LoadWF( name );

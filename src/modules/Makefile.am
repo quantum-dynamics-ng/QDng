@@ -18,7 +18,6 @@ libqd_OCheby_la_LIBADD = $(top_builddir)/src/sys/libtools.la \
 	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la \
 	-lg2c -lblas -lslatec -llapack
 libqd_OGridNablaSq_la_SOURCES = mod-OGridNablaSq.cpp
-noinst_HEADERS = mod-OGridPotential.cpp.h
 libqd_OGridPotential_la_SOURCES = mod-OGridPotential.cpp
 libqd_OSPO_la_SOURCES = mod-OSPO.cpp
 libqd_OSOD_la_SOURCES = mod-OSOD.cpp

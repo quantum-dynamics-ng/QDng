@@ -266,7 +266,6 @@ namespace QDLIB {
       lint strides = A->strides();
       
       double *a;
-      
       lint s;
       for (s=0; s < strides; s++){
 	 a = A->begin(s);

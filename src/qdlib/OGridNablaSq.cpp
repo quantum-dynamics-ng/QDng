@@ -198,10 +198,15 @@ namespace QDLIB {
       if (org == NULL)
 	 throw ( EIncompatible("O is not of type OGridNablaSq", O->Name()) );
 
-      
+      _params = org->_params;
       /* Copy parents */
       *((GridSystem*) this) = *((GridSystem*) org);
-      _kspace = org->_kspace;
+      
+      if (_kspace == NULL)
+	 _kspace = new dVec();
+      
+      if (org->_kspace != NULL)
+         *_kspace = *(org->_kspace);
       
       for (int i=0; i < GridSystem::Dim(); i++){
 	 _mass[i] = org->_mass[i];

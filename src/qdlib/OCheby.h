@@ -3,7 +3,7 @@
 
 #include "OPropagator.h"
 
-#define BESSEL_DELTA 1e-30       /* Upper limit for convergence of the Bessel series convergence */
+#define BESSEL_DELTA 1e-30       /* Lower limit for convergence of the Bessel series convergence (default) */
 #define BESSEL_MAX_ORDER 1e6     /* Maximum recursion order to used (by automatic determination) */
 
 
@@ -16,6 +16,7 @@ namespace QDLIB
     * Init parameters:
     * \li order   desired order of recursion, if left empty it's chosen automatically.
     * \li scaling The scaling of the Hamiltonian. Can only be used in combination with order.
+    * \li prec    The lower limit precission of the bessel coeffcients (mutual exclusive with order)
     * 
     * \todo implement imaginary time propagation.
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>

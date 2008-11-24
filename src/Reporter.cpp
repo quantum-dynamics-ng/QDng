@@ -52,7 +52,7 @@ namespace QDLIB
       
       /* Write header */
       if (_step == 0){
-// 	 _specbuf.newsize(clock->Steps());
+ 	 _specbuf.newsize(clock->Steps()+1);
 	 cout << "Step\tTime[au]";
 	 if (_norm) cout << "\tNorm";
 	 if (_proj0) cout << "\t<Psi0|PsiT>";
@@ -79,7 +79,7 @@ namespace QDLIB
       
 	 if (_spectrum)
 	 {
-	    _specbuf[_step] = proj;
+	    _specbuf[_step-1] = proj;
 	 }
       }
    
@@ -95,7 +95,7 @@ namespace QDLIB
    /**
     * Finish the report at the end of a propagation.
     * 
-    * The autocorrellation is spectrum is done here.
+    * The autocorrellation spectrum is done here.
     */
    void Reporter::Finalize( )
    {
@@ -113,8 +113,10 @@ namespace QDLIB
 	  ofile.open(_specname.c_str());
 	  if (!ofile.is_open()) throw;
 	  
+	  fftw.forward();
+	  
 	  for (lint i=0; i < out.size(); i++){
-	     cout << i << "\t" << cabs(out[i]) << endl;
+	     ofile << i << "\t" << cabs(out[i]) / (clock->Steps()/2) << endl;
 	  }
 	  ofile.close();
 	     

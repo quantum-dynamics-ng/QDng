@@ -69,51 +69,41 @@ namespace QDLIB
    
    WaveFunction * OCheby::operator *( WaveFunction * Psi )
    {
-      WaveFunction *r;
-      WaveFunction *swap;
+      WaveFunction *buf, *r;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
       if (ket2 == NULL) ket2 = Psi->NewInstance();
-      
+    
+      buf = Psi->NewInstance();
       r = Psi->NewInstance();
-      *((cVec*) r) = dcomplex(0,0);
       
-      /* \phi_0 and \phi_1 are fixed */
-      *ket0 =  Psi;
-//       *ket0 *= _coeff[0];
+      *r  = Psi;  /* Copy */
       
-      *ket1 = Psi;
-      *ket1 *= _exp;
-      *_hamilton *= ket1;
-//       *ket1 *= _coeff[1];
-      
-      
-      /* Operator recursion loop */
-      for(int i=2; i < _order; i++) {
-	 /* 2 X \phi_i-1 + \phi_i-2 */
-	 *ket2 = ket1;
-	 *ket2 *= 2 * _exp;
-	 *_hamilton *= ket2;
-	 *ket2 += ket0;
-// 	 *ket2 *= _coeff[i];
-	 
-	 /* multiply by coefficients of the series expansion and add up to the result*/
-	 *ket0 *= _coeff[i-2];
-	 *r += ket0;
-	 cout << r->Norm() << endl;
-	 /* shift back by one - use pointers instead of copy */
-	 swap = ket0;
-	 ket0 = ket1;
-	 ket1 = ket2;
-	 ket2 = swap;
-      } 
-      /* multiply the last two coefficients of the series expansion */
-      *ket0 *= _coeff[_order-2];
-      *r += ket0;
-      *ket1 *= _coeff[_order-1];
-      *r += ket1;
+      *ket0 = Psi;   /* phi_0 */
 
+      *ket1 = Psi;
+      *_hamilton *= ket1;
+      *ket1 *=  _exp;
+
+      *r *= _coeff[0];
+
+      *buf = ket1;
+      *buf *= _coeff[1];
+
+      *r += buf;
+
+      int i=2;
+      while (i < _order){
+	 _Recursion(ket0, ket1, buf, r, i);
+	 i++;
+	 if(!(i < _order)) break;
+	 _Recursion(ket1, ket0, buf, r, i);
+	 i++;
+      }
+
+      delete buf;
+      /* multiply the last two coefficients of the series expansion */
       return r;
    }
 
@@ -121,7 +111,7 @@ namespace QDLIB
 
    void OCheby::_Recursion( WaveFunction * psi0, WaveFunction * psi1, WaveFunction * Hpsi1, WaveFunction *Psi, int n )
    {
-      *Hpsi1 = psi1;       /* 1/R * H * Psi */
+      *Hpsi1 = psi1;       /* H * Psi */
       *_hamilton *= Hpsi1;
       
       *ket2 = psi0;
@@ -133,7 +123,7 @@ namespace QDLIB
       *ket2 *= _coeff[n];
       *Psi += ket2;
       
-      cout << "\tNorm ket2, psi: " << ket2->Norm() << " " <<  Psi->Norm() << endl; 
+//       cout << "\tNorm ket2, psi: " << ket2->Norm() << " " <<  Psi->Norm() << endl; 
       
    }
    
@@ -191,7 +181,7 @@ namespace QDLIB
       clock = P->clock;
       
       /* Copy own stuff */
-      _hamilton = P->_hamilton;
+      *_hamilton = P->_hamilton;
       _order = P->_order;
       _coeff = P->_coeff;
       Rdelta = P->Rdelta;
@@ -240,7 +230,7 @@ namespace QDLIB
       
       /* This is an estimate for the recursion depth */
       if (_order <= 0)
-	 _order =  int(5 * Rdelta * clock->Dt());
+	 _order =  abs(int(5 * Rdelta * clock->Dt()));
       
       if (_order < 10) _order=10;
 
@@ -258,20 +248,29 @@ namespace QDLIB
       
       /* Remove tailing zeroes (from underflow) */
       _order -= zeroes;
-      int i=2;
-      /* Check how much is needed for series convergence */
-      while ( i < _order && abs(bessel[i - 1] - bessel[i - 2] ) > BESSEL_DELTA) {
-	 i++;
-      }
-      _order = i;
       
+      /* Check the order which is really needed*/
+      if (! _params.isPresent("order") ){
+	 double precission = BESSEL_DELTA;
+	 if (_params.isPresent("prec"))
+	    _params.GetValue("prec", precission);
+	 int i=2;
+	 /* Check how much is needed for series convergence */
+	 while ( i < _order && abs(bessel[i - 1] - bessel[i - 2] ) > precission) {
+	    i++;
+	 }
+	 _order = i;
+	 _params.SetValue("prec", precission);
+      }
+
 	
       /* Check Recursion order */
       if (_order > 0 && _order <= int(Rdelta * clock->Dt()) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
-            
+      
       /* Scale the Hamiltonian */
       _hamilton->Offset( -1*(Rdelta+Gmin) );
+      
       _hamilton->Scale( 1/Rdelta );
       
       _params.SetValue("order", _order);
@@ -281,7 +280,6 @@ namespace QDLIB
       /* Setup coefficients */
       _coeff.newsize(_order);
       _coeff[0] = cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin)) * bessel[0];
-      cout << "exponentReal" << cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin));
       for (int i=1; i < _coeff.size(); i++){
 	 _coeff[i] = 2.0 * cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin)) * bessel[i];
       }

@@ -114,10 +114,7 @@ namespace QDLIB {
       
       _U = ChainLoader::LoadPropagator( section, &_h );
       delete section;
-      
-      _H = _h->NewInstance();
-      *_H = _h; /* Copy, since the propagator will propably scale it etc. */
-      
+            
       /* Load the initial Wavefunction */
       cout << "Initalize Wave function:\n";
       WaveFunction *Psi;
@@ -129,14 +126,18 @@ namespace QDLIB {
       delete section;
       
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
+           
+      /* Make sure our hamiltonian is initalized */
+      cout << "Initial engergy: " << _h->Expec(Psi) << endl;
       
+      /* Copy, since the propagator will propably scale it etc. */
+      _H = _h->NewInstance();
+      *_H = _h; 
+
       /* Give the reporter module what it needs */
       _reporter.PsiInitial( Psi );
       _reporter.Hamilton( _H );
       
-      /* Make sure our hamiltonian is initalized */
-      _H->Expec(Psi);
-
       /* Let the Propagator do it's initalisation */
       _H->UpdateTime();
       _U->Clock( clock );
@@ -167,6 +168,7 @@ namespace QDLIB {
 	++(*clock);                     /* Step the clock */
       }
       
+      _reporter.Finalize();
       delete Psi;
    }
 

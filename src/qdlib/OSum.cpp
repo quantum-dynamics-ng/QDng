@@ -190,10 +190,10 @@ namespace QDLIB {
       if (r == NULL)
 	 throw( EIncompatible ("Incompatible in Assginment", this->Name(), O->Name() ) );
       
-      r->_size = _size;
+      _size = r->_size;
       for (int i=0; i < _size; i++){
-	 r->_O[i] = _O[i]->NewInstance();
-	 *(r->_O[i]) = _O[i];
+	 _O[i] = r->_O[i]->NewInstance();
+	 *(_O[i]) = r->_O[i];
       }
       return r;
    }
@@ -213,8 +213,10 @@ namespace QDLIB {
 
    Operator* QDLIB::OSum::Scale(const double d)
    {
-      for (int i=0; i < _size; i++)
+      for (int i=0; i < _size; i++){
 	 _O[i]->Scale(d);
+      }
+      
       return this;
    }
 

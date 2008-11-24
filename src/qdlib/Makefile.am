@@ -5,9 +5,9 @@ libqd_la_SOURCES = GridSystem.cpp InternalMods.cpp Laser.cpp OCheby.cpp \
 	OGobbler.cpp OGridNablaSq.cpp OGridPotential.cpp OGridSum.cpp OGridsystem.cpp \
 	OHerMat.cpp OMultistate.cpp OSOD.cpp OSPO.cpp OSum.cpp WFGridCartesian.cpp \
 	WFGridSystem.cpp WFLevel.cpp WFMultistate.cpp
-noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h OGrid1Dd2dx.h \
+noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h \
 		OGridDipole.h OGridNablaSq.h OGridPotential.h OGridSum.h OGridsystem.h OHerMat.h \
-		OKSpace.h OPropagator.h OSOD.h OSPO.h OSum.h Operator.h WFGrid1D.h \
+		OKSpace.h OPropagator.h OSOD.h OSPO.h OSum.h Operator.h \
 		WFGridCartesian.h WFGridSystem.h WFLevel.h WFMultistate.h WaveFunction.h WFMultistate.h \
 	OMultistate.h
 

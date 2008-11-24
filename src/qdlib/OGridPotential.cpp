@@ -153,16 +153,17 @@ namespace QDLIB
 	 
    Operator* OGridPotential::operator=(Operator* O)
    {
-      OGridPotential *n = dynamic_cast<OGridPotential*> (this->NewInstance());
+      OGridPotential *n = dynamic_cast<OGridPotential*> (O);
       if (n == NULL)
 	 throw ( EIncompatible("O is not of type OGridPotential", O->Name()) );
       
-      for (int i=0; i < size(); i++){  /* Copy vector */
-	 (*n)[i] = (*this)[i];
-      }
+      _params = n->_params;
+      
+      /* Copy vector */
+      *((dVec*) this) = *((dVec*) n);
       
       /* Copy Grid description */
-      (GridSystem) (*this) = *((GridSystem*) n);
+      *((GridSystem*) this) = *((GridSystem*) n);
       
       return n;
    }

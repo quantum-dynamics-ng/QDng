@@ -45,11 +45,10 @@ namespace QDLIB {
 	 /** We don't do offsetting. */
 	 virtual Operator* Offset(const double d){return this;}
 
-	 /** We don't do offsetting. */
-	 virtual Operator* operator-=(const double d){return this;};
-
 	 virtual Operator* Scale(const double d)
 	 {
+	    if (_kspace == NULL)
+	       throw ( EParamProblem("k-space not initialized", Name()) );
 	    MultElements(_kspace, d);
 	    return this;
 	 }
