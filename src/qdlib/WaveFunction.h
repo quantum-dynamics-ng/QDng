@@ -82,10 +82,27 @@ namespace QDLIB {
          void operator*=(const double d)
          {
             for (int i=0; i < cVec::size(); i++){
-               (*this)[i] *= d;
+               MultElements((cVec*) this, d);
             }
          }
          
+	 /**
+	  * Assign scalar value.
+	  */
+	 WaveFunction* operator=(double d)
+	 {
+	    *((cVec*) this) = dcomplex(d,0);
+	 }
+	 
+	 /**
+	  * Assign scalar value.
+	  */
+	 WaveFunction* operator=(dcomplex d)
+	 {
+	    *((cVec*) this) = d;
+	 }
+
+	 
          /** Multiply with scalar */
          WaveFunction* operator*(const double d)
          {
