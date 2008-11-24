@@ -99,6 +99,8 @@ namespace QDLIB {
    void ProgPropa::Run()
    {
       XmlNode *section;
+      Operator *_h;
+      
       /* Init global Propa parameters */
       _InitParams();
       
@@ -110,9 +112,11 @@ namespace QDLIB {
       if (section == NULL)
 	 throw ( EParamProblem ("No propagator found") );
       
-      _U = ChainLoader::LoadPropagator( section, &_H );
+      _U = ChainLoader::LoadPropagator( section, &_h );
       delete section;
       
+      _H = _h->NewInstance();
+      *_H = _h; /* Copy, since the propagator will propably scale it etc. */
       
       /* Load the initial Wavefunction */
       cout << "Initalize Wave function:\n";
