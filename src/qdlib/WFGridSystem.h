@@ -17,7 +17,6 @@ namespace QDLIB {
    {
       private:
          bool _isKspace;
-         cVec *_spacebuffer;  /* buffer for FFT*/
          
          void _check_kspace();
       protected:

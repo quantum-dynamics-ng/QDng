@@ -33,6 +33,7 @@ namespace QDLIB {
       if (psi == NULL)
 	 throw ( EIncompatible("Psi not of type WFGridSystem", Psi->Name()) );
       
+      *((GridSystem*) this) = *((GridSystem*) psi);
   
       /* Setup single derivative for every coordinate */
       for (lint i=0; i < GridSystem::Dim(); i++)
@@ -41,7 +42,7 @@ namespace QDLIB {
 	    throw ( EParamProblem("Gmatrix does not match Wavefunction") );
    
 	 /* buffers */
-	 if (_wfbuf[i] == NULL) _wfbuf[i] = Psi->NewInstance();
+	 if (_wfbuf[i] == NULL) _wfbuf[i] = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
 	 
 	 /* derivatives */
          if (_kspace[i].size() == 0){
@@ -152,8 +153,37 @@ namespace QDLIB {
 
    WaveFunction * OGridGMat::operator *=( WaveFunction * Psi )
    {
+      WaveFunction *psi;
       if (_kspace.size() == 0) _InitKspace(Psi);
-      return Psi;
+      
+      psi = dynamic_cast<WFGridSystem*>(Psi);
+      if (psi == NULL)
+	 throw ( EIncompatible ("Can't apply to ", Psi->Name()) );
+      
+      /* Make a copy from Psi */
+      for (int i=0; i < GridSystem::Dim(); i++)
+         *((WaveFunction*) _wfbuf[i]) = Psi;
+      
+      *Psi = dcomplex(0,0);
+      
+      lint i;
+      for (i=0; i < GridSystem::Dim(); i++){
+	 /* d/dx from WF */
+	 _wfbuf[i]->ToKspace();
+	 MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[i], 1/double(GridSystem::Size()) );
+	 _wfbuf[i]->ToXspace();
+	 
+	 for (lint j=0; j < (i+1); j++){
+	    /* Multiply Gmatrix element */
+	    MultElements( (cVec*) _wfbuf[i], (dVec*) &_Gmat[i][j]);
+	    _wfbuf[i]->ToKspace();
+	    MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[j], 1/double(GridSystem::Size()) );
+	    _wfbuf[i]->ToXspace();
+	    *psi += _wfbuf[i];
+	 }
+      }
+      
+      return psi;
    }
    
    Operator * OGridGMat::operator =( Operator * O )

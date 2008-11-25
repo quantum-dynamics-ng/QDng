@@ -5,13 +5,12 @@
 namespace QDLIB {
          
    WFGridSystem::WFGridSystem() :
-	 _isKspace(false), _spacebuffer(NULL), fft(NULL)
+	 _isKspace(false), fft(NULL)
    {}
 	    
    WFGridSystem::~WFGridSystem()
    {
       if (fft != NULL) delete fft;
-      if (_spacebuffer != NULL) delete _spacebuffer;
    }
    
    
@@ -30,12 +29,10 @@ namespace QDLIB {
    {
       if (GridSystem::Dim() == 0 || GridSystem::Dim() > MAX_DIMS)
          throw( EParamProblem("Dims not initialized or to large") );
-
-      if (_spacebuffer == NULL) _spacebuffer = new cVec(cVec::size());
       
       /* Initialize FFT */
       if (fft == NULL){
-	 fft = new FFT(*((GridSystem*) this), *((cVec*) this), *_spacebuffer);
+	 fft = new FFT(*((GridSystem*) this), *((cVec*) this));
       }
    }
    
@@ -47,12 +44,8 @@ namespace QDLIB {
       if (_isKspace) return;
       
       _check_kspace();
-      
       fft->forward();
-      
-      cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
       _isKspace = true;
-      
    }
    
    /**
@@ -63,9 +56,7 @@ namespace QDLIB {
       if (!_isKspace) return;
       
       _check_kspace();
-
       fft->backward();
-      cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
       _isKspace = false;
       
    }

@@ -2,6 +2,7 @@
 #define QDLIBOGRIDGMAT_H
 
 #include "OGridPotential.h"
+#include "WFGridSystem.h"
 
 namespace QDLIB {
 
@@ -24,7 +25,7 @@ namespace QDLIB {
 	 lint _size;
 	 Gmatrix_t _Gmat;
 	 Gkspace_t _kspace;
-	 Vector<WaveFunction*> _wfbuf;
+	 Vector<WFGridSystem*> _wfbuf;
 	 
 	 void _InitKspace (WaveFunction *Psi);
       public:
