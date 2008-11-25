@@ -1,15 +1,186 @@
 #include "OGridGMat.h"
 
+#include "WFGridSystem.h"
+#include "Kspace.h"
+#include "sys/FileSingleDefs.h"
+
+
 namespace QDLIB {
 
-OGridGMat::OGridGMat(): OGridSystem()
-{
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(0,0), _kspace(0,0), _wfbuf(0)
+   {
+   }
+   
+   
+   OGridGMat::~OGridGMat()
+   {
+      for(lint i=0; i < GridSystem::Dim(); i++){
+	 if (_wfbuf[i] != NULL) delete _wfbuf[i];
+      }
+   }
+
+   
+   void OGridGMat::_InitKspace (WaveFunction *Psi)
+   {
+      if (GridSystem::Dim() == 0) throw ( EParamProblem("Missing GridSystem parameters") );
+   
+      dVec *kspace1;
+      dVecView *view;
+      
+      WFGridSystem* psi;
+      psi = dynamic_cast<WFGridSystem*>(Psi);
+      
+      if (psi == NULL)
+	 throw ( EIncompatible("Psi not of type WFGridSystem", Psi->Name()) );
+      
+  
+      /* Setup single derivative for every coordinate */
+      for (lint i=0; i < GridSystem::Dim(); i++)
+      {
+	 if ( ((GridSystem) (_Gmat[i][i])) != *((GridSystem*) psi) )
+	    throw ( EParamProblem("Gmatrix does not match Wavefunction") );
+   
+	 /* buffers */
+	 if (_wfbuf[i] == NULL) _wfbuf[i] = Psi->NewInstance();
+	 
+	 /* derivatives */
+         if (_kspace[i].size() == 0){
+	    _kspace[i].newsize(GridSystem::Size(),0);
+	 }
+	 kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i));
+	 view = new dVecView(_kspace[i], GridSystem::Dim(), GridSystem::DimSizes());
+	 
+	 view->ActiveDim(i);
+	 *view += *kspace1;
+	 
+	 delete view;
+	 delete kspace1;
+      }
+   }
+   
+   Operator* OGridGMat::NewInstance()
+   {
+      OGridGMat* r = new OGridGMat();
+      return r;
+   }
+   
+   /**
+    * \todo Clean memory if already initialized.
+    */
+   void OGridGMat::Init(ParamContainer &params)
+   {
+      int n;
+      string name;
+      
+      _params = params;
+      _params.GetValue( "dims", n);
+   
+      if (n < 1)
+	 throw ( EParamProblem ("G-matrix operator needs at least one dimension") );
+      GridSystem::Dim(n);
+      
+      _kspace.newsize(n,0);   /* Setup k-space, init every kspace Vector with size zero */
+      _wfbuf.newsize(n);      /* We need dim buffers */
+      
+      for (lint i=0; i < n; i++)
+      {
+	_wfbuf[i] = NULL;
+      }
+      
+      _params.GetValue( "gmat", name);
+      
+      if (name.empty())
+	 throw( EParamProblem ("No G-matrix elements given"));
+      
+      OGridSystem::FileOGrid file;
+      file.Suffix(BINARY_O_SUFFIX);
+      
+      /* Read Matrix elements */
+      int i;
+      char si[32], sj[32];
+      string s;
+      for (i=0; i < n; i++){
+	 for(int j=0; j < (i + 1); j++){
+	    snprintf (si, 32, "%d", i);
+	    snprintf (sj, 32, "%d", j);
+	    s = name + string("_") + string(si) + string("_") + string(sj);
+	    file.Name(s);
+	    file >> ((OGridSystem*) &_Gmat(i,j));
+	 }
+      }
+      
+   }
+   
+   const string & OGridGMat::Name( )
+   {
+      return _name;
+   }
+
+   dcomplex OGridGMat::MatrixElement( WaveFunction * PsiBra, WaveFunction * PsiKet )
+   {
+      return dcomplex(0,0);
+   }
+
+   double OGridGMat::Expec( WaveFunction * Psi )
+   {
+      return 0;
+   }
+
+   double OGridGMat::Emax()
+   {
+      if (GridSystem::Dim() == 0) throw ( EParamProblem("Nabla operator not initalized") );
+      
+      /* Calc Tmax on the Grid */
+      double T=0;
+      
+      for (int i=0; i < GridSystem::Dim(); i++)
+	 T += 1/ ( VecMin(_Gmat[i][i]) *  GridSystem::Dx(i) * GridSystem::Dx(i));
+      
+      T *= ( M_PI*M_PI / 2 );
+      return T;
+   }
+	 
+   double OGridGMat::Emin()
+   {
+      return 0; /* Minimum kinetic energy is zero */
+   }
+   
+   WaveFunction * OGridGMat::operator *( WaveFunction * Psi )
+   {
+      return Psi;
+   }
+
+   WaveFunction * OGridGMat::operator *=( WaveFunction * Psi )
+   {
+      if (_kspace.size() == 0) _InitKspace(Psi);
+      return Psi;
+   }
+   
+   Operator * OGridGMat::operator =( Operator * O )
+   {
+      return this;
+   }
+   
+   Operator * OGridGMat::operator *( Operator * O )
+   {
+      return this;
+   }
+   
+   
+   Operator* OGridGMat::Scale(const double d)
+   {
+      if (_kspace.size() == 0)
+	 throw ( EParamProblem("k-space not initialized", Name()) );
+      
+      for (lint i=0; i < GridSystem::Dim(); i++)
+         MultElements(&_kspace[i], d);
+      
+      return this;
+   }
+
 }
 
 
-OGridGMat::~OGridGMat()
-{
-}
 
 
-}
+

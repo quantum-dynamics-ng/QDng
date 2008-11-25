@@ -2,6 +2,7 @@
 #define QDLIBOGRIDNABLASQ_H
 
 #include "OKSpace.h"
+#include "Kspace.h"
 #include "GridSystem.h"
 
 namespace QDLIB {
@@ -24,9 +25,7 @@ namespace QDLIB {
    {
       private:
 	 string _name;
-	 double _mass[MAX_DIMS];
-      protected:
-	 dVec* InitKspace1D(const double mass, const double length, const int Nx);
+	 double _mass[MAX_DIMS]; 
       public:
 	 OGridNablaSq();
       

@@ -17,43 +17,6 @@ namespace QDLIB {
    {
    }
 
-   /**
-    * Init K-Space in one dimension.
-    * All factors are included in the kspace representation except FFT normalization.
-    * 
-    * \param mass reduced mass
-    */
-   dVec * OGridNablaSq::InitKspace1D(const double mass, const double length, const int Nx)
-   {
-
-      dVec *kspace;
-   
-      kspace = new dVec(Nx);
-   
-      double dp = (2*M_PI) / length;    // Setup dp for kspace
-      dp *= dp;   /* dp^2 */
-   
-      /* We include all the factors in the k-space function => Do it only once */
-      /* The minus cancels with minus from -kx^2. */
-      dp *= 0.5 / mass ;
-     
-      if (Nx % 2 == 0){ /* even + odd grid points */
-	 for (int i=0; i < Nx / 2; i++){ //run from [-p..+p]
-	    (*kspace)[i] = (double(i) * double(i)) * dp;
-	    (*kspace)[Nx - i - 1] = (double(i+1) * double(i+1)) * dp;
-	 }
-      } else {
-	 (*kspace)[0] = 0; 
-	 for (int i=1; i < (Nx+1) / 2; i++){ //run from [-p..+p]
-	    (*kspace)[i] = (double(i) * double(i)) * dp;
-	    (*kspace)[Nx - i] = (double(i+1) * double(i+1)) * dp;
-	 }
-      }
-      
-      return kspace;
-   }
-
-
    Operator * OGridNablaSq::NewInstance()
    {
       OGridNablaSq *r;
@@ -243,7 +206,7 @@ namespace QDLIB {
       /* Init k-space for every dimension */
       for (int i=0; i < GridSystem::Dim(); i++){ 
 	 if (_mass[i] > 0) {
-	    kspace1 = InitKspace1D(_mass[i], GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i) );
+	    kspace1 = Kspace::Init1Dd2dx2(_mass[i], GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i) );
 	    view.ActiveDim(i);
 	    view += *kspace1;
 	    delete kspace1;

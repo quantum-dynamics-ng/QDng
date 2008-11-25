@@ -1,31 +1,35 @@
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
-/**
- * Counter/index integer
- * 
- * This should be used for all indices.
- * Helps us to avoid potential size problems
- * 
- */
+
 namespace QDLIB {
+   	       
+   /**
+    * Counter/index integer
+    * 
+    * This should be used for all indices.
+    * Helps us to avoid potential size problems
+    * 
+    */
    typedef  int lint;
 }
 
-#include "Vector.h"
+
 #include "dcomplex.h"
-#include "tnt/tnt.h"
+#include "tnt/tnt.h"		  
+#include "Vector.h"
 #include "VectorView.h"
+#include "Matrix.h"
 
-
-namespace TNT {
+	       
+namespace QDLIB {
    /**
     * Enable multiplication of type double with arbitrary Types of Vector.
     */
    template <class T>
    Vector<T> operator*(const double &a, const Vector<T> &A)
    {
-      Subscript N = A.dim();
+      lint N = A.dim();
       Vector<T> r(N);
    
       for (int i=0; i<N; i++)
@@ -50,10 +54,10 @@ namespace TNT {
     */
    inline dcomplex operator*(const Vector<dcomplex> &A, const Vector<dcomplex> &B)
    {
-       Subscript N = A.dim();
-       assert(N == B.dim());
+       lint N = A.size();
+       assert(N == B.size());
    
-       Subscript i;
+       lint i;
        dcomplex sum = 0;
    
        for (i=0; i<N; i++)
@@ -67,7 +71,7 @@ namespace TNT {
    template <class T>
    inline Vector<dcomplex> operator*(const Matrix<T> &A, const Vector<dcomplex> &B)
    {
-      Subscript N = B.dim();
+      lint N = B.size();
       Vector<dcomplex> r(N);
    
       for (int i=0; i<N; i++){
@@ -79,11 +83,8 @@ namespace TNT {
    
       return r;
    }
-}
 
 
-
-namespace QDLIB {
 
    /** Variant of TNT Vector of doubles */
    typedef QDLIB::Vector<double> dVec;
@@ -91,11 +92,11 @@ namespace QDLIB {
    /** Variant of TNT Vector of dcomplex */
    typedef QDLIB::Vector<dcomplex> cVec;
 
-   /** TNT Matrix of doubles */
-   typedef TNT::Matrix<double> dMat;
+   /** Variant of TNT Matrix of doubles */
+   typedef QDLIB::Matrix<double> dMat;
    
-   /** TNT Matrix of dcomplex */
-   typedef TNT::Matrix<dcomplex> cMat;
+   /** Variant ofTNT Matrix of dcomplex */
+   typedef QDLIB::Matrix<dcomplex> cMat;
 
    /** Multidimensional view on dVec */
    typedef QDLIB::VectorView<double> dVecView;

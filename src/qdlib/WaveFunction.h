@@ -92,6 +92,7 @@ namespace QDLIB {
 	 WaveFunction* operator=(double d)
 	 {
 	    *((cVec*) this) = dcomplex(d,0);
+	    return this;
 	 }
 	 
 	 /**
@@ -100,6 +101,7 @@ namespace QDLIB {
 	 WaveFunction* operator=(dcomplex d)
 	 {
 	    *((cVec*) this) = d;
+	    return this;
 	 }
 
 	 
