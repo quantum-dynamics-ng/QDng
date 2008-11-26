@@ -59,12 +59,16 @@ namespace QDLIB {
 	 };
       private:
          bool _drop_meta;      // Ignore metadata
+	 
+	 void _ReadMeta(C *data);
+	 void _WriteMeta(C *data);
+	 
          void _WriteFileBinary(C *data);
-// 	 bool _WriteFileASCII(WaveFunction &wf);
+	 bool _WriteFileASCII(C *data);
 // 	 bool _WriteFileHDF(WaveFunction &wf);
 	 
          void _ReadFileBinary(C *data);
-// 	 bool _ReadFileASCII(WaveFunction &wf);
+	 bool _ReadFileASCII(C *data);
 // 	 bool _ReadFileHDF(WaveFunction &wf);
       protected:
 	StorageType _type;
@@ -236,26 +240,34 @@ namespace QDLIB {
       _counter = counter;
    }
    
-   /**
-    * Write raw binary data.
-    */
    template <class C>
-   void FileSingle<C>::_WriteFileBinary(C *data)
+   void FileSingle<C>::_WriteMeta(C *data)
    {
       ParamContainer p;
-      ofstream file;
-      string s;
       
       /* Write meta file. In a sequence only for the first file. */
       if (!_drop_meta || _counter > 0){
 	 p = data->Params();
 	 p.SetValue("CLASS", data->Name() );
 	 
-         KeyValFile meta_file(_name + METAFILE_SUFFIX);
-         if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
+	 KeyValFile meta_file(_name + METAFILE_SUFFIX);
+	 if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
       }
-     
       
+   }
+   
+   
+   /**
+    * Write raw binary data.
+    */
+   template <class C>
+   void FileSingle<C>::_WriteFileBinary(C *data)
+   {
+      
+      ofstream file;
+      string s;
+      
+      _WriteMeta(data);
       
       /* Build name */
       if (_sequence) {
@@ -279,6 +291,18 @@ namespace QDLIB {
    
    }
    
+   template <class C>
+   void FileSingle<C>::_ReadMeta(C *data)
+   {
+      /* Read meta file */
+      if (!_drop_meta){
+	 KeyValFile file(_name + METAFILE_SUFFIX);
+	 ParamContainer p;
+	 if ( !file.Parse(p) ) throw( EIOError("Can not read meta file") );
+	 data->Init(p);
+      }
+   }
+   
    /**
     * Read raw binary data.
     */
@@ -289,13 +313,7 @@ namespace QDLIB {
       string s;
       ifstream file;
       
-      /* Read meta file */
-      if (!_drop_meta){
-         KeyValFile file(_name + METAFILE_SUFFIX);
-         ParamContainer p;
-         if ( !file.Parse(p) ) throw( EIOError("Can not read meta file") );
-         data->Init(p);
-      }
+      _ReadMeta(data);
       
       /* We need some parameters for reading */
       if (data->sizeBytes() <= 0) throw( EParamProblem("Wrong size") ) ;
@@ -324,8 +342,7 @@ namespace QDLIB {
 	 }
       }
 	  
-       file.close();
-      
+      file.close();
    
    }
 

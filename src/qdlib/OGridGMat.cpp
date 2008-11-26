@@ -106,7 +106,7 @@ namespace QDLIB {
 	    snprintf (sj, 32, "%d", j);
 	    s = name + string("_") + string(si) + string("_") + string(sj);
 	    file.Name(s);
-	    file >> ((OGridSystem*) &_Gmat(i,j));
+	    file >> ((OGridSystem*) &_Gmat[i][j]);
 	 }
       }
       
@@ -119,12 +119,23 @@ namespace QDLIB {
 
    dcomplex OGridGMat::MatrixElement( WaveFunction * PsiBra, WaveFunction * PsiKet )
    {
-      return dcomplex(0,0);
+      dcomplex d;
+      WaveFunction *opKet;
+      
+      opKet = PsiKet->NewInstance();
+      d = *PsiBra * opKet;
+      delete opKet;
+      
+      return d;
    }
 
    double OGridGMat::Expec( WaveFunction * Psi )
    {
-      return 0;
+      dcomplex d;
+      
+      d = MatrixElement(Psi,Psi);
+      
+      return d.real();
    }
 
    double OGridGMat::Emax()
@@ -148,7 +159,37 @@ namespace QDLIB {
    
    WaveFunction * OGridGMat::operator *( WaveFunction * Psi )
    {
-      return Psi;
+      WaveFunction *psi;
+      if (_kspace.size() == 0) _InitKspace(Psi);
+      
+      psi = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
+      if (psi == NULL)
+	 throw ( EIncompatible ("Can't apply to ", Psi->Name()) );
+      
+      /* Make a copy from Psi */
+      for (int i=0; i < GridSystem::Dim(); i++)
+	 *((WaveFunction*) _wfbuf[i]) = Psi;
+      
+      *Psi = dcomplex(0,0);
+      
+      lint i;
+      for (i=0; i < GridSystem::Dim(); i++){
+	 /* d/dx from WF */
+	 _wfbuf[i]->ToKspace();
+	 MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[i], 1/double(GridSystem::Size()) );
+	 _wfbuf[i]->ToXspace();
+	 
+	 for (lint j=0; j < (i+1); j++){
+	    /* Multiply Gmatrix element */
+	    MultElements( (cVec*) _wfbuf[i], (dVec*) &_Gmat[i][j]);
+	    _wfbuf[i]->ToKspace();
+	    MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[j], 1/double(GridSystem::Size()) );
+	    _wfbuf[i]->ToXspace();
+	    *psi += _wfbuf[i];
+	 }
+      }
+      
+      return psi;
    }
 
    WaveFunction * OGridGMat::operator *=( WaveFunction * Psi )
@@ -188,12 +229,27 @@ namespace QDLIB {
    
    Operator * OGridGMat::operator =( Operator * O )
    {
+      OGridGMat *o = dynamic_cast<OGridGMat*>(O);
+      if (o == NULL)
+	 throw ( EIncompatible("Error in Assignment", Name(), O->Name()) );
+      
+      /* Copy parents */
+      *((GridSystem*) this) = *((GridSystem*) o);
+      
+      _size = o->_size;
+      _Gmat = o->_Gmat;
+      _kspace = o->_kspace;
+      
+      for (int i=0; i < _size; i++)
+	 _wfbuf[i] = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
+      
       return this;
    }
    
+   
    Operator * OGridGMat::operator *( Operator * O )
    {
-      return this;
+      throw ( EIncompatible("Can't apply", Name(), O->Name()) );
    }
    
    

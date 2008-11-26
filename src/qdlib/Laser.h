@@ -5,6 +5,7 @@
 #include "sys/ParamContainer.h"
 #include "sys/QDClock.h"
 #include "fft/fft.h"
+#include "FileSingle.h"
 
 namespace QDLIB {
    
@@ -12,18 +13,25 @@ namespace QDLIB {
     * Class which represents a laserfield.
     */
    class Laser : public dVec {
+      public:
+	 typedef FileSingle<Laser> FileLaser;
       private:
+	 
 	 string _name;
 	 QDClock *_clock;
+	 double _dt;
          FFT *_fft;
 	 cVec *_spectrum;
-	 bool _remove_clock;
 	 ParamContainer _params;
+	 
+	 FileLaser _file;
       public:
 	 
 	 Laser();
 	 
 	 ~Laser();
+	 
+	 FileLaser& File();
 	 
 	 void Init(ParamContainer &params);
 	 
@@ -38,6 +46,10 @@ namespace QDLIB {
 	 void Clock(QDClock *clock);
 	 
 	 QDClock* Clock();
+	 
+	 double Get();
+	 
+	 Laser& operator=(const Laser &laser);
    };
 
 } /* namespace QDLIB */

@@ -109,6 +109,13 @@ namespace QDLIB {
       /* negative imaginary potential */
       if (_params.isPresent("nip")) _nip = true;
       else _nip = false;
+      
+      /* Gain value. */
+      if (_params.isPresent("gain")){
+	 double gain;
+	 _params.GetValue("gain", gain);
+	 *this *= gain;
+      }
    }
    
    Operator * OGobbler::NewInstance()

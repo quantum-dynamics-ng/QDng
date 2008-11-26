@@ -233,7 +233,7 @@ namespace QDLIB {
   {
     return sqrt(z._real * z._real + z._imag * z._imag);
   }
-  
+ 
   /** Phase angle of complex number.*/
   inline double phase(dcomplex z)
   {
@@ -243,7 +243,7 @@ namespace QDLIB {
   
   
   /**
-   * Represents the imaginary unit \sqrt(-1).
+   * Represents the imaginary unit \f$ \sqrt(-1) \f$.
    */
   struct Imaginary
   {

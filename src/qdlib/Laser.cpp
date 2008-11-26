@@ -3,14 +3,15 @@
 
 namespace QDLIB {
    
-   Laser::Laser() : _name("Laser"), _clock(NULL), _fft(NULL), _spectrum(NULL), _remove_clock(false)
+   Laser::Laser() : _name("Laser"), _clock(NULL), _fft(NULL),
+		_spectrum(NULL), file(ascii, "Laserfield", "")
    {}
 
    Laser::~ Laser()
    {
       if (_fft != NULL) delete _fft;
       if (_spectrum != NULL) delete _spectrum;
-      if (_remove_clock) delete _clock;
+      
    }
 
    /**
@@ -18,27 +19,24 @@ namespace QDLIB {
     *
     * Import parameters are:
     * 
-    * - dt
-    * - Nt 
-    * 
-    * If no clock is set then Laser will create it's own clock which will
-    * also be removed in the Destructor.
+    * \li dt
+    * \li Nt 
     */
-   void Laser::Init(ParamContainer & params)
+   void Laser::Init(ParamContainer &params)
    {
       _params = params;
       
-      double dt;
       int Nt;
-      _params.GetValue("dt", dt);
+      
+      if (!_params.isPresent("dt"))
+	 throw ( EParamProblem("The laser is missing dt") );
+      _params.GetValue("dt", _dt);
+      
+      if (!_params.isPresent("Nt"))
+	 throw ( EParamProblem("The laser is missing the number of time steps") );
       _params.GetValue("Nt", Nt);
       
-      if (_clock != NULL && ( dt != _clock->Dt() || Nt < _clock->Steps() ) )
-	 throw ( EParamProblem("Parameter values are different for laser and own clock!") );
-      if (_clock == NULL) {
-	 _clock = new QDClock(Nt, dt);
-	 _remove_clock = true;
-      }
+      dVec::newsize(Nt);
    }
 
    /**
@@ -98,8 +96,8 @@ namespace QDLIB {
    void Laser::Clock(QDClock * clock)
    {
       _clock = clock;
-      _params.SetValue("dt", _clock->Dt());
-      _params.SetValue("Nt", _clock->Steps());
+      if (clock->Dt() != _dt || clock->Steps() > dVec::size())
+	 throw ( EParamProblem("Clock values doesn't fit the laser field") );
    }
 
    /**
@@ -110,7 +108,23 @@ namespace QDLIB {
       return _clock;
    }
 
+   double Laser::Get()
+   {
+      return (*this)[clock->Step()];
+   }
    
+   Laser& Laser::operator =(const Laser &laser)
+   {
+      *((dVec*) this) = (dVec) laser;
+      clock = laser._clock;
+      _params = laser._params;
+      _dt = laser._dt;
+      if (_spectrum != NULL) *_spectrum = *(laser._spectrum);
+   }
+
    
 }
+
+
+
 
