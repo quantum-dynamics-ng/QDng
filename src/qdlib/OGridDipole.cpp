@@ -6,12 +6,12 @@ namespace QDLIB {
    
    OGridDipole::OGridDipole() : _name("OGridDipole") {}
    
-   void QDLIB::OGridDipole::Laser(Laser & laser)
+   void OGridDipole::SetLaser(Laser & laser)
    {
       _laser = laser;
    }
 
-   Laser & QDLIB::OGridDipole::Laser()
+   Laser & OGridDipole::GetLaser()
    {
       return _laser;
    }
@@ -23,45 +23,46 @@ namespace QDLIB {
       
       /* Read the laser field */
       string name;
-      Laser::FileLaser file = laser.File();
+      Laser::FileLaser file = _laser.File();
       
       if (_params.isPresent("laser"))
 	 throw (EParamProblem("No laser file name given"));
       _params.GetValue("laser", name);
       file.Name(name);
-      file >> laser;
+      file >> &_laser;
    }
    
-   void QDLIB::OGridDipole::UpdateTime()
+   void OGridDipole::UpdateTime()
    {
-      laser.Clock(clock);
+      _laser.Clock(clock);
    }
 
    
-   double QDLIB::OGridDipole::Emax()
+   double OGridDipole::Emax()
    {
-      return VecMax( (dVec) *this ) * VecMax( (dVec) laser );
+      
+      return VecMax( *((dVec*) this) ) * VecMax( (dVec&) _laser );
    }
    
-   double QDLIB::OGridDipole::Emin()
+   double OGridDipole::Emin()
    {
       return 0;
    }
    
-   WaveFunction * QDLIB::OGridDipole::operator *(WaveFunction * Psi)
+   WaveFunction * OGridDipole::operator *(WaveFunction * Psi)
    {
       WaveFunction *psi = Psi->NewInstance();
       
-      MultElements((cVec*) psi, (dVec*) this, laser.Get());
+      MultElements((cVec*) psi, (dVec*) this, _laser.Get());
       
       return psi;
    }
    
-   WaveFunction * QDLIB::OGridDipole::operator *=(WaveFunction * Psi)
+   WaveFunction * OGridDipole::operator *=(WaveFunction * Psi)
    {
-      MultElements((cVec*) Psi, (dVec*) this, laser.Get());
+      MultElements((cVec*) Psi, (dVec*) this, _laser.Get());
       
-      return psi;
+      return Psi;
    }
    
    Operator * OGridDipole::operator =(Operator * O)
@@ -72,7 +73,9 @@ namespace QDLIB {
       
       /* Copy parents */
       *((OGridPotential*) this) = *((OGridPotential*) o);
-      laser = o->_laser;
+      _laser = o->_laser;
+      
+      return this;
    }
 
 }

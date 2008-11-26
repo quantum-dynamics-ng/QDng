@@ -237,11 +237,15 @@ namespace QDLIB {
       *((GridSystem*) this) = *((GridSystem*) o);
       
       _size = o->_size;
-      _Gmat = o->_Gmat;
+      
       _kspace = o->_kspace;
       
-      for (int i=0; i < _size; i++)
+      for (int i=0; i < _size; i++){
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
+	 for(int j=0; j < i; j++){
+	    _Gmat[i][j] = &(o->_Gmat[i][j]);
+	 }
+      }
       
       return this;
    }

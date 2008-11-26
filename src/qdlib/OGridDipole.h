@@ -20,8 +20,8 @@ namespace QDLIB {
 	 string _name;
          Laser _laser;
       public:
-         void Laser(Laser &laser);
-	 Laser& Laser();
+         void SetLaser(Laser &laser);
+	 Laser& GetLaser();
 	 
 	 OGridDipole();
 	 

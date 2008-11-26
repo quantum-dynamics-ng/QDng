@@ -114,7 +114,7 @@ namespace QDLIB {
       if (_params.isPresent("gain")){
 	 double gain;
 	 _params.GetValue("gain", gain);
-	 *this *= gain;
+	 MultElements((cVec*) this, gain);
       }
    }
    

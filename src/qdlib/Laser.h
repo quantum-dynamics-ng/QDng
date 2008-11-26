@@ -5,7 +5,7 @@
 #include "sys/ParamContainer.h"
 #include "sys/QDClock.h"
 #include "fft/fft.h"
-#include "FileSingle.h"
+#include "sys/FileSingle.h"
 
 namespace QDLIB {
    

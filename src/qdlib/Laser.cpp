@@ -4,7 +4,7 @@
 namespace QDLIB {
    
    Laser::Laser() : _name("Laser"), _clock(NULL), _fft(NULL),
-		_spectrum(NULL), file(ascii, "Laserfield", "")
+      _spectrum(NULL), _file(FileLaser::StorageType(1), "Laserfield", "")
    {}
 
    Laser::~ Laser()
@@ -110,16 +110,18 @@ namespace QDLIB {
 
    double Laser::Get()
    {
-      return (*this)[clock->Step()];
+      return (*this)[_clock->TimeStep()];
    }
    
    Laser& Laser::operator =(const Laser &laser)
    {
       *((dVec*) this) = (dVec) laser;
-      clock = laser._clock;
-      _params = laser._params;
+      _clock = laser._clock;
+//       _params = laser._params;
       _dt = laser._dt;
       if (_spectrum != NULL) *_spectrum = *(laser._spectrum);
+      
+      return *this;
    }
 
    
