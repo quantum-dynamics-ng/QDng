@@ -32,7 +32,7 @@ int main(int argc, char **argv)
    cmdline.SetHelp( 'm', "module path", false,
 		    "User defined path to the wave function and operator modules", "");
    cmdline.ReadArgs(argc, argv);
-//    cmdline.CheckOptions();
+   cmdline.CheckOptions();
    
    /* This is the global try-catch block */
    try {
@@ -40,7 +40,6 @@ int main(int argc, char **argv)
       /* Provide a user path for module loading */
       if (cmdline.GetOption('m')){
 	 cmdline.GetOption('m', fname);
-	 cout << fname << endl;
 	 mods->UserPath( fname );
       }
       

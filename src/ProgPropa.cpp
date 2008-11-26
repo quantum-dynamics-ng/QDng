@@ -139,8 +139,8 @@ namespace QDLIB {
       _reporter.Hamilton( _H );
       
       /* Let the Propagator do it's initalisation */
-      _H->UpdateTime();
       _U->Clock( clock );
+      _H->UpdateTime();
       _U->ReInit();
       
       /* Report what the propagator has chosen */
@@ -162,7 +162,6 @@ namespace QDLIB {
       /* The propagation loop */
       for (lint i=0; i <= clock->Steps(); i++){
 	 _reporter.Analyze( Psi );      /* propagation report. */
-	 _H->UpdateTime();              /* Make sure every hamiltonian is up-to-date */
 	*_U *= Psi;                     /* Propagate */
 	if (i % _wcycle == 0) wfile << Psi;  /* Write wavefunction */
 	++(*clock);                     /* Step the clock */

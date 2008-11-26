@@ -42,8 +42,9 @@ void Getopt::ParseArgs(int argc, char **argv, const char *optdef)
      char a = (char) i;
      if ( a != '?' && optarg != NULL) {
        value_map[a] = optarg;
-     } else if (a != '?' && optarg == NULL)
-	value_map[a] = "-";
+     } else if (a != '?' && optarg == NULL){
+	value_map[a] = "";
+     }
    }
 }
 
@@ -264,7 +265,7 @@ void Getopt::GetOption(char letter, string &value)
  */
 bool QDLIB::Getopt::GetNonOption(int number, char *value, int len)
 {
-   if (_argc > (value_map.size() + 1) && (value_map.size() + number) < _argc ){
+   if (((unsigned int) optind + number) < _argc ){
       strncpy(value, _argv[value_map.size() + 1 + number], len);
       return true;
    } else return false;
@@ -281,7 +282,7 @@ bool QDLIB::Getopt::GetNonOption(int number, char *value, int len)
  */
 bool QDLIB::Getopt::GetNonOption(int number, string &value)
 {
-   if (_argc > (value_map.size() + 1) && ((unsigned int) optind + number) < _argc ){
+   if (((unsigned int) optind + number) < _argc ){
       value = _argv[optind + number];
       return true;
    } else return false;
