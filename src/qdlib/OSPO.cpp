@@ -92,7 +92,6 @@ namespace QDLIB {
 	 _expT = new cVec(_Tkin_kspace->size());
 	 _expT->newsize(_Tkin_kspace->size());
       }
-      cout << _cT << " " << _cV << endl;
       _InitT();
       _InitV();
       

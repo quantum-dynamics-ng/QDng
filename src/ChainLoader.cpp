@@ -121,13 +121,17 @@ namespace QDLIB
 	    }
 	    if (pm_child.isPresent("coeff")){
 	       pm_child.GetValue("coeff", coeff);
-	       *wfadd *= coeff;
+	       MultElements((cVec*) wfadd, coeff);
 	    }
+	    
 	    *WF += wfadd;
 	    delete wfadd;
 	    child->NextNode();
 	 }
-	 if ( pm.isPresent("normalize") ) WF->Normalize();
+	 if ( pm.isPresent("normalize") ) {
+	    cout << "Normalizing...\n";
+	    WF->Normalize();
+	 }
 	 return WF; 
       } else {
 	 

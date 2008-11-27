@@ -145,9 +145,7 @@ namespace QDLIB
       if (Psi->size() != size())
 	 throw ( EIncompatible("Potential and WF differ in size") );
 
-      for (int i=0; i < size(); i++){
-	 (*Psi)[i] *= (*this)[i];
-      }
+      MultElements((cVec*) Psi, (dVec*) this);
       return Psi;
    }
 	 

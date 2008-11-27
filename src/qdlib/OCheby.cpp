@@ -115,7 +115,7 @@ namespace QDLIB
       *_hamilton *= Hpsi1;
       
       *ket2 = psi0;
-      *Hpsi1 *= 2*_exp;
+      MultElements ( (cVec*) Hpsi1, 2*_exp);
       *ket2 += Hpsi1;
       
       *psi0 = ket2;

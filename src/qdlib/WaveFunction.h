@@ -123,7 +123,8 @@ namespace QDLIB {
 	 WaveFunction* operator*=(const dcomplex d)
 	 {
       
-	    for (int i=0; i < cVec::size(); i++){
+	    int size = cVec::size();
+	    for (int i=0; i < size; i++){
 	       (*this)[i] *= d;
 	    }
 	    
