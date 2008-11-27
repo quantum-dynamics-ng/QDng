@@ -104,8 +104,8 @@ namespace QDLIB
       cout << "\n\n" << clock->Steps() << " step done (" << clock->Steps() *  clock->Dt() << " au)\n";
       
       if (_spectrum){
- 
-	 FFT fftw(_specbuf, true);
+         cVec spec(_specbuf.size());
+	 FFT fftw(_specbuf, spec,true);
 	 ofstream ofile;
 	 
 	 
@@ -116,7 +116,7 @@ namespace QDLIB
 	  fftw.forward();
 	  
 	  for (lint i=0; i < _specbuf.size(); i++){
-	     ofile << i << "\t" << cabs(_specbuf[i]) / (clock->Steps()/2) << endl;
+	     ofile << i << "\t" << cabs(spec[i]) / (clock->Steps()/2) << endl;
 	  }
 	  ofile.close();
 	     
