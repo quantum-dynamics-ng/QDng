@@ -3,4 +3,4 @@ METASOURCES = AUTO
 noinst_LTLIBRARIES = libtools.la
 libtools_la_SOURCES = Getopt.cpp KeyValFile.cpp ParamContainer.cpp QDClock.cpp \
 		QDGlobalClock.cpp XmlNode.cpp XmlParser.cpp Exception.cpp
-AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -Wall -ansi -O3
+AM_CXXFLAGS = -O3

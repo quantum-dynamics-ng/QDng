@@ -138,11 +138,11 @@ namespace QDLIB {
       lint s;
       for (s=0; s < strides; s++)
 	 a = A->begin(s);
-      b = B->begin(s);
-      for (lint i=0; i < size; i++){
-	 {
-	    a[i] *= (I*b[i]) * d;
-	 }
+	 b = B->begin(s);
+	 for (lint i=0; i < size; i++){
+	    {
+	       a[i] *= (I*b[i]) * d;
+	    }
       }
    }
    
@@ -233,11 +233,21 @@ namespace QDLIB {
     */
    inline void MultElements(cVec *A, cVec *B, double c)
    {
-      int size = A->size();
+      lint size = A->lsize();
+      lint strides = A->strides();
       
-      for (int i=0; i < size; i++)
-      {
-	 (*A)[i] *= (*B)[i] * c;
+      dcomplex *a;
+      dcomplex *b;
+      
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 b = B->begin(s);
+	 for (lint i=0; i < size; i++)
+	 {
+	    a[i] *= b[i] * c;
+	 }
       }
    }
    
@@ -249,11 +259,21 @@ namespace QDLIB {
     */
    inline void MultElements(cVec *A, dVec *B, double c)
    {
-      int size = A->size();
+      lint size = A->lsize();
+      lint strides = A->strides();
       
-      for (int i=0; i < size; i++)
-      {
-	 (*A)[i] *= (*B)[i] * c;
+      dcomplex *a;
+      double *b;
+      
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 b = B->begin(s);
+	 for (lint i=0; i < size; i++)
+	 {
+	    a[i] *= b[i] * c;
+	 }
       }
    }
    
@@ -265,11 +285,21 @@ namespace QDLIB {
     */
    inline void MultElements(cVec *A, dVec *B, dcomplex c)
    {
-      int size = A->size();
+      lint size = A->lsize();
+      lint strides = A->strides();
       
-      for (int i=0; i < size; i++)
-      {
-	 (*A)[i] *= (*B)[i] * c;
+      dcomplex *a;
+      double *b;
+      
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 b = B->begin(s);
+	 for (lint i=0; i < size; i++)
+	 {
+	    a[i] *= b[i] * c;
+	 }
       }
    }
    
@@ -339,6 +369,32 @@ namespace QDLIB {
 	    a[i] *= c;
 	 }
       }
+   }
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElementsAdd(cVec *A, cVec *B, dcomplex c)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+      
+      dcomplex *a=NULL;
+      dcomplex *b=NULL;
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 b = B->begin(s);
+	 for (lint i=0; i < size; i++){
+	    {
+	       a[i] += c * b[i];
+	    }
+	 }
+      }
+
    }
    
 }

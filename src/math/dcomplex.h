@@ -53,11 +53,10 @@ namespace QDLIB {
       _imag = -_imag;
     }
 
-    inline dcomplex& operator=(const dcomplex &B)
+    inline void operator=(const dcomplex &B)
     {
 	_real = B._real;
 	_imag = B._imag;
-	return *this;
     }
     
     inline dcomplex& operator=(const double B)
