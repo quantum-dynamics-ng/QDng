@@ -179,7 +179,7 @@ namespace QDLIB {
    {
       WFGridSystem *opPsi;
       
-        opPsi = dynamic_cast<WFGridSystem*>(Psi);
+      opPsi = dynamic_cast<WFGridSystem*>(Psi);
       if (opPsi == NULL)
 	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
 

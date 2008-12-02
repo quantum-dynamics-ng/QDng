@@ -146,6 +146,9 @@ namespace QDLIB
    WaveFunction * OCheby::Apply( WaveFunction * Psi )
    {
       WaveFunction *buf, *swap;
+      Operator::METHODWF2 apply;
+      
+      apply = &Operator::Apply;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
@@ -154,9 +157,9 @@ namespace QDLIB
       buf = Psi->NewInstance();
       
      
-      *ket0 = Psi;   /* phi_0 */
+      ket0->FastCopy(*Psi);   /* phi_0 */
       
-      *ket1 = Psi;
+      ket1->FastCopy(*Psi);
       _hamilton->Apply( ket1, _exp);
 //       *ket1 *=  _exp;
       
@@ -170,15 +173,18 @@ namespace QDLIB
       int i=2;
       while (i < _order){
 	 
-	 *((cVec*) buf) = *((cVec*) ket1);       /* H * Psi */
+	 buf->FastCopy(*ket1);
+// 	 *((cVec*) buf) = *((cVec*) ket1);       /* H * Psi */
 //       *_hamilton *= Hpsi1;
-	 _hamilton->Apply( buf, 2*_exp );
+	 (_hamilton->*apply)( buf, 2*_exp );
       
-	 *((cVec*) ket2) = *((cVec*) ket0);
+	 ket2->FastCopy(*ket0);
+// 	 *((cVec*) ket2) = *((cVec*) ket0);
 //       MultElements ( (cVec*) Hpsi1, 2*_exp);
 	 *ket2 += buf;
       
-	 *((cVec*) ket0) = *((cVec*) ket2);
+	 ket0->FastCopy(*ket2);
+// 	 *((cVec*) ket0) = *((cVec*) ket2);
       	 
 /*	 *ket2 *= _coeff[i];
 	 *Psi += ket2;*/

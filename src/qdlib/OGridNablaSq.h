@@ -25,7 +25,8 @@ namespace QDLIB {
    {
       private:
 	 string _name;
-	 double _mass[MAX_DIMS]; 
+	 double _mass[MAX_DIMS];
+
       public:
 	 OGridNablaSq();
       

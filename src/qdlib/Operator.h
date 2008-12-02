@@ -186,6 +186,7 @@ namespace QDLIB {
 
          
          typedef WaveFunction* (Operator::*METHODWF) (WaveFunction*);
+	 typedef WaveFunction* (Operator::*METHODWF2) (WaveFunction*, dcomplex);
 	 
    }; /* class Operator */
 

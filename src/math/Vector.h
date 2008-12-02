@@ -205,6 +205,21 @@ class Vector
        return true;
     }
     
+    void FastCopy(Vector<T> &A)
+    {
+       if (n_ == A.n_ && nstrides_ == A.nstrides_){
+	  /* no need to re-alloc */
+	  for (lint s=0; s < nstrides_; s++)
+	     memcpy(v_[s], A.v_[s], sizeof(T) *  stride_size_);
+       } else {
+	  if (!isRef_) destroy();
+	  initialize(A.n_, A.nstrides_);
+
+	  for (lint s=0; s < nstrides_; s++)
+	     memcpy(v_[s], A.v_[s], sizeof(T) *  stride_size_);
+       }
+    }
+    
     // destructor
     ~Vector() 
     {
