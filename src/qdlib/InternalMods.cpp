@@ -36,12 +36,12 @@ namespace QDLIB
       return p;
    }
    
-   Operator* INT_OSOD()
+/*   Operator* INT_OSOD()
    {
       OSOD *p;
       p = new OSOD ();
       return p;
-   }
+   }*/
    
    Operator* INT_OGridNablaSq()
    {
@@ -50,12 +50,12 @@ namespace QDLIB
       return p;
    }
    
-   Operator* INT_OGridGMat()
+/*   Operator* INT_OGridGMat()
    {
       OGridGMat *p;
       p = new OGridGMat ();
       return p;
-   }
+   }*/
    
    Operator* INT_OGridPotential()
    {
@@ -73,17 +73,17 @@ namespace QDLIB
    }
    
    
-   WaveFunction* INT_WFLevel()
+/*   WaveFunction* INT_WFLevel()
    {
       WFLevel* p;
       p = new WFLevel();
       return p;
-   }	    
+   }	    */
    
    instWF* InternalWF(const string &name)
    {
       if (name == "INT_WFGridCartesian") return &INT_WFGridCartesian;
-      if (name == "INT_WFLevel") return &INT_WFLevel;
+//       if (name == "INT_WFLevel") return &INT_WFLevel;
       return NULL;
    }
    
@@ -91,10 +91,10 @@ namespace QDLIB
    {
       if (name == "INT_OCheby") return &INT_OCheby;
       if (name == "INT_OSPO") return &INT_OSPO;
-      if (name == "INT_OSOD") return &INT_OSOD;
+//       if (name == "INT_OSOD") return &INT_OSOD;
       
       if (name == "INT_OGridNablaSq") return &INT_OGridNablaSq;
-      if (name == "INT_OGridGmat") return &INT_OGridGMat;
+//       if (name == "INT_OGridGmat") return &INT_OGridGMat;
       if (name == "INT_OGridPotential") return &INT_OGridPotential;
       return NULL;
    }

@@ -140,7 +140,7 @@ namespace QDLIB
       return ket;
    }
 	 
-   WaveFunction* OGridPotential::operator*=(WaveFunction *Psi)
+   WaveFunction* OGridPotential::Apply(WaveFunction *Psi)
    {
       if (Psi->size() != size())
 	 throw ( EIncompatible("Potential and WF differ in size") );
@@ -149,6 +149,25 @@ namespace QDLIB
       return Psi;
    }
 	 
+   WaveFunction* OGridPotential::Apply(WaveFunction *Psi, const double d)
+   {
+      if (Psi->size() != size())
+	 throw ( EIncompatible("Potential and WF differ in size") );
+
+      MultElements((cVec*) Psi, (dVec*) this, d);
+      return Psi;
+   }
+   
+   WaveFunction* OGridPotential::Apply(WaveFunction *Psi, const dcomplex d)
+   {
+      if (Psi->size() != size())
+	 throw ( EIncompatible("Potential and WF differ in size") );
+
+      MultElements((cVec*) Psi, (dVec*) this, d);
+      return Psi;
+   }
+
+   
    Operator* OGridPotential::operator=(Operator* O)
    {
       OGridPotential *n = dynamic_cast<OGridPotential*> (O);

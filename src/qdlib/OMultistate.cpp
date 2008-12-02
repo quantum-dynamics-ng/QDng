@@ -101,11 +101,22 @@ namespace QDLIB
       return psi;
    }
 
-   WaveFunction * OMultistate::operator *=( WaveFunction * Psi )
+   WaveFunction * OMultistate::Apply( WaveFunction * Psi )
+   {
+      return Psi;
+   }
+   
+   WaveFunction * OMultistate::Apply( WaveFunction * Psi, const double d )
    {
       return Psi;
    }
 
+   WaveFunction * OMultistate::Apply( WaveFunction * Psi, const dcomplex d )
+   {
+      return Psi;
+   }
+
+   
    Operator * OMultistate::operator =( Operator * O )
    {
       return this;

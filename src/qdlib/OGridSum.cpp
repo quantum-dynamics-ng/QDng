@@ -125,7 +125,7 @@ namespace QDLIB {
       return psi;
    }
 
-   WaveFunction * OGridSum::operator *=( WaveFunction * Psi )
+   WaveFunction * OGridSum::Apply( WaveFunction * Psi )
    {
       if (_size == 0)
 	 throw ( EParamProblem("Sum Operator is empty") );
@@ -139,6 +139,39 @@ namespace QDLIB {
    
       return Psi;
    }
+   
+   WaveFunction * OGridSum::Apply( WaveFunction * Psi, const double d )
+   {
+      if (_size == 0)
+	 throw ( EParamProblem("Sum Operator is empty") );
+   
+      if (dVec::size() != Psi->size())
+	 throw ( EIncompatible("Operator and WF differ in size") );
+   
+      if(! _isUpTodate) _Update( );
+      
+      MultElements( (cVec*) Psi, (dVec*) this, d);
+   
+      return Psi;
+   }
+
+   
+   WaveFunction * OGridSum::Apply( WaveFunction * Psi, const dcomplex d )
+   {
+      if (_size == 0)
+	 throw ( EParamProblem("Sum Operator is empty") );
+   
+      if (dVec::size() != Psi->size())
+	 throw ( EIncompatible("Operator and WF differ in size") );
+   
+      if(! _isUpTodate) _Update( );
+      
+      MultElements( (cVec*) Psi, (dVec*) this, d);
+   
+      return Psi;
+   }
+
+   
    
    Operator* OGridSum::operator =( Operator * O )
    {

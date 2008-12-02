@@ -57,7 +57,10 @@ namespace QDLIB
 	 
 	 virtual WaveFunction* operator*(WaveFunction *Psi);
 	 
-	 virtual WaveFunction* operator*=(WaveFunction *Psi);
+	 //virtual WaveFunction* operator*=(WaveFunction *Psi);
+	 virtual WaveFunction* Apply(WaveFunction *Psi);
+	 virtual WaveFunction* Apply(WaveFunction *Psi, const double d);
+	 virtual WaveFunction* Apply(WaveFunction *Psi, const dcomplex d);
 	 
          virtual Operator* operator=(Operator* O);
 	 

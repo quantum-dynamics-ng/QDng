@@ -147,8 +147,17 @@ namespace QDLIB {
 	 
 	 /**
 	  * Apply operator to wavefunction in place.
+	  * \return the input wavefunction.
 	  */
-	 virtual WaveFunction* operator*=(WaveFunction *Psi) = 0;
+	 //virtual WaveFunction* operator*=(WaveFunction *Psi) = 0;
+	 virtual WaveFunction* Apply(WaveFunction *Psi) = 0;
+	 
+	 /**
+	  * Apply operator to wavefunction in place and multiply output.
+	  * \return the input wavefunction.
+	  */	 
+	 virtual WaveFunction* Apply(WaveFunction *Psi, const double d) = 0;
+	 virtual WaveFunction* Apply(WaveFunction *Psi, const dcomplex d) = 0;
 	 
 	 /**
 	  * Copy operator.
@@ -176,7 +185,8 @@ namespace QDLIB {
 	 virtual Operator* Scale(const double d) = 0;
 
          
-         
+         typedef WaveFunction* (Operator::*METHODWF) (WaveFunction*);
+	 
    }; /* class Operator */
 
    

@@ -178,8 +178,21 @@ namespace QDLIB {
       return psi;
    }
 
+   WaveFunction* OSPO::Apply(WaveFunction *Psi, const double d)
+   {
+      Apply(Psi);
+      *Psi *= d;
+      return Psi;
+   }
    
-   WaveFunction* OSPO::operator *=(WaveFunction *Psi)
+   WaveFunction* OSPO::Apply(WaveFunction *Psi, const dcomplex d)
+   {
+      Apply(Psi);
+      *Psi *= d;
+      return Psi;
+   }
+   
+   WaveFunction* OSPO::Apply(WaveFunction *Psi)
    {
       WFGridSystem *psi;
       
