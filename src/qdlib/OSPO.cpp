@@ -66,8 +66,15 @@ namespace QDLIB {
    }
    
    
-   void OSPO::ReInit( )
+   void OSPO::Init( WaveFunction * Psi)
    {
+      if (clock == NULL)
+	 throw ( EParamProblem("Propagator has no clock!") );
+      
+      WFGridSystem* psi = dynamic_cast<WFGridSystem*>(Psi);
+      if (psi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+      
       _cV = OPropagator::Exponent()/2;
       _cT = OPropagator::Exponent();
       
@@ -143,63 +150,19 @@ namespace QDLIB {
       throw ( EIncompatible("Sorry the SPO can't calculate an expectation value") );
    }
    
-   
-   WaveFunction* OSPO::operator *( WaveFunction * Psi )
-   {
-      WaveFunction *ket;
-      WFGridSystem *psi;
-      
-      if (clock == NULL)
-	 throw ( EParamProblem("Propagator has no clock!") );
-
-      
-      if (_expT == NULL || _expV == NULL) ReInit();
-      if (_last_time != clock->TimeStep() && _Vpot->isTimeDep()) /* Re-init Vpot if is time dep.*/
-      {
-	 _last_time = clock->TimeStep();
-	 _InitV();
-      }
-      
-      ket = Psi->NewInstance();
-      *ket = Psi;       // Copy
-      
-      psi = dynamic_cast<WFGridSystem*>(ket);
-      if (psi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-      
-      MultElements( (cVec*) psi, _expV);
-      
-      psi->ToKspace();
-      MultElements( (cVec*) psi,  _expV, 1/ double(psi->size()) );
-      psi->ToXspace();
-      
-      MultElements( (cVec*) psi, _expV );
-      
-      return psi;
+   /**
+    * \todo implement
+    */
+   WaveFunction* OSPO::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   {      
+      return sourcePsi;
    }
 
-   WaveFunction* OSPO::Apply(WaveFunction *Psi, const double d)
-   {
-      Apply(Psi);
-      *Psi *= d;
-      return Psi;
-   }
-   
-   WaveFunction* OSPO::Apply(WaveFunction *Psi, const dcomplex d)
-   {
-      Apply(Psi);
-      *Psi *= d;
-      return Psi;
-   }
-   
    WaveFunction* OSPO::Apply(WaveFunction *Psi)
    {
       WFGridSystem *psi;
       
-      if (clock == NULL)
-	 throw ( EParamProblem("Propagator has no clock!") );
-      
-      if (_expT == NULL || _expV == NULL) ReInit();
+
       if (_last_time != clock->TimeStep() && _Vpot->isTimeDep()) /* Re-init Vpot if is time dep.*/
       {  
 	 _last_time = clock->TimeStep();
@@ -207,9 +170,6 @@ namespace QDLIB {
       }
       
       psi = dynamic_cast<WFGridSystem*>(Psi);
-            
-      if (psi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
       
       MultElements( (cVec*) psi, _expV );
       

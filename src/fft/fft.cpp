@@ -1,5 +1,9 @@
 #include "fft.h"
 
+#ifdef _OPENMP
+ #include <omp.h>
+#endif
+
 namespace QDLIB {
   
    /**
@@ -135,6 +139,12 @@ namespace QDLIB {
    }
 
    bool FFT::_planed = false;
-
+   int FFT::nthreads = 0;
+   
+#ifdef _OPENMP
+   FFT::nthreads = omp_get_num_thereads();
+   int fftw_init_threads(FFT::nthreads);
+#endif
+   
 } /* namespace QDLIB */
 

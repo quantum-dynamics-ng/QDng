@@ -12,5 +12,5 @@ noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h \
 	OMultistate.h
 
 
-AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -Wall -ansi -O3 -funroll-loops
+AM_CXXFLAGS = -Werror -pedantic -pedantic-errors -ansi -O3 -funroll-loops
 libqd_la_LDFLAGS = -module

@@ -21,6 +21,7 @@ namespace QDLIB {
 	 string _name;
          int _size;
          Operator* _O[MAX_OPS];
+	 Operator::METHODWF2 _apply2;
 	 WaveFunction* _WFbuf[MAX_OPS];    /* Use a buffer for wfs, to get rid of much mallocs */
       public:
          
@@ -39,6 +40,8 @@ namespace QDLIB {
 	 	 
          virtual void Init(ParamContainer &params);
 	 
+	 virtual void Init( WaveFunction * Psi );
+	 
 	 virtual void UpdateTime();
 	 	 
          virtual const string& Name();
@@ -51,12 +54,11 @@ namespace QDLIB {
 	 
 	 virtual double Emin();
 	 
-         virtual WaveFunction* operator*(WaveFunction *Psi);
+         //virtual WaveFunction* operator*(WaveFunction *Psi);
+	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
 //          virtual WaveFunction* operator*=(WaveFunction *Psi);
 	 virtual WaveFunction* Apply(WaveFunction *Psi);
-	 virtual WaveFunction* Apply(WaveFunction *Psi, const double d);
-	 virtual WaveFunction* Apply(WaveFunction *Psi, const dcomplex d);
 	 
 	 
          virtual Operator* operator=(Operator* O);

@@ -50,6 +50,8 @@ namespace QDLIB {
 		  
 	    virtual void Init(ParamContainer &params);
 	    
+	    virtual void Init(WaveFunction *Psi);
+	    
 	    virtual const string& Name();
 			   
 	    virtual void UpdateTime();
@@ -58,12 +60,12 @@ namespace QDLIB {
 	    
 	    virtual double Expec(WaveFunction *Psi);
 	   	    
-	    virtual WaveFunction* operator*(WaveFunction *Psi);
+// 	    virtual WaveFunction* operator*(WaveFunction *Psi);
+	    virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	    
 // 	    virtual WaveFunction* operator*=(WaveFunction *Psi);
 	    virtual WaveFunction* Apply(WaveFunction *Psi);
-	    virtual WaveFunction* Apply(WaveFunction *Psi, const double d);
-	    virtual WaveFunction* Apply(WaveFunction *Psi, const dcomplex d);
+
 	    
 	    virtual Operator* operator=(Operator* O);
 	    
@@ -74,7 +76,6 @@ namespace QDLIB {
 	 
 	    virtual void AddNeeds(string &Key, Operator *O);
 	    
-	    virtual void ReInit();
 	 	    
       };
 

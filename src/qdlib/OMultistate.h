@@ -13,6 +13,8 @@ namespace QDLIB
     * Takes several operators as matrix elementsments and acts as a hermitian
     * operator with real matrix elements.
     * 
+    * \todo do implementation
+    * 
     *	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
    class OMultistate : public Operator, public Matrix<Operator*>
@@ -29,6 +31,8 @@ namespace QDLIB
 	 	 
          virtual void Init(ParamContainer &params);
 	 
+	 virtual void Init(WaveFunction *Psi);
+	 
 	 virtual const string& Name();
 	                
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
@@ -41,12 +45,12 @@ namespace QDLIB
 	 
 	 virtual double Emin();
 	 
-	 virtual WaveFunction* operator*(WaveFunction *Psi);
+// 	 virtual WaveFunction* operator*(WaveFunction *Psi);
+	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
 // 	 virtual WaveFunction* operator*=(WaveFunction *Psi);
 	 virtual WaveFunction* Apply(WaveFunction *Psi);
-	 virtual WaveFunction* Apply(WaveFunction *Psi, const double d);
-	 virtual WaveFunction* Apply(WaveFunction *Psi, const dcomplex d);
+
 	 
          virtual Operator* operator=(Operator* O);
 	 

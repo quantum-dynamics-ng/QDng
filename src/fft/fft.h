@@ -18,7 +18,9 @@ namespace QDLIB {
    /**
     * Interface to the FFTW library.
     * 
-    * \todo Check if aligment of domplex array is fine (=> memalign)
+    * Note that you have use the Align method of the vector class.
+    * fftw relies on aligned memory for accelleration.
+    * 
     * \todo Improve the FFTW planing (FFTW_MEASURE is fine! wisdoms etc.)
     */
    class FFT {
@@ -28,6 +30,7 @@ namespace QDLIB {
 	 int *_dims;
 	 bool _oneway;
 	 static bool _planed;
+	 static int nthreads;
       public:
 	 FFT(cVec &in, cVec &out, bool oneway = false);
 	 FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway = false);

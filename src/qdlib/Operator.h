@@ -79,6 +79,14 @@ namespace QDLIB {
          virtual void Init(ParamContainer &params) = 0;
 	 
 	 /**
+	  * Initialize the operator with a wavefunction.
+	  * 
+	  * This should be done after initalisation with all parameters and
+	  * before using the Operator with any wave function.
+	  */
+	 virtual void Init(WaveFunction *Psi) = 0;
+	 
+	 /**
 	  * Return the parameter set.
 	  */
 	 ParamContainer& Params() { return _params; };
@@ -142,8 +150,14 @@ namespace QDLIB {
 	 
 	 /**
 	  * Apply operator to wavefunction.
+	  * 
+	  * \param destPsi   The result is stored here
+	  * \param sourcePsi Input wave function
+	  * 
+	  * \return destPsi
 	  */
-	 virtual WaveFunction* operator*(WaveFunction *Psi) = 0;
+	 //virtual WaveFunction* operator*(WaveFunction *Psi) = 0;
+	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi) = 0;
 	 
 	 /**
 	  * Apply operator to wavefunction in place.
@@ -151,14 +165,7 @@ namespace QDLIB {
 	  */
 	 //virtual WaveFunction* operator*=(WaveFunction *Psi) = 0;
 	 virtual WaveFunction* Apply(WaveFunction *Psi) = 0;
-	 
-	 /**
-	  * Apply operator to wavefunction in place and multiply output.
-	  * \return the input wavefunction.
-	  */	 
-	 virtual WaveFunction* Apply(WaveFunction *Psi, const double d) = 0;
-	 virtual WaveFunction* Apply(WaveFunction *Psi, const dcomplex d) = 0;
-	 
+	 	 
 	 /**
 	  * Copy operator.
 	  */

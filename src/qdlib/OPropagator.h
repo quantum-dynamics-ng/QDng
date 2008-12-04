@@ -50,12 +50,6 @@ namespace QDLIB {
 	  */
 	 virtual void AddNeeds(string &Key, Operator *O) = 0;
 	 
-	 /**
- 	  * This is used to init the propagator after changing the exponent.
- 	  * (Clock, Forward, Backward, ImaginaryTime, RealTime, Exponent).
-	  */
-	 virtual void ReInit() = 0;
-
 	 
 	 virtual void Clock(QDClock *cl)
 	 {

@@ -27,9 +27,10 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
-
+#include <string.h>
 
 #define TNT_MAX_STRIDES 32
+#define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD */
 
 using namespace std;
 
@@ -72,11 +73,13 @@ class Vector
     size_type stride_size_;
     
     bool isRef_;
+    
+    bool align_;
     // internal helper function to create the array
     // of row pointers
 
     /**
-     * Initialize allocate memory for the vector.
+     * Initialize/allocate memory for the vector.
      * 
      * \param N       size of the vector.
      * \param strides number of strides.
@@ -90,8 +93,13 @@ class Vector
       n_ = N;
       
       for (lint i=0; i < nstrides_; i++){
-         v_[i] = new T[stride_size_];
+	 if (align_){
+	    posix_memalign((void**) &v_[i], QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
+	 } else {
+            v_[i] = new T[stride_size_];
+	 }
       }
+
       
     }
    
@@ -228,7 +236,7 @@ class Vector
 
     // constructors
 
-    Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false)
+    Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(false)
     {
        for(lint i=0; i < TNT_MAX_STRIDES; i++)
        {
@@ -237,31 +245,41 @@ class Vector
     }
 
     
-    Vector(const Vector<T> &A) : n_(0), nstrides_(1), stride_size_(0), isRef_(false)
+    Vector(const Vector<T> &A) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(false)
     {
        initialize(A.n_, A.nstrides_);
         copy(A.v_);
     }
 
-    Vector(lint N, const T& value = T()) : n_(0), nstrides_(1), stride_size_(0), isRef_(false)
+    Vector(lint N, const bool align = false, const T& value = T()) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(align)
     {
         initialize(N, nstrides_);
         set(value);
     }
 
-    Vector(lint N, lint strides, const T** v) :  n_(N), nstrides_(strides), stride_size_(0), isRef_(false)
+    Vector(lint N, lint strides, const T** v) :  n_(N), nstrides_(strides), stride_size_(0), isRef_(false), align_(false)
     {
         initialize(N, strides);
         copy(v);
     }
 
-    Vector(lint N, const T* v) :  n_(0), nstrides_(1), stride_size_(0), isRef_(false)
+    Vector(lint N, const T* v) :  n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(false)
     {
        initialize(N, nstrides_);
        copy(v);
     }
 
 
+    /**
+     * Turn on data alignment.
+     * 
+     * This works only for non-class type
+     */
+    void Align()
+    {
+       align_ = true;
+    }
+    
     /**
      * Resize the vector.
      */

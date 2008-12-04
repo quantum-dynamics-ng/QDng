@@ -19,17 +19,19 @@ namespace QDLIB {
          bool _isKspace;
          cVec *_spacebuffer;  /* buffer for FFT*/
          
-         void _check_kspace();
       protected:
          FFT *fft;
 
       public:
-         WFGridSystem() ;
+         WFGridSystem();
  
-            
          ~WFGridSystem();
-         
+	 
+	 virtual void Init(ParamContainer &params);
+	 
          bool isKspace();
+	 
+	 void isKspace(bool is);
          
          void ToKspace();
          

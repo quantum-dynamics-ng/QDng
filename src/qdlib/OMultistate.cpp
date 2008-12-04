@@ -24,6 +24,12 @@ namespace QDLIB
    {
    }
 
+   
+
+   void QDLIB::OMultistate::Init( WaveFunction * Psi )
+   {
+   } 
+   
    const string & OMultistate::Name( )
    {
       return _name;
@@ -71,56 +77,37 @@ namespace QDLIB
       return d;
    }
    
-   WaveFunction * OMultistate::operator *( WaveFunction * Psi )
+   /**
+    * \todo implement
+    */
+   WaveFunction * OMultistate::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WFMultistate *psi, *org;
-      WaveFunction *ket;
-   
-      if ( num_rows() != num_cols() )
-	 throw (EParamProblem ("Matrix of operators is not rectangualar") );
-      
-      psi = dynamic_cast<WFMultistate*>(Psi->NewInstance());
-      org = dynamic_cast<WFMultistate*>(Psi);
-      if (psi == NULL || org == NULL)
-	 throw ( EIncompatible("Psi is not of type WFMultistate", Psi->Name()) );
-      
-      *((cVec*) psi) = dcomplex(0.0);
-   
-      lint size = psi->Size();
-      if ( psi->Size() != num_cols() )
-	 throw (EParamProblem ("Matrix and Vector differ in size") );
 
-   
-      for (lint i=0; i < size; i++){
-	 for (lint j=0; j < size; j++){
-	    ket = *((*this)[i][j]) * org->State(j);
-	    *(psi->State(i)) += ket;
-	    delete ket;
-	 }
-      }
-      return psi;
+      return destPsi;
    }
+
+      /**
+    * \todo implement
+       */
 
    WaveFunction * OMultistate::Apply( WaveFunction * Psi )
    {
       return Psi;
    }
    
-   WaveFunction * OMultistate::Apply( WaveFunction * Psi, const double d )
-   {
-      return Psi;
-   }
 
-   WaveFunction * OMultistate::Apply( WaveFunction * Psi, const dcomplex d )
-   {
-      return Psi;
-   }
+      /**
+    * \todo implement
+       */
 
-   
    Operator * OMultistate::operator =( Operator * O )
    {
       return this;
    }
+
+      /**
+    * \todo implement
+       */
 
    Operator * OMultistate::operator *( Operator * O )
    {

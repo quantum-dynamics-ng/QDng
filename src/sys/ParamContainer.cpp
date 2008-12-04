@@ -1,8 +1,8 @@
-
-
 #include <sstream>
+#include <string.h>
 
 #include "ParamContainer.h"
+
 
 namespace QDLIB {
    

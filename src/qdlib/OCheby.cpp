@@ -67,22 +67,22 @@ namespace QDLIB
    }
 
    
-   WaveFunction * OCheby::operator *( WaveFunction * Psi )
+   WaveFunction * OCheby::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       WaveFunction *buf, *r;
       
-      if (ket0 == NULL) ket0 = Psi->NewInstance();
-      if (ket1 == NULL) ket1 = Psi->NewInstance();
-      if (ket2 == NULL) ket2 = Psi->NewInstance();
+      if (ket0 == NULL) ket0 = sourcePsi->NewInstance();
+      if (ket1 == NULL) ket1 = sourcePsi->NewInstance();
+      if (ket2 == NULL) ket2 = sourcePsi->NewInstance();
     
-      buf = Psi->NewInstance();
-      r = Psi->NewInstance();
+      buf = sourcePsi->NewInstance();
+      r = sourcePsi->NewInstance();
       
-      *r  = Psi;  /* Copy */
+      *r  = sourcePsi;  /* Copy */
       
-      *ket0 = Psi;   /* phi_0 */
-
-      *ket1 = Psi;
+      *ket0 = sourcePsi;   /* phi_0 */
+      
+      *ket1 = sourcePsi;
 //       *_hamilton *= ket1;
       _hamilton->Apply(ket1);
        *ket1 *=  _exp;
@@ -96,10 +96,10 @@ namespace QDLIB
 
       int i=2;
       while (i < _order){
-	 _Recursion(ket0, ket1, buf, r, i);
+
 	 i++;
 	 if(!(i < _order)) break;
-	 _Recursion(ket1, ket0, buf, r, i);
+	
 	 i++;
       }
 
@@ -108,27 +108,7 @@ namespace QDLIB
       return r;
    }
 
-   
-
-   void OCheby::_Recursion( WaveFunction * psi0, WaveFunction * psi1, WaveFunction * Hpsi1, WaveFunction *Psi, int n )
-   {
-      *Hpsi1 = psi1;       /* H * Psi */
-//       *_hamilton *= Hpsi1;
-      _hamilton->Apply( Hpsi1, 2*_exp );
       
-      *ket2 = psi0;
-//       MultElements ( (cVec*) Hpsi1, 2*_exp);
-      *ket2 += Hpsi1;
-      
-      *psi0 = ket2;
-      
-      *ket2 *= _coeff[n];
-      *Psi += ket2;
-      
-//       cout << "\tNorm ket2, psi: " << ket2->Norm() << " " <<  Psi->Norm() << endl; 
-      
-   }
-   
    WaveFunction * OCheby::Apply( WaveFunction * Psi, const dcomplex d )
    {
       Apply( Psi );
@@ -146,9 +126,6 @@ namespace QDLIB
    WaveFunction * OCheby::Apply( WaveFunction * Psi )
    {
       WaveFunction *buf, *swap;
-      Operator::METHODWF2 apply;
-      
-      apply = &Operator::Apply;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
@@ -156,11 +133,12 @@ namespace QDLIB
     
       buf = Psi->NewInstance();
       
-     
       ket0->FastCopy(*Psi);   /* phi_0 */
       
       ket1->FastCopy(*Psi);
-      _hamilton->Apply( ket1, _exp);
+      _hamilton->Apply(ket1);
+      MultElements( (cVec*) ket1, _exp);
+      
 //       *ket1 *=  _exp;
       
       *Psi *= _coeff[0];
@@ -172,24 +150,44 @@ namespace QDLIB
       
       int i=2;
       while (i < _order){
-	 
-	 buf->FastCopy(*ket1);
 // 	 *((cVec*) buf) = *((cVec*) ket1);       /* H * Psi */
 //       *_hamilton *= Hpsi1;
-	 (_hamilton->*apply)( buf, 2*_exp );
-      
-	 ket2->FastCopy(*ket0);
+ 	 _hamilton->Apply( buf, ket1);
+// 	 _hamilton->Apply( buf, 2*_exp );
+	 int strides = Psi->strides();
+	 int size = Psi->lsize();
+	 int s;
+	 dcomplex *k2, *bf, *k0, *psi;
+	 
+	 
+	 for (s=0; s < strides; s++){
+	    k2 = ket2->begin(s);
+	    bf = buf->begin(s);
+	    k0 = ket0->begin(s);
+	    psi = Psi->begin(s);
+	    
+	    for(int j=0; j< size; j++){
+// 	 ket2->FastCopy(*ket0);
+	       bf[j] *= 2*_exp;
+	       k2[j] = k0[j];
 // 	 *((cVec*) ket2) = *((cVec*) ket0);
 //       MultElements ( (cVec*) Hpsi1, 2*_exp);
-	 *ket2 += buf;
-      
-	 ket0->FastCopy(*ket2);
+// 	 *ket2 += buf;
+	       k2[j] += bf[j];
+	 
+	       
+// 	 ket0->FastCopy(*ket2);
+	       k0[j] = k2[j];
 // 	 *((cVec*) ket0) = *((cVec*) ket2);
       	 
 /*	 *ket2 *= _coeff[i];
 	 *Psi += ket2;*/
 	 
-	 MultElementsAdd( (cVec*) Psi, (cVec*) ket2, _coeff[i]);
+// 	 MultElementsAdd( (cVec*) Psi, (cVec*) ket2, _coeff[i]);
+	       psi[j] += k2[j] *  _coeff[i];
+	       
+	    }
+	 }
 	 
 	 swap = ket1;
 	 ket1 = ket0;
@@ -201,7 +199,7 @@ namespace QDLIB
 	 _Recursion(ket1, ket0, buf, Psi, i);
 	 i++;*/
       }
-      
+
       delete buf;
       /* multiply the last two coefficients of the series expansion */
       return Psi;
@@ -255,7 +253,7 @@ namespace QDLIB
    }
 
    
-   void OCheby::ReInit( )
+   void OCheby::Init( WaveFunction *Psi )
    {
       
       if (_hamilton == NULL)
@@ -265,6 +263,8 @@ namespace QDLIB
       if (clock->Dt() == 0)
 	 throw ( EParamProblem("No time step defined") );
       
+      /* Initalize H*/
+      _hamilton->Init(Psi);
       
       /* Energy range & offset */
       Rdelta = (_hamilton->Emax() - _hamilton->Emin())/ 2;
@@ -291,7 +291,7 @@ namespace QDLIB
       /* Remove tailing zeroes (from underflow) */
       _order -= zeroes;
       
-      /* Check the order which is really needed*/
+      /* Check the order which is really needed */
       if (! _params.isPresent("order") ){
 	 double precission = BESSEL_DELTA;
 	 if (_params.isPresent("prec"))

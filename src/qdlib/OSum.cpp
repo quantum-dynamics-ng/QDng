@@ -87,7 +87,13 @@ namespace QDLIB {
    {
    }
   
-	   
+   void OSum::Init( WaveFunction *Psi)
+   {
+      for(int i=0; i < _size; i++){
+	 _O[i]->Init(Psi);
+      }
+   }
+   
    const string& OSum::Name()
    {
       return _name;
@@ -98,7 +104,8 @@ namespace QDLIB {
       WaveFunction  *out;
       dcomplex d;
      
-      out =  (*this) * PsiKet;
+      out = PsiKet->NewInstance();
+      Apply(out, PsiKet);
       d = *PsiBra * out;
       delete out;
       
@@ -138,86 +145,55 @@ namespace QDLIB {
       return d;
    }
    
-   /**
-    * \todo find a an efficient way to avoid to much deletes.
-    */
-   WaveFunction* OSum::operator*(WaveFunction *Psi)
+   WaveFunction* OSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WaveFunction *sum;
+      if (_WFbuf[0] == NULL) _WFbuf[0] = sourcePsi->NewInstance();
       
-      for(int i=0; i < _size; i++){
-	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
-	 *_WFbuf[i] = Psi; 
-      }
+      _O[0]->Apply(destPsi, sourcePsi);
       
-      sum = Psi->NewInstance();
-      *((cVec*) sum) = dcomplex(0,0);
-      
-      for (int i=0; i < _size; i++)
+      dcomplex *d = destPsi->begin(0), *b = _WFbuf[0]->begin(0);
+      int size = destPsi->lsize();
+      int strides = destPsi->strides();
+      for (int i=1; i < _size; i++)
       {
-	_O[i]->Apply(_WFbuf[i]);
-	*sum += _WFbuf[i];
+	 _O[i]->Apply(_WFbuf[0], sourcePsi);	 
+	 for (int s=0; s < strides; s++){
+	    for (int j=0; j < size; j++){
+	       d[j] += b[j];
+	    }
+	 }
       }
-     
-      return sum;
+   
+      return destPsi;
    }
    
    WaveFunction* OSum::Apply(WaveFunction *Psi)
    {
       
-      for(int i=0; i < _size; i++){
-	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
-	 *_WFbuf[i] = Psi; 
-      }
+      if (_WFbuf[0] == NULL) _WFbuf[0] = Psi->NewInstance();
+      if (_WFbuf[1] == NULL) _WFbuf[1] = Psi->NewInstance();
       
-      *((cVec*) Psi) = dcomplex(0,0); // Init with zeroes
+      _WFbuf[0]->FastCopy(*Psi);
       
-      for (int i=0; i < _size; i++)
+      _O[0]->Apply(Psi);
+      
+      dcomplex *d = Psi->begin(0), *b = _WFbuf[1]->begin(0);
+      int size = Psi->lsize();
+      int strides = Psi->strides();
+      
+      for (int i=1; i < _size; i++)
       {
-	 _O[i]->Apply(_WFbuf[i]);
-	 *Psi +=  _WFbuf[i];
+	 _O[i]->Apply(_WFbuf[1], _WFbuf[0]);
+	 for (int s=0; s < strides; s++){
+	    for (int j=0; j < size; j++){
+	       d[j] += b[j];
+	    }
+	 }
       }
       
       return Psi;
    }
-   
-   WaveFunction* OSum::Apply(WaveFunction *Psi, const double d)
-   {
-            
-      for(int i=0; i < _size; i++){
-	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
-	 *_WFbuf[i] = Psi; 
-      }
       
-      *((cVec*) Psi) = dcomplex(0,0); // Init with zeroes
-      
-      for (int i=0; i < _size; i++)
-      {
-	 _O[i]->Apply(_WFbuf[i], d);
-	 *Psi +=  _WFbuf[i];
-      }
-      
-      return Psi;
-   }
-   
-   WaveFunction* OSum::Apply(WaveFunction *Psi, const dcomplex d)
-   {
-            
-      for(int i=0; i < _size; i++){
-	 if (_WFbuf[i] == NULL) _WFbuf[i] = Psi->NewInstance();
-	 *_WFbuf[i] = Psi; 
-      }
-      
-      *((cVec*) Psi) = dcomplex(0,0); // Init with zeroes
-      
-      for (int i=0; i < _size; i++)
-      {
-	 _O[i]->Apply(_WFbuf[i], d);
-	 *Psi +=  _WFbuf[i];
-      }
-      
-      return Psi;
-   }
    
    Operator* OSum::operator=(Operator* O)
    {

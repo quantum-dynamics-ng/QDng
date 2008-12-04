@@ -5,6 +5,10 @@
 #include <iostream>
 #include <cstdlib>
 
+#ifdef _OPENMP
+ #include <omp.h>
+#endif
+
 #include "sys/Exception.h"
 #include "sys/Getopt.h"
 #include "sys/XmlParser.h"
@@ -31,6 +35,11 @@ int main(int argc, char **argv)
    cmdline.SetDescription("QD next generation");
    cmdline.SetHelp( 'm', "module path", false,
 		    "User defined path to the wave function and operator modules", "");
+#ifdef _OPENMP
+   int procs;
+   cmdline.SetHelp( 'p', "num threads", false, "Specify the number of threads to use", 1);
+#endif
+   
    cmdline.ReadArgs(argc, argv);
    cmdline.CheckOptions();
    
@@ -43,6 +52,11 @@ int main(int argc, char **argv)
 	 mods->UserPath( fname );
       }
       
+#ifdef _OPENMP
+      /* Get the number of openmp threads */
+      cmdline.GetOption( 'p', procs);
+      omp_set_num_threads(procs);
+#endif
       
       if(! cmdline.GetNonOption(0, fname) )
 	 throw ( EParamProblem ("No input file given") );

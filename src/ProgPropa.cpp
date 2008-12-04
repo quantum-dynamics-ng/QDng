@@ -128,6 +128,7 @@ namespace QDLIB {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
            
       /* Make sure our hamiltonian is initalized */
+      _h->Init(Psi);
       cout << "Initial engergy: " << _h->Expec(Psi) << endl;
       
       /* Copy, since the propagator will propably scale it etc. */
@@ -141,7 +142,7 @@ namespace QDLIB {
       /* Let the Propagator do it's initalisation */
       _U->Clock( clock );
       _H->UpdateTime();
-      _U->ReInit();
+      _U->Init(Psi);
       
       /* Report what the propagator has chosen */
       ParamContainer Upm;

@@ -87,9 +87,14 @@ namespace QDLIB
 	 sprintf (c, "%d", i);
       }
       
+      dVec::Align();
       dVec::newsize(GridSystem::Size());
    }
 	 
+   void OGridPotential::Init( WaveFunction *Psi)
+   {
+   }
+   
    const string& OGridPotential::Name()
    {
       return _name;
@@ -101,9 +106,9 @@ namespace QDLIB
    {
       dcomplex d;
       
-      WaveFunction *opket;
+      WaveFunction *opket = PsiKet->NewInstance();
       
-      opket = (*this) * PsiKet;
+      Apply(opket, PsiKet);
       d = (*PsiBra) * opket;
       
       delete opket;
@@ -127,47 +132,18 @@ namespace QDLIB
       return VecMin( *((dVec*) this) );
    }
    
-   WaveFunction* OGridPotential::operator*(WaveFunction *Psi)
+   WaveFunction* OGridPotential::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      if (Psi->size() != size())
-	 throw ( EIncompatible("Potential and WF differ in size") );
-      
-      WaveFunction *ket = Psi->NewInstance();
-      
-      for (int i=0; i < size(); i++){
-	 (*ket)[i] = (*this)[i] * (*Psi)[i];
-      }
-      return ket;
+      MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
+      return destPsi;
    }
 	 
    WaveFunction* OGridPotential::Apply(WaveFunction *Psi)
    {
-      if (Psi->size() != size())
-	 throw ( EIncompatible("Potential and WF differ in size") );
-
       MultElements((cVec*) Psi, (dVec*) this);
       return Psi;
    }
 	 
-   WaveFunction* OGridPotential::Apply(WaveFunction *Psi, const double d)
-   {
-      if (Psi->size() != size())
-	 throw ( EIncompatible("Potential and WF differ in size") );
-
-      MultElements((cVec*) Psi, (dVec*) this, d);
-      return Psi;
-   }
-   
-   WaveFunction* OGridPotential::Apply(WaveFunction *Psi, const dcomplex d)
-   {
-      if (Psi->size() != size())
-	 throw ( EIncompatible("Potential and WF differ in size") );
-
-      MultElements((cVec*) Psi, (dVec*) this, d);
-      return Psi;
-   }
-
-   
    Operator* OGridPotential::operator=(Operator* O)
    {
       OGridPotential *n = dynamic_cast<OGridPotential*> (O);

@@ -17,3 +17,4 @@ libqd_OGridPotential_la_SOURCES = mod-OGridPotential.cpp
 libqd_OSPO_la_SOURCES = mod-OSPO.cpp
 libqd_OSOD_la_SOURCES = mod-OSOD.cpp
 libqdWFGridCartesian_la_SOURCES = mod-WFGridCartesian.cpp
+AM_CXXFLAGS = -O3

@@ -55,19 +55,36 @@ namespace QDLIB {
       }
    }
 
+   void OGridNablaSq::Init(WaveFunction *Psi)
+   {
+      WFGridSystem *opPsi;
+      
+      opPsi = dynamic_cast<WFGridSystem*>(Psi);
+      if (opPsi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+
+      /* re-Init k-space ?*/
+      if (*this != *((GridSystem*) opPsi)  || _kspace == NULL) {
+	 *((GridSystem*) this) = *((GridSystem*) opPsi);
+	 InitKspace();
+      }
+     
+   }
+   
    const string & OGridNablaSq::Name()
    {
       return _name;
    }
 
-   void OGridNablaSq::UpdateTime(){}
+   void OGridNablaSq::UpdateTime(){/* No need for */}
 
    dcomplex OGridNablaSq::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
       dcomplex c;
       WaveFunction *opPsi;
       
-      opPsi = *this * PsiKet;
+      opPsi = PsiBra->NewInstance();
+      Apply(opPsi, PsiKet);
       c = *PsiBra * opPsi;
       delete opPsi;
       
@@ -99,38 +116,21 @@ namespace QDLIB {
       return 0; /* Minimum kinetic energy is zero */
    }
    
-   WaveFunction * OGridNablaSq::operator *(WaveFunction *Psi)
+   WaveFunction * OGridNablaSq::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WFGridSystem *opPsi, *ket;
-      WaveFunction *psi;
+      WFGridSystem *ket, *opPsi;
       
       
-      /* Copy */
-     ket = dynamic_cast<WFGridSystem*>(Psi);
-     if (ket == NULL)
-	throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-
-     
-      if (*this != *((GridSystem*) ket) || _kspace == NULL) {  /* re-Init k-space ?*/
-	 *((GridSystem*) this) = *((GridSystem*) ket);
-	 InitKspace();
-      }
+      ket = dynamic_cast<WFGridSystem*>(sourcePsi);
+      opPsi = dynamic_cast<WFGridSystem*>(destPsi);
       
-      psi =  Psi->NewInstance();
-      *psi = Psi;
-      
-      opPsi = dynamic_cast<WFGridSystem*>(psi);
-      if (opPsi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-
-      
-      opPsi->ToKspace();
-      MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
-//       MultElements((cVec*) opPsi, _kspace);
+      ket->ToKspace();
+      opPsi->isKspace(true);
+      MultElements((cVec*) opPsi, (cVec*) ket, _kspace, 1/double(GridSystem::Size()));
+      ket->isKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
       opPsi->ToXspace();
-
       
-      return opPsi;
+      return destPsi;
    }
 
    WaveFunction * OGridNablaSq::Apply(WaveFunction * Psi)
@@ -138,15 +138,7 @@ namespace QDLIB {
       WFGridSystem *opPsi;
       
       opPsi = dynamic_cast<WFGridSystem*>(Psi);
-      if (opPsi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
 
-      
-      if (*this != *((GridSystem*) opPsi)  || _kspace == NULL) {  /* re-Init k-space ?*/
-	 *((GridSystem*) this) = *((GridSystem*) opPsi);
-	 InitKspace();
-      }    
-      
       opPsi->ToKspace();
       MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
       opPsi->ToXspace();
@@ -154,49 +146,6 @@ namespace QDLIB {
       return opPsi;
    }
 
-   WaveFunction * OGridNablaSq::Apply(WaveFunction * Psi, const double d)
-   {
-      WFGridSystem *opPsi;
-      
-      opPsi = dynamic_cast<WFGridSystem*>(Psi);
-      if (opPsi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-
-      
-      if (*this != *((GridSystem*) opPsi)  || _kspace == NULL) {  /* re-Init k-space ?*/
-	 *((GridSystem*) this) = *((GridSystem*) opPsi);
-	 InitKspace();
-      }    
-      
-      opPsi->ToKspace();
-      MultElements((cVec*) opPsi, _kspace, d/double(GridSystem::Size()));
-      opPsi->ToXspace();
-      
-      return opPsi;
-   }
-   
-   WaveFunction* OGridNablaSq::Apply(WaveFunction *Psi, const dcomplex d)
-   {
-      WFGridSystem *opPsi;
-      
-      opPsi = dynamic_cast<WFGridSystem*>(Psi);
-      if (opPsi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-
-      
-//      if (*this != *((GridSystem*) opPsi)  || _kspace == NULL) {  /* re-Init k-space ?*/
-//	 *((GridSystem*) this) = *((GridSystem*) opPsi);
-//	 InitKspace();
-      //}   
-      
-      if (_kspace == NULL)  InitKspace();
-      opPsi->ToKspace();
-      MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size())* d);
-      opPsi->ToXspace();
-      
-      return opPsi;
-   }
-   
    
    Operator * OGridNablaSq::operator =(Operator * O)
    {
@@ -235,12 +184,11 @@ namespace QDLIB {
    void OGridNablaSq::InitKspace()
    {
    
-      
       if (GridSystem::Dim() == 0) throw ( EParamProblem("Missing GridSystem parameters") );
    
       dVec *kspace1;
    
-      if (_kspace == NULL ) _kspace = new dVec(GridSystem::Size());
+      if (_kspace == NULL ) _kspace = new dVec(GridSystem::Size(), true);
       else _kspace->newsize(GridSystem::Size());
       
       

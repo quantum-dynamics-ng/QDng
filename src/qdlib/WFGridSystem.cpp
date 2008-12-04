@@ -1,3 +1,5 @@
+
+
 #include "WFGridSystem.h"
 #include "sys/Exception.h"
 #include "fft/fft.h"
@@ -14,6 +16,19 @@ namespace QDLIB {
       if (_spacebuffer != NULL) delete _spacebuffer;
    }
    
+   void WFGridSystem::Init(ParamContainer &params)
+   {
+      if (GridSystem::Dim() == 0 || GridSystem::Dim() > MAX_DIMS)
+	 throw( EParamProblem("Dims not initialized or to large") );
+
+      if (_spacebuffer == NULL) _spacebuffer = new cVec(cVec::size());
+      
+      /* Initialize FFT */
+      if (fft == NULL){
+	 fft = new FFT(*((GridSystem*) this), *((cVec*) this), *_spacebuffer);
+      }
+   }
+   
    
    /**
     * \return true if wave function is in Kspace representation.
@@ -24,32 +39,22 @@ namespace QDLIB {
    }
    
    /**
-    * Check if FFT is initialized.
+    * Tell the WF that it is in k-Space representation.
     */
-   void WFGridSystem::_check_kspace()
+   void WFGridSystem::isKspace( bool is )
    {
-      if (GridSystem::Dim() == 0 || GridSystem::Dim() > MAX_DIMS)
-         throw( EParamProblem("Dims not initialized or to large") );
-
-      if (_spacebuffer == NULL) _spacebuffer = new cVec(cVec::size());
-      
-      /* Initialize FFT */
-      if (fft == NULL){
-	 fft = new FFT(*((GridSystem*) this), *((cVec*) this), *_spacebuffer);
+      if (_isKspace != is){
+	 cVec::swap(*_spacebuffer);
       }
+      _isKspace = is;
    }
-   
+      
    /**
     * Transform the wavefunction into momentum space.
     */
    void WFGridSystem::ToKspace()
    {
-      if (_isKspace) return;
-      
-      _check_kspace();
-      
       fft->forward();
-      
       cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
       _isKspace = true;
       
@@ -60,10 +65,6 @@ namespace QDLIB {
     */
    void WFGridSystem::ToXspace()
    {
-      if (!_isKspace) return;
-      
-      _check_kspace();
-
       fft->backward();
       cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
       _isKspace = false;

@@ -55,10 +55,10 @@ namespace QDLIB {
 	 sprintf (c, "%d", i);
       }
       
-
-
-	 
+      cVec::Align();
       cVec::newsize(GridSystem::Size());
+      
+      WFGridSystem::Init(_params);
    }
 
    const string & WFGridCartesian::Name()
@@ -102,10 +102,14 @@ namespace QDLIB {
 //       ket = Psi->NewInstance();
 //       *ket = Psi;
    
-      
-      for(int i=0; i < size(); i++){
-	 c += ((*this)[i]).conj() * (*Psi)[i];
-// 	 cout << c << " " << ((*this)[i]).conj() << " " << (*Psi)[i] << endl;
+      int s;
+      dcomplex *a, *b;
+      for (s=0; s < strides(); s++){
+	 a = begin(s);
+         b = Psi->begin(s);
+	 for(int i=0; i < lsize(); i++){
+	    c += a[i].conj() * b[i];
+	 }
       }
    
       /* k-space has different Norm! */
