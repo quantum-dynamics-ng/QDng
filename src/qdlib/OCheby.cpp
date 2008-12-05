@@ -10,7 +10,7 @@ namespace QDLIB
 
    OCheby::OCheby()
       : OPropagator(), _name("OCheby"), _hamilton(NULL),
-      _order(0), _coeff(0), Rdelta(0.0), Gmin(0), ket0(NULL), ket1(NULL), ket2(NULL)
+      _order(0), _coeff(0), Rdelta(0.0), Gmin(0), ket0(NULL), ket1(NULL), ket2(NULL), buf(NULL)
    {}
 
 
@@ -19,6 +19,7 @@ namespace QDLIB
       if (ket0 != NULL) delete ket0;
       if (ket1 != NULL) delete ket1;
       if (ket2 != NULL) delete ket2;
+      if (buf != NULL) delete buf;
    }
 
 
@@ -72,69 +73,21 @@ namespace QDLIB
    
    WaveFunction * OCheby::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WaveFunction *buf, *r;
-      
-      if (ket0 == NULL) ket0 = sourcePsi->NewInstance();
-      if (ket1 == NULL) ket1 = sourcePsi->NewInstance();
-      if (ket2 == NULL) ket2 = sourcePsi->NewInstance();
-    
-      buf = sourcePsi->NewInstance();
-      r = sourcePsi->NewInstance();
-      
-      *r  = sourcePsi;  /* Copy */
-      
-      *ket0 = sourcePsi;   /* phi_0 */
-      
-      *ket1 = sourcePsi;
-//       *_hamilton *= ket1;
-      _hamilton->Apply(ket1);
-       *ket1 *=  _exp;
-
-      *r *= _coeff[0];
-
-      *buf = ket1;
-      *buf *= _coeff[1];
-
-      *r += buf;
-
-      int i=2;
-      while (i < _order){
-
-	 i++;
-	 if(!(i < _order)) break;
-	
-	 i++;
-      }
-
-      delete buf;
-      /* multiply the last two coefficients of the series expansion */
-      return r;
+     
+      destPsi->FastCopy(*sourcePsi);
+      Apply(destPsi);
+      return destPsi;
    }
 
-      
-   WaveFunction * OCheby::Apply( WaveFunction * Psi, const dcomplex d )
-   {
-      Apply( Psi );
-      *Psi *= d;
-      return Psi;
-   }
-   
-   WaveFunction * OCheby::Apply( WaveFunction * Psi, const double d )
-   {
-      Apply( Psi );
-      *Psi *= d;
-      return Psi;
-   }
-   
+         
    WaveFunction * OCheby::Apply( WaveFunction * Psi )
    {
-      WaveFunction *buf, *swap;
+      WaveFunction *swap;
       
       if (ket0 == NULL) ket0 = Psi->NewInstance();
       if (ket1 == NULL) ket1 = Psi->NewInstance();
       if (ket2 == NULL) ket2 = Psi->NewInstance();
-    
-      buf = Psi->NewInstance();
+      if (buf == NULL) buf =  Psi->NewInstance();
       
       ket0->FastCopy(*Psi);   /* phi_0 */
       
@@ -142,19 +95,15 @@ namespace QDLIB
       _hamilton->Apply(ket1);
       MultElements( (cVec*) ket1, _exp);
       
-//       *ket1 *=  _exp;
+      MultElements( (cVec*) Psi, _coeff[0]);
       
-      *Psi *= _coeff[0];
-     
-      *buf = ket1;
-      *buf *= _coeff[1];
+      MultElementsCopy( (cVec*) buf, (cVec*) ket1, _coeff[1]);
       
       *Psi += buf;
       
       int i=2;
       dcomplex *k2, *bf, *k0, *psi;
-//       #pragma omp parallel private(i, k2, bf, k0, psi)
-//       {
+
       while (i < _order){
  	 _hamilton->Apply( buf, ket1);
 
@@ -167,7 +116,6 @@ namespace QDLIB
 	    bf = buf->begin(s);
 	    k0 = ket0->begin(s);
 	    psi = Psi->begin(s);
-	    #pragma omp for
 	    for(int j=0; j< size; j++){
 	       bf[j] *= 2*_exp;
 	       k2[j] = k0[j];
@@ -181,16 +129,9 @@ namespace QDLIB
 	 ket1 = ket0;
 	 ket0 = swap;
 	 i++;
-/*	 _Recursion(ket0, ket1, buf, Psi, i);
-	 i++;
-	 if(!(i < _order)) break;
-	 _Recursion(ket1, ket0, buf, Psi, i);
-	 i++;*/
-      }
-//       } /* parallel*/
 
-      delete buf;
-      /* multiply the last two coefficients of the series expansion */
+      }
+
       return Psi;
    }
 
