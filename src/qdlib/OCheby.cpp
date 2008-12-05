@@ -1,6 +1,9 @@
 #include "sys/Exception.h"
 #include "OCheby.h"
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 namespace QDLIB
 {
@@ -149,46 +152,31 @@ namespace QDLIB
       *Psi += buf;
       
       int i=2;
+      dcomplex *k2, *bf, *k0, *psi;
+//       #pragma omp parallel private(i, k2, bf, k0, psi)
+//       {
       while (i < _order){
-// 	 *((cVec*) buf) = *((cVec*) ket1);       /* H * Psi */
-//       *_hamilton *= Hpsi1;
  	 _hamilton->Apply( buf, ket1);
-// 	 _hamilton->Apply( buf, 2*_exp );
+
+	 
 	 int strides = Psi->strides();
 	 int size = Psi->lsize();
 	 int s;
-	 dcomplex *k2, *bf, *k0, *psi;
-	 
-	 
 	 for (s=0; s < strides; s++){
 	    k2 = ket2->begin(s);
 	    bf = buf->begin(s);
 	    k0 = ket0->begin(s);
 	    psi = Psi->begin(s);
-	    
+	    #pragma omp for
 	    for(int j=0; j< size; j++){
-// 	 ket2->FastCopy(*ket0);
 	       bf[j] *= 2*_exp;
 	       k2[j] = k0[j];
-// 	 *((cVec*) ket2) = *((cVec*) ket0);
-//       MultElements ( (cVec*) Hpsi1, 2*_exp);
-// 	 *ket2 += buf;
 	       k2[j] += bf[j];
-	 
-	       
-// 	 ket0->FastCopy(*ket2);
 	       k0[j] = k2[j];
-// 	 *((cVec*) ket0) = *((cVec*) ket2);
-      	 
-/*	 *ket2 *= _coeff[i];
-	 *Psi += ket2;*/
-	 
-// 	 MultElementsAdd( (cVec*) Psi, (cVec*) ket2, _coeff[i]);
 	       psi[j] += k2[j] *  _coeff[i];
-	       
 	    }
 	 }
-	 
+	 	 
 	 swap = ket1;
 	 ket1 = ket0;
 	 ket0 = swap;
@@ -199,6 +187,7 @@ namespace QDLIB
 	 _Recursion(ket1, ket0, buf, Psi, i);
 	 i++;*/
       }
+//       } /* parallel*/
 
       delete buf;
       /* multiply the last two coefficients of the series expansion */

@@ -158,6 +158,7 @@ namespace QDLIB {
       {
 	 _O[i]->Apply(_WFbuf[0], sourcePsi);	 
 	 for (int s=0; s < strides; s++){
+	    #pragma omp parallel for
 	    for (int j=0; j < size; j++){
 	       d[j] += b[j];
 	    }
@@ -185,6 +186,7 @@ namespace QDLIB {
       {
 	 _O[i]->Apply(_WFbuf[1], _WFbuf[0]);
 	 for (int s=0; s < strides; s++){
+	    #pragma omp parallel for
 	    for (int j=0; j < size; j++){
 	       d[j] += b[j];
 	    }

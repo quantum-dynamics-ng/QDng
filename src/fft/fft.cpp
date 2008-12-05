@@ -1,4 +1,5 @@
 #include "fft.h"
+#include <stdio.h>
 
 #ifdef _OPENMP
  #include <omp.h>
@@ -41,11 +42,29 @@ namespace QDLIB {
       
       if (!_planed){
          inbuf = in;
-	 fftwFlag = FFTW_MEASURE;
-      } else 
+	 FILE * pFile;
+	 if (pFile = fopen("wisdom", "r")){
+	    fftw_import_wisdom_from_file(pFile);
+	    fclose(pFile);
+	 }
+	 fftwFlag = FFTW_PATIENT;
+	 cerr << "FFTW run init" << endl;
+#ifdef _OPENMP
+	 nthreads = omp_get_num_procs();
+	 cerr << "FFTW run init" << endl;
+	 /* Initalisation */
+	 if (fftw_init_threads() == 0)
+	    cerr << "FFTW init thread error" << endl;
+	 else
+	    cerr << "FFTW init thread success " << nthreads << endl;
+ 	 fftw_plan_with_nthreads(nthreads);
+#endif	 
+      } else {
 	 fftwFlag = FFTW_ESTIMATE;
-      
-      
+      }
+#ifdef _OPENMP
+//       fftw_plan_with_nthreads(nthreads);
+#endif
       switch (grid.Dim()){
 	 case 1:  /* 1D */
 	    _planf = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) in.begin(0),
@@ -88,6 +107,12 @@ namespace QDLIB {
       if (!_planed) {
 	 in = inbuf;
 	 _planed = true;
+	 FILE * pFile;
+	 if (pFile = fopen("wisdom", "w")){
+	    fftw_export_wisdom_to_file(pFile);
+	    fclose(pFile);
+	 }
+	 
       }
       
    }
@@ -141,10 +166,6 @@ namespace QDLIB {
    bool FFT::_planed = false;
    int FFT::nthreads = 0;
    
-#ifdef _OPENMP
-   FFT::nthreads = omp_get_num_thereads();
-   int fftw_init_threads(FFT::nthreads);
-#endif
    
 } /* namespace QDLIB */
 

@@ -37,15 +37,17 @@ int main(int argc, char **argv)
 		    "User defined path to the wave function and operator modules", "");
 #ifdef _OPENMP
    int procs;
-   cmdline.SetHelp( 'p', "num threads", false, "Specify the number of threads to use", 1);
+   cmdline.SetHelp( 'p', "num threads", false, "Specify the number of threads to use", "1");
 #endif
    
    cmdline.ReadArgs(argc, argv);
    cmdline.CheckOptions();
    
-   /* This is the global try-catch block */
-   try {
+   
+
       
+   try {
+      if ( cmdline.GetOption('h') ) throw (Exception());
       /* Provide a user path for module loading */
       if (cmdline.GetOption('m')){
 	 cmdline.GetOption('m', fname);
@@ -56,13 +58,20 @@ int main(int argc, char **argv)
       /* Get the number of openmp threads */
       cmdline.GetOption( 'p', procs);
       omp_set_num_threads(procs);
+      cout << "Running with " << procs << " threads.\n";
 #endif
       
       if(! cmdline.GetNonOption(0, fname) )
 	 throw ( EParamProblem ("No input file given") );
       
-
-      
+   } catch (Exception e) {
+      cerr << e.GetMessage() << "\n";
+      cmdline.ShowHelp();
+      exit(0);
+   }
+   
+   /* This is the global try-catch block */
+   try {    
       /* Open input file and check programm nodes */
       XMLfile.Parse(fname);
       

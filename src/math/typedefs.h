@@ -21,6 +21,10 @@ namespace QDLIB {
 #include "VectorView.h"
 #include "Matrix.h"
 
+#ifdef _OPENMP
+ #include <omp.h>
+#endif
+
 	       
 namespace QDLIB {
    /**
@@ -244,6 +248,7 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
+	 #pragma omp parallel for
 	 for (lint i=0; i < size; i++)
 	 {
 	    a[i] *= b[i] * c;
@@ -270,6 +275,7 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
+         #pragma omp parallel for
 	 for (lint i=0; i < size; i++)
 	 {
 	    a[i] *= b[i] * c;
@@ -294,15 +300,19 @@ namespace QDLIB {
       
       
       lint s;
+//#pragma omp parallel private(a,b,c)
+  //    {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
 	 c = C->begin(s);
+         #pragma omp for
 	 for (lint i=0; i < size; i++)
 	 {
 	    c[i] = a[i] * b[i] * d;
 	 }
       }
+     // } /* parallel */
    }
    
       /**
@@ -320,17 +330,21 @@ namespace QDLIB {
       dcomplex *c;
       double *b;
       
-      
+//       #pragma omp parallel private(a,b,c)
+//       {
       lint s;
+//       #pragma omp for private(s)
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
 	 c = C->begin(s);
+//          #pragma omp for
 	 for (lint i=0; i < size; i++)
 	 {
 	    c[i] = a[i] * b[i];
 	 }
       }
+//       } /* parallel */
    }
    
    /**
@@ -352,6 +366,7 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
+         #pragma omp parallel for
 	 for (lint i=0; i < size; i++)
 	 {
 	    a[i] *= b[i] * c;
@@ -420,6 +435,7 @@ namespace QDLIB {
       lint s;
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
+         #pragma omp parallel for
 	 for (lint i=0; i < size; i++)
 	 {
 	    a[i] *= c;
