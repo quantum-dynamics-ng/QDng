@@ -50,12 +50,12 @@ namespace QDLIB
       return p;
    }
    
-/*   Operator* INT_OGridGMat()
+   Operator* INT_OGridGMat()
    {
       OGridGMat *p;
       p = new OGridGMat ();
       return p;
-   }*/
+   }
    
    Operator* INT_OGridPotential()
    {
@@ -94,7 +94,7 @@ namespace QDLIB
 //       if (name == "INT_OSOD") return &INT_OSOD;
       
       if (name == "INT_OGridNablaSq") return &INT_OGridNablaSq;
-//       if (name == "INT_OGridGmat") return &INT_OGridGMat;
+      if (name == "INT_OGridGmat") return &INT_OGridGMat;
       if (name == "INT_OGridPotential") return &INT_OGridPotential;
       return NULL;
    }

@@ -23,11 +23,12 @@ namespace QDLIB {
 	 
 	 string _name;
 	 lint _size;
-	 Gmatrix_t _Gmat;
-	 Gkspace_t _kspace;
-	 Vector<WFGridSystem*> _wfbuf;
+	 OGridPotential*** _Gmat;     /* 2D Array*/
+	 dVec* _kspace;
+	 WFGridSystem** _wfbuf;      /* 1D Array */
+	 WFGridSystem* buf;
 	 
-	 void _InitKspace (WaveFunction *Psi);
+	 void _InitKspace (WFGridSystem *Psi);
       public:
 	 OGridGMat();
       

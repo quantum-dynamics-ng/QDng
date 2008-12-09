@@ -140,13 +140,12 @@ namespace QDLIB {
       double *b=NULL;
       
       lint s;
-      for (s=0; s < strides; s++)
+      for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
 	 for (lint i=0; i < size; i++){
-	    {
-	       a[i] *= (I*b[i]) * d;
-	    }
+	    a[i] *= (I*b[i]) * d;
+	 }
       }
    }
    

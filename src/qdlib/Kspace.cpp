@@ -41,7 +41,7 @@ namespace QDLIB
    }
    
    /**
-    * k-space representation of \f$ \frac{\partial}{\partial x} \f$.
+    * k-space representation of \f$ -\frac{\partial}{\partial x} \f$.
     * 
     * \param length Desired length of the grid.
     * \param Nx     number of points.

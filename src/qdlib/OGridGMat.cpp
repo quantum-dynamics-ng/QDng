@@ -7,7 +7,7 @@
 
 namespace QDLIB {
 
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(0,0), _kspace(0,0), _wfbuf(0)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL)
    {
    }
    
@@ -17,37 +17,34 @@ namespace QDLIB {
       for(lint i=0; i < GridSystem::Dim(); i++){
 	 if (_wfbuf[i] != NULL) delete _wfbuf[i];
       }
+      if (_kspace != NULL) delete _kspace;
    }
 
    
-   void OGridGMat::_InitKspace (WaveFunction *Psi)
+   void OGridGMat::_InitKspace (WFGridSystem *Psi)
    {
       if (GridSystem::Dim() == 0) throw ( EParamProblem("Missing GridSystem parameters") );
    
       dVec *kspace1;
       dVecView *view;
+           
       
-      WFGridSystem* psi;
-      psi = dynamic_cast<WFGridSystem*>(Psi);
-      
-      if (psi == NULL)
-	 throw ( EIncompatible("Psi not of type WFGridSystem", Psi->Name()) );
-      
-      *((GridSystem*) this) = *((GridSystem*) psi);
+      *((GridSystem*) this) = *((GridSystem*) Psi);
   
       /* Setup single derivative for every coordinate */
-      for (lint i=0; i < GridSystem::Dim(); i++)
+      for (lint i=0; i < _size; i++)
       {
-	 if ( ((GridSystem) (_Gmat[i][i])) != *((GridSystem*) psi) )
+	 
+	 if ( *((GridSystem*) (_Gmat[i][i])) != *((GridSystem*) Psi) )
 	    throw ( EParamProblem("Gmatrix does not match Wavefunction") );
-   
-	 /* buffers */
-	 if (_wfbuf[i] == NULL) _wfbuf[i] = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
+   	 
 	 
 	 /* derivatives */
          if (_kspace[i].size() == 0){
-	    _kspace[i].newsize(GridSystem::Size(),0);
+	    _kspace[i].newsize(Psi->lsize());
+	    _kspace[i] = 0.0;
 	 }
+	 
 	 kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i));
 	 view = new dVecView(_kspace[i], GridSystem::Dim(), GridSystem::DimSizes());
 	 
@@ -57,6 +54,18 @@ namespace QDLIB {
 	 delete view;
 	 delete kspace1;
       }
+   }
+   
+   void OGridGMat::Init(WaveFunction *Psi)
+   {
+      buf = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
+      if (buf == NULL)
+	 throw (EIncompatible ("Psi not a WFGridSystem"), Psi->Name() );
+      for (int i=0; i < _size; i++){
+	 _wfbuf[i] = dynamic_cast<WFGridSystem*> (Psi->NewInstance());
+      }
+      
+      _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
    }
    
    Operator* OGridGMat::NewInstance()
@@ -78,18 +87,22 @@ namespace QDLIB {
    
       if (n < 1)
 	 throw ( EParamProblem ("G-matrix operator needs at least one dimension") );
+      
       GridSystem::Dim(n);
+      _size=n;
       
-      _kspace.newsize(n,0);   /* Setup k-space, init every kspace Vector with size zero */
-      _wfbuf.newsize(n);      /* We need dim buffers */
-      
-      for (lint i=0; i < n; i++)
-      {
-	_wfbuf[i] = NULL;
+      int i;
+      _Gmat = new OGridPotential**[n];
+      _kspace = new dVec[n];
+      for (i=0; i < n; i++){
+	 for (int j=0; j < n; j++){
+            _Gmat[i][j] = new OGridPotential();
+	 }
       }
+     
+      _wfbuf = new WFGridSystem*[n];
       
       _params.GetValue( "gmat", name);
-      
       if (name.empty())
 	 throw( EParamProblem ("No G-matrix elements given"));
       
@@ -97,16 +110,17 @@ namespace QDLIB {
       file.Suffix(BINARY_O_SUFFIX);
       
       /* Read Matrix elements */
-      int i;
       char si[32], sj[32];
       string s;
       for (i=0; i < n; i++){
-	 for(int j=0; j < (i + 1); j++){
+	 for(int j=0; j < n; j++){
 	    snprintf (si, 32, "%d", i);
 	    snprintf (sj, 32, "%d", j);
-	    s = name + string("_") + string(si) + string("_") + string(sj);
+	    s = name + string("_") + string(si) + string(sj);
+	    cout << "Name " << s << endl;
 	    file.Name(s);
-	    file >> ((OGridSystem*) &_Gmat[i][j]);
+	    file >> ((OGridSystem*) _Gmat[i][j]);
+	    cout << _Gmat[i][j]->size()  << endl;
 	 }
       }
       
@@ -123,6 +137,7 @@ namespace QDLIB {
       WaveFunction *opKet;
       
       opKet = PsiKet->NewInstance();
+      Apply(opKet, PsiKet);
       d = *PsiBra * opKet;
       delete opKet;
       
@@ -146,7 +161,7 @@ namespace QDLIB {
       double T=0;
       
       for (int i=0; i < GridSystem::Dim(); i++)
-	 T += 1/ ( VecMin(_Gmat[i][i]) *  GridSystem::Dx(i) * GridSystem::Dx(i));
+	 T += 1/ ( VecMin(*_Gmat[i][i]) *  GridSystem::Dx(i) * GridSystem::Dx(i));
       
       T *= ( M_PI*M_PI / 2 );
       return T;
@@ -157,45 +172,46 @@ namespace QDLIB {
       return 0; /* Minimum kinetic energy is zero */
    }
    
-   WaveFunction * OGridGMat::operator *( WaveFunction * Psi )
+   WaveFunction * OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       WaveFunction *psi;
-      if (_kspace.size() == 0) _InitKspace(Psi);
       
-      psi = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
-      if (psi == NULL)
-	 throw ( EIncompatible ("Can't apply to ", Psi->Name()) );
+      psi = dynamic_cast<WFGridSystem*>(sourcePsi->NewInstance());
       
+	    
       /* Make a copy from Psi */
       for (int i=0; i < GridSystem::Dim(); i++)
-	 *((WaveFunction*) _wfbuf[i]) = Psi;
+	 *((cVec*) _wfbuf[i]) = *psi;
       
-      *Psi = dcomplex(0,0);
+      *destPsi = dcomplex(0,0);
       
       lint i;
-      for (i=0; i < GridSystem::Dim(); i++){
-	 /* d/dx from WF */
+      for (i=0; i < _size; i++){ /* Loop over dims*/
+	 /* d/dx from WF */ 
 	 _wfbuf[i]->ToKspace();
-	 MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[i], 1/double(GridSystem::Size()) );
+	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(_wfbuf[i]->size()) );
 	 _wfbuf[i]->ToXspace();
 	 
-	 for (lint j=0; j < (i+1); j++){
+	 for (lint j=0; j < _size; j++){
+	    *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	    /* Multiply Gmatrix element */
-	    MultElements( (cVec*) _wfbuf[i], (dVec*) &_Gmat[i][j]);
+	    cout << i <<" " << j<< " "<< (*(_Gmat[i][j]))[0] << endl;
+	    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
+	    /* d/dx from G* d/dx WF */
 	    _wfbuf[i]->ToKspace();
-	    MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[j], 1/double(GridSystem::Size()) );
+	    MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), 0.5/double(_wfbuf[i]->size()) );
 	    _wfbuf[i]->ToXspace();
-	    *psi += _wfbuf[i];
+	    *destPsi += buf;
+	    
 	 }
       }
       
-      return psi;
+      return destPsi;
    }
 
-   WaveFunction * OGridGMat::operator *=( WaveFunction * Psi )
+   WaveFunction * OGridGMat::Apply( WaveFunction * Psi )
    {
       WaveFunction *psi;
-      if (_kspace.size() == 0) _InitKspace(Psi);
       
       psi = dynamic_cast<WFGridSystem*>(Psi);
       if (psi == NULL)
@@ -235,15 +251,14 @@ namespace QDLIB {
       
       /* Copy parents */
       *((GridSystem*) this) = *((GridSystem*) o);
-      
+      _params = o->_params;
       _size = o->_size;
-      
-      _kspace = o->_kspace;
-      
       for (int i=0; i < _size; i++){
+	 _kspace[i] = o->_kspace[i];
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
-	 for(int j=0; j < i; j++){
-	    _Gmat[i][j] = &(o->_Gmat[i][j]);
+	 buf = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
+	 for(int j=0; j < _size; j++){
+	    *_Gmat[i][j] = *(o->_Gmat[i][j]);
 	 }
       }
       
@@ -259,12 +274,8 @@ namespace QDLIB {
    
    Operator* OGridGMat::Scale(const double d)
    {
-      if (_kspace.size() == 0)
-	 throw ( EParamProblem("k-space not initialized", Name()) );
-      
       for (lint i=0; i < GridSystem::Dim(); i++)
          MultElements(&_kspace[i], d);
-      
       return this;
    }
 
