@@ -136,7 +136,10 @@ class Vector
         /* do nothing, if no memory has been previously allocated */
        for (lint s=0; s < nstrides_; s++){
  	  if (v_[s] != NULL){
-	     delete [] v_[s];
+	     if(align_)
+		free(v_[s]);
+	     else 
+	        delete [] v_[s];
 	     v_[s] = NULL;
  	  }
        }

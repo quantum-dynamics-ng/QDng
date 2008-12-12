@@ -17,7 +17,8 @@ namespace QDLIB {
       for(lint i=0; i < GridSystem::Dim(); i++){
 	 if (_wfbuf[i] != NULL) delete _wfbuf[i];
       }
-      if (_kspace != NULL) delete _kspace;
+      if (_kspace != NULL) delete[] _kspace;
+      if (buf != NULL) delete buf;
    }
 
    
@@ -81,7 +82,7 @@ namespace QDLIB {
    {
       int n;
       string name;
-      
+    
       _params = params;
       _params.GetValue( "dims", n);
    
@@ -94,13 +95,17 @@ namespace QDLIB {
       int i;
       _Gmat = new OGridPotential**[n];
       _kspace = new dVec[n];
+      _wfbuf = new WFGridSystem*[n];
+      
       for (i=0; i < n; i++){
+	 _Gmat[i] = new OGridPotential*[n];
 	 for (int j=0; j < n; j++){
-            _Gmat[i][j] = new OGridPotential();
+	    _Gmat[i][j] = new OGridPotential();
+	   
 	 }
       }
      
-      _wfbuf = new WFGridSystem*[n];
+      
       
       _params.GetValue( "gmat", name);
       if (name.empty())
@@ -174,34 +179,37 @@ namespace QDLIB {
    
    WaveFunction * OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
-      WaveFunction *psi;
+      WFGridSystem *psi;
       
       psi = dynamic_cast<WFGridSystem*>(sourcePsi->NewInstance());
+      if (psi == NULL) throw (EIncompatible("Psi is damaged") );
       
-	    
       /* Make a copy from Psi */
       for (int i=0; i < GridSystem::Dim(); i++)
-	 *((cVec*) _wfbuf[i]) = *psi;
+	 _wfbuf[i]->FastCopy (*sourcePsi);
       
       *destPsi = dcomplex(0,0);
       
       lint i;
       for (i=0; i < _size; i++){ /* Loop over dims*/
 	 /* d/dx from WF */ 
+// 	 cout << *(_wfbuf[i]) * _wfbuf[i] <<" ";
 	 _wfbuf[i]->ToKspace();
 	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(_wfbuf[i]->size()) );
 	 _wfbuf[i]->ToXspace();
 	 
+// 	 cout << *(_wfbuf[i]) * _wfbuf[i] <<endl;
+	 
 	 for (lint j=0; j < _size; j++){
 	    *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	    /* Multiply Gmatrix element */
-	    cout << i <<" " << j<< " "<< (*(_Gmat[i][j]))[0] << endl;
+// 	    cout << i <<" " << j<< " "<< (*(_Gmat[i][j]))[0] << endl;
 	    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
 	    /* d/dx from G* d/dx WF */
-	    _wfbuf[i]->ToKspace();
+	    buf->ToKspace();
 	    MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), 0.5/double(_wfbuf[i]->size()) );
-	    _wfbuf[i]->ToXspace();
-	    *destPsi += buf;
+	    buf->ToXspace();
+	    *destPsi -= buf;
 	    
 	 }
       }
@@ -211,36 +219,17 @@ namespace QDLIB {
 
    WaveFunction * OGridGMat::Apply( WaveFunction * Psi )
    {
-      WaveFunction *psi;
+     
+      WaveFunction *ket;
       
-      psi = dynamic_cast<WFGridSystem*>(Psi);
-      if (psi == NULL)
-	 throw ( EIncompatible ("Can't apply to ", Psi->Name()) );
+      ket=Psi->NewInstance();
       
-      /* Make a copy from Psi */
-      for (int i=0; i < GridSystem::Dim(); i++)
-         *((WaveFunction*) _wfbuf[i]) = Psi;
+      Apply(ket, Psi);
       
-      *Psi = dcomplex(0,0);
-      
-      lint i;
-      for (i=0; i < GridSystem::Dim(); i++){
-	 /* d/dx from WF */
-	 _wfbuf[i]->ToKspace();
-	 MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[i], 1/double(GridSystem::Size()) );
-	 _wfbuf[i]->ToXspace();
-	 
-	 for (lint j=0; j < (i+1); j++){
-	    /* Multiply Gmatrix element */
-	    MultElements( (cVec*) _wfbuf[i], (dVec*) &_Gmat[i][j]);
-	    _wfbuf[i]->ToKspace();
-	    MultElementsComplex( (cVec*) _wfbuf[i], &_kspace[j], 1/double(GridSystem::Size()) );
-	    _wfbuf[i]->ToXspace();
-	    *psi += _wfbuf[i];
-	 }
-      }
-      
-      return psi;
+      *Psi = ket;
+
+      delete ket;
+      return Psi;
    }
    
    Operator * OGridGMat::operator =( Operator * O )
@@ -253,15 +242,19 @@ namespace QDLIB {
       *((GridSystem*) this) = *((GridSystem*) o);
       _params = o->_params;
       _size = o->_size;
+      if(_kspace == NULL) _kspace = new dVec[_size];
+      if (_Gmat == NULL) _Gmat = new OGridPotential**[_size];
+      if (_wfbuf == NULL) _wfbuf = new WFGridSystem*[_size];
       for (int i=0; i < _size; i++){
 	 _kspace[i] = o->_kspace[i];
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 buf = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
+	 _Gmat[i] = new OGridPotential*[_size];
 	 for(int j=0; j < _size; j++){
-	    *_Gmat[i][j] = *(o->_Gmat[i][j]);
+	    _Gmat[i][j] = new OGridPotential();
+	    *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
 	 }
       }
-      
       return this;
    }
    

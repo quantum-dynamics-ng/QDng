@@ -41,7 +41,12 @@ namespace QDLIB
    }
    
    /**
-    * k-space representation of \f$ -\frac{\partial}{\partial x} \f$.
+    * k-space representation of \f$ \frac{\partial}{\partial x} \f$.
+    * 
+    * No minus is included here! The method returns real numbers
+    * which have to be interpreted as imaginary part.
+    * 
+    * \f$ FT[\frac{\partial}{\partial x}] = ik \f$
     * 
     * \param length Desired length of the grid.
     * \param Nx     number of points.
@@ -54,8 +59,6 @@ namespace QDLIB
       
       double dp = Dk(length);    // Setup dp for kspace
       
-      /* We include all the factors in the k-space function => Do it only once */
-      dp *= -1;
      
       if (Nx % 2 == 0){ /* even + odd grid points */
 	 for (int i=0; i < Nx / 2; i++){ //run from [-p..+p]
