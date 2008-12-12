@@ -61,7 +61,7 @@ namespace QDLIB
       
      
       if (Nx % 2 == 0){ /* even + odd grid points */
-	 for (int i=0; i < Nx / 2; i++){ //run from [-p..+p]
+	 for (int i=0; i < Nx / 2; i++){ //run from [-p..dp] and [0..p-dp]
 	    (*kspace)[i] = double(i) * dp;
 	    (*kspace)[Nx - i - 1] = double(i+1)* dp;
 	 }

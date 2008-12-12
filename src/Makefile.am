@@ -20,7 +20,7 @@ libqdng_la_LIBADD = $(top_builddir)/src/sys/libtools.la \
 	$(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la
 
-bin_PROGRAMS = qdng
+bin_PROGRAMS = qdng autokorr
 qdng_SOURCES = ProgPropa.cpp qdng.cpp Reporter.cpp ChainLoader.cpp
 qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/sys/libtools.la $(top_builddir)/src/math/libmath.la \
@@ -28,3 +28,7 @@ qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	-llapack -lg2c -lfftw3 -lxml2
 noinst_HEADERS = ProgPropa.h Reporter.h ChainLoader.h
 AM_CXXFLAGS = -O3
+autokorr_SOURCES = Autokorr.cpp
+autokorr_LDADD = $(top_builddir)/src/qdlib/libqd.la \
+	$(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la $(top_builddir)/src/sys/libtools.la \
+	-lfftw3

@@ -181,8 +181,6 @@ namespace QDLIB {
    {
       WFGridSystem *psi;
       
-      psi = dynamic_cast<WFGridSystem*>(sourcePsi->NewInstance());
-      if (psi == NULL) throw (EIncompatible("Psi is damaged") );
       
       /* Make a copy from Psi */
       for (int i=0; i < GridSystem::Dim(); i++)
@@ -198,20 +196,18 @@ namespace QDLIB {
 	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(_wfbuf[i]->size()) );
 	 _wfbuf[i]->ToXspace();
 	 
-// 	 cout << *(_wfbuf[i]) * _wfbuf[i] <<endl;
-	 
-	 for (lint j=0; j < _size; j++){
+	 int j=i;
+// 	 for (lint j=0; j < _size; j++){
 	    *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	    /* Multiply Gmatrix element */
-// 	    cout << i <<" " << j<< " "<< (*(_Gmat[i][j]))[0] << endl;
 	    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
 	    /* d/dx from G* d/dx WF */
 	    buf->ToKspace();
-	    MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), 0.5/double(_wfbuf[i]->size()) );
+	    MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -0.5/double(_wfbuf[i]->size())/M_PI*2 );
 	    buf->ToXspace();
-	    *destPsi -= buf;
+	    *destPsi += buf;
 	    
-	 }
+// 	 }
       }
       
       return destPsi;
