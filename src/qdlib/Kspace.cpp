@@ -60,18 +60,18 @@ namespace QDLIB
       double dp = Dk(length);    // Setup dp for kspace
       
      
-      if (Nx % 2 == 0){ /* even + odd grid points */
+//       if (Nx % 2 == 0){ /* even + odd grid points */
 	 for (int i=0; i < Nx / 2; i++){ //run from [-p..dp] and [0..p-dp]
 	    (*kspace)[i] = double(i) * dp;
-	    (*kspace)[Nx - i - 1] = double(i+1)* dp;
+	    (*kspace)[Nx - i - 1] = -1*double(i+1)* dp;
 	 }
-      } else {
-	 (*kspace)[0] = 0; 
-	 for (int i=1; i < (Nx+1) / 2; i++){ //run from [-p..+p]
-	    (*kspace)[i] = double(i) * dp;
-	    (*kspace)[Nx - i] = double(i+1) * dp;
-	 }
-      }
+//       } else {
+// 	 (*kspace)[0] = 0; 
+// 	 for (int i=1; i < (Nx+1) / 2; i++){ //run from [-p..+p]
+// 	    (*kspace)[i] = double(i) * dp;
+// 	    (*kspace)[Nx - i] = double(i+1) * dp;
+// 	 }
+//       }
       
       return kspace;
    }

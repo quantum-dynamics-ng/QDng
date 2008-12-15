@@ -42,15 +42,14 @@ namespace QDLIB {
 	 
 	 /* derivatives */
          if (_kspace[i].size() == 0){
-	    _kspace[i].newsize(Psi->lsize());
-	    _kspace[i] = 0.0;
+	    _kspace[i].newsize(Psi->size());
 	 }
 	 
 	 kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i));
 	 view = new dVecView(_kspace[i], GridSystem::Dim(), GridSystem::DimSizes());
 	 
 	 view->ActiveDim(i);
-	 *view += *kspace1;
+	 *view = *kspace1;
 	 
 	 delete view;
 	 delete kspace1;
@@ -99,14 +98,12 @@ namespace QDLIB {
       
       for (i=0; i < n; i++){
 	 _Gmat[i] = new OGridPotential*[n];
-	 for (int j=0; j < n; j++){
+	 for (int j=0; j <= i; j++){
 	    _Gmat[i][j] = new OGridPotential();
 	   
 	 }
       }
      
-      
-      
       _params.GetValue( "gmat", name);
       if (name.empty())
 	 throw( EParamProblem ("No G-matrix elements given"));
@@ -118,14 +115,12 @@ namespace QDLIB {
       char si[32], sj[32];
       string s;
       for (i=0; i < n; i++){
-	 for(int j=0; j < n; j++){
+	 for(int j=0; j <= i; j++){
 	    snprintf (si, 32, "%d", i);
 	    snprintf (sj, 32, "%d", j);
 	    s = name + string("_") + string(si) + string(sj);
-	    cout << "Name " << s << endl;
 	    file.Name(s);
 	    file >> ((OGridSystem*) _Gmat[i][j]);
-	    cout << _Gmat[i][j]->size()  << endl;
 	 }
       }
       
@@ -166,7 +161,7 @@ namespace QDLIB {
       double T=0;
       
       for (int i=0; i < GridSystem::Dim(); i++)
-	 T += 1/ ( VecMin(*_Gmat[i][i]) *  GridSystem::Dx(i) * GridSystem::Dx(i));
+	 T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));
       
       T *= ( M_PI*M_PI / 2 );
       return T;
@@ -191,23 +186,23 @@ namespace QDLIB {
       lint i;
       for (i=0; i < _size; i++){ /* Loop over dims*/
 	 /* d/dx from WF */ 
-// 	 cout << *(_wfbuf[i]) * _wfbuf[i] <<" ";
 	 _wfbuf[i]->ToKspace();
-	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(_wfbuf[i]->size()) );
+	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(buf->size()) );
 	 _wfbuf[i]->ToXspace();
-	 
-	 int j=i;
-// 	 for (lint j=0; j < _size; j++){
+ 	 for (lint j=0; j <= i; j++){
 	    *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	    /* Multiply Gmatrix element */
 	    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
 	    /* d/dx from G* d/dx WF */
 	    buf->ToKspace();
-	    MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -0.5/double(_wfbuf[i]->size())/M_PI*2 );
+	    if (i==j)
+	       MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
+	    else
+	       MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -1/double(buf->size()) );
+	    
 	    buf->ToXspace();
 	    *destPsi += buf;
-	    
-// 	 }
+ 	 }
       }
       
       return destPsi;
@@ -246,7 +241,7 @@ namespace QDLIB {
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 buf = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 _Gmat[i] = new OGridPotential*[_size];
-	 for(int j=0; j < _size; j++){
+	 for(int j=0; j <= i; j++){
 	    _Gmat[i][j] = new OGridPotential();
 	    *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
 	 }
@@ -264,7 +259,7 @@ namespace QDLIB {
    Operator* OGridGMat::Scale(const double d)
    {
       for (lint i=0; i < GridSystem::Dim(); i++)
-         MultElements(&_kspace[i], d);
+         MultElements(&_kspace[i], sqrt(d));
       return this;
    }
 
