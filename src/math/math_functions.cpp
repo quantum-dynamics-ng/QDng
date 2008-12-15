@@ -1,5 +1,6 @@
 #include "math.h"
-#include "typedefs.h"
+#include "math_functions.h"
+
 
 namespace QDLIB {
    

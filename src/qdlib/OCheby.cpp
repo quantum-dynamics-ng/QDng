@@ -1,5 +1,6 @@
 #include "sys/Exception.h"
 #include "OCheby.h"
+#include "math/math_functions.h"
 
 #ifdef _OPENMP
 #include <omp.h>

@@ -108,18 +108,6 @@ namespace QDLIB {
    /** Multidimensional view on dVec */
    typedef QDLIB::VectorView<dcomplex> cVecView;
    
-     
-   extern double VecMin(dVec &v);
-   extern double VecMax(dVec &v);
-   
-   extern double Faculty (int arg);
-   
-   extern "C" { int dbesj_(double *x, double *alpha, int *n, double *coeffs, int *nz); }
-   extern "C" { void zbesj_(double *re, double *im, double *alpha, int *kode, int *n,
-      double *cRe, double *cIm, int *nz, int *ierr); }
-   
-   extern int BesselJ0 (int n, double arg, dVec &coeffs, int &zeroes);
-   
    
    /**
     * Multiply vectors by elements.

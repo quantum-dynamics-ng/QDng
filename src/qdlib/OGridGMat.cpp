@@ -3,11 +3,11 @@
 #include "WFGridSystem.h"
 #include "Kspace.h"
 #include "sys/FileSingleDefs.h"
-
+#include "math/math_functions.h"
 
 namespace QDLIB {
 
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL), _NoKinCoup(false)
    {
    }
    
@@ -108,6 +108,10 @@ namespace QDLIB {
       if (name.empty())
 	 throw( EParamProblem ("No G-matrix elements given"));
       
+      if (_params.isPresent("coup")) {
+	 _params.GetValue( "coup", _NoKinCoup);
+      }
+      
       OGridSystem::FileOGrid file;
       file.Suffix(BINARY_O_SUFFIX);
       
@@ -116,11 +120,13 @@ namespace QDLIB {
       string s;
       for (i=0; i < n; i++){
 	 for(int j=0; j <= i; j++){
-	    snprintf (si, 32, "%d", i);
-	    snprintf (sj, 32, "%d", j);
-	    s = name + string("_") + string(si) + string(sj);
-	    file.Name(s);
-	    file >> ((OGridSystem*) _Gmat[i][j]);
+	    if (!(i != j && _NoKinCoup)){ /* No off-diagonals if kinetic coupling is turned off*/
+	       snprintf (si, 32, "%d", i);
+	       snprintf (sj, 32, "%d", j);
+	       s = name + string("_") + string(si) + string(sj);
+	       file.Name(s);
+	       file >> ((OGridSystem*) _Gmat[i][j]);
+	    }
 	 }
       }
       
@@ -155,15 +161,29 @@ namespace QDLIB {
 
    double OGridGMat::Emax()
    {
-      if (GridSystem::Dim() == 0) throw ( EParamProblem("Nabla operator not initalized") );
+      if (GridSystem::Dim() == 0) throw ( EParamProblem("Gmatrix operator not initalized") );
       
       /* Calc Tmax on the Grid */
       double T=0;
       
-      for (int i=0; i < GridSystem::Dim(); i++)
-	 T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));
-      
+      if (_size == 2 ){ // Quick diag
+	 double g0, g1, g10, t0, t1;
+	 g0 =  VecMin(*(_Gmat[0][0]));
+	 g1 = VecMin(*(_Gmat[1][1]));
+	 g10 = VecMin(*(_Gmat[1][0]));
+	 
+	 diag22symm(g0, g1, g10, t0, t1);
+	 
+	 if (t0 < t1)
+	    T = 1/ (t0*GridSystem::Dx(0) * GridSystem::Dx(0)) / 2;
+	 else
+	    T = 1/ (t1*GridSystem::Dx(1) * GridSystem::Dx(1)) / 2;	 
+      } else {
+	 for (int i=0; i < GridSystem::Dim(); i++)
+	    T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));
+      }
       T *= ( M_PI*M_PI / 2 );
+      cout << "Tmax " << T << endl;
       return T;
    }
 	 
@@ -190,18 +210,20 @@ namespace QDLIB {
 	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(buf->size()) );
 	 _wfbuf[i]->ToXspace();
  	 for (lint j=0; j <= i; j++){
-	    *((cVec*) buf) = *((cVec*) _wfbuf[i]);
-	    /* Multiply Gmatrix element */
-	    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
-	    /* d/dx from G* d/dx WF */
-	    buf->ToKspace();
-	    if (i==j)
-	       MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
-	    else
-	       MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -1/double(buf->size()) );
-	    
-	    buf->ToXspace();
-	    *destPsi += buf;
+	    if (!(i != j && _NoKinCoup)){ /* Kinetic coupling ?*/
+	       *((cVec*) buf) = *((cVec*) _wfbuf[i]);
+	       /* Multiply Gmatrix element */
+	       MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
+	       /* d/dx from G* d/dx WF */
+	       buf->ToKspace();
+	       if (i==j)
+		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
+	       else
+		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -1/double(buf->size()) );
+	       
+	       buf->ToXspace();
+	       *destPsi += buf;
+	    }
  	 }
       }
       

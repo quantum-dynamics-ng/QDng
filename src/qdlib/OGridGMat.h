@@ -29,6 +29,8 @@ namespace QDLIB {
 	 WFGridSystem* buf;
 	 
 	 void _InitKspace (WFGridSystem *Psi);
+	 
+	 bool _NoKinCoup;
       public:
 	 OGridGMat();
       
