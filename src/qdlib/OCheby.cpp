@@ -102,23 +102,23 @@ namespace QDLIB
       
       *Psi += buf;
       
-      int i=2;
       dcomplex *k2, *bf, *k0, *psi;
 
-      while (i < _order){
+      int strides = Psi->strides();
+      int size = Psi->lsize();
+      
+      dcomplex exp2 = 2*_exp;
+	    
+      for (int i=2; i < _order; i++){
  	 _hamilton->Apply( buf, ket1);
-
 	 
-	 int strides = Psi->strides();
-	 int size = Psi->lsize();
-	 int s;
-	 for (s=0; s < strides; s++){
+	 for (int s=0; s < strides; s++){
 	    k2 = ket2->begin(s);
 	    bf = buf->begin(s);
 	    k0 = ket0->begin(s);
 	    psi = Psi->begin(s);
 	    for(int j=0; j< size; j++){
-	       bf[j] *= 2*_exp;
+	       bf[j] *= exp2;
 	       k2[j] = k0[j];
 	       k2[j] += bf[j];
 	       k0[j] = k2[j];
@@ -129,8 +129,6 @@ namespace QDLIB
 	 swap = ket1;
 	 ket1 = ket0;
 	 ket0 = swap;
-	 i++;
-
       }
 
       return Psi;
