@@ -85,6 +85,11 @@ int main(int argc, char **argv)
 	    ProgPropa propa(rnodes);
 	    cout << "\n\t\t\t*** Run Propagation ***\n\n";
 	    propa.Run();
+	 }
+	 if (progname == "propa"){
+	    ProgPropa propa(rnodes);
+	    cout << "\n\t\t\t*** Run Propagation ***\n\n";
+	    propa.Run();
 	 } else if (progname == "eigen") {
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
 	 } else if (progname == "oct") {
