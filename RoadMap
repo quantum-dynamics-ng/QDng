@@ -1,0 +1,39 @@
+* MPI
+ * Vector Classes
+ * Matrix Classes
+ * Check loops over elements
+ * transparent task/calc level scheme
+
+* I/O
+ * MPI-IO
+ * HDF5
+
+* Propgramm types
+ * Eigen (=> SPO,Cheby with real exponents)
+ * OCT (Krotov, freq-shape)
+
+* Matrix Class
+ * Efficient Storage Scheme for Symmetric
+ * -"- Hermitian 
+ * Band Matrix
+
+* Operators to implement
+ * Dipole Operator
+ * SIL
+ * SOD
+ * Filter systems (eg. Filtering after every propagation step)
+
+* Multistate System
+ * efficient SPO Scheme
+ * matrix system
+
+* FFT
+ * Decouple Intialiazation
+ * Plan buffering
+ * MPI-FFT (how to combine with distribution?)
+
+* Density Matrix operations
+ * Faber propagator
+ * basic operations types for density matrices
+
+
