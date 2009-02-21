@@ -62,6 +62,7 @@ namespace QDLIB {
       cout << "Propagation parameters:\n\n";
       cout << "\tNumber of steps: " <<  clock->Steps() << endl;
       cout.precision(2); cout << "\tTime step: " << fixed << clock->Dt() << endl;
+      cout.precision(2); cout << "\tWrite cycles: " << _wcycle << endl;
       cout.precision(2); cout << "\tOverall time: " << fixed << clock->Steps() * clock->Dt() << endl;
       cout << "\tBasename for wave function output: " << _fname << endl;
       cout.precision(6); cout << scientific;

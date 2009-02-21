@@ -213,18 +213,15 @@ namespace QDLIB {
 	    if (!(i != j && _NoKinCoup)){ /* Kinetic coupling ?*/
 	       *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	       /* Multiply Gmatrix element */
-	       if ( j>i)
+	       if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
 	         MultElements( (cVec*) buf, (dVec*) _Gmat[j][i]);
 	       else
 	         MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
 	       /* d/dx from G* d/dx WF */
 	       buf->ToKspace();
-// 	       if (i==j)
-		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
-// 	       else
-// 		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -1/double(buf->size()) );
-	       
+	       MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
 	       buf->ToXspace();
+	       
 	       *destPsi += buf;
 	    }
  	 }

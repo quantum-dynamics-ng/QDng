@@ -59,7 +59,6 @@ namespace QDLIB
 	 if (_energy) cout << "\tEnergy[au]";
 	 cout << endl;
       }
-      if (clock->TimeStep() % _wcycle != 0) return;
       _step++;
       
       /* Write time */
@@ -108,18 +107,27 @@ namespace QDLIB
 	 FFT fftw(_specbuf, spec,true);
 	 ofstream ofile;
 	 
-	 
+	 /* Autocorellation power spectrum */
 	 try {
 	  ofile.open(_specname.c_str());
 	  if (!ofile.is_open()) throw;
 	  
 	  fftw.forward();
 	  
-	  for (lint i=0; i < _specbuf.size(); i++){
-	     ofile << i << "\t" << cabs(spec[i]) / (clock->Steps()/2) << endl;
+	  int N = _specbuf.size();
+	  double dw = M_PI / (clock->Dt() * clock->Steps());
+		   
+	  for (lint i=0; i < N; i++){
+	     /* Frequency axis in angualar frequency */
+	     if (i < N/2)
+	        ofile << i * dw;
+	     else
+		ofile << -(N-i) * dw;
+	     
+	     ofile << "\t"<< cabs(spec[i]) / (clock->Steps()/2) << endl;
 	  }
 	  ofile.close();
-	     
+	  cout << "Autocorellation power spectrum written to file: " << _specname.c_str() << endl << endl;
 	 }  catch (...)
 	 {cout << "!!! Can't write auto correlation spectrum\n\n";}
 	  
