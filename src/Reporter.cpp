@@ -115,7 +115,7 @@ namespace QDLIB
 	  fftw.forward();
 	  
 	  int N = _specbuf.size();
-	  double dw = M_PI / (clock->Dt() * clock->Steps());
+	  double dw = 2*M_PI / (clock->Dt() * clock->Steps());
 		   
 	  for (lint i=0; i < N; i++){
 	     /* Frequency axis in angualar frequency */

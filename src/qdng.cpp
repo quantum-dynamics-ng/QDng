@@ -80,13 +80,11 @@ int main(int argc, char **argv)
       /* Loop over program nodes */
       while (rnodes.EndNode()) {
 	 progname = rnodes.Name();
-	 
 	 if (progname == "propa"){
 	    ProgPropa propa(rnodes);
 	    cout << "\n\t\t\t*** Run Propagation ***\n\n";
 	    propa.Run();
-	 }
-	 if (progname == "auto"){
+	 } else if (progname == "auto"){
 /*	    ProgAuto autoc(rnodes);
 	    cout << "\n\t\t\t*** Run Autocorrelation ***\n\n";
 	    autoc.Run();*/

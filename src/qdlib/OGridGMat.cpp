@@ -165,8 +165,9 @@ namespace QDLIB {
       
       /* Calc Tmax on the Grid */
       double T=0;
-      
-      if (_size == 2 ){ // Quick diag
+      if (_size == 1 ){ // Simple case
+	 T = VecMin(*(_Gmat[0][0])) / (GridSystem::Dx(0) * GridSystem::Dx(0));
+      } else  if (_size == 2 ){ // Quick diag
 	 double g0, g1, g10, t0, t1;
 	 g0 =  VecMin(*(_Gmat[0][0]));
 	 g1 = VecMin(*(_Gmat[1][1]));
