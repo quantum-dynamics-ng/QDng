@@ -10,7 +10,7 @@ namespace QDLIB
     * a single coordinate in the array.
     * 
     * The order in the dimension numbering is x,y,z,...
-    * that the fastest varing index has the highest number.
+    * that the <b>fastest</b> varing index has the <b>lowest</b> number.
     */
    template <class T>
    class VectorView

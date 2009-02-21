@@ -287,7 +287,7 @@ namespace QDLIB {
          file.write((char*) data->begin(i), data->sizeBytes() );
          if( file.bad() ) throw( EIOError("Can not write binary file") );
       }
-      
+      file.close();
    
    }
    
@@ -298,7 +298,11 @@ namespace QDLIB {
       if (!_drop_meta){
 	 KeyValFile file(_name + METAFILE_SUFFIX);
 	 ParamContainer p;
-	 if ( !file.Parse(p) ) throw( EIOError("Can not read meta file") );
+	 if ( !file.Parse(p) ) {
+	    string e;
+	    e = "Can not read meta file: " + _name + METAFILE_SUFFIX;
+	    throw( EIOError(e.c_str()) );
+	 }
 	 data->Init(p);
       }
    }
@@ -338,7 +342,9 @@ namespace QDLIB {
       for(int i=0; i < data->strides(); i++){
 	 file.read((char*) data->begin(i), data->sizeBytes());
 	 if( file.fail() || file.eof() ){
-	    throw( EIOError("Can not read binary file") );
+	    string e;
+	    e = "Can not read binary file: " + s;
+	    throw( EIOError(e.c_str()) );
 	 }
       }
 	  

@@ -86,6 +86,9 @@ namespace QDLIB {
     
   }; /*struct dcomplex*/
   
+  /* Dummies to allow carry out complex conjugation no matter if real or complex */
+  inline double conj(double d){return d;}
+  inline dcomplex conj(dcomplex c){return c.conj();}
   
   /*
   Operator Definitions

@@ -51,7 +51,7 @@ namespace QDLIB
     * \param length Desired length of the grid.
     * \param Nx     number of points.
     */
-   dVec* Kspace::Init1Dddx(const double length, const int Nx)
+   dVec* Kspace::Init1Dddx(const double length, const int Nx, const double factor)
    {
       dVec *kspace;
    
@@ -62,8 +62,8 @@ namespace QDLIB
      
 //       if (Nx % 2 == 0){ /* even + odd grid points */
 	 for (int i=0; i < Nx / 2; i++){ //run from [-p..dp] and [0..p-dp]
-	    (*kspace)[i] = double(i) * dp;
-	    (*kspace)[Nx - i - 1] = -1*double(i+1)* dp;
+	    (*kspace)[i] = double(i) * dp * factor;
+	    (*kspace)[Nx - i - 1] = -1*double(i+1)* dp * factor;
 	 }
 //       } else {
 // 	 (*kspace)[0] = 0; 

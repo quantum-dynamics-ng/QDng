@@ -179,7 +179,7 @@ namespace QDLIB {
 
    /**
     * \todo clean Vector view.
-    * \bug dimensions are inverse => x is the fastest!
+    * \bug dimensions are inverse => x (lowest number ) is the fastest!
     */
    void OGridNablaSq::InitKspace()
    {
@@ -195,16 +195,32 @@ namespace QDLIB {
       *_kspace = 0;
       dVecView view(*_kspace, GridSystem::Dim(), GridSystem::DimSizes());
    
+//       ofstream kfile;
       /* Init k-space for every dimension */
       for (int i=0; i < GridSystem::Dim(); i++){ 
 	 if (_mass[i] > 0) {
+// 	    stringstream ss;
+// 	    ss << "kfile_";
+// 	    ss << i;
+// 	    kfile.open(ss.str().c_str());
 	    kspace1 = Kspace::Init1Dd2dx2(_mass[i], GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i) );
+// 	    kfile << *kspace1;
 	    view.ActiveDim(i);
 	    view += *kspace1;
 	    delete kspace1;
+// 	    kfile.close();
 	 }
       }
       
+//       kfile.open("kfile_all");
+//       int k=0;
+//       for (int i=0; i < GridSystem::DimSizes(1); i++){
+// 	 for (int j=0; j < GridSystem::DimSizes(0); j++){
+// 	    kfile << i << " " << j << " " << (*_kspace)[k] << endl;
+// 	    k++;
+// 	 }
+//       }
+//       kfile.close();
       
    }
 

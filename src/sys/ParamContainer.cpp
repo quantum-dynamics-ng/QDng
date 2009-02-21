@@ -153,7 +153,7 @@ namespace QDLIB {
    bool ParamContainer::GetValue(const string name, bool &value)
    {
       if ( _param_map.find(name) != _param_map.end()){
-         if (_param_map[name] == "true") value = true;
+         if (_param_map[name] == string("true")) value = true;
 	 else value = false;
          return true;
       }

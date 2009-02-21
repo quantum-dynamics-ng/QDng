@@ -135,6 +135,7 @@ namespace QDLIB {
       _H = _h->NewInstance();
       *_H = _h; 
 
+      cout << "Initial engergy: " << _H->Expec(Psi) << endl;
       /* Give the reporter module what it needs */
       _reporter.PsiInitial( Psi );
       _reporter.Hamilton( _H );

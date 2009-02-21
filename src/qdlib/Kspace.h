@@ -18,7 +18,7 @@ namespace QDLIB {
 	 }
 	 
 	 static dVec* Init1Dd2dx2(const double mass, const double length, const int Nx);
-	 static dVec* Init1Dddx(const double length, const int Nx);
+	 static dVec* Init1Dddx(const double length, const int Nx, const double factor = 1);
    };
 }
 

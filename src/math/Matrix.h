@@ -33,6 +33,33 @@
 namespace QDLIB
 {
 
+   
+   /**
+    * Matrix class for general purpose operations
+    */
+//    template<class T>
+//    class Matrix
+//    {
+//       public:
+// 	 typedef enum {full, band, packed} StorageType;
+// 	 typedef enum {generic, symmetric, hermitian} MatrixType;
+// 
+//       private:
+// 	 void initialize(lint i, lint j);
+// 	 
+//       public:
+// 	 Matrix(lint M);
+// 	 Matrix(lint M, lint N);
+// 	 Matrix(lint M, lint N, const T& value);
+// 	 Matrix(lint M, lint N, MatrixType type);
+// 	 
+// 	 void newsize(lint size);
+// 	 void newsize(lint rows, lint cols);
+// 	 void newsize(lint rows, lint cols, MatrixType type);
+// 	 
+// 	 
+// 	 
+//    };
 
 /**
  * Dense matrix class for basic linear algebra operations.

@@ -171,13 +171,13 @@ namespace QDLIB {
 	 g0 =  VecMin(*(_Gmat[0][0]));
 	 g1 = VecMin(*(_Gmat[1][1]));
 	 g10 = VecMin(*(_Gmat[1][0]));
-	 
+	
 	 diag22symm(g0, g1, g10, t0, t1);
 	 
-	 if (t0 < t1)
-	    T = 1/ (t0*GridSystem::Dx(0) * GridSystem::Dx(0)) / 2;
-	 else
-	    T = 1/ (t1*GridSystem::Dx(1) * GridSystem::Dx(1)) / 2;	 
+	 cout << g0 << " " << g1 << " " << g10 << " " <<t0 << " " <<t1<<endl;
+	 cout << GridSystem::Dx(0) << " " <<GridSystem::Dx(1)<<endl;
+	 T = t0/ (GridSystem::Dx(0) * GridSystem::Dx(0));
+	 T += t1/ (GridSystem::Dx(1) * GridSystem::Dx(1));
       } else {
 	 for (int i=0; i < GridSystem::Dim(); i++)
 	    T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));
@@ -209,17 +209,20 @@ namespace QDLIB {
 	 _wfbuf[i]->ToKspace();
 	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(buf->size()) );
 	 _wfbuf[i]->ToXspace();
- 	 for (lint j=0; j <= i; j++){
+ 	 for (lint j=0; j < _size; j++){
 	    if (!(i != j && _NoKinCoup)){ /* Kinetic coupling ?*/
 	       *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	       /* Multiply Gmatrix element */
-	       MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
+	       if ( j>i)
+	         MultElements( (cVec*) buf, (dVec*) _Gmat[j][i]);
+	       else
+	         MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
 	       /* d/dx from G* d/dx WF */
 	       buf->ToKspace();
-	       if (i==j)
+// 	       if (i==j)
 		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
-	       else
-		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -1/double(buf->size()) );
+// 	       else
+// 		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -1/double(buf->size()) );
 	       
 	       buf->ToXspace();
 	       *destPsi += buf;
@@ -280,7 +283,7 @@ namespace QDLIB {
    
    Operator* OGridGMat::Scale(const double d)
    {
-      for (lint i=0; i < GridSystem::Dim(); i++)
+      for (lint i=0; i < _size; i++)
          MultElements(&_kspace[i], sqrt(d));
       return this;
    }
