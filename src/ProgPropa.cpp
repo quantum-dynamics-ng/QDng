@@ -8,8 +8,8 @@ namespace QDLIB {
 
    ProgPropa::ProgPropa(XmlNode & PropaNode) :
 	 _propaNode(PropaNode), _ContentNodes(NULL),
-	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _U(NULL), _H(NULL),
-	 _usepost(false)
+	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _dir(""),
+         _U(NULL), _H(NULL), _usepost(false), _usepre(false)
    {
    }
    
@@ -55,11 +55,18 @@ namespace QDLIB {
 	 _reporter.WriteCycle(_wcycle);
       }
       
+      /* Init propagation output dir */
+      if ( attr.isPresent("dir") ) {
+	 attr.GetValue("dir", _dir);
+	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
+	    _dir += "/";
+      }
+      
       /* Init propagation file basename */
       if ( attr.isPresent("fname") ) {
 	 attr.GetValue("fname", _fname);
       }
-      
+            
       cout << "Propagation parameters:\n\n";
       cout << "\tNumber of steps: " <<  clock->Steps() << endl;
       cout.precision(2); cout << "\tTime step: " << fixed << clock->Dt() << endl;
@@ -91,7 +98,7 @@ namespace QDLIB {
       }
       if ( attr.isPresent("spectrum") ) {
 	 attr.GetValue("spectrum", s);
-	 _reporter.Spectrum( s );
+	 _reporter.Spectrum( _dir+s );
       }
 
       
@@ -134,7 +141,7 @@ namespace QDLIB {
       /* Pre step filters */
       section = _ContentNodes->FindNode( "filterpre" );
       if (section != NULL) {
-	 string s(DEFAULT_EXPEC_PRE_FILENAME);
+	 string s(_dir+DEFAULT_EXPEC_PRE_FILENAME);
 	 cout << "Using pre propagation step filters:\n\n";
 	 _prefilter.SetDefaultName(s);
 	 _prefilter.Init( section );
@@ -145,7 +152,7 @@ namespace QDLIB {
       /* Post step filters */
       section = _ContentNodes->FindNode( "filterpost" );
       if (section != NULL) {
-	 string s(DEFAULT_EXPEC_POST_FILENAME);
+	 string s(_dir+DEFAULT_EXPEC_POST_FILENAME);
 	 cout << "Using post propagation step filters:\n\n";
 	 _prefilter.SetDefaultName(s);
 	 _postfilter.Init( section );
@@ -182,7 +189,7 @@ namespace QDLIB {
       /* Init file writer for wf output */
       FileWF wfile;
       
-      wfile.Name(_fname);
+      wfile.Name(_dir+_fname);
      
       wfile.Suffix(BINARY_WF_SUFFIX);
       wfile.ActivateSequence();
@@ -191,7 +198,7 @@ namespace QDLIB {
       /* The propagation loop */
       for (lint i=0; i <= clock->Steps(); i++){
 	 _reporter.Analyze( Psi );      /* propagation report. */
-	_U->Apply(Psi);                     /* Propagate */
+	_U->Apply(Psi);                 /* Propagate */
 	if (_usepost)
 	   _postfilter.Apply( Psi );
 	if (i % _wcycle == 0) wfile << Psi;  /* Write wavefunction */

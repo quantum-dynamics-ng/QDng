@@ -25,6 +25,7 @@ namespace QDLIB {
     * \li steps   number of time steps [required]
     * \li wcycle  number of step to make until a wf will be written and the reporter will analyze.
     * \li fname   basename for the propagated files.
+    * \li dir     Output directory
     * 
     * printing options:
     * \li norm    yes/no  print norm in the report.
@@ -44,6 +45,7 @@ namespace QDLIB {
 	 int _wcycle;     /* Write rate */
 	 Reporter _reporter;
 	 string _fname;
+	 string _dir;
 	 
 	 OPropagator *_U;
 	 Operator *_H;
