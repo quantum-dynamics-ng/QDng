@@ -33,7 +33,7 @@ namespace QDLIB {
 	       
 	 int* DimSizes();
 	 
-	 int Size();
+	 int Size() const;
 	 
 	 void DimSizes(const int dim, const int size);
 	       

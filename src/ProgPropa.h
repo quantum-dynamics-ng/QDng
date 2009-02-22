@@ -11,6 +11,10 @@
 #define DEFAULT_WRITE_CYCLE 10
 #define DEFAULT_BASENAME "WF"
 
+#define DEFAULT_EXPEC_POST_FILENAME "expec_post.dat"
+#define DEFAULT_EXPEC_PRE_FILENAME "expec_post.dat"
+
+
 namespace QDLIB {
 
    /**
@@ -37,7 +41,7 @@ namespace QDLIB {
 	 XmlNode &_propaNode;
 	 XmlNode *_ContentNodes;
  
-	 int _wcycle;     /* Write and analyze rate */
+	 int _wcycle;     /* Write rate */
 	 Reporter _reporter;
 	 string _fname;
 	 
@@ -47,15 +51,18 @@ namespace QDLIB {
 	 FiltersList _postfilter;
 	 bool _usepost;
 	 
+	 FiltersList _prefilter;
+	 bool _usepre;
+
 	 void _InitParams();
 	 void _InitSumOperator();
 	 
       public:
 	 ProgPropa(XmlNode &PropaNode);
 	 ~ProgPropa();
-	 
-	 void Run();
-   
+	 	
+	void Run();
+	
    };
 
 }

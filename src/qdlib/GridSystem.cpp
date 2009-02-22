@@ -73,7 +73,7 @@ namespace QDLIB {
    /**
     * Absolute number of grid points.
     */
-   int GridSystem::Size()
+   int GridSystem::Size() const
    {
       int size=1;
       

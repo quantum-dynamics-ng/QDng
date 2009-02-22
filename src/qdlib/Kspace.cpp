@@ -10,6 +10,8 @@ namespace QDLIB
     * \param mass   reduced mass
     * \param length Desired length of the grid.
     * \param Nx     number of points.
+    * 
+    * \bug odd grids are wrong
     */
    dVec* Kspace::Init1Dd2dx2(const double mass, const double length, const int Nx)
    {
@@ -32,7 +34,7 @@ namespace QDLIB
       } else {
 	 (*kspace)[0] = 0; 
 	 for (int i=1; i < (Nx+1) / 2; i++){ //run from [-p..+p]
-	    (*kspace)[i] = (double(i) * double(i)) * dp;
+	    (*kspace)[i-1] = (double(i) * double(i)) * dp;
 	    (*kspace)[Nx - i] = (double(i+1) * double(i+1)) * dp;
 	 }
       }
@@ -50,6 +52,8 @@ namespace QDLIB
     * 
     * \param length Desired length of the grid.
     * \param Nx     number of points.
+    * 
+    * \bug odd grids are wrong
     */
    dVec* Kspace::Init1Dddx(const double length, const int Nx, const double factor)
    {

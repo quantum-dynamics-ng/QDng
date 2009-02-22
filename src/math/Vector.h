@@ -182,7 +182,7 @@ class Vector
    /**
     * Return a pointer to the local stride.
     */
-    T* begin(lint stride) { return v_[stride];}
+    inline T* begin(lint stride) { return v_[stride];}
     
     /**
      * Return a pointer to the tride set.

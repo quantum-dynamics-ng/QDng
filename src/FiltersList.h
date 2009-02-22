@@ -4,7 +4,8 @@
 #include "qdlib/Operator.h"
 #include "sys/XmlNode.h"
 
-#define MAX_FILTERS 32  /* Maximum number of filters */
+#define MAX_FILTERS 32           /* Maximum number of filters */
+#define DEFAULT_EXPEC_FILENAME "expec.dat"  /* Default filename for expectation values */
 
 namespace QDLIB {
 
@@ -27,15 +28,21 @@ namespace QDLIB {
 	 string _fname;
 	 bool _writefile;
 	 
+	 ofstream _ofile;
+	       
+	 void _destroy();
+	 
       public:
 	 FiltersList();
 	 ~FiltersList();
+	 
+	 void SetDefaultName(string &s);
 	 
 	 void Init(XmlNode* section);
 	 
 	 void Apply( WaveFunction *Psi );
    };
    
-   }
+}
 
 #endif

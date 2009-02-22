@@ -98,8 +98,6 @@ namespace QDLIB {
    }
 
 
-
-   
    /**
     * Run the propagation program.
     */
@@ -133,13 +131,28 @@ namespace QDLIB {
       delete section;
       
       
+      /* Pre step filters */
+      section = _ContentNodes->FindNode( "filterpre" );
+      if (section != NULL) {
+	 string s(DEFAULT_EXPEC_PRE_FILENAME);
+	 cout << "Using pre propagation step filters:\n\n";
+	 _prefilter.SetDefaultName(s);
+	 _prefilter.Init( section );
+	 _usepre = true;
+	 delete section;
+      }
+
+      /* Post step filters */
       section = _ContentNodes->FindNode( "filterpost" );
       if (section != NULL) {
+	 string s(DEFAULT_EXPEC_POST_FILENAME);
 	 cout << "Using post propagation step filters:\n\n";
+	 _prefilter.SetDefaultName(s);
 	 _postfilter.Init( section );
 	 _usepost = true;
 	 delete section;
       }
+      
       
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
            
@@ -174,7 +187,6 @@ namespace QDLIB {
       wfile.Suffix(BINARY_WF_SUFFIX);
       wfile.ActivateSequence();
       wfile << Psi;
-      
       
       /* The propagation loop */
       for (lint i=0; i <= clock->Steps(); i++){

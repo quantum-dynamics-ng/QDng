@@ -38,20 +38,16 @@ namespace QDLIB {
 	 throw ( EParamProblem ("Nabla operator needs at least one dimension") );
       GridSystem::Dim(n);
       
-      int i=0;
       char c[256];
       string s;
    
-      sprintf (c, "%d", i);
-      s = string("mass") + string(c);
-      while (i < n){
+      for (int i=0; i < n; i++){
+	 sprintf (c, "mass%d", i);
 	 if ( _params.isPresent(s) ) {
-	    _params.GetValue( string("mass") + string(c), _mass[i]);
+	    _params.GetValue( string(c), _mass[i]);
 	    if (_mass[i] == 0) throw ( EParamProblem ("Zero mass defined") );
-	 } else _mass[i] = -1;    /* Mark as -1 => don't build k-space */
-	 i++;
-	 sprintf (c, "%d", i);
-	 s = string("mass") + string(c);
+	 } else
+	    _mass[i] = -1;    /* Mark as -1 => don't build k-space */
       }
    }
 
@@ -158,11 +154,11 @@ namespace QDLIB {
       /* Copy parents */
       *((GridSystem*) this) = *((GridSystem*) org);
       
-      if (_kspace == NULL)
+      if (_kspace == NULL && org->_kspace != NULL){
 	 _kspace = new dVec();
-      
-      if (org->_kspace != NULL)
-         *_kspace = *(org->_kspace);
+	 *_kspace = *(org->_kspace);
+      }
+         
       
       for (int i=0; i < GridSystem::Dim(); i++){
 	 _mass[i] = org->_mass[i];

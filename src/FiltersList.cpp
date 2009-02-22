@@ -3,7 +3,8 @@
 
 namespace QDLIB {
 
-   FiltersList::FiltersList() : _size(0), _initalized(false),  _writefile(false)
+   FiltersList::FiltersList() : _size(0), _initalized(false),  _writefile(false),
+			    _fname(DEFAULT_EXPEC_FILENAME)
    {
       for (int i=0; i < MAX_FILTERS; i++){
 	 _olist[i] = NULL;
@@ -13,11 +14,33 @@ namespace QDLIB {
    
    FiltersList::~FiltersList()
    {
-      for (int i=0; i < MAX_FILTERS; i++){
-	 if (_olist[i] != NULL) delete _olist[i];
-      }
+      _destroy();
    }
    
+   /**
+    * Remove all operators.
+    */
+   void FiltersList::_destroy()
+   {
+      for (int i=0; i < MAX_FILTERS; i++){
+	 if (_olist[i] != NULL) {
+	    delete _olist[i];
+	    _olist[i] = NULL;
+	 }
+      }
+      _size = 0;
+      _initalized = false;
+      _writefile = false;
+      _ofile.close();
+   }
+   
+   /**
+    * Set the default filename for expectation value table output.
+    */
+   void FiltersList::SetDefaultName(string &s)
+   {
+      _fname = s;
+   }
    
    /**
     * Initialize the filter list
@@ -36,11 +59,12 @@ namespace QDLIB {
       
       if (section == NULL) return;
       
+      if (_size > 0) _destroy();
+      
       /* Check for output file name */
       params = section->Attributes();
       if (params.isPresent("fname")){
 	 params.GetValue("fname", _fname);
-	 _writefile = true;
       }
       
       /* Load the filter list*/
@@ -56,13 +80,14 @@ namespace QDLIB {
 	 faction = filters->Name();
 	 if (faction == "expec"){
 	    _action[_size] = expec;
-	    cout << "expec chosn\n";
+	    _writefile == true;
 	 }
 	 else if (faction == "apply")
 	    _action[_size] = apply;
-	 else if (faction == "expeconly")
+	 else if (faction == "expeconly"){
 	    _action[_size] = expeconly;
-	 else {
+	    _writefile == true;
+	 } else {
 	    string error("Unknown filter action provided: ");
 	    error += faction;
 	    throw EParamProblem (error.c_str());
@@ -71,28 +96,37 @@ namespace QDLIB {
 	 _size++;
 	 filters->NextNode();
       }
+      
+      if (_writefile){
+         _ofile.open(_fname.c_str());
+      }
    }
    
    /**
-    * Apply the filter list and print expecation values
+    * Apply the filter list and print expection values
     */
    void FiltersList::Apply( WaveFunction *Psi )
    {
-      bool print = false;
+      if (_size == 0) return;
+      
+      if (! _initalized){
+	 for(int i=0; i < _size; i++){
+	    _olist[i]->Init(Psi);
+	    if (_writefile)
+	       _ofile << Psi->Name() << "\t";
+	 }
+      }
       
       for(int i=0; i < _size; i++){
-	 if (! _initalized){
-	    _olist[i]->Init(Psi);
-	 }
 	 if (_action[i] == expec || _action[i] == expeconly){
-	    print = true;
-	    cout << _olist[i]->Expec(Psi) << "\t";
+	    _ofile << _olist[i]->Expec(Psi) << "\t";
 	 }	 
 	 if (_action[i] == apply || _action[i] == expec){
 	    _olist[i]->Apply(Psi);
 	 }
       }
-      if (print) cout << endl;
+      
+      if (_writefile) _ofile << endl;
       if (! _initalized) _initalized = true;
    }
    

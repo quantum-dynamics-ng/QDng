@@ -9,7 +9,7 @@ namespace QDLIB
 {
 
    /**
-    * Contains some methods to load Operator and WaveFunctions from XML input.
+    * Contains some methods to load Operators and WaveFunctions from XML input.
     * 
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */

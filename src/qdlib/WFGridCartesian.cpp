@@ -66,10 +66,6 @@ namespace QDLIB {
       return _name;
    }
 
-   int  WFGridCartesian::ID()
-   {
-      return 0;
-   }
 
    double WFGridCartesian::Norm()
    {

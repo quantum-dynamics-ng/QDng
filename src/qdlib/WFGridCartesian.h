@@ -31,8 +31,6 @@ namespace QDLIB {
 	       virtual void Init(ParamContainer &params);
 	       
 	       virtual const string& Name();
-	       
-	       virtual int ID();
 		  
 	       virtual double Norm();
 	       

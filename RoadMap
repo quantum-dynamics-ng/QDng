@@ -12,6 +12,7 @@
 * Propgramm types
  * Eigen (=> SPO,Cheby with real exponents)
  * OCT (Krotov, freq-shape)
+ * Pump Probe Spectroscopy simulation
 
 * Matrix Class
  * Efficient Storage Scheme for Symmetric
@@ -22,7 +23,7 @@
  * Dipole Operator
  * SIL
  * SOD
- * Filter systems (eg. Filtering after every propagation step)
+ * Projection Operator
 
 * Multistate System
  * efficient SPO Scheme
