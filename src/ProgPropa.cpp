@@ -197,10 +197,10 @@ namespace QDLIB {
       
       /* The propagation loop */
       for (lint i=0; i <= clock->Steps(); i++){
+	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
 	_U->Apply(Psi);                 /* Propagate */
-	if (_usepost)
-	   _postfilter.Apply( Psi );
+	if (_usepost) _postfilter.Apply( Psi );/* Apply post-filters*/
 	if (i % _wcycle == 0) wfile << Psi;  /* Write wavefunction */
 	++(*clock);                     /* Step the clock */
       }
@@ -210,8 +210,4 @@ namespace QDLIB {
    }
 
 }
-
-
-
-
 
