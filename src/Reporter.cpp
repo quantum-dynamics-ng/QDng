@@ -6,8 +6,8 @@ namespace QDLIB
 {
 
    Reporter::Reporter() :
-	 _wcycle(10), _norm(true), _energy(false), _proj0(false), _spectrum(false),
-         _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
+	 _wcycle(10), _norm(true), _energy(false), _proj0(false), _proj0Sq(false),
+         _spectrum(false), _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
    {}
 
 
@@ -48,15 +48,14 @@ namespace QDLIB
       QDClock *clock = QDGlobalClock::Instance();
       dcomplex proj;
    
-       
-      
       /* Write header */
       if (_step == 0){
  	 _specbuf.newsize(clock->Steps()+1);
 	 cout << "Step\tTime[au]";
 	 if (_norm) cout << "\tNorm";
-	 if (_proj0) cout << "\t<Psi0|PsiT>";
-	 if (_energy) cout << "\tEnergy[au]";
+	 if (_proj0 && !_proj0Sq) cout << "\t\t<Psi0|PsiT>";
+	 if (_proj0 && _proj0Sq) cout << "\t\t|<Psi0|PsiT>|^2";
+	 if (_energy) cout << "\t\tEnergy[au]";
 	 cout << endl;
       }
       _step++;
@@ -74,11 +73,18 @@ namespace QDLIB
       /* projection and spectrum */
       if (_proj0){
 	 proj = *_psi0 * Psi;
-	 cout << "\t\t" << proj;
-      
+	 
+	 if (_proj0Sq) /* Squared - Normal*/
+	    cout << "\t" << cabs(proj)*cabs(proj);
+	 else
+	    cout << "\t" << proj;
+	 
 	 if (_spectrum)
 	 {
-	    _specbuf[_step-1] = proj;
+	    if (_proj0Sq)
+	       _specbuf[_step-1] = cabs(proj)*cabs(proj);
+	    else
+	       _specbuf[_step-1] = proj;
 	 }
       }
    

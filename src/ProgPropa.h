@@ -25,6 +25,7 @@ namespace QDLIB {
     * \li norm    yes/no  print norm in the report.
     * \li energy  yes/no  print the Energy in the report.
     * \li proj0   yes/no  print the projection against in the initial wave function.
+    * \li proj0Abs  yes/no  print the absolute square of the projection against in the initial wave function.
     * \li spectrum   filename  if given a the projection against the inital wavefunction is turned on.
     *                          The power spectrum of the propagagation will be written.
     * 

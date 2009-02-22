@@ -19,6 +19,7 @@ namespace QDLIB
 	 bool _norm;
 	 bool _energy;
 	 bool _proj0;
+	 bool _proj0Sq;
 	 bool _spectrum;
 	 
 	 WaveFunction *_psi0;
@@ -54,8 +55,15 @@ namespace QDLIB
 	 
 	 /** Autocorellation */
 	 bool Proj0() const { return _proj0; }
+	 
 	 /** Autocorellation */
 	 void Proj0(bool on) { _proj0 = on; }
+	 
+	 /** Absolute square off the Autocorrelation **/
+	 void Proj0Square(bool on) {_proj0Sq = on; _proj0 = on; }
+	 
+	 /** Absolute square off the Autocorrelation **/
+	 bool Proj0Square() { return _proj0Sq; }
 	 
 	 /** Auto correllation spectrum on?*/
 	 bool Spectrum() const { return _spectrum; }

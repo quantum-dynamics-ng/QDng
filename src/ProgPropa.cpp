@@ -83,6 +83,11 @@ namespace QDLIB {
 	 if (s == "yes") _reporter.Proj0( true );
 	 else _reporter.Proj0( false );
       }
+      if ( attr.isPresent("proj0Abs") ) {
+	 attr.GetValue("proj0Abs", s);
+	 if (s == "yes") _reporter.Proj0Square( true );
+	 else _reporter.Proj0( false );
+      }
       if ( attr.isPresent("spectrum") ) {
 	 attr.GetValue("spectrum", s);
 	 _reporter.Spectrum( s );
