@@ -6,6 +6,7 @@
 #include "sys/QDGlobalClock.h"
 #include "qdlib/OPropagator.h"
 #include "Reporter.h"
+#include "FiltersList.h"
 
 #define DEFAULT_WRITE_CYCLE 10
 #define DEFAULT_BASENAME "WF"
@@ -42,6 +43,9 @@ namespace QDLIB {
 	 
 	 OPropagator *_U;
 	 Operator *_H;
+	 
+	 FiltersList _postfilter;
+	 bool _usepost;
 	 
 	 void _InitParams();
 	 void _InitSumOperator();

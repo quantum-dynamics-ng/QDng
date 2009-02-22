@@ -33,7 +33,7 @@ namespace QDLIB {
 	 int _order;           /* filter order */
 	 bool _nip;            /* Negative imaginary potential */
 	 
-	 void _Init(GridSystem *Psi);
+	 void _Init();
       public:
 	 OGobbler();
       
@@ -43,6 +43,8 @@ namespace QDLIB {
 	 virtual Operator* NewInstance();
 		  
 	 virtual void Init(ParamContainer &params);
+	 
+	 virtual void Init(WaveFunction *Psi);
 	 
 	 virtual const string& Name();
 	 
@@ -56,9 +58,9 @@ namespace QDLIB {
 	 
 	 virtual double Emin(){return 0;}
 	 
-	 virtual WaveFunction* operator*(WaveFunction *Psi);
+	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
-	 virtual WaveFunction* operator*=(WaveFunction *Psi);
+	 virtual WaveFunction* Apply(WaveFunction *Psi);
 	 
 	 virtual Operator* operator=(Operator* O);
 	 

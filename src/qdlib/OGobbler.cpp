@@ -23,12 +23,13 @@ namespace QDLIB {
    /**
     * Set up the filter grid.
     */
-   void OGobbler::_Init(GridSystem * grid)
+   void OGobbler::_Init()
    {
       dVec filter;
       double x;
       
-      *((GridSystem*) this) = *grid;
+      
+      dVec::newsize(GridSystem::Size());
       
       *((dVec*) this) = 1;
       dVecView view( *((dVec*) this), GridSystem::Dim(), GridSystem::DimSizes());
@@ -42,7 +43,7 @@ namespace QDLIB {
 	    
 	    filter.newsize(GridSystem::DimSizes(i));
 	    Butterworth<dVec>::Lowpass(filter, x, _order);
-	    
+	
 	    view.ActiveDim(i);
 	    view *= filter;
 	 }
@@ -52,7 +53,7 @@ namespace QDLIB {
 	       throw ( EParamProblem ("Center of filter edge out of the grid") );
 	    
 	    filter.newsize(GridSystem::DimSizes(i));
-	    Butterworth<dVec>::Lowpass(filter, x, _order);
+	    Butterworth<dVec>::Highpass(filter, x, _order);
 	    
 	    view.ActiveDim(i);
 	    view *= filter;
@@ -89,26 +90,25 @@ namespace QDLIB {
    
       int i=0;
       char c[256];
-      sprintf (c, "%d", i);
-      s = string("N") + string(c);
-      for (i=0; i < GridSystem::Dim(); i++){
+
+      for (i=0; i < n; i++){
+	 sprintf (c, "%d", i);
 	 /* check the left pass */
 	 if (_params.isPresent(string("lp") + string(c))) {
 	    _params.GetValue(string("lp") + string(c), _lpx[i]);
+	    _lp[i] = true;
 	 } else _lp[i] = false;
 	    
 	 /* check the right pass */
-	 if (_params.isPresent(string("lp") + string(c))) {
-	    _params.GetValue(string("lp") + string(c), _rpx[i]);
+	 if (_params.isPresent(string("rp") + string(c))) {
+	    _params.GetValue(string("rp") + string(c), _rpx[i]);
+	    _rp[i] = true;
 	 } else _rp[i] = false;
 	 
-	 i++;
-	 sprintf (c, "%d", i);
       }
       
       /* negative imaginary potential */
       if (_params.isPresent("nip")) _nip = true;
-      else _nip = false;
       
       /* Gain value. */
       if (_params.isPresent("gain")){
@@ -116,6 +116,18 @@ namespace QDLIB {
 	 _params.GetValue("gain", gain);
 	 MultElements((cVec*) this, gain);
       }
+   }
+   
+   void OGobbler::Init(WaveFunction *Psi)
+   {
+      WFGridSystem* psi;
+      
+      psi = dynamic_cast<WFGridSystem*>(Psi);
+      if (psi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+      
+      *((GridSystem*) this) = *((GridSystem*) psi);
+      _Init();
    }
    
    Operator * OGobbler::NewInstance()
@@ -134,11 +146,17 @@ namespace QDLIB {
    dcomplex OGobbler::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
       WaveFunction *ket;
+      dcomplex c;
+	    
       
       ket = PsiKet->NewInstance();
-      *ket = PsiKet;
+    
+      Apply(ket, PsiKet);
       
-      return *PsiBra * ket;
+      c = *PsiBra * ket;
+      delete ket;
+      
+      return c;
    }
    
    double OGobbler::Expec(WaveFunction * Psi)
@@ -150,38 +168,34 @@ namespace QDLIB {
       return c.real();
    }
    
-   WaveFunction * OGobbler::operator *(WaveFunction * Psi)
+   WaveFunction * OGobbler::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       WFGridSystem *ket;
-      WaveFunction *psi;
+      WaveFunction *opPsi;
       
-      psi = Psi->NewInstance();
-      ket = dynamic_cast<WFGridSystem*>(psi);
+      opPsi = dynamic_cast<WFGridSystem*>(destPsi);
+      if (opPsi == NULL)
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", sourcePsi->Name()) );
+      
+      ket = dynamic_cast<WFGridSystem*>(sourcePsi);
       if (ket == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-      
-      if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init(ket);
+	 throw ( EIncompatible("Psi is not of type WFGridSystem", destPsi->Name()) );
       
       if (_nip) 
 	 MultElements( (cVec*) ket, (dVec*) this, dcomplex(0,-1));
       else 
-         MultElements( (cVec*) ket, (dVec*) this);
+	 MultElements((cVec*) opPsi, (cVec*) ket, (dVec*) this);
       
       return ket;
    }
    
-   WaveFunction * OGobbler::operator *=(WaveFunction * Psi)
+   WaveFunction * OGobbler::Apply(WaveFunction * Psi)
    {
       WFGridSystem *ket;
-      WaveFunction *psi;
       
-      psi = Psi->NewInstance();
-      ket = dynamic_cast<WFGridSystem*>(psi);
+      ket = dynamic_cast<WFGridSystem*>(Psi);
       if (ket == NULL)
 	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-      
-      
-      if ( *((GridSystem*) this) != *((GridSystem*) ket) ) _Init((GridSystem*) ket);
       
       if (_nip)
          MultElements( (cVec*) ket, (dVec*) this, dcomplex(0,-1));
@@ -211,7 +225,7 @@ namespace QDLIB {
 	 throw ( EIncompatible("O is not of type OGridSystem", O->Name()) );
       
       
-      if ( *((GridSystem*) this) != *((GridSystem*) op) ) _Init( (GridSystem*) op);
+      if ( *((GridSystem*) this) != *((GridSystem*) op) ) _Init();
       
       MultElements( (dVec*) op, (dVec*) this);
       

@@ -8,7 +8,8 @@ namespace QDLIB {
 
    ProgPropa::ProgPropa(XmlNode & PropaNode) :
 	 _propaNode(PropaNode), _ContentNodes(NULL),
-	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _U(NULL), _H(NULL)
+	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _U(NULL), _H(NULL),
+	 _usepost(false)
    {
    }
    
@@ -131,17 +132,25 @@ namespace QDLIB {
       Psi = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
       
+      
+      section = _ContentNodes->FindNode( "filterpost" );
+      if (section != NULL) {
+	 cout << "Using post propagation step filters:\n\n";
+	 _postfilter.Init( section );
+	 _usepost = true;
+	 delete section;
+      }
+      
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
            
       /* Make sure our hamiltonian is initalized */
       _h->Init(Psi);
       cout << "Initial engergy: " << _h->Expec(Psi) << endl;
       
-      /* Copy, since the propagator will propably scale it etc. */
+      /* Copy, since the propagator will propably scale it/modify etc. */
       _H = _h->NewInstance();
       *_H = _h; 
 
-      cout << "Initial engergy: " << _H->Expec(Psi) << endl;
       /* Give the reporter module what it needs */
       _reporter.PsiInitial( Psi );
       _reporter.Hamilton( _H );
@@ -171,6 +180,8 @@ namespace QDLIB {
       for (lint i=0; i <= clock->Steps(); i++){
 	 _reporter.Analyze( Psi );      /* propagation report. */
 	_U->Apply(Psi);                     /* Propagate */
+	if (_usepost)
+	   _postfilter.Apply( Psi );
 	if (i % _wcycle == 0) wfile << Psi;  /* Write wavefunction */
 	++(*clock);                     /* Step the clock */
       }

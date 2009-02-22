@@ -64,6 +64,13 @@ namespace QDLIB
       return p;
    }
    
+   Operator* INT_OGobbler()
+   {
+      OGobbler *p;
+      p = new OGobbler ();
+      return p;
+   }
+
    
    WaveFunction* INT_WFGridCartesian()
    {
@@ -96,6 +103,7 @@ namespace QDLIB
       if (name == "INT_OGridNablaSq") return &INT_OGridNablaSq;
       if (name == "INT_OGridGmat") return &INT_OGridGMat;
       if (name == "INT_OGridPotential") return &INT_OGridPotential;
+      if (name == "INT_OGobbler") return &INT_OGobbler;
       return NULL;
    }
 
