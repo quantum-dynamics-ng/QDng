@@ -17,7 +17,7 @@ namespace QDLIB
    {
       public:
 	 static Operator* LoadOperatorChain( XmlNode *Onode );
-	 static WaveFunction* LoadWaveFunctionChain( XmlNode *WFNode );
+	 static WaveFunction* LoadWaveFunctionChain( XmlNode *WFNode, bool empty=false);
 	 static OPropagator* LoadPropagator( XmlNode *Unode, Operator **Hamiltonian);
    };
 

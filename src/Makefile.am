@@ -21,15 +21,13 @@ libqdng_la_LIBADD = $(top_builddir)/src/sys/libtools.la \
 	$(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la
 
 bin_PROGRAMS = qdng
-qdng_SOURCES = ProgPropa.cpp qdng.cpp Reporter.cpp ChainLoader.cpp \
-	FiltersList.cpp
+qdng_SOURCES = ChainLoader.cpp FiltersList.cpp OProjection.cpp ProgEigen.cpp \
+	ProgPropa.cpp Reporter.cpp qdng.cpp
 qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/sys/libtools.la $(top_builddir)/src/math/libmath.la \
 	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la -L/opt/adm/fftw-latest/lib -lblas \
 	-llapack -lg2c -lfftw3 -lxml2
-noinst_HEADERS = ProgPropa.h Reporter.h ChainLoader.h ProgAutocorr.h \
-	FiltersList.h
+noinst_HEADERS = ChainLoader.h FiltersList.h OProjection.h ProgAutocorr.h \
+	ProgEigen.h ProgPropa.h Reporter.h
 AM_CXXFLAGS = -O3
 
-noinst_HEADERS = ProgPropa.h Reporter.h ChainLoader.h ProgAutocorr.h\
-	FiltersList.h

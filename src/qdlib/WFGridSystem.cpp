@@ -87,5 +87,3 @@ namespace QDLIB {
 } /* namespace QDLIB */
 
 
-
-

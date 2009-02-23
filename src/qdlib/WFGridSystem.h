@@ -36,7 +36,7 @@ namespace QDLIB {
          void ToKspace();
          
          void ToXspace();
-         
+	 
 	 void operator=(WFGridSystem *G);
 
          

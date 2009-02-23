@@ -84,7 +84,7 @@ namespace QDLIB
     * Works recursive.
     * 
     */
-   WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode )
+   WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, bool empty)
    {
       ModuleLoader* mods = ModuleLoader::Instance();
       ParamContainer pm;
@@ -106,7 +106,7 @@ namespace QDLIB
 	    child->NextNode();
 	 }
 	 return multi;
-      } else if (name == "LC"){
+      } else if (name == "LC"){ /* Further recursion for linear combination */
 	 cout << "Build linear combination from wave functions:" << endl;
 	 child = WFNode->NextChild();
 	 WaveFunction *wfadd;
@@ -133,23 +133,29 @@ namespace QDLIB
 	    WF->Normalize();
 	 }
 	 return WF; 
-      } else {
+      } else { /* load a specific wf */
 	 
 	 WF = mods->LoadWF( name );
 	 if (WF == NULL)
 	    throw ( EParamProblem("WaveFunction module loading failed") );
 	 
-	 pm.GetValue( "file", name );
-	 FileWF file;
-	 file.Suffix(BINARY_WF_SUFFIX);
-	 file.Name(name);
-	 cout << pm << "------------------\n" << endl;
-	 file >> WF;
-	 if ( pm.isPresent("normalize") ) {
-	    cout << "Normalizing...\n";
-	    WF->Normalize();
+	 if (!pm.isPresent("file") && !empty)
+	    throw ( EParamProblem("File for loading wave function given") );
+	 
+	 /* load wf */
+	 if (!empty){
+	    pm.GetValue( "file", name );
+	    FileWF file;
+	    file.Suffix(BINARY_WF_SUFFIX);
+	    file.Name(name);
+	    file >> WF;
+	    if ( pm.isPresent("normalize") ) {
+	       cout << "Normalizing...\n";
+	       WF->Normalize();
+	    }
 	 }
 	 
+	 cout << pm << "------------------\n" << endl;
       }
       return WF;
    }
