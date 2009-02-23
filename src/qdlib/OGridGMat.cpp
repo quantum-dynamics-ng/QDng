@@ -59,8 +59,13 @@ namespace QDLIB {
    void OGridGMat::Init(WaveFunction *Psi)
    {
       buf = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
+            
       if (buf == NULL)
 	 throw (EIncompatible ("Psi not a WFGridSystem"), Psi->Name() );
+      
+/*      if ( *((GridSystem*) this) == *((GridSystem*) buf) )
+	 throw (EIncompatible ("Gmatrix: Different Grid parameters!"));*/
+      
       for (int i=0; i < _size; i++){
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*> (Psi->NewInstance());
       }
@@ -126,6 +131,7 @@ namespace QDLIB {
 	       s = name + string("_") + string(si) + string(sj);
 	       file.Name(s);
 	       file >> ((OGridSystem*) _Gmat[i][j]);
+	       //*((GridSystem*) this) = *((GridSystem*) _Gmat[i][j]);
 	    }
 	 }
       }

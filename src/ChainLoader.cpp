@@ -145,6 +145,10 @@ namespace QDLIB
 	 file.Name(name);
 	 cout << pm << "------------------\n" << endl;
 	 file >> WF;
+	 if ( pm.isPresent("normalize") ) {
+	    cout << "Normalizing...\n";
+	    WF->Normalize();
+	 }
 	 
       }
       return WF;

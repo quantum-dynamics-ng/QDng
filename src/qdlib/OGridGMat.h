@@ -13,6 +13,10 @@ namespace QDLIB {
     * \li dims       Number of internal coordiantes
     * \li gmat   G-matrix element file name
     * 
+    * \bug Segfault when grid different from wavefunction (improve error checking)
+    * \todo possibility to turn of specific matrix elements
+    * \todo enable constant-g mode / mixed g-mode
+    * 
     * @author Markus Kowalewski
     */
    class OGridGMat : public Operator, public GridSystem

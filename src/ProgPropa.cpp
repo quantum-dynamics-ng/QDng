@@ -154,7 +154,7 @@ namespace QDLIB {
       if (section != NULL) {
 	 string s(_dir+DEFAULT_EXPEC_POST_FILENAME);
 	 cout << "Using post propagation step filters:\n\n";
-	 _prefilter.SetDefaultName(s);
+	 _postfilter.SetDefaultName(s);
 	 _postfilter.Init( section );
 	 _usepost = true;
 	 delete section;

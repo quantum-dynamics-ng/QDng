@@ -12,7 +12,7 @@
 #define DEFAULT_BASENAME "WF"
 
 #define DEFAULT_EXPEC_POST_FILENAME "expec_post.dat"
-#define DEFAULT_EXPEC_PRE_FILENAME "expec_post.dat"
+#define DEFAULT_EXPEC_PRE_FILENAME "expec_pre.dat"
 
 
 namespace QDLIB {

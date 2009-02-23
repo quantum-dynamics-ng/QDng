@@ -80,13 +80,13 @@ namespace QDLIB {
 	 faction = filters->Name();
 	 if (faction == "expec"){
 	    _action[_size] = expec;
-	    _writefile == true;
+	    _writefile = true;
 	 }
 	 else if (faction == "apply")
 	    _action[_size] = apply;
 	 else if (faction == "expeconly"){
 	    _action[_size] = expeconly;
-	    _writefile == true;
+	    _writefile = true;
 	 } else {
 	    string error("Unknown filter action provided: ");
 	    error += faction;
@@ -98,6 +98,7 @@ namespace QDLIB {
       }
       
       if (_writefile){
+	 cout << _fname << "<- logfile\n";
          _ofile.open(_fname.c_str());
       }
    }
@@ -113,10 +114,12 @@ namespace QDLIB {
 	 for(int i=0; i < _size; i++){
 	    _olist[i]->Init(Psi);
 	    if (_writefile)
-	       _ofile << Psi->Name() << "\t";
+	       _ofile << _olist[i]->Name() << "\t";
 	 }
+	 if (_writefile)
+	    _ofile << endl;
       }
-      
+      	 
       for(int i=0; i < _size; i++){
 	 if (_action[i] == expec || _action[i] == expeconly){
 	    _ofile << _olist[i]->Expec(Psi) << "\t";
