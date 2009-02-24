@@ -97,4 +97,44 @@ namespace QDLIB {
       }
       return ierr;
    }
+   
+   int BesselI0( int n, double arg, dVec & coeffs, int & zeroes )
+   {
+      double alpha =0;
+      double argIm =0;
+      int nz;
+      dVec bRe, bIm;
+      int kode=1;    /* taken from qdmpi*/
+      int ierr;
+      
+      if (n==0) return -1;
+      
+      coeffs.newsize(n);
+      bIm.newsize(n);
+//       (ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)
+      zbesj_(&arg, &argIm, &alpha, &kode, &n, (double*) coeffs.begin(0), (double*) bIm.begin(0), &zeroes, &ierr);
+      
+      //if (nz > 0) cout << "\n\n*** Bessel underflow warning : " << nz << "\n";
+      switch (ierr) {
+	 case 0: break;
+	 case 1:
+	    cout << "\n\n*** Bessel error : Input error\n";
+	    break;
+	 case 2:
+	    cout << "\n\n*** Bessel error : Overflow\n";
+	    break;
+	 case 3:
+	    cout << "\n\n*** Bessel warning : Precision warning\n";
+	    break;
+	 case 4:
+	    cout << "\n\n*** Bessel warning : Precision error\n";
+	    break;
+	 case 5:
+	    cout << "\n\n*** Bessel warning : Algorithmic error\n";
+	    break;
+	    
+      }
+      return ierr;
+   }
 }
+

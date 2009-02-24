@@ -12,6 +12,7 @@ namespace QDLIB {
       double *cRe, double *cIm, int *nz, int *ierr); }
    
    extern int BesselJ0 (int n, double arg, dVec &coeffs, int &zeroes);
+   extern int BesselI0 (int n, double arg, dVec &coeffs, int &zeroes);
    
    
    /**
