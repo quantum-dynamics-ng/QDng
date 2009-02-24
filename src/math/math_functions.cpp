@@ -112,7 +112,7 @@ namespace QDLIB {
       coeffs.newsize(n);
       bIm.newsize(n);
 //       (ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)
-      zbesj_(&arg, &argIm, &alpha, &kode, &n, (double*) coeffs.begin(0), (double*) bIm.begin(0), &zeroes, &ierr);
+      zbesi_(&arg, &argIm, &alpha, &kode, &n, (double*) coeffs.begin(0), (double*) bIm.begin(0), &zeroes, &ierr);
       
       //if (nz > 0) cout << "\n\n*** Bessel underflow warning : " << nz << "\n";
       switch (ierr) {
