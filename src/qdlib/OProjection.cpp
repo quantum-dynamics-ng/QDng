@@ -12,7 +12,8 @@ namespace QDLIB {
    {
       _destroy();
    }
-   
+ 
+
    void OProjection::_destroy()
    {
       for (int i=0; i < _size; i++){
@@ -25,6 +26,13 @@ namespace QDLIB {
       _size = 0;
    }
    
+   /**
+    * Add a new wave function to the container.
+    * 
+    * The Operator takes responsibility for the
+    * WF object (get destructed along with the projector).
+    * 
+    */
    void QDLIB::OProjection::Add( WaveFunction * Psi )
    {
       if (_size == MAX_WFSPACE)
@@ -38,6 +46,23 @@ namespace QDLIB {
 	 _size++;
       }
    }
+   
+   /**
+    * Extract a wave function from the operator.
+    */
+   WaveFunction* QDLIB::OProjection::Get(int n)
+   {
+      if (n < _size)
+	 return _wfbuf[n];
+      else
+	 throw ( EParamProblem("Larger index requested than size of the projector"));
+      
+      return NULL;
+   }
+   
+   void QDLIB::OProjection::Init(ParamContainer & params)
+   {
+   }  
    
    string & QDLIB::OProjection::Name( )
    {
@@ -120,3 +145,4 @@ namespace QDLIB {
 
 
 }
+

@@ -32,7 +32,10 @@ namespace QDLIB {
       
 	 void Add(WaveFunction* Psi);
 	 
+	 WaveFunction* Get(int n);
+	 
 	 int Length() { return _size; };
+	 
 	 
 	 /* Interface implementation, Operator */ 
    
