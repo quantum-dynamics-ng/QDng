@@ -214,8 +214,17 @@ namespace QDLIB
       /* Manual choice of recursion depth */
       if (_params.isPresent("order")) _params.GetValue("order", _order);
       
-      if ( BesselJ0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
-	 throw ( EOverflow("Error while calculating Bessel coefficients") );
+      /* Check for Real/imag time */
+      if (fabs(OPropagator::Exponent().imag()) != 0 && fabs(OPropagator::Exponent().real()) == 0){
+	 if ( BesselJ0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
+	    throw ( EOverflow("Error while calculating Bessel coefficients") );
+      } else if (fabs(OPropagator::Exponent().imag()) == 0 && fabs(OPropagator::Exponent().real()) != 0){
+	 if ( BesselI0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
+	    throw ( EOverflow("Error while calculating Bessel coefficients") );	 
+      } else {
+	 throw (EParamProblem("Chebychev propagator doesn't support mixed real/complex exponents") );
+      }
+      
       
       /* Remove tailing zeroes (from underflow) */
       _order -= zeroes;
@@ -250,9 +259,9 @@ namespace QDLIB
       
       /* Setup coefficients */
       _coeff.newsize(_order);
-      _coeff[0] = cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin)) * bessel[0];
+      _coeff[0] = cexp(OPropagator::Exponent()*(Rdelta + Gmin)) * bessel[0];
       for (int i=1; i < _coeff.size(); i++){
-	 _coeff[i] = 2.0 * cexpI(OPropagator::Exponent().imag()*(Rdelta + Gmin)) * bessel[i];
+	 _coeff[i] = 2.0 * cexp(OPropagator::Exponent()*(Rdelta + Gmin)) * bessel[i];
       }
       
 //       cout << "Bessel :\n" << bessel;

@@ -212,7 +212,11 @@ namespace QDLIB {
   Functions
   */
   
-  /** Calculates exp(I*phi). This ist faster than cexp(), which is more general */
+  /** 
+   * Calculates \f$ e^{i phi} \f$.
+   * 
+   * This ist faster than cexp(), which is more general
+   */
   inline  dcomplex cexpI(double phi)
   {
     dcomplex c;
@@ -221,7 +225,9 @@ namespace QDLIB {
     return c;
   }
   
-  /** Calculates exp(z). */
+  /**
+   * Calculates \f$ e^{z} = e^{i Re(z)} e^{i Im(z)}\f$.
+   */
   inline dcomplex cexp(dcomplex z)
   {
     dcomplex d;

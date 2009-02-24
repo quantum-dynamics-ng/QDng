@@ -1,6 +1,10 @@
 #ifndef QDLIBOPROJECTION_H
 #define QDLIBOPROJECTION_H
 
+#include "Operator.h"
+
+#define MAX_WFSPACE 1024 /* Maximum number of storable WFs */
+
 namespace QDLIB {
 
    /**
@@ -8,14 +12,19 @@ namespace QDLIB {
     * 
     * \f$ \sum_i |\Psi_i><\Psi_i> \f$
     * 
-    * Options:
-    * \li fname   Base name for file series
     * 
     * @author Markus Kowalewski
     */
-   class OProjection{
+   class OProjection : public Operator {
       private:
+	 string _name;
+	 
 	 int _size;
+	 WaveFunction* _wfbuf[MAX_WFSPACE];
+	 WaveFunction* _buf;
+	 
+	 void _destroy();
+	 
       public:
 	 OProjection();
       
@@ -29,11 +38,13 @@ namespace QDLIB {
    
 	 virtual Operator* NewInstance() ;
 		  
+	 virtual string& Name();
+	 
 	 virtual void Init(ParamContainer &params);
 	    
 	 virtual void Init(WaveFunction *Psi);
    
-	 virtual void UpdateTime();
+	 virtual void UpdateTime(){};
 	    
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	    
@@ -51,7 +62,7 @@ namespace QDLIB {
 	    
 	 virtual Operator* operator*(Operator* O);
       
-	 virtual Operator* Offset(const double d);
+	 virtual Operator* Offset(const double d) {return (Operator*) this; /* No Offset! */};
    
 	 virtual Operator* Scale(const double d);
       
