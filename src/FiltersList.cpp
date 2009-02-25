@@ -76,8 +76,10 @@ namespace QDLIB {
       string faction;
       
       while (filters->EndNode()){
-	 cout << filters->Name();
 	 faction = filters->Name();
+	 if (faction == "normalize"){
+	    _action[_size] = normalize;
+	 }
 	 if (faction == "expec"){
 	    _action[_size] = expec;
 	    _writefile = true;
@@ -92,7 +94,9 @@ namespace QDLIB {
 	    error += faction;
 	    throw EParamProblem (error.c_str());
 	 }
-	 _olist[_size] = ChainLoader::LoadOperatorChain( filters );
+	 if (faction != "normalize"){
+	     _olist[_size] = ChainLoader::LoadOperatorChain( filters );
+	 }
 	 _size++;
 	 filters->NextNode();
       }
@@ -127,6 +131,8 @@ namespace QDLIB {
 	 if (_action[i] == apply || _action[i] == expec){
 	    _olist[i]->Apply(Psi);
 	 }
+	 if (_action[i] == normalize)
+	    Psi->Normalize();
       }
       
       if (_writefile) _ofile << endl;

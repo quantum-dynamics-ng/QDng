@@ -17,7 +17,7 @@ namespace QDLIB {
     */
    class FiltersList{
       private:
-	 typedef enum {expec, apply, expeconly} _FilterAction;
+	 typedef enum {expec, apply, expeconly, normalize} _FilterAction;
 	 
 	 lint _size;
 	 bool _initalized;
