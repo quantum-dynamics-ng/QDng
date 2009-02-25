@@ -1,8 +1,11 @@
 #ifndef QDLIBPROGEIGEN_H
 #define QDLIBPROGEIGEN_H
 
-#include "qdlib/Operator.h"
+#include "sys/XmlNode.h"
+
+#include "qdlib/OPropagator.h"
 #include "qdlib/OProjection.h"
+
 
 
 #define DEFAULT_NUMBER_EFS      20
@@ -47,7 +50,7 @@ namespace QDLIB
 	 string _dir;
 	 lint _Nef;
 	 double _convergence;
-	 double _MaxSteps;
+	 int _MaxSteps;
 	 int _ncycle;
 	 string _fname;
 	 double _dt;
@@ -57,7 +60,9 @@ namespace QDLIB
       public:
 	 ProgEigen(XmlNode &EigenNode);
 	 
-	 void Run(string &directory);
+	 void SetDirectory(string &directory) {_dir = directory;}
+	       
+	 void Run();
          
 	 ~ProgEigen();
 

@@ -16,6 +16,7 @@
 #include "modules/ModuleLoader.h"
 
 #include "ProgPropa.h"
+#include "ProgEigen.h"
 
 using namespace std;
 using namespace QDLIB;
@@ -95,6 +96,7 @@ int main(int argc, char **argv)
 	 progname = rnodes.Name();
 	 if (progname == "propa"){
 	    ProgPropa propa(rnodes);
+	    propa.SetDirectory(dir);
 	    cout << "\n\t\t\t*** Run Propagation ***\n\n";
 	    propa.Run();
 	 } else if (progname == "auto"){
@@ -105,8 +107,9 @@ int main(int argc, char **argv)
 	 } else if (progname == "eigen") {
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
 	    /* ProgEigen eigen(rnodes);
+	    eigen.SetDirectory(dir);
 	    cout << "\n\t\t\t*** Run Eigenfunction solver ***\n\n";
-	    eigen.Run(dir); */
+	    eigen.Run(); */
 	 } else if (progname == "oct") {
 	    throw ( EParamProblem ("OCT not implementet yet") );
 	 } else if (progname == "densmat") {

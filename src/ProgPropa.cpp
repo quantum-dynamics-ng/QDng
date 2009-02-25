@@ -56,7 +56,7 @@ namespace QDLIB {
       }
       
       /* Init propagation output dir */
-      if ( attr.isPresent("dir") ) {
+      if ( attr.isPresent("dir") && _dir.empty() ) {
 	 attr.GetValue("dir", _dir);
 	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
 	    _dir += "/";

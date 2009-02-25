@@ -8,7 +8,7 @@ namespace QDLIB {
     * Removes whitespaces from the string.
     * 
     * Spaces and Tabulators are removed from the left and
-    * the right of string. Whitespace in between of the charackters
+    * the right of string. Whitespace in between of the characters
     * are conserved.
     * 
     */

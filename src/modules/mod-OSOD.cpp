@@ -2,11 +2,12 @@
 
 using namespace QDLIB;
 
-extern "C" {
-   Operator* InstanceOP()
-   {
-      OSOD *p;
-      p = new OSOD();
-      return p;
-   }
-}
+// extern "C" {
+//    Operator* InstanceOP()
+//    {
+//       OSOD *p;
+//       p = new OSOD();
+//       return p;
+//    }
+// }
+
