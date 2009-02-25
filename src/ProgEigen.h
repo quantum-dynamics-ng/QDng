@@ -42,6 +42,7 @@ namespace QDLIB
 	 
 	 OPropagator *_U;
 	 Operator *_H;
+	 OProjection _P;
 	 
 	 string _dir;
 	 lint _Nef;
@@ -56,7 +57,7 @@ namespace QDLIB
       public:
 	 ProgEigen(XmlNode &EigenNode);
 	 
-	 void Run();
+	 void Run(string &directory);
          
 	 ~ProgEigen();
 

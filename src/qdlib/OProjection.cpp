@@ -60,10 +60,7 @@ namespace QDLIB {
       return NULL;
    }
    
-   void QDLIB::OProjection::Init(ParamContainer & params)
-   {
-   }  
-   
+
    string & QDLIB::OProjection::Name( )
    {
       return _name;

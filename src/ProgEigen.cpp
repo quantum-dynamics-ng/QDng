@@ -72,6 +72,13 @@ namespace QDLIB
 	    throw ( EParamProblem ("Empty base name for file output defined") );
       }
 
+      /* Init propagation output dir */
+      if ( attr.isPresent("dir") ) {
+	 attr.GetValue("dir", _dir);
+	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
+	    _dir += "/";
+      }
+      
       cout << "Eigenfunction calculation parameters:\n\n";
       cout << "\tNumber of steps: " <<  clock->Steps() << endl;
       cout.precision(2); cout << "\tTime step: " << fixed << clock->Dt() << endl;
@@ -83,16 +90,96 @@ namespace QDLIB
    }
 
    
-   void ProgEigen::Run()
+   void ProgEigen::Run(string &directory)
    {
-      /* Load propagator */
       
-      /* Load intial WF*/
+      XmlNode *section;
+      
+      WaveFunction *Psi_old, *Psi;
+      Operator *h;
+      
+      FileWF efile;
+      
+      QDClock *clock = QDGlobalClock::Instance();
       
       
-      /* Calc loop */
+      _InitParams();
+      
+      /* Load & Init the propagator */
+      _ContentNodes = _EigenNode.NextChild();
+      
+      section = _ContentNodes->FindNode( "propagator" );
+      if (section == NULL)
+	 throw ( EParamProblem ("No propagator found") );
+      
+      _U = ChainLoader::LoadPropagator( section, &h );
+      delete section;
+      
+      /* Load the initial Wavefunction */
+      cout << "Initalize Wave function:\n";
+      WaveFunction *Psi;
+      section = _ContentNodes->FindNode( "wf" );
+      if (section == NULL)
+	 throw ( EParamProblem ("No inital wave function found") );
+      
+      Psi = ChainLoader::LoadWaveFunctionChain( section );
+      delete section;
+      
+      
+      /* Make sure our hamiltonian is initalized */
+      _h->Init(Psi);
+      cout << "Initial engergy: " << _h->Expec(Psi) << endl;
+      
+      /* Copy, since the propagator will propably scale it/modify etc. */
+      _H = _h->NewInstance();
+      *_H = _h;
+      
+      /* Let the Propagator do it's initalisation */
+      _U->Clock( clock );
+      _H->UpdateTime();
+      _U->Init(Psi);
+      
+      /* Report what the propagator has chosen */
+      ParamContainer Upm;
+    
+      Upm = _U->Params();
+      cout << "Propagators init parameters:\n\n" << Upm << endl;
+      
+      /* Init file writer for wf output */
+      wfile.Name(_dir+_fname);
+      wfile.Suffix(BINARY_WF_SUFFIX);
+      wfile.ActivateSequence();
+      
+      
+      cout << "Eigenfunction\tEnergy\n";
+      
+      Psi_old = Psi->NewInstance();
+      
+      /* EF loop */
+      for (int i=0; i < Nef; i++){
+	 Psi->Normalize(); 
+	 /* propagation loop */
+	 while (s < _MaxSteps && diff > _convergence){
+	    *Psi_old = Psi;
+	    _U->Apply(Psi);
+	    /* Remove lower states */
+	    if ( i>0 ){
+	       _P.Apply(Psi);
+	    }
+	    /* normalization and convergence check */
+	    if (s % _ncycle == 0){
+	       Psi->Normalize();
+	       diff = cabs(1 - *Psi_old * Psi);
+	    }
+	    ++(*clock);                     /* Step the clock */
+	    s++;
+	 }
+	 P.Add(Psi);
+	 cout << i << "\t" <_H->Expec(Psi) << endl;
+      }
       
       /* Write energy dat */
+      delete Psi_old;
    }
 
 

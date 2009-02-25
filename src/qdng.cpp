@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 {
 
    Getopt cmdline;
-   string fname;
+   string fname, dir;
    
    XmlParser XMLfile;
    XmlNode   rnodes;
@@ -35,6 +35,10 @@ int main(int argc, char **argv)
    cmdline.SetDescription("QD next generation");
    cmdline.SetHelp( 'm', "module path", false,
 		    "User defined path to the wave function and operator modules", "");
+   
+   cmdline.SetHelp( 'd', "output directory path", false,
+		    "All output files are saved in this directory", "");
+
 #ifdef _OPENMP
    int procs;
    cmdline.SetHelp( 'p', "num threads", false, "Specify the number of threads to use", "1");
@@ -47,11 +51,20 @@ int main(int argc, char **argv)
 
       
    try {
+      /*Show the help ?*/
       if ( cmdline.GetOption('h') ) throw (Exception());
+      
       /* Provide a user path for module loading */
       if (cmdline.GetOption('m')){
 	 cmdline.GetOption('m', fname);
 	 mods->UserPath( fname );
+      }
+      
+      /* Provide a user path for module loading */
+      if (cmdline.GetOption('d')){
+	 cmdline.GetOption('d', dir);
+	 if (dir[dir.length()-1] != '/' && ! dir.empty())
+	    dir += "/";
       }
       
 #ifdef _OPENMP
@@ -88,8 +101,12 @@ int main(int argc, char **argv)
 /*	    ProgAuto autoc(rnodes);
 	    cout << "\n\t\t\t*** Run Autocorrelation ***\n\n";
 	    autoc.Run();*/
+	    throw ( EParamProblem ("Autocorrelation not implementet yet") );
 	 } else if (progname == "eigen") {
 	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
+	    /* ProgEigen eigen(rnodes);
+	    cout << "\n\t\t\t*** Run Eigenfunction solver ***\n\n";
+	    eigen.Run(dir); */
 	 } else if (progname == "oct") {
 	    throw ( EParamProblem ("OCT not implementet yet") );
 	 } else if (progname == "densmat") {
