@@ -43,6 +43,7 @@ namespace QDLIB {
    
       for (int i=0; i < n; i++){
 	 sprintf (c, "mass%d", i);
+	 s=c;
 	 if ( _params.isPresent(s) ) {
 	    _params.GetValue( string(c), _mass[i]);
 	    if (_mass[i] == 0) throw ( EParamProblem ("Zero mass defined") );
@@ -102,8 +103,11 @@ namespace QDLIB {
       /* Calc Tmax on the Grid */
       double T=0;
       for (int i=0; i < GridSystem::Dim(); i++)
-	 T += 1/ ( _mass[i] *  GridSystem::Dx(i) * GridSystem::Dx(i));
+	 if (_mass[i] != -1) 
+	    T += 1/ ( _mass[i] *  GridSystem::Dx(i) * GridSystem::Dx(i));
+      
       T *= ( M_PI*M_PI / 2 );
+      cout << "Tmax: " << T << " " << _mass[0] << endl;
       return T;
    }
 	 
