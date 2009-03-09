@@ -1,5 +1,10 @@
 #include "ProgEigen.h"
 
+#include "sys/QDGlobalClock.h"
+#include "sys/FileSingleDefs.h"
+#include "sys/helpers.h"
+#include "ChainLoader.h"
+
 #include "sys/FileSingleDefs.h"
 #include "sys/QDGlobalClock.h"
 
@@ -8,12 +13,11 @@
 namespace QDLIB
 {
 
-   ProgEigen::ProgEigen(XmlNode &EigenNode) :
-	 _EigenNode(EigenNode), _ContentNodes(NULL),
-         _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
-	 _convergence(DEFAULT_CONVERGENCE_EF),
-	 _MaxSteps(DEFAULT_MAXSTEPS), _ncycle(DEFAULT_NCYCLE),
-	 _fname(DEFAULT_EF_BASE_NAME)
+   ProgEigen::ProgEigen(XmlNode &EigenNode) : _EigenNode(EigenNode),
+                            _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
+			    _convergence(DEFAULT_CONVERGENCE_EF),
+			    _MaxSteps(DEFAULT_MAXSTEPS), _ncycle(DEFAULT_NCYCLE),
+		            _fname(DEFAULT_EF_BASE_NAME)
    {
    }
 
@@ -62,6 +66,10 @@ namespace QDLIB
 	    throw ( EParamProblem ("Maximum number of time steps smaller than one requested") );
       }
 
+      /* Init the clock */
+      clock->Dt(_dt);
+      clock->Steps(_MaxSteps);
+      
       /* Normalization & convergence check cycle */
       if ( attr.isPresent("ncycle") ) {
 	 attr.GetValue("ncycle", _ncycle);

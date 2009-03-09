@@ -105,11 +105,11 @@ int main(int argc, char **argv)
 	    autoc.Run();*/
 	    throw ( EParamProblem ("Autocorrelation not implementet yet") );
 	 } else if (progname == "eigen") {
-	    throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
-	    /* ProgEigen eigen(rnodes);
+	    //throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
+	    ProgEigen eigen(rnodes);
 	    eigen.SetDirectory(dir);
 	    cout << "\n\t\t\t*** Run Eigenfunction solver ***\n\n";
-	    eigen.Run(); */
+	    eigen.Run(dir);
 	 } else if (progname == "oct") {
 	    throw ( EParamProblem ("OCT not implementet yet") );
 	 } else if (progname == "densmat") {

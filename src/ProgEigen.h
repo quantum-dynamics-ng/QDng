@@ -3,9 +3,10 @@
 
 #include "sys/XmlNode.h"
 
-#include "qdlib/OPropagator.h"
 #include "qdlib/OProjection.h"
+#include "qdlib/OPropagator.h"
 
+#include "sys/XmlNode.h"
 
 
 #define DEFAULT_NUMBER_EFS      20
@@ -44,7 +45,7 @@ namespace QDLIB
 	 XmlNode *_ContentNodes;
 	 
 	 OPropagator *_U;
-	 Operator *_H;
+	 Operator *_H, *_h;
 	 OProjection _P;
 	 
 	 string _dir;

@@ -2,6 +2,7 @@
 #define KEYVALFILE_H
 
 #include "ParamContainer.h"
+#include "helpers.h"
 
 #define MAX_LINE_LENGTH 2048
 

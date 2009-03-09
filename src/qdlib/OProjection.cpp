@@ -115,6 +115,25 @@ namespace QDLIB {
       }
    }
    
+   dcomplex OProjection::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
+   {
+      dcomplex c;
+      WaveFunction *OpPsi;
+      
+      OpPsi = PsiKet->NewInstance();
+      
+      Apply(OpPsi, PsiKet);
+      c = *PsiBra * OpPsi;
+      delete OpPsi;
+      return c;
+   }
+   
+   double OProjection::Expec(WaveFunction *Psi)
+   {
+      return MatrixElement( Psi, Psi).real();
+   }
+	    
+   
    WaveFunction * QDLIB::OProjection::Apply( WaveFunction * Psi )
    {
       WaveFunction* in = Psi->NewInstance();

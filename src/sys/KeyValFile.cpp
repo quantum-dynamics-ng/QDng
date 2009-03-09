@@ -1,5 +1,4 @@
 #include "KeyValFile.h"
-#include "helpers.h"
 
 #include <fstream>
 namespace QDLIB {

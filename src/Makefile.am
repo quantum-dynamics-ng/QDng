@@ -21,8 +21,8 @@ libqdng_la_LIBADD = $(top_builddir)/src/sys/libtools.la \
 	$(top_builddir)/src/math/libmath.la $(top_builddir)/src/fft/libfft.la
 
 bin_PROGRAMS = qdng
-qdng_SOURCES = ChainLoader.cpp FiltersList.cpp ProgEigen.cpp ProgPropa.cpp \
-	Reporter.cpp qdng.cpp
+qdng_SOURCES = ChainLoader.cpp FiltersList.cpp ProgPropa.cpp Reporter.cpp \
+	qdng.cpp ProgEigen.cpp
 qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/sys/libtools.la $(top_builddir)/src/math/libmath.la \
 	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la -L/opt/adm/fftw-latest/lib -lblas \
