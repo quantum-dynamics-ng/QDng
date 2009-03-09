@@ -49,7 +49,7 @@ namespace QDLIB {
       
       for (int i=0; i < _Tkin_kspace->size(); i++)
       {
-	 (*_expT)[i] = cexpI( (*_Tkin_kspace)[i] * _cT._imag );
+	 (*_expT)[i] = cexp( (*_Tkin_kspace)[i] * _cT );
       }
    }
    
@@ -60,7 +60,7 @@ namespace QDLIB {
       _Vpot->UpdateTime();
       for (int i=0; i < _Vpot->size(); i++)
       {
-	 (*_expV)[i] = cexpI( (*_Vpot)[i] * _cV._imag);
+	 (*_expV)[i] = cexp( (*_Vpot)[i] * _cV);
       }
             
    }

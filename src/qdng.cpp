@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 	    ProgEigen eigen(rnodes);
 	    eigen.SetDirectory(dir);
 	    cout << "\n\t\t\t*** Run Eigenfunction solver ***\n\n";
-	    eigen.Run(dir);
+	    eigen.Run();
 	 } else if (progname == "oct") {
 	    throw ( EParamProblem ("OCT not implementet yet") );
 	 } else if (progname == "densmat") {

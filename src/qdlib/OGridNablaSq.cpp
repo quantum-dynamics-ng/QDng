@@ -107,7 +107,6 @@ namespace QDLIB {
 	    T += 1/ ( _mass[i] *  GridSystem::Dx(i) * GridSystem::Dx(i));
       
       T *= ( M_PI*M_PI / 2 );
-      cout << "Tmax: " << T << " " << _mass[0] << endl;
       return T;
    }
 	 

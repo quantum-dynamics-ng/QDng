@@ -91,6 +91,11 @@ namespace QDLIB
 	    _dir += "/";
       }
       
+      /* Filter diagonalization */
+      if ( attr.isPresent("diag"))
+	 throw ( EParamProblem ("Filter diagonalization not implementet yet!") );
+	      
+      
       clock->Dt(_dt);
       clock->Steps(_MaxSteps);
       
@@ -100,6 +105,8 @@ namespace QDLIB
       cout.precision(2); cout << "\tCheck cycles: " << _ncycle << endl;
       cout.precision(2); cout << "\tMaximum propagation  time: " 
 	                      << fixed << _MaxSteps * clock->Dt() << endl;
+      cout.precision(2); cout <<  "Requestet convergence: " 
+	    << scientific << _convergence << endl;			      
       cout << "\tBasename for wave function output: " << _fname << endl;
       cout.precision(6); cout << scientific;
    }
@@ -110,13 +117,12 @@ namespace QDLIB
       
       XmlNode *section;
       
-      WaveFunction *Psi_old, *Psi;
+      WaveFunction *Psi_old, *Psi, *Psi_initial, *_buf;
       Operator *h;
       
       FileWF efile;
       
       QDClock *clock = QDGlobalClock::Instance();
-      
       
       _InitParams();
       
@@ -136,13 +142,13 @@ namespace QDLIB
       if (section == NULL)
 	 throw ( EParamProblem ("No inital wave function found") );
       
-      Psi = ChainLoader::LoadWaveFunctionChain( section );
+      Psi_initial = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
       
       
       /* Make sure our hamiltonian is initalized */
-      h->Init(Psi);
-      cout << "Initial engergy: " << h->Expec(Psi) << endl;
+      h->Init(Psi_initial);
+      cout << "Initial Norm & energy: " << Psi_initial->Norm() << "\t" << h->Expec(Psi_initial) << endl;
       
       /* Copy, since the propagator will propably scale it/modify etc. */
       _H = h->NewInstance();
@@ -151,7 +157,10 @@ namespace QDLIB
       /* Let the Propagator do it's initalisation */
       _U->Clock( clock );
       _H->UpdateTime();
-      _U->Init(Psi);
+      /* Force backward imaginary time */
+      _U->ImaginaryTime();
+      _U->Backward();
+      _U->Init(Psi_initial);
       
       /* Report what the propagator has chosen */
       ParamContainer Upm;
@@ -164,14 +173,22 @@ namespace QDLIB
       efile.Suffix(BINARY_WF_SUFFIX);
       efile.ActivateSequence();
       
+      _Energies_raw.newsize(_Nef);
       
       cout << "Eigenfunction\tEnergy\n";
+     
+   
+      Psi_initial->Normalize();
       
-      Psi_old = Psi->NewInstance();
-      
+      Psi_old = Psi_initial->NewInstance();
+      Psi = Psi_initial->NewInstance();
+      _buf = Psi_initial->NewInstance();
+	    
+      _P.Init(Psi_initial);
+	    
       /* EF loop */
       for (int i=0; i < _Nef; i++){
-	 Psi->Normalize(); 
+	 *Psi = Psi_initial;
 	 /* propagation loop */
 	 int s=0;
 	 double diff=1;
@@ -180,19 +197,23 @@ namespace QDLIB
 	    _U->Apply(Psi);
 	    /* Remove lower states */
 	    if ( i>0 ){
-	       _P.Apply(Psi);
+	       _P.Apply(_buf, Psi);
+	       *Psi -= _buf;
 	    }
 	    /* normalization and convergence check */
 	    if (s % _ncycle == 0){
 	       Psi->Normalize();
-	       diff = cabs(1 - *Psi_old * Psi);
+	       diff = cabs(1-*Psi_old * Psi);
+	       cout << "  " << s << "\t" << Psi->Norm() <<  "\tdiff: " << diff << endl;
+	       //diff=1;
 	    }
 	    ++(*clock);                     /* Step the clock */
 	    s++;
 	 }
 	 _P.Add(Psi);
 	 efile << Psi;
-	 cout << i << "\t" << _H->Expec(Psi) << endl;
+	 _Energies_raw[i] = _H->Expec(Psi);
+	 cout << i << "\t" << _Energies_raw[i] << endl;
       }
       
       /* Write energy dat */

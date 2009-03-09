@@ -220,7 +220,7 @@ namespace QDLIB
 	    throw ( EOverflow("Error while calculating Bessel coefficients") );
       } else if (fabs(OPropagator::Exponent().imag()) == 0 && fabs(OPropagator::Exponent().real()) != 0){
 	 if ( BesselI0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
-	    throw ( EOverflow("Error while calculating Bessel coefficients") );	 
+	    throw ( EOverflow("Error while calculating Bessel coefficients") );
       } else {
 	 throw (EParamProblem("Chebychev propagator doesn't support mixed real/complex exponents") );
       }

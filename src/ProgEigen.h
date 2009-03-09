@@ -33,6 +33,7 @@ namespace QDLIB
     *  \li Nef    Number of eigenfunctions
     *  \li dir    Output directory
     *  \li fname  Base name for ef output
+    *  \li diag   yes/no diagonalize the eigen basis
     * 
     *  \todo diagonalization
     *  @author Markus Kowalewski
@@ -41,13 +42,16 @@ namespace QDLIB
    {
 
       private:
+	 /* Input */
 	 XmlNode &_EigenNode;
 	 XmlNode *_ContentNodes;
 	 
+	 /* Operators */
 	 OPropagator *_U;
 	 Operator *_H, *_h;
 	 OProjection _P;
 	 
+	 /* Parameters */
 	 string _dir;
 	 lint _Nef;
 	 double _convergence;
@@ -55,6 +59,10 @@ namespace QDLIB
 	 int _ncycle;
 	 string _fname;
 	 double _dt;
+	 bool diag;
+	 
+	 dVec _Energies_raw;
+	 dVec _Energies_diag;
 	 
 	 void _InitParams();
 	 void _CreateInitalWF(); 

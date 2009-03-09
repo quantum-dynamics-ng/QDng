@@ -36,15 +36,17 @@ namespace QDLIB {
    void QDLIB::OProjection::Add( WaveFunction * Psi )
    {
       if (_size == MAX_WFSPACE)
-	 throw( EOverflow("Projector has reached max capaticty: MAX_WFSPACE"));
+	 throw( EOverflow("Projector has reached max capaticity: MAX_WFSPACE"));
 	 
       if (Psi != NULL){
 	 if (_size == 0)
 	    _buf = Psi->NewInstance();
 		  
-	 _wfbuf[_size] = Psi;
+	 _wfbuf[_size] = Psi->NewInstance();
+	 *(_wfbuf[_size]) = Psi;
 	 _size++;
       }
+      
    }
    
    /**
