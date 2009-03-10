@@ -27,7 +27,7 @@ qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/tools/libtools.la $(top_builddir)/src/math/libmath.la \
 	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la -L/opt/adm/fftw-latest/lib -lblas \
 	-llapack -lg2c -lfftw3 -lxml2
-noinst_HEADERS = ChainLoader.h FiltersList.h OProjection.h ProgAutocorr.h \
-	ProgEigen.h ProgPropa.h Reporter.h
+noinst_HEADERS = ChainLoader.h FiltersList.h ProgAutocorr.h ProgEigen.h \
+	ProgPropa.h Reporter.h
 AM_CXXFLAGS = -O3
 
