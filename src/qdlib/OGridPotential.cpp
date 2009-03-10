@@ -1,6 +1,6 @@
 #include "OGridPotential.h"
 #include "math/math_functions.h"
-#include "sys/Exception.h"
+#include "tools/Exception.h"
 #include <cstdio>
 
 namespace QDLIB

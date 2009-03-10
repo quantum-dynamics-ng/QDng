@@ -1,8 +1,8 @@
 #include "ChainLoader.h"
 
-#include "sys/FileSingleDefs.h"
+#include "tools/FileSingleDefs.h"
 #include "modules/ModuleLoader.h"
-#include "sys/QDGlobalClock.h"
+#include "tools/QDGlobalClock.h"
 
 #include "qdlib/OSum.h"
 #include "qdlib/OGridSum.h"

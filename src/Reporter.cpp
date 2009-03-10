@@ -1,5 +1,5 @@
 #include "Reporter.h"
-#include "sys/QDGlobalClock.h"
+#include "tools/QDGlobalClock.h"
 #include "fft/fft.h"
 
 namespace QDLIB

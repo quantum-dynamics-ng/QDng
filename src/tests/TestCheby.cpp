@@ -1,6 +1,6 @@
 #include "TestCheby.h"
 #include "cppunit/portability/FloatingPoint.h"
-#include "sys/Exception.h"
+#include "tools/Exception.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION (TestCheby);
 

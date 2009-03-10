@@ -1,12 +1,12 @@
 #ifndef QDLIBPROGEIGEN_H
 #define QDLIBPROGEIGEN_H
 
-#include "sys/XmlNode.h"
+#include "tools/XmlNode.h"
 
 #include "qdlib/OProjection.h"
 #include "qdlib/OPropagator.h"
 
-#include "sys/XmlNode.h"
+#include "tools/XmlNode.h"
 
 
 #define DEFAULT_NUMBER_EFS      20

@@ -1,6 +1,6 @@
 #include "qdlib/WFGridCartesian.h"
-#include "sys/FileSingleDefs.h"
-#include "sys/Getopt.h"
+#include "tools/FileSingleDefs.h"
+#include "tools/Getopt.h"
 
 using namespace QDLIB;
 

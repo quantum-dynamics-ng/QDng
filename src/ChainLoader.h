@@ -2,7 +2,7 @@
 #define QDLIBCHAINLOADER_H
 
 #include "qdlib/OPropagator.h"
-#include "sys/XmlNode.h"
+#include "tools/XmlNode.h"
 
 
 namespace QDLIB

@@ -1,7 +1,7 @@
 #ifndef TESTLOGGER_H
 #define TESTLOGGER_H
 
-#include "sys/Logger.h"
+#include "tools/Logger.h"
 #include "cppunit/extensions/HelperMacros.h"
 
 /**

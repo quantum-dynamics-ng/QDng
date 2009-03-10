@@ -1,7 +1,7 @@
 #ifndef TESTGETOPT_H
 #define TESTGETOPT_H
 
-#include "sys/Getopt.h"
+#include "tools/Getopt.h"
 
 #include <cppunit/extensions/HelperMacros.h>
 

@@ -1,9 +1,9 @@
 #ifndef QDLIBPROGPROPA_H
 #define QDLIBPROGPROPA_H
 
-#include "sys/Exception.h"
-#include "sys/XmlNode.h"
-#include "sys/QDGlobalClock.h"
+#include "tools/Exception.h"
+#include "tools/XmlNode.h"
+#include "tools/QDGlobalClock.h"
 #include "qdlib/OPropagator.h"
 #include "Reporter.h"
 #include "FiltersList.h"

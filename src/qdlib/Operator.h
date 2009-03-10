@@ -2,8 +2,8 @@
 #define OPERATOR_H
 
 #include "WaveFunction.h"
-#include "sys/Exception.h"
-#include "sys/QDClock.h"
+#include "tools/Exception.h"
+#include "tools/QDClock.h"
 
 namespace QDLIB {
 

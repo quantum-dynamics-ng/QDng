@@ -9,9 +9,9 @@
  #include <omp.h>
 #endif
 
-#include "sys/Exception.h"
-#include "sys/Getopt.h"
-#include "sys/XmlParser.h"
+#include "tools/Exception.h"
+#include "tools/Getopt.h"
+#include "tools/XmlParser.h"
 
 #include "modules/ModuleLoader.h"
 

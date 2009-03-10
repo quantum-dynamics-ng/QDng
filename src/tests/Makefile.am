@@ -11,10 +11,10 @@ runtest_SOURCES = dVecMinMax.cpp TestViews.cpp main.cpp TestMathFunctions.cpp Te
 	WFGridHarmonic.cpp OGridHarmonic.cpp 
 runtest_LDFLAGS = ../$(top_builddir)/src/cppunit/lib/libcppunit.a
 runtest_LDADD = $(top_builddir)/src/qdlib/libqd.la \
-	$(top_builddir)/src/sys/libtools.la $(top_builddir)/src/fft/libfft.la $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/tools/libtools.la $(top_builddir)/src/fft/libfft.la $(top_builddir)/src/math/libmath.la \
 	-lslatec -lg2c -lblas -ldl -lfftw3 -llapack
 Getopt_SOURCES = TestGetopt.cpp main.cpp
-Getopt_LDADD = $(top_builddir)/src/sys/libtools.la
+Getopt_LDADD = $(top_builddir)/src/tools/libtools.la
 bin_PROGRAMS = StridedVector
 StridedVector_SOURCES = TestStridedVector.cpp TestViews.cpp main.cpp
 StridedVector_LDADD = $(top_builddir)/src/math/libmath.la

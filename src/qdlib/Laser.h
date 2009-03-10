@@ -2,10 +2,10 @@
 #define LASER_H
 
 #include "math/typedefs.h"
-#include "sys/ParamContainer.h"
-#include "sys/QDClock.h"
+#include "tools/ParamContainer.h"
+#include "tools/QDClock.h"
 #include "fft/fft.h"
-#include "sys/FileSingle.h"
+#include "tools/FileSingle.h"
 
 namespace QDLIB {
    

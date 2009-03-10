@@ -2,7 +2,7 @@
 #define QDLIBOPROPAGATOR_H
 
 #include "Operator.h"
-#include "sys/QDClock.h"
+#include "tools/QDClock.h"
 #include "math/dcomplex.h"
 
 namespace QDLIB {

@@ -4,7 +4,7 @@
 #include "OKSpace.h"
 #include "OPropagator.h"
 #include "OGridSum.h"
-#include "sys/Exception.h"
+#include "tools/Exception.h"
 
 
 namespace QDLIB {

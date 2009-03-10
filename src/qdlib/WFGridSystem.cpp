@@ -1,7 +1,7 @@
 
 
 #include "WFGridSystem.h"
-#include "sys/Exception.h"
+#include "tools/Exception.h"
 #include "fft/fft.h"
 
 namespace QDLIB {

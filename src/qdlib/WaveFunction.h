@@ -2,9 +2,9 @@
 #define WAVEFUNCTION_H
 
 
-#include "sys/ParamContainer.h"
+#include "tools/ParamContainer.h"
 #include "math/typedefs.h"
-#include "sys/Exception.h"
+#include "tools/Exception.h"
 
 
 

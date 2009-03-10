@@ -1,12 +1,12 @@
 #include "ProgEigen.h"
 
-#include "sys/QDGlobalClock.h"
-#include "sys/FileSingleDefs.h"
-#include "sys/helpers.h"
+#include "tools/QDGlobalClock.h"
+#include "tools/FileSingleDefs.h"
+#include "tools/helpers.h"
 #include "ChainLoader.h"
 
-#include "sys/FileSingleDefs.h"
-#include "sys/QDGlobalClock.h"
+#include "tools/FileSingleDefs.h"
+#include "tools/QDGlobalClock.h"
 
 #include "ChainLoader.h"
 #include "qdlib/Conversion.h"
