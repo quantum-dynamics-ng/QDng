@@ -45,10 +45,8 @@ namespace QDLIB
 	 
 	 virtual double Emin();
 	 
-// 	 virtual WaveFunction* operator*(WaveFunction *Psi);
 	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
-	 
-	 //virtual WaveFunction* operator*=(WaveFunction *Psi);
+	
 	 virtual WaveFunction* Apply(WaveFunction *Psi);
 
 	 

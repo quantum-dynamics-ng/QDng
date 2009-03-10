@@ -1,6 +1,8 @@
 #include "OGridDipole.h"
 #include "tools/Exception.h"
 
+#include "math/math_functions.h"
+
 namespace QDLIB {
    
    
@@ -49,16 +51,16 @@ namespace QDLIB {
       return 0;
    }
    
-   WaveFunction * OGridDipole::operator *(WaveFunction * Psi)
+   WaveFunction * OGridDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WaveFunction *psi = Psi->NewInstance();
+      *destPsi = sourcePsi;
       
-      MultElements((cVec*) psi, (dVec*) this, _laser.Get());
+      MultElements((cVec*) destPsi, (dVec*) this, _laser.Get());
       
-      return psi;
+      return destPsi;
    }
    
-   WaveFunction * OGridDipole::operator *=(WaveFunction * Psi)
+   WaveFunction * OGridDipole::Apply(WaveFunction *Psi)
    {
       MultElements((cVec*) Psi, (dVec*) this, _laser.Get());
       
@@ -79,7 +81,4 @@ namespace QDLIB {
    }
 
 }
-
-
-
 
