@@ -29,6 +29,7 @@ int main(int argc, char **argv)
    
    XmlParser XMLfile;
    XmlNode   rnodes;
+   XmlNode   *prognodes;
    string progname;
    
    ModuleLoader *mods = ModuleLoader::Instance();
@@ -91,11 +92,20 @@ int main(int argc, char **argv)
       
       rnodes = XMLfile.Root();
       
+      /* enables multiple programm nodes*/
+      if (rnodes.Name() == "multi")
+	 prognodes = rnodes.NextChild();
+      else 
+	 prognodes = &rnodes;
+      
+      if (prognodes == NULL)
+	 throw ( EParamProblem ("Empty parameter file provided") );
+      
       /* Loop over program nodes */
-      while (rnodes.EndNode()) {
-	 progname = rnodes.Name();
+      while (prognodes->EndNode()) {
+	 progname = prognodes->Name();
 	 if (progname == "propa"){
-	    ProgPropa propa(rnodes);
+	    ProgPropa propa(*prognodes);
 	    propa.SetDirectory(dir);
 	    cout << "\n\t\t\t*** Run Propagation ***\n\n";
 	    propa.Run();
@@ -105,8 +115,7 @@ int main(int argc, char **argv)
 	    autoc.Run();*/
 	    throw ( EParamProblem ("Autocorrelation not implementet yet") );
 	 } else if (progname == "eigen") {
-	    //throw ( EParamProblem ("Eigenvalue solving not implementet yet") );
-	    ProgEigen eigen(rnodes);
+	    ProgEigen eigen(*prognodes);
 	    eigen.SetDirectory(dir);
 	    cout << "\n\t\t\t*** Run Eigenfunction solver ***\n\n";
 	    eigen.Run();
@@ -118,7 +127,7 @@ int main(int argc, char **argv)
 	    throw ( EParamProblem ("Programm type not known") );
 	 }
 	 
-	 rnodes.NextNode();
+	 prognodes->NextNode();
       }
       
    } catch (Exception e) {

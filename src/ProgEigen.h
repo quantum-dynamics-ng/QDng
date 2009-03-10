@@ -14,7 +14,7 @@
 #define DEFAULT_NCYCLE          10
 #define DEFAULT_MAXSTEPS        10000
 #define DEFAULT_EF_BASE_NAME    "ef"
-#define DEFAULT_EF_ENERGY_NAME    "energy.dat"
+#define DEFAULT_EF_ENERGY_NAME  "energy.dat"
 
 
 

@@ -1,7 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include string
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -11,30 +12,31 @@ namespace QDLIB {
     * 
     * This is a singleton class.
     */
-
    class Logger
    {
       private:
 	 stringstream _cout;
 	 stringstream _coutdbg;
-	 string _sout;
-	 string _soutdbg;
+	 stringbuf *_sout;
+	 stringbuf *_soutdbg;
 	 
 	 int _laststream; /* 0: no one, 1: cout , 2: coutdbg */
 	 
 	 bool _supress;
+	 bool _debug;
+	 
 	 ofstream _ofile;
 	 
 	 static Logger *_ref;
 	 
-	 ostream _global_out;
+	 ostream  *_global_out;
 	 
 	 Logger ( );
 	 
          /**
 	  * Empty Copy constructor
           */
-	 Logger (Logger &L) {}
+	 //Logger (Logger &L) : _global_out(cout) {}
 
    
          /**
@@ -44,20 +46,9 @@ namespace QDLIB {
 
    public:
       
-      /**
-       * return instance for singleton
-       * @return Messenger*
-       */
-      static Messenger* Instance ();
+      static Logger* Instance ();
 
-      
-      /**
-       * Return an instance
-       */
-      static void InstanceRef ();
-   
-   
-   
+      static Logger& InstanceRef ();
    
       /**
       * Set a function which is called with every flush()
@@ -65,31 +56,12 @@ namespace QDLIB {
       */
       //void SetNotify (ftpr notifyfunction );
    
-   
-      /**
-       * Redirect output to file.
-       * 
-       * @param  filename
-       */
       void FileOutput (string& filename );
-   
-   
-      /** 
-       * Set redirect to arbitrary stream.
-       */
-      void SetRedirect (ostream &redirect) {_global_out = redirect;}
       
+      void SetRedirect (ostream &redirect);
       
-      /**
-       * Returns the standard output stream.
-       */
       stringstream& cout ( );
    
-      /**
-       * Returns the standard output debug stream.
-       * 
-       * Use this for very detailed output.
-       */
       stringstream& coutdbg ( );
 
    
@@ -115,11 +87,7 @@ namespace QDLIB {
       */
 //       stringstream& coutdbg (WaveFunction* Caller );
    
-   
-      /**
-      * Flush the all text messages to the output
-      */
-      void flush ( );
+      void flush ();
    
    
       /**
@@ -139,6 +107,9 @@ namespace QDLIB {
       * @return bool
       */
       bool Supress ( ) { return _supress; }
+      
+      void Debug(bool on) { _debug = on; }
+      
    };
 
    
