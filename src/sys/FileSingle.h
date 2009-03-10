@@ -334,7 +334,6 @@ namespace QDLIB {
       
       file.open(s.c_str(), ios::binary);
       if( file.fail() ) {
-	 cout << "can't open\n";
 	 throw ( EIOError("Can not open binary file for reading") );
       }
       
