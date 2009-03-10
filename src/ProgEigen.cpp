@@ -9,6 +9,7 @@
 #include "sys/QDGlobalClock.h"
 
 #include "ChainLoader.h"
+#include "qdlib/Conversion.h"
 
 namespace QDLIB
 {
@@ -17,7 +18,7 @@ namespace QDLIB
                             _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
 			    _convergence(DEFAULT_CONVERGENCE_EF),
 			    _MaxSteps(DEFAULT_MAXSTEPS), _ncycle(DEFAULT_NCYCLE),
-		            _fname(DEFAULT_EF_BASE_NAME)
+			    _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME)
    {
    }
 
@@ -28,6 +29,36 @@ namespace QDLIB
       if (_H != NULL) delete _H;
    }
 
+   /**
+    * Write the energies to a file
+    */
+   void ProgEigen::WriteEnergyFile( )
+   {
+      /* Write energy dat */
+      ofstream enfile;
+      string sn;
+      sn = _dir + _ename;
+      try {
+	 enfile.open(sn.c_str());
+	 if (!enfile.is_open()) throw;
+	
+	 for (int i=0; i < _Nef; i++){
+	    enfile.precision(8);
+	    enfile << i << "\t" << fixed << _Energies_raw[i];
+	    enfile.precision(2);
+	    enfile << "\t" << _Energies_raw[i]*AU2WAVENUMBERS;
+	    enfile << "\t" << (_Energies_raw[i]-_Energies_raw[0])*AU2WAVENUMBERS;
+	    if (i>0)
+	       enfile << "\t" << (_Energies_raw[i]-_Energies_raw[i-1])*AU2WAVENUMBERS;
+	    enfile << endl;
+	 }
+	 enfile.close();
+      } catch (...){
+	 cout << "!!! Can't write energy file\n\n";
+      }
+   }
+
+   
    /**
     * Init the propramm parameters.
     * 
@@ -84,6 +115,13 @@ namespace QDLIB
 	    throw ( EParamProblem ("Empty base name for file output defined") );
       }
 
+      /* ef base name */
+      if ( attr.isPresent("ename") ) {
+	 attr.GetValue("ename", _ename);
+	 if ( _ename.length() == 0)
+	    throw ( EParamProblem ("Empty name for energy.dat") );
+      }
+      
       /* Init propagation output dir */
       if ( attr.isPresent("dir") && _dir.empty()) {
 	 attr.GetValue("dir", _dir);
@@ -105,8 +143,9 @@ namespace QDLIB
       cout.precision(2); cout << "\tCheck cycles: " << _ncycle << endl;
       cout.precision(2); cout << "\tMaximum propagation  time: " 
 	                      << fixed << _MaxSteps * clock->Dt() << endl;
-      cout.precision(2); cout <<  "Requestet convergence: " 
-	    << scientific << _convergence << endl;			      
+      cout.precision(2); cout <<  "\tRequestet convergence: " 
+	                      << scientific << _convergence << endl;
+      cout << "\tName for eigenenergy file: " << _ename << endl;
       cout << "\tBasename for wave function output: " << _fname << endl;
       cout.precision(6); cout << scientific;
    }
@@ -192,7 +231,8 @@ namespace QDLIB
 	 /* propagation loop */
 	 int s=0;
 	 double diff=1;
-	 while (s < _MaxSteps && diff > _convergence){
+ 	 while (s < _MaxSteps && diff > _convergence){
+// 	 while (s < _MaxSteps){
 	    *Psi_old = Psi;
 	    _U->Apply(Psi);
 	    /* Remove lower states */
@@ -204,7 +244,7 @@ namespace QDLIB
 	    if (s % _ncycle == 0){
 	       Psi->Normalize();
 	       diff = cabs(1-*Psi_old * Psi);
-	       cout << "  " << s << "\t" << Psi->Norm() <<  "\tdiff: " << diff << endl;
+	       //cout << "  " << s << "\t" << Psi->Norm() <<  "\tdiff: " << diff << endl;
 	       //diff=1;
 	    }
 	    ++(*clock);                     /* Step the clock */
@@ -212,15 +252,24 @@ namespace QDLIB
 	 }
 	 _P.Add(Psi);
 	 efile << Psi;
+	 
 	 _Energies_raw[i] = _H->Expec(Psi);
-	 cout << i << "\t" << _Energies_raw[i] << endl;
+	 cout.precision(8);
+	 cout << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
       }
       
-      /* Write energy dat */
+
+      WriteEnergyFile();
+      
+      /* Cleanup */
       delete Psi_old;
+      delete Psi;
+      delete _buf;
+      delete Psi_initial;
    }
 
 
 }
+
 
 

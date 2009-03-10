@@ -14,6 +14,7 @@
 #define DEFAULT_NCYCLE          10
 #define DEFAULT_MAXSTEPS        10000
 #define DEFAULT_EF_BASE_NAME    "ef"
+#define DEFAULT_EF_ENERGY_NAME    "energy.dat"
 
 
 
@@ -33,6 +34,7 @@ namespace QDLIB
     *  \li Nef    Number of eigenfunctions
     *  \li dir    Output directory
     *  \li fname  Base name for ef output
+    *  \li ename  Name for energy.dat
     *  \li diag   yes/no diagonalize the eigen basis
     * 
     *  \todo diagonalization
@@ -58,6 +60,7 @@ namespace QDLIB
 	 int _MaxSteps;
 	 int _ncycle;
 	 string _fname;
+	 string _ename;
 	 double _dt;
 	 bool diag;
 	 
@@ -66,6 +69,9 @@ namespace QDLIB
 	 
 	 void _InitParams();
 	 void _CreateInitalWF(); 
+	 
+      protected:
+	 void WriteEnergyFile();
       public:
 	 ProgEigen(XmlNode &EigenNode);
 	 
