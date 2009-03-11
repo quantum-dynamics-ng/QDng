@@ -281,11 +281,11 @@ namespace QDLIB {
       
       /* Write binary data */
       file.open(s.c_str(), ofstream::binary);
-      if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing") );
+      if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing", s) );
       /* Write multiple strides */
       for(int i=0; i < data->strides(); i++){
          file.write((char*) data->begin(i), data->sizeBytes() );
-         if( file.bad() ) throw( EIOError("Can not write binary file") );
+         if( file.bad() ) throw( EIOError("Can not write binary file", s) );
       }
       file.close();
    
@@ -299,9 +299,13 @@ namespace QDLIB {
 	 KeyValFile file(_name + METAFILE_SUFFIX);
 	 ParamContainer p;
 	 if ( !file.Parse(p) ) {
-	    string e;
-	    e = "Can not read meta file: " + _name + METAFILE_SUFFIX;
-	    throw( EIOError(e.c_str()) );
+	    /* try again, but remove trailing underscore + further chars */
+	    file.SetName( _name.substr(0,_name.find('_')-1) + METAFILE_SUFFIX);
+	    if ( !file.Parse(p) ) {
+	       string e;
+	       e = "Can not read meta file: " + _name + METAFILE_SUFFIX;
+	       throw( EIOError(e.c_str()) );
+	    }
 	 }
 	 data->Init(p);
       }

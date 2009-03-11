@@ -22,6 +22,12 @@ namespace QDLIB{
    }
    
 
+   EIOError::EIOError( const char * message, string &name ) : Exception()
+   {
+      SetMessage(string(message) + ": " + name);
+   }
+
+   
    EIncompatible::EIncompatible(const char * message, const string & name)
    {
       string s = string(message) + ": " + name;
