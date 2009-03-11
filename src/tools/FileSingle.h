@@ -62,8 +62,11 @@ namespace QDLIB {
 	 
 	 void _ReadMeta(C *data);
 	 void _WriteMeta(C *data);
+	 void _WriteMetaStrided(C *data, int stride);
 	 
          void _WriteFileBinary(C *data);
+	 void _WriteFileBinaryStrided(C *data);
+	 
 	 bool _WriteFileASCII(C *data);
 // 	 bool _WriteFileHDF(WaveFunction &wf);
 	 
@@ -246,7 +249,7 @@ namespace QDLIB {
       ParamContainer p;
       
       /* Write meta file. In a sequence only for the first file. */
-      if (!_drop_meta || _counter > 0){
+      if (!_drop_meta || _counter == 1){
 	 p = data->Params();
 	 p.SetValue("CLASS", data->Name() );
 	 
@@ -257,8 +260,29 @@ namespace QDLIB {
    }
    
    
+   template <class C>
+   void FileSingle<C>::_WriteMetaStrided(C *data, int stride)
+   {
+      ParamContainer p;
+      
+      /* Write meta file. In a sequence only for the first file. */
+      if (!_drop_meta || _counter == 1){
+	 p = data->Params();
+	 p.SetValue("CLASS", data->Name() );
+	 
+	 stringstream ss;
+	 ss << stride;
+	 
+	 KeyValFile meta_file(_name + "-" + ss.str() +METAFILE_SUFFIX);
+	 if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
+      }
+      
+   }
+   
    /**
     * Write raw binary data.
+    * 
+    * Version for single stride of Vector.
     */
    template <class C>
    void FileSingle<C>::_WriteFileBinary(C *data)
@@ -282,30 +306,71 @@ namespace QDLIB {
       /* Write binary data */
       file.open(s.c_str(), ofstream::binary);
       if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing", s) );
-      /* Write multiple strides */
-      for(int i=0; i < data->strides(); i++){
-         file.write((char*) data->begin(i), data->sizeBytes() );
-         if( file.bad() ) throw( EIOError("Can not write binary file", s) );
-      }
+      
+      file.write((char*) data->begin(0), data->sizeBytes() );
+      if( file.bad() ) throw( EIOError("Can not write binary file", s) );
+      
       file.close();
    
+   }
+   
+   /**
+    * Write raw binary data.
+    * 
+    * Version for strided Vector.
+    * Every stride is saved as in an own file.
+    */
+   template <class C>
+   void FileSingle<C>::_WriteFileBinaryStrided(C *data)
+   {
+      
+      ofstream file;
+      string s;
+      
+      
+      for(int i=0; i < data->strides(); i++){ /* run over strides */
+	 stringstream stride;
+	 
+	 _WriteMetaStrided(data, i);
+	 stride << i;
+	 
+	 /* Build name */
+	 if (_sequence) {
+	    stringstream ss;
+	    ss << _counter;
+	    s = _name + "-" + stride.str() + "_" + ss.str() + _suffix;
+	 } else {
+	    s = _name + "-" + stride.str() + _suffix;
+	 }
+	 
+	 /* Write binary data */
+	 file.open(s.c_str(), ofstream::binary);
+	 if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing", s) );	 
+	 file.write((char*) data->begin(i), data->sizeBytes() );
+	 if( file.bad() ) throw( EIOError("Can not write binary file", s) );
+	 file.close();
+      
+      }
+      
+      if (_sequence) _counter++;
    }
    
    template <class C>
    void FileSingle<C>::_ReadMeta(C *data)
    {
+      string name;
+      
       /* Read meta file */
       if (!_drop_meta){
-	 KeyValFile file(_name + METAFILE_SUFFIX);
+	 name = _name + METAFILE_SUFFIX;
+	 KeyValFile file(name);
 	 ParamContainer p;
 	 if ( !file.Parse(p) ) {
 	    /* try again, but remove trailing underscore + further chars */
-	    file.SetName( _name.substr(0,_name.find('_')-1) + METAFILE_SUFFIX);
-	    if ( !file.Parse(p) ) {
-	       string e;
-	       e = "Can not read meta file: " + _name + METAFILE_SUFFIX;
-	       throw( EIOError(e.c_str()) );
-	    }
+	    name = _name.substr(0,_name.find('_')) + METAFILE_SUFFIX;
+	    file.SetName( name );
+	    if ( !file.Parse(p) ) 
+	       throw( EIOError("Can not read meta file", name) );
 	 }
 	 data->Init(p);
       }
@@ -345,9 +410,7 @@ namespace QDLIB {
       for(int i=0; i < data->strides(); i++){
 	 file.read((char*) data->begin(i), data->sizeBytes());
 	 if( file.fail() || file.eof() ){
-	    string e;
-	    e = "Can not read binary file: " + s;
-	    throw( EIOError(e.c_str()) );
+	    throw( EIOError("Can not read binary file", s) );
 	 }
       }
 	  
@@ -367,7 +430,9 @@ namespace QDLIB {
       
        switch(_type){
          case binary:
-               _WriteFileBinary(data);
+	        if (data->strides() == 1)
+                  _WriteFileBinary(data);
+		else _WriteFileBinaryStrided(data);
          break;
 	 case ascii:
                throw(Exception("ASCII Unsupported"));

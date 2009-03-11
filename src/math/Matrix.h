@@ -80,7 +80,6 @@ namespace QDLIB
 template <class T>
 class Matrix 
 {
-
   private:
     lint m_;
     lint n_;
@@ -1071,7 +1070,25 @@ Matrix<T> transpose(const Matrix<T> &A)
     return S;
 }
 
+/**
+ * Return the adjoint matrix.
+ * 
+ */
+template <class T>
+Matrix<T> adjoint(const Matrix<T> &A)
+{
+   lint M = A.num_rows();
+   lint N = A.num_cols();
 
+   Matrix<T> S(N,M);
+   lint i, j;
+
+   for (i=0; i<M; i++)
+      for (j=0; j<N; j++)
+	 S[j][i] = conj(A[i][j]);
+
+   return S;
+}
 
 
 

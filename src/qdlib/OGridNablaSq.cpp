@@ -103,7 +103,7 @@ namespace QDLIB {
       /* Calc Tmax on the Grid */
       double T=0;
       for (int i=0; i < GridSystem::Dim(); i++)
-	 if (_mass[i] != -1) 
+	 if (_mass[i] > 0) 
 	    T += 1/ ( _mass[i] *  GridSystem::Dx(i) * GridSystem::Dx(i));
       
       T *= ( M_PI*M_PI / 2 );

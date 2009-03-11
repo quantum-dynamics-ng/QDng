@@ -2,7 +2,7 @@
 #define QDLIBOMULTISTATE_H
 
 #include "Operator.h"
-
+#include "WFMultistate.h"
 
 namespace QDLIB
 {
@@ -17,14 +17,30 @@ namespace QDLIB
     * 
     *	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
-   class OMultistate : public Operator, public Matrix<Operator*>
+   class OMultistate : public Operator
    {
       private:
 	 string _name;
+	 
+	 bool _hermitian;
+	 int _nstates;
+	 
+	 Operator* _matrix[QD_MAX_STATES][QD_MAX_STATES];
+	 
+	 WFMultistate *_buf1, *_buf2;
+	 
       public:
          OMultistate();
 
          ~OMultistate();
+	 
+	 void Hermitian(bool hermit) {_hermitian = hermit;}
+	 
+	 bool Hermitian() {return _hermitian;}
+	 
+	 void Add(Operator *O, int row, int col);
+	 
+	 int States() {return _nstates;}
 	 
 	 /* Interface implementation */
 	 virtual Operator* NewInstance();
@@ -58,7 +74,7 @@ namespace QDLIB
 
 	 virtual Operator* Offset(const double d);
 
-	 virtual Operator* operator-=(const double d);
+// 	 virtual Operator* operator-=(const double d);
 
 	 virtual Operator* Scale(const double d);
    };

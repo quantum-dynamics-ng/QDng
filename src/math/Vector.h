@@ -139,7 +139,7 @@ class Vector
 	     if(align_)
 		free(v_[s]);
 	     else 
-	        delete [] v_[s];
+	        delete[] v_[s];
 	     v_[s] = NULL;
  	  }
        }
@@ -168,6 +168,7 @@ class Vector
 	     destroy();
 	     if (nstrides_ < dest) nstrides_ = dest + 1;
 	     stride_size_ = vec.stride_size_;
+	     isRef_ = true;
 	  }
 	
 	  v_[dest] = vec.v_[source];

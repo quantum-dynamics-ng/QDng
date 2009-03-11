@@ -33,7 +33,19 @@ namespace QDLIB {
 	    }
 	    return _ref;
 	 }
-   
+            
+	 /**
+	  * Destroys the global clock.
+	  * 
+	  * Use this in the destructors of a master programm.
+	  */
+	 static void Destroy()
+	 {
+	    if (_ref != 0){
+	       delete _ref;
+	       _ref = 0;
+	    }
+	 }
    };
    
   

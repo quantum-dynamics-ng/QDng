@@ -12,7 +12,9 @@ namespace QDLIB
    OCheby::OCheby()
       : OPropagator(), _name("OCheby"), _hamilton(NULL),
       _order(0), _coeff(0), Rdelta(0.0), Gmin(0), ket0(NULL), ket1(NULL), ket2(NULL), buf(NULL)
-   {}
+   {
+      _needs.SetValue("hamiltonian", 0);
+   }
 
 
    OCheby::~OCheby()
@@ -167,11 +169,7 @@ namespace QDLIB
 
    ParamContainer & OCheby::TellNeeds( )
    {      
-      ParamContainer *p = new ParamContainer();
-      
-      p->SetValue("hamiltonian", 0);
-      
-      return *p;
+      return _needs;
    }
 
    

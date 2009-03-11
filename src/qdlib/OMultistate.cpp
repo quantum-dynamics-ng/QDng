@@ -1,18 +1,51 @@
-
-
 #include "OMultistate.h"
 #include "WFMultistate.h"
 
 namespace QDLIB
 {
 
-   OMultistate::OMultistate() : Operator(), Matrix<Operator*>(), _name("OMultistate")
-   {}
+   OMultistate::OMultistate() : Operator(), _name("OMultistate"), _hermitian(true),
+				 _nstates(0), _buf1(NULL), _buf2(NULL)
+   {
+      for(int i=0; i< QD_MAX_STATES; i++){
+	 for(int j=0; j< QD_MAX_STATES; j++){
+            _matrix[i][j] = NULL;
+	 }
+      }
+   }
 
 
    OMultistate::~OMultistate()
-   {}
+   {
+      for(int i=0; i< _nstates; i++){
+	 for(int j=0; j< _nstates; j++){
+	    if (_matrix[i][j] != NULL && i <= j)
+	       delete _matrix[i][j];
+	    if (_matrix[i][j] != NULL && i > j && !_hermitian)
+	       delete _matrix[i][j];
+	 }
+      }
+      if (_buf1 != NULL) delete _buf1;
+      if (_buf2 != NULL) delete _buf2;
+   }
 
+   /**
+    * Add an operator to the matrix.
+    */
+   void OMultistate::Add(Operator *O, int row, int col)
+   {
+      if (row >= QD_MAX_STATES || col >= QD_MAX_STATES)
+	 throw (EOverflow("More than QD_MAX_STATES not possible"));
+      
+      if (row+1 > _nstates)
+	 _nstates = row+1;
+      if (col+1 > _nstates)
+	 _nstates = col+1;
+      
+      cout << "fill " << QD_MAX_STATES<< " " << _nstates << " " << row << " " << col << endl;
+      _matrix[row][col] = O;
+   }
+   
    Operator * QDLIB::OMultistate::NewInstance( )
    {
       OMultistate *r = new OMultistate();
@@ -22,12 +55,45 @@ namespace QDLIB
 
    void QDLIB::OMultistate::Init( ParamContainer & params )
    {
+      _params = params;
    }
 
    
 
    void QDLIB::OMultistate::Init( WaveFunction * Psi )
    {
+      WFMultistate *psi;
+      
+      if (_nstates < 1)
+	 throw (EParamProblem ("Multistate operator is empty"));
+      
+      psi = dynamic_cast<WFMultistate*>(Psi);
+      
+      if (psi == NULL)
+	 throw (EIncompatible("Multistate operator can only act on WFMultistate", Psi->Name()));
+      
+      cout << psi->States() <<endl;
+      if (psi->States() != _nstates)
+	 throw (EParamProblem ("Multistate operator can only use WFs with same number of states"));
+      
+      _buf1 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
+      _buf2 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
+      
+      if (_hermitian){
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= i; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->Init(psi->State(j));
+	    }
+	 }
+      } else {
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= _nstates; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->Init(psi->State(j));
+	    }
+	 }
+      }
    } 
    
    const string & OMultistate::Name( )
@@ -37,19 +103,42 @@ namespace QDLIB
 
    dcomplex OMultistate::MatrixElement( WaveFunction * PsiBra, WaveFunction * PsiKet )
    {
-      return dcomplex(0,0);
+      WaveFunction* opPsi;
+      dcomplex c;
+      
+      opPsi=PsiKet->NewInstance();
+      
+      Apply( opPsi, PsiKet);
+      c = *PsiBra * opPsi;
+      delete opPsi;
+      
+      return c;
    }
 
    double OMultistate::Expec( WaveFunction * Psi )
    {
-      return 0;
+      dcomplex c;
+      
+      c = MatrixElement( Psi, Psi);
+      
+      return c.real();
    }
 
    void OMultistate::UpdateTime()
    {
-      for (lint i=0; i < num_rows(); i++){
-	 for (lint j=0; j < num_rows(); j++){
-	    (*this)[i][j]->UpdateTime();
+      if (_hermitian){
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= i; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->UpdateTime();
+	    }
+	 }
+      } else {
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= _nstates; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->UpdateTime();
+	    }
 	 }
       }
    }
@@ -57,9 +146,13 @@ namespace QDLIB
    double OMultistate::Emax()
    {
       double d=0;
+      double max;
       
-      for (lint i=0; i < num_rows(); i++){
-	 if ( (*this)[i][i]->Emax() > d) d = (*this)[i][i]->Emax();
+      for (lint i=0; i < _nstates; i++){
+	 if (_matrix[i][i] != NULL){
+	    max = _matrix[i][i]->Emax();
+	    if (max  > d) d = max;
+	 }
       }
       
       return d;
@@ -68,59 +161,118 @@ namespace QDLIB
    double OMultistate::Emin()
    {
       double d;
-      d = (*this)[0][0]->Emin();
+      double min;
       
-      for (lint i=1; i < num_rows(); i++){
-	 if ( (*this)[i][i]->Emin() < d) d = (*this)[i][i]->Emin();
+      d = _matrix[0][0]->Emin();
+      
+      for (lint i=1; i < _nstates; i++){
+	 if (_matrix[i][i] != NULL){
+	    min = _matrix[i][i]->Emin();
+	    if ( min < d) d = min;
+	 }
       }
       
       return d;
    }
    
-   /**
-    * \todo implement
-    */
    WaveFunction * OMultistate::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
+      WFMultistate *psi, *dPsi;
+      psi = dynamic_cast<WFMultistate*>(sourcePsi);
+      dPsi = dynamic_cast<WFMultistate*>(destPsi);
+      
+//       cout << psi << " " << dPsi << " "<< _matrix[0][0] << endl;
+      *((cVec*) dPsi) = dcomplex(0,0);
+      _matrix[0][0]->Apply(_buf1->State(0), psi->State(0));
+      *(dPsi->State(0)) += _buf1->State(0);
+      
+//       _matrix[1][1]->Apply(_buf1->State(1), psi->State(1));
+//       *(dPsi->State(1)) += _buf1->State(1);
 
-      return destPsi;
+//       for(int i=0; i< _nstates; i++){ 
+// 	 for(int j=0; j< _nstates; j++){
+// 	    if (_matrix[i][j] != NULL){
+// 	       if ( (i >= j && _hermitian) || !_hermitian){
+// 		  _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
+// 		  *(dPsi->State(i)) += _buf1->State(i);
+// 		  
+// 		  /* Calculate symm. elements only once */
+// 		  if (i != j && _hermitian){
+// 		     *(dPsi->State(j)) += _buf1->State(i);
+// 		  }
+// 	       }
+// 	    }
+// 	 }
+//       }
+      
+      return dPsi;
    }
 
-      /**
-    * \todo implement
-       */
 
-   WaveFunction * OMultistate::Apply( WaveFunction * Psi )
+   WaveFunction * OMultistate::Apply( WaveFunction *Psi )
    {
+      Apply( _buf2, Psi);
+      *Psi = _buf2;
       return Psi;
    }
    
-
-      /**
-    * \todo implement
-       */
-
    Operator * OMultistate::operator =( Operator * O )
    {
+      OMultistate *o;
+      
+      o = dynamic_cast<OMultistate*>(O);
+      
+      if (o == NULL)
+	 throw (EIncompatible("Multistate operator copy not possible", O->Name()));
+      
+      _hermitian = o->_hermitian;
+      _nstates = o->_nstates;
+      
+      if (_hermitian){
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= i; j++){
+	       if (o->_matrix[i][j] != NULL){
+		  _matrix[i][j] = o->_matrix[i][j]->NewInstance();
+		  *(_matrix[i][j]) = o->_matrix[i][j];
+	       }
+	    }
+	 }
+      } else {
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j< _nstates; j++){
+	       if (o->_matrix[i][j] != NULL){
+		  _matrix[i][j] = o->_matrix[i][j]->NewInstance();
+		  *(_matrix[i][j]) = o->_matrix[i][j];
+	       }
+	    }
+	 }
+      }
       return this;
    }
 
-      /**
-    * \todo implement
-       */
-
    Operator * OMultistate::operator *( Operator * O )
    {
+      throw (EIncompatible("Multistate operator can't be applied to other operators"));
       return O;
    }
 
    
    Operator* OMultistate::Offset(const double d)
    {
-      lint size = num_rows();
-      for (lint i=0; i < size; i++){
-	 for (lint j=0; j < size; j++){
-	    (*this)[i][j]->Offset(d);
+      
+      if (_hermitian){
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= i; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->Offset(d);
+	    }
+	 }
+      } else {
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j< _nstates; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->Offset(d);
+	    }
 	 }
       }
       return this;
@@ -128,17 +280,22 @@ namespace QDLIB
 
    Operator* OMultistate::Scale(const double d)
    {
-      lint size = num_rows();
-      for (lint i=0; i < size; i++){
-	 for (lint j=0; j < size; j++){
-	    (*this)[i][j]->Scale(d);
+      if (_hermitian){
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= i; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->Scale(d);
+	    }
+	 }
+      } else {
+	 for(int i=0; i< _nstates; i++){
+	    for(int j=0; j< _nstates; j++){
+	       if (_matrix[i][j] != NULL)
+		  _matrix[i][j]->Scale(d);
+	    }
 	 }
       }
       return this;
    }
 
 } /* namespace QDLIB */
-
-
-
-

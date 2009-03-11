@@ -28,7 +28,7 @@ namespace QDLIB {
       protected:
 	 ParamContainer _params;
       public:
-	 WaveFunction() {}
+	 WaveFunction() :cVec() {}
 	 WaveFunction(ParamContainer &params) : _params(params) {}
 	 /**
 	  * Make the class pure virtual.

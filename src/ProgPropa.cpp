@@ -16,8 +16,11 @@ namespace QDLIB {
    
    ProgPropa::~ProgPropa()
    {
-      if (_U != NULL) delete _U;
       if (_H != NULL) delete _H;
+      if (_U != NULL) delete _U;
+
+      /* remove the clock */
+      QDGlobalClock::Destroy();
    }
    
    
@@ -206,6 +209,8 @@ namespace QDLIB {
       }
       
       _reporter.Finalize();
+      
+      delete _h;
       delete Psi;
    }
 

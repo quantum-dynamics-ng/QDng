@@ -25,6 +25,8 @@ namespace QDLIB
    {
       private:
 	 string _name;
+	 ParamContainer _needs;
+	 
 	 Operator *_hamilton;   /* The Hamiltonian */
 	 int _order;           /* Recursion depth */
 	 cVec _coeff;          /* Coefficients including the Bessel functions at k'th order */

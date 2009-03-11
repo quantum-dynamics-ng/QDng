@@ -17,7 +17,7 @@ namespace QDLIB
    {
       private:
 	 string _name;
-	 lint _size;
+	 lint _nstates;
 	 WaveFunction* _states[QD_MAX_STATES];
 	 
 	 void _destroy();
@@ -26,7 +26,7 @@ namespace QDLIB
          ~WFMultistate();
 
 	 void Add(WaveFunction* Psi);
-	 lint Size();
+	 lint States();
 	 WaveFunction* State(lint index);
 	 
 	 /* Interface implementation WaveFunction */

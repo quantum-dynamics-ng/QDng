@@ -58,13 +58,28 @@ namespace QDLIB
 	 }
 	 return sum;
       } else if (name == "Multistate") { /* Matrix of operators */
-	 throw (EParamProblem ("Multistate operator not implementet yet") );
+	 cout << "Multistate operator: " << endl;
+// 	 throw (EParamProblem ("Multistate operator not implementet yet") );
 	 child = Onode->NextChild();
 	 Operator *osub;
-	 OMultistate *matrix;
-	 while (child != NULL){
-	    //osub = _LoadOperatorChain( child );
-	   // matrix(x,y) = osub
+	 OMultistate *matrix = new OMultistate();
+	 while (child->EndNode()){
+	    string name;
+	    stringstream ss_row, ss_col;
+	    int row, col;
+	    
+	    osub = LoadOperatorChain( child );
+	    if (osub == NULL)
+	       throw ( EParamProblem("Can't load operator") );
+	    
+	    name = child->Name();
+	    ss_row << name.substr(1, name.find('.')-1);
+	    ss_col << name.substr(name.find('.')+1);
+	    ss_row >> row;
+	    ss_col >> col;
+	    
+	    matrix->Add(osub, row, col);
+	    child->NextNode();
 	 }
 	 return matrix;
       } else { 
@@ -231,6 +246,7 @@ namespace QDLIB
 	 *Hamiltonian = h;
 	 delete sum;
       }
+      
       return U;
    }
    

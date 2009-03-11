@@ -4,7 +4,7 @@
 namespace QDLIB
 {
 
-   WFMultistate::WFMultistate() : WaveFunction(), _name("WFMultistate"), _size(0)
+   WFMultistate::WFMultistate() : WaveFunction(), _name("WFMultistate"), _nstates(0)
    {
       for (lint i=0; i < QD_MAX_STATES; i++){
 	 _states[i] = NULL;
@@ -22,13 +22,13 @@ namespace QDLIB
     */   
    void WFMultistate::_destroy()
    {
-      for (lint i=0; i < _size; i++){
+      for (lint i=0; i < _nstates; i++){
 	 if (_states[i] != NULL) { 
 	    delete _states[i];
 	    _states[i] = NULL;
 	 }
       }
-      _size = 0;
+      _nstates = 0;
    }
 
    /**
@@ -40,23 +40,24 @@ namespace QDLIB
     */
    void WFMultistate::Add( WaveFunction * Psi )
    {
-      if (_size >= QD_MAX_STATES )
+      if (_nstates >= QD_MAX_STATES )
 	 throw( EOverflow( "More states requested than possible (QD_MAX_STATES)") );
       
-      _states[_size] = Psi;
+      _states[_nstates] = Psi;
       
       /* link it into our space */
       if (Psi->strides() > 1)
 	 throw( EOverflow( "WFMultistate can't handle strided vectors") );
      
-      cVec::StrideRef(*((cVec*) Psi), 0, _size);
+      if (! cVec::StrideRef(*((cVec*) Psi), 0, _nstates))
+	 throw(Exception("Stride Failure"));
       
-      _size++;
+      _nstates++;
    }
    
-   lint WFMultistate::Size( )
+   lint WFMultistate::States( )
    {
-      return _size;
+      return _nstates;
    }
 
    WaveFunction*  WFMultistate::State(lint index)
@@ -68,11 +69,9 @@ namespace QDLIB
    {
       WFMultistate *r = new WFMultistate();
       
-      if (_size > 0){
-	 for (int i=0; i < _size; i++)
-	    r->Add(_states[i]->NewInstance());
-      }
-      
+      for (int i=0; i < _nstates; i++)
+	 r->Add(_states[i]->NewInstance());
+
      return r;
    }
 
@@ -89,7 +88,7 @@ namespace QDLIB
    {
       double d=0;
       
-      for(lint i=0; i < _size; i++){
+      for(lint i=0; i < _nstates; i++){
 	 d += _states[i]->Norm();
       }
       
@@ -99,7 +98,7 @@ namespace QDLIB
    void WFMultistate::Normalize( )
    {
       double norm = Norm();
-      for(lint i=0; i < _size; i++){
+      for(lint i=0; i < _nstates; i++){
 	 *(_states[i]) *= 1/norm;
       }
    }
@@ -112,12 +111,13 @@ namespace QDLIB
       if (psi == NULL)
 	 throw( EIncompatible("Incompatible in assignment", this->Name(), Psi->Name()) ) ;
       
-      _destroy(); /* remove old conent */
+      if (_nstates != psi->_nstates)
+	 throw( EIncompatible("Multistate WFs differ in number of states") ) ;
       
-      for(lint i=0; i < psi->_size; i++){
-	 add = psi->_states[i]->NewInstance();
-	 *add = psi;  /* copy */
-	 Add(add);
+     // _destroy(); /* remove old content */
+      
+      for(lint i=0; i < psi->_nstates; i++){
+	 *(_states[i]) = psi->_states[i];
       }
       
       return this;
@@ -127,7 +127,7 @@ namespace QDLIB
    {
       dcomplex c(0,0);
       
-      for(lint i=0; i < _size; i++){
+      for(lint i=0; i < _nstates; i++){
 	 c += *(_states[i]) * _states[i];
       }
       

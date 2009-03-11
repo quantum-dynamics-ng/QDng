@@ -199,9 +199,25 @@ namespace QDLIB {
 
    
 
+   /**
+    * C++ operator for application to WFs.
+    */
+   inline void operator*=(Operator &O, WaveFunction *Psi)
+   {
+      O.Apply( Psi );
+   }
    
+   /**
+    * C++ operator for application to WFs.
+    */
+//    inline WaveFunction* operator*(Operator &O, WaveFunction *Psi)
+//    {
+//       O.Apply( destPsi, Psi );
+//       
+//       return
+//    }
+
    
-   using namespace TNT;
    
    /**
     * Matrix-Vector Multiplication for Wavefunctions.
@@ -212,7 +228,7 @@ namespace QDLIB {
    template <class T, class U>
    void MatrixVectorMult(WaveFunction *Psi, const Matrix<T> &A, const Vector<U> &B)
    {
-      Subscript N;
+      lint N;
    
        
       if ( B.size() != A.num_cols() || A.num_cols() != Psi->size() ) {
@@ -243,7 +259,7 @@ namespace QDLIB {
    template <class T, class U>
    void MatrixMatrixMult(Matrix<T> *O, const Matrix<T> *A, const Matrix<U> *B)
    {
-       Subscript AN, BN;
+       lint AN, BN;
       
        
       if (B->num_rows() != A->num_cols()){
