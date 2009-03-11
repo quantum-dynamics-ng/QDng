@@ -9,19 +9,47 @@ namespace QDLIB {
    Logger* Logger::_ref = 0;
    
    
-   Logger::Logger() : _global_out(&std::cout), _supress(false), _debug(false), _laststream(0)
+   Logger::Logger() : _global_out(&std::cout), _supress(false), _debug(false),
+		  _line_length(LOGGER_LINE_LENGTH), _indent(0), _laststream(0)
    {
       /* Set the string objects for the output streams */
       _sout = _cout.rdbuf();
       _soutdbg = _coutdbg.rdbuf();
    }
    
-   Logger::~ Logger()
+   /**
+    * Add indentation to string.
+    */
+   void Logger::_IndentString(string &s)
+   {
+      string sind;
+      
+      for (int i=0; i < _indent * LOGGER_INDENT_WIDTH; i++)
+      {
+	 sind += " ";
+      }
+      
+      int spos;
+      
+      s.insert(0, sind);
+      spos = s.find("\n");
+      while (spos != string::npos && spos+1 < s.length()){
+	 s.insert(spos+1, sind);
+	 if (spos+1 >= s.length())
+	    spos = string::npos;
+	 else
+	    spos = s.find("\n", spos+1);
+	 
+      }
+   }
+   
+   void Logger::Close()
    {
       flush();
       _ofile.close();
+      delete _ref;
+      _ref = 0;
    }
-
    
    /**
     * return instance for singleton
@@ -108,9 +136,13 @@ namespace QDLIB {
    {
       if (_supress) return;
       
+      string s;
       
       if (_laststream == 1){
-	 *_global_out << _sout->str();
+	 s = _sout->str();
+	 _IndentString(s);
+	 *_global_out << s;
+	 
 // 	 std::cout << _sout->str();
 	 _sout->str("");
       }
@@ -122,9 +154,50 @@ namespace QDLIB {
       _laststream = 0;
    }
    
+   /**
+    * Create a formated section header.
+    */
+   void Logger::Header(const string &title, SectionType type)
+   {
+      switch(type){
+	 case Chapter:
+	       *_global_out << "\n\n";
+	       for(int i=0; i < _line_length; i++)
+		  *_global_out << "*";
+	       *_global_out << "\n";
+	       for(int i=0; i < (_line_length-title.length())/2; i++)
+		  *_global_out << " ";
+	       *_global_out << title<<endl;
+	       for(int i=0; i < _line_length; i++)
+		  *_global_out << "*";
+	       *_global_out << "\n\n";
+	    break;
+	 case Section:
+	       *_global_out << "\n*";
+	       for(int i=0; i < (_line_length-title.length())/2-2; i++)
+		  *_global_out << "*";
+	       *_global_out << " ";
+	       *_global_out << title << " ";
+	       for(int i=0; i < (_line_length-title.length())/2-2; i++)
+		  *_global_out << "*";
+	       *_global_out << "\n\n";
+	    break;
+	 case SubSection:
+	    *_global_out << "* ";
+	    *_global_out << title << endl<< endl;
+	    break;
+      }
+   }
+   
+   /**
+    * Create a formated section header.
+    */
+   void Logger::Header(const char *title, SectionType type)
+   {
+      string stitle(title);
+      
+      Header(stitle, type);
+   }
 }
-
-
-
 
 
