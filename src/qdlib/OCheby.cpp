@@ -99,7 +99,6 @@ namespace QDLIB
       MultElements( (cVec*) ket1, _exp);
       
       MultElements( (cVec*) Psi, _coeff[0]);
-      
       MultElementsCopy( (cVec*) buf, (cVec*) ket1, _coeff[1]);
       
       *Psi += buf;

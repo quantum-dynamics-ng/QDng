@@ -120,6 +120,10 @@ namespace QDLIB
 	    multi->Add( wfsub );
 	    child->NextNode();
 	 }
+	 if ( pm.isPresent("normalize") ) {
+	    cout << "Normalizing...\n";
+	    multi->Normalize();
+	 }
 	 return multi;
       } else if (name == "LC"){ /* Further recursion for linear combination */
 	 cout << "Build linear combination from wave functions:" << endl;

@@ -166,11 +166,14 @@ class Vector
 	  if (!isRef_){
 	     if (dest >= TNT_MAX_STRIDES) return false;
 	     destroy();
-	     if (nstrides_ < dest) nstrides_ = dest + 1;
+	     
 	     stride_size_ = vec.stride_size_;
 	     isRef_ = true;
+	     align_ = false;
+	     
 	  }
-	
+	  if (nstrides_ <= dest+1) nstrides_ = dest + 1;
+	  n_ = nstrides_ * stride_size_;
 	  v_[dest] = vec.v_[source];
 	  
 	  return true;

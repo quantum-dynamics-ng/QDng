@@ -69,8 +69,11 @@ namespace QDLIB
    {
       WFMultistate *r = new WFMultistate();
       
-      for (int i=0; i < _nstates; i++)
-	 r->Add(_states[i]->NewInstance());
+      r->_nstates=_nstates;
+      for (int i=0; i < _nstates; i++){
+	 r->_states[i] =  _states[i]->NewInstance();
+	 r->StrideRef(*(r->_states[i]), 0, i);
+      }
 
      return r;
    }
@@ -99,7 +102,7 @@ namespace QDLIB
    {
       double norm = Norm();
       for(lint i=0; i < _nstates; i++){
-	 *(_states[i]) *= 1/norm;
+	 MultElements( (cVec*) _states[i] , 1/norm );
       }
    }
 
@@ -118,6 +121,7 @@ namespace QDLIB
       
       for(lint i=0; i < psi->_nstates; i++){
 	 *(_states[i]) = psi->_states[i];
+	 //cVec::StrideRef(*(_states[i]), 0, i);
       }
       
       return this;

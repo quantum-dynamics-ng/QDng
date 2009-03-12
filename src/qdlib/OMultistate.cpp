@@ -118,8 +118,13 @@ namespace QDLIB
    double OMultistate::Expec( WaveFunction * Psi )
    {
       dcomplex c;
+      WaveFunction* opPsi;
       
-      c = MatrixElement( Psi, Psi);
+      opPsi=Psi->NewInstance();
+      Apply( opPsi, Psi);
+      c = *opPsi * Psi;
+      
+      delete opPsi;
       
       return c.real();
    }
@@ -181,29 +186,26 @@ namespace QDLIB
       psi = dynamic_cast<WFMultistate*>(sourcePsi);
       dPsi = dynamic_cast<WFMultistate*>(destPsi);
       
-//       cout << psi << " " << dPsi << " "<< _matrix[0][0] << endl;
       *((cVec*) dPsi) = dcomplex(0,0);
-      _matrix[0][0]->Apply(_buf1->State(0), psi->State(0));
-      *(dPsi->State(0)) += _buf1->State(0);
       
-//       _matrix[1][1]->Apply(_buf1->State(1), psi->State(1));
-//       *(dPsi->State(1)) += _buf1->State(1);
-
-//       for(int i=0; i< _nstates; i++){ 
-// 	 for(int j=0; j< _nstates; j++){
-// 	    if (_matrix[i][j] != NULL){
-// 	       if ( (i >= j && _hermitian) || !_hermitian){
-// 		  _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
-// 		  *(dPsi->State(i)) += _buf1->State(i);
-// 		  
-// 		  /* Calculate symm. elements only once */
-// 		  if (i != j && _hermitian){
-// 		     *(dPsi->State(j)) += _buf1->State(i);
-// 		  }
-// 	       }
-// 	    }
-// 	 }
-//       }
+      for(int i=0; i< _nstates; i++){ 
+	 for(int j=0; j< _nstates; j++){
+	    if (_matrix[i][j] != NULL){
+	       if ( (i >= j && _hermitian) || !_hermitian){
+//  		  cout << "H" << i << j << " * Psi" << j << endl;
+		  _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
+		  AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
+/*		  cout << "pen0 " << *(_buf1->State(i)) * psi->State(i) << endl;
+		  cout << "pen1 " << *(dPsi->State(i)) * psi->State(i) << endl;*/
+		  
+		  /* Calculate symm. elements only once */
+		  if (i != j && _hermitian){
+		     AddElements((cVec*) (dPsi->State(j)), (cVec*) (_buf1->State(i)));
+		  }
+	       }
+	    }
+	 }
+      }
       
       return dPsi;
    }
@@ -213,6 +215,7 @@ namespace QDLIB
    {
       Apply( _buf2, Psi);
       *Psi = _buf2;
+      
       return Psi;
    }
    
@@ -227,6 +230,12 @@ namespace QDLIB
       
       _hermitian = o->_hermitian;
       _nstates = o->_nstates;
+            
+      _buf1 =  dynamic_cast<WFMultistate*>(o->_buf1->NewInstance());
+      _buf2 =  dynamic_cast<WFMultistate*>(o->_buf2->NewInstance());
+      
+      *_buf1 = o->_buf1;
+      *_buf2 = o->_buf2;
       
       if (_hermitian){
 	 for(int i=0; i< _nstates; i++){

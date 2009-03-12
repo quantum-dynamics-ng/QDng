@@ -81,9 +81,7 @@ namespace QDLIB {
          /** Multiply with scalar */
          void operator*=(const double d)
          {
-            for (int i=0; i < cVec::size(); i++){
-               MultElements((cVec*) this, d);
-            }
+	    MultElements((cVec*) this, d);
          }
          
 	 /**
@@ -106,19 +104,20 @@ namespace QDLIB {
 
 	 
          /** Multiply with scalar */
-         WaveFunction* operator*(const double d)
-         {
-            WaveFunction *wf;
-      
-            wf = this->NewInstance();
-      
-            for (int i=0; i < cVec::size(); i++){
-               (*wf)[i] = (*this)[i] * d;
-            }
-	    
-	    return wf;
-         }
-         
+//          WaveFunction* operator*(const double d)
+//          {
+//             WaveFunction *wf;
+//       
+//             wf = this->NewInstance();
+//       
+//             for (int i=0; i < cVec::size(); i++){
+//                (*wf)[i] = (*this)[i] * d;
+//             }
+// 	    
+// 	    return wf;
+//          }
+
+	 
 	 /** Multiply with complex number */
 	 WaveFunction* operator*=(const dcomplex d)
 	 {
@@ -149,9 +148,8 @@ namespace QDLIB {
 	 WaveFunction* operator+=(WaveFunction* Psi)
 	 {
 	    if (cVec::size() != Psi->size()) throw ( EParamProblem("Grids differ in size") );
-            for (int i=0; i < cVec::size(); i++){
-	       (*(cVec*)this)[i] += (*(cVec*) Psi)[i];
-	    }
+	    
+	    AddElements((cVec*) this, (cVec*) Psi);
 	    return this;
 	    
 	 }
