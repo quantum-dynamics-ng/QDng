@@ -38,23 +38,24 @@ namespace QDLIB
     * into the storage of the multistate vector.
     * (Representet as strided vector)
     */
-   void WFMultistate::Add( WaveFunction * Psi )
+   void WFMultistate::Add( WaveFunction * Psi, lint index)
    {
-      if (_nstates >= QD_MAX_STATES )
+      if (index+1 >= QD_MAX_STATES )
 	 throw( EOverflow( "More states requested than possible (QD_MAX_STATES)") );
       
-      _states[_nstates] = Psi;
+      if (index+1 > _nstates)
+	 _nstates = index+1;
+      
+       _states[index] = Psi;
       
       /* link it into our space */
       if (Psi->strides() > 1)
 	 throw( EOverflow( "WFMultistate can't handle strided vectors") );
      
-      if (! cVec::StrideRef(*((cVec*) Psi), 0, _nstates))
+      if (! cVec::StrideRef(*((cVec*) Psi), 0, index))
 	 throw(Exception("Stride Failure"));
-      
-      _nstates++;
    }
-   
+      
    lint WFMultistate::States( )
    {
       return _nstates;
@@ -78,8 +79,58 @@ namespace QDLIB
      return r;
    }
 
+   
    void WFMultistate::Init( ParamContainer & params )
    {
+      int reqsize;
+      WaveFunction *wflast = NULL;
+      
+      _params = params;
+      
+      _params.GetValue("states", reqsize);
+      
+      if (reqsize >= QD_MAX_STATES )
+	 throw( EOverflow( "More states requested than possible (QD_MAX_STATES)") );
+      
+      if (reqsize < _nstates )
+	 throw( EParamProblem( "Less states requested than provided!?") );
+      
+      /* look for empty states */
+      for (int i=0; i < _nstates; i++){
+	 if (_states[i] != NULL)
+	    wflast = _states[i];
+	 else if (wflast != NULL){
+	    _states[i] = wflast->NewInstance();
+	    *((cVec*) _states[i]) = dcomplex(0,0);
+	    cVec::StrideRef(*((cVec*) (_states[i])), 0, i);
+	 }
+      }
+      /* same thing again to refill lower states */
+      for (int i=0; i < _nstates; i++){
+	 if (_states[i] != NULL)
+	    wflast = _states[i];
+	 else if (wflast != NULL){
+	    _states[i] = wflast->NewInstance();
+	    *((cVec*) _states[i]) = dcomplex(0,0);
+	    cVec::StrideRef(*((cVec*) (_states[i])), 0, i);
+	 }
+      }
+      
+      if (wflast == NULL)
+	 throw (EParamProblem("Empty multi state wave function"));
+      
+      /* resize if needed */
+      if (_nstates != reqsize){
+	 for (int i=_nstates; i < reqsize; i++){
+	    _states[i] = wflast->NewInstance();
+	    *((cVec*) _states[i]) = dcomplex(0,0);
+	    cVec::StrideRef(*((cVec*) (_states[i])), 0, i);
+	 }
+      }
+      _nstates = reqsize;
+      
+      
+      
    }
 
    const string & WFMultistate::Name( )
@@ -140,5 +191,7 @@ namespace QDLIB
    
 
    
-} /* namespace QDLIB */
+}
+
+/* namespace QDLIB */
 

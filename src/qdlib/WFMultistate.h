@@ -25,7 +25,8 @@ namespace QDLIB
          WFMultistate();
          ~WFMultistate();
 
-	 void Add(WaveFunction* Psi);
+	 void Add(WaveFunction* Psi, lint index);
+	 
 	 lint States();
 	 WaveFunction* State(lint index);
 	 

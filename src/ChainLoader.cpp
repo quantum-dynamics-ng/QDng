@@ -59,7 +59,7 @@ namespace QDLIB
 	 return sum;
       } else if (name == "Multistate") { /* Matrix of operators */
 	 cout << "Multistate operator: " << endl;
-// 	 throw (EParamProblem ("Multistate operator not implementet yet") );
+	 
 	 child = Onode->NextChild();
 	 Operator *osub;
 	 OMultistate *matrix = new OMultistate();
@@ -110,16 +110,26 @@ namespace QDLIB
       pm = WFNode->Attributes();
       pm.GetValue( "name", name );
       
-      if (name == "Multistate"){
+      if (name == "Multistate"){ /* Further recursion for multistate WF */
 	 cout << "Multi state wave function:" << endl;
 	 child = WFNode->NextChild();
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
 	 while (child->EndNode()){
+	    string name;
+	    stringstream ss;
+	    int state;
+	    
  	    wfsub = LoadWaveFunctionChain( child );
-	    multi->Add( wfsub );
+	    
+	    name = child->Name();
+	    ss << name.substr(2);
+	    ss >> state;
+	    cout << name << " "<< state << endl;
+	    multi->Add( wfsub, state);
 	    child->NextNode();
 	 }
+	 multi->Init(pm);
 	 if ( pm.isPresent("normalize") ) {
 	    cout << "Normalizing...\n";
 	    multi->Normalize();
