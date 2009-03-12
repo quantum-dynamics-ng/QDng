@@ -86,8 +86,6 @@ namespace QDLIB
       if ( !_isUpToDate ) _Init(Psi);
       
       WaveFunction *psi = Psi->NewInstance();
-     
-      cout << _exp << endl;
       
       *_ham *= psi;
       *psi *= 2*_exp;

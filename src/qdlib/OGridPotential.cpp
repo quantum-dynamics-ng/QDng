@@ -53,11 +53,6 @@ namespace QDLIB
 	    }
 	 }
 	 
-/*	 for (int i=0; i < 256; i+=2){
-	    for (int j=0; j < 256; j+=2){
-	       cout <<  i << " " << j << " " << (*this)[256*i+j] << endl;
-	    }
-	 }*/
 	 _init = false;
 	 return;
       }

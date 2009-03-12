@@ -31,7 +31,6 @@ namespace QDLIB {
       if (_size > 1) {
 	 for (k=1; k < _size; k++)             /* Loop over operators */
 	    _O[k]->UpdateTime();
-	 cout << "size: " << _size << endl;
 	    for (int i=0; i < dVec::size(); i++)   /* Loop over grid points */
 	       (*this)[i] += (*(_O[k]))[i];
       }

@@ -42,7 +42,6 @@ namespace QDLIB
       if (col+1 > _nstates)
 	 _nstates = col+1;
       
-      cout << "fill " << QD_MAX_STATES<< " " << _nstates << " " << row << " " << col << endl;
       _matrix[row][col] = O;
    }
    
@@ -72,7 +71,6 @@ namespace QDLIB
       if (psi == NULL)
 	 throw (EIncompatible("Multistate operator can only act on WFMultistate", Psi->Name()));
       
-      cout << psi->States() <<endl;
       if (psi->States() != _nstates)
 	 throw (EParamProblem ("Multistate operator can only use WFs with same number of states"));
       
@@ -192,12 +190,9 @@ namespace QDLIB
 	 for(int j=0; j< _nstates; j++){
 	    if (_matrix[i][j] != NULL){
 	       if ( (i >= j && _hermitian) || !_hermitian){
-//  		  cout << "H" << i << j << " * Psi" << j << endl;
 		  _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
 		  AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
-/*		  cout << "pen0 " << *(_buf1->State(i)) * psi->State(i) << endl;
-		  cout << "pen1 " << *(dPsi->State(i)) * psi->State(i) << endl;*/
-		  
+
 		  /* Calculate symm. elements only once */
 		  if (i != j && _hermitian){
 		     AddElements((cVec*) (dPsi->State(j)), (cVec*) (_buf1->State(i)));

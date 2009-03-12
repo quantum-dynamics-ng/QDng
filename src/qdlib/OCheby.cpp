@@ -261,9 +261,6 @@ namespace QDLIB
 	 _coeff[i] = 2.0 * cexp(OPropagator::Exponent()*(Rdelta + Gmin)) * bessel[i];
       }
       
-//       cout << "Bessel :\n" << bessel;
-//       cout << "exp_clock: "<<OPropagator::Exponent().imag() << endl;
-      
       _exp  = OPropagator::Exponent()/clock->Dt();
       _params.SetValue("exponent Re", _exp.real());
       _params.SetValue("exponent Im", _exp.imag());

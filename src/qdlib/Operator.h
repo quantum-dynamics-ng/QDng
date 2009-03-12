@@ -266,7 +266,6 @@ namespace QDLIB {
 	 throw( EIncompatible("num_cols != num_rows of Matrices") );
       }
 	  
-      cout << "Matrix Ok" << endl;
       AN = A->num_cols();
       BN = A->num_rows();
       

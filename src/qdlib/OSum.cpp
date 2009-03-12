@@ -129,7 +129,6 @@ namespace QDLIB {
       double d = 0;
       for (int i=0; i < _size; i++){
 	 d += _O[i]->Emax();
-	 cout << "Emax: " << _O[i]->Emax() << _O[i]->Name() << endl;
       }
       
       return d;

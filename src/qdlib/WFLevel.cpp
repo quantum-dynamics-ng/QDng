@@ -90,7 +90,6 @@ namespace QDLIB {
    void WFLevel::Normalize()
    {
       double  d = 1/Norm();
-      cout << "factor: " << d << endl;
       for (int i=0; i < size(); i++){
 	 (*this)[i] = (*this)[i] * d;
       }

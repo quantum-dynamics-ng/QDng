@@ -181,8 +181,6 @@ namespace QDLIB {
 	
 	 diag22symm(g0, g1, g10, t0, t1);
 	 
-	 cout << g0 << " " << g1 << " " << g10 << " " <<t0 << " " <<t1<<endl;
-	 cout << GridSystem::Dx(0) << " " <<GridSystem::Dx(1)<<endl;
 	 T = t0/ (GridSystem::Dx(0) * GridSystem::Dx(0));
 	 T += t1/ (GridSystem::Dx(1) * GridSystem::Dx(1));
       } else {
@@ -190,7 +188,6 @@ namespace QDLIB {
 	    T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));
       }
       T *= ( M_PI*M_PI / 2 );
-      cout << "Tmax " << T << endl;
       return T;
    }
 	 
