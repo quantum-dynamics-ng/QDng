@@ -2,7 +2,7 @@
 
 #include "tools/FileSingleDefs.h"
 #include "ChainLoader.h"
-
+#include "tools/Logger.h"
 
 namespace QDLIB {
 
@@ -31,7 +31,8 @@ namespace QDLIB {
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       ParamContainer attr;
-   
+      Logger& log = Logger::InstanceRef();
+      
       attr = _propaNode.Attributes();
    
       double dt;
@@ -70,13 +71,18 @@ namespace QDLIB {
 	 attr.GetValue("fname", _fname);
       }
             
-      cout << "Propagation parameters:\n\n";
-      cout << "\tNumber of steps: " <<  clock->Steps() << endl;
-      cout.precision(2); cout << "\tTime step: " << fixed << clock->Dt() << endl;
-      cout.precision(2); cout << "\tWrite cycles: " << _wcycle << endl;
-      cout.precision(2); cout << "\tOverall time: " << fixed << clock->Steps() * clock->Dt() << endl;
-      cout << "\tBasename for wave function output: " << _fname << endl;
-      cout.precision(6); cout << scientific;
+      log.Header("Propagation parameters", Logger::Section);
+    
+      log.IndentInc();
+      log.cout() << "Number of steps: " <<  clock->Steps() << endl;
+      log.cout().precision(2);
+      log.cout() << "Time step: " << fixed << clock->Dt() << endl;
+      log.cout() << "Write cycles: " << _wcycle << endl;
+      log.cout() << "\tOverall time: " << fixed << clock->Steps() * clock->Dt() << endl;
+      log.cout() << "\tBasename for wave function output: " << _fname << endl;
+      log.IndentDec();
+
+      log.cout().precision(6); log.cout() << scientific;
       
       /* Check the reporter values */
       if ( attr.isPresent("norm") ) {
@@ -113,6 +119,8 @@ namespace QDLIB {
     */
    void ProgPropa::Run()
    {
+      Logger& log = Logger::InstanceRef();
+      
       XmlNode *section;
       Operator *_h;
       
@@ -145,7 +153,7 @@ namespace QDLIB {
       section = _ContentNodes->FindNode( "filterpre" );
       if (section != NULL) {
 	 string s(_dir+DEFAULT_EXPEC_PRE_FILENAME);
-	 cout << "Using pre propagation step filters:\n\n";
+	 log.cout() << "Using pre propagation step filters:\n\n";
 	 _prefilter.SetDefaultName(s);
 	 _prefilter.Init( section );
 	 _usepre = true;
@@ -156,7 +164,7 @@ namespace QDLIB {
       section = _ContentNodes->FindNode( "filterpost" );
       if (section != NULL) {
 	 string s(_dir+DEFAULT_EXPEC_POST_FILENAME);
-	 cout << "Using post propagation step filters:\n\n";
+	 log.cout() << "Using post propagation step filters:\n\n";
 	 _postfilter.SetDefaultName(s);
 	 _postfilter.Init( section );
 	 _usepost = true;
@@ -168,7 +176,7 @@ namespace QDLIB {
            
       /* Make sure our hamiltonian is initalized */
       _h->Init(Psi);
-      cout << "Initial engergy: " << _h->Expec(Psi) << endl;
+      log.cout() << "Initial engergy: " << _h->Expec(Psi) << endl;
       
       /* Copy, since the propagator will propably scale it/modify etc. */
       _H = _h->NewInstance();
@@ -187,7 +195,7 @@ namespace QDLIB {
       ParamContainer Upm;
     
       Upm = _U->Params();
-      cout << "Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
       
       /* Init file writer for wf output */
       FileWF wfile;

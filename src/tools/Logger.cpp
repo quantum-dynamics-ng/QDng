@@ -43,6 +43,13 @@ namespace QDLIB {
       }
    }
    
+   /**
+    * Close the logger.
+    * 
+    * Flushes the output and closes open files.
+    * Destroys the singleton.
+    * 
+    */
    void Logger::Close()
    {
       flush();

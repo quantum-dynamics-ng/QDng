@@ -14,21 +14,13 @@ namespace QDLIB {
    * Defines what an operator must provide.
    * Since this is an abstract class, all the defined operations apply to pointers.
    * The left handed argument (in this case the operator) has to dereferenced with *O.
-   * Application to a WaveFunction could look like:
    * 
-   * \code
-   * ...
-   * Operator *O;
-   * WaveFunction *WF1, *WF2;
-   *
-   * //Initialize O & WF with specific types.
-   * ...
-   * WF2 = (*O) * WF1;
-   * WF2 = (*O) * ((*O) * WF1);  <-- Don't do this, causes memory leaks
+   * An operator has to initialized in the following way:
+   * \li Call Init with parameter set
+   * \li Call Init with WaveFunction
+   * \li update the clock
    * 
-   * *O *= WF1;    Apply the operator in-place. Much faster.
-   * \endcode
-   * 
+   * Re-Inits with different parameters or WaveFunctions are forbidden!
    */
    class Operator
    {

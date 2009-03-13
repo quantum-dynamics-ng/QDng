@@ -12,6 +12,7 @@
 #include "tools/Exception.h"
 #include "tools/Getopt.h"
 #include "tools/XmlParser.h"
+#include "tools/Logger.h"
 
 #include "modules/ModuleLoader.h"
 
@@ -26,6 +27,8 @@ int main(int argc, char **argv)
 
    Getopt cmdline;
    string fname, dir;
+   
+   Logger& log = Logger::InstanceRef();
    
    XmlParser XMLfile;
    XmlNode   rnodes;
@@ -107,7 +110,7 @@ int main(int argc, char **argv)
 	 if (progname == "propa"){
 	    ProgPropa propa(*prognodes);
 	    propa.SetDirectory(dir);
-	    cout << "\n\t\t\t*** Run Propagation ***\n\n";
+	    log.Header("Propagation", Logger::Chapter);
 	    propa.Run();
 	 } else if (progname == "auto"){
 /*	    ProgAuto autoc(rnodes);
@@ -117,7 +120,7 @@ int main(int argc, char **argv)
 	 } else if (progname == "eigen") {
 	    ProgEigen eigen(*prognodes);
 	    eigen.SetDirectory(dir);
-	    cout << "\n\t\t\t*** Run Eigenfunction solver ***\n\n";
+	    log.Header("Imaginary Time Eigenfunctions", Logger::Chapter);
 	    eigen.Run();
 	 } else if (progname == "oct") {
 	    throw ( EParamProblem ("OCT not implementet yet") );
