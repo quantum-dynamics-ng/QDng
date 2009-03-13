@@ -1,6 +1,7 @@
 #include "Reporter.h"
 #include "tools/QDGlobalClock.h"
 #include "fft/fft.h"
+#include "tools/Logger.h"
 
 namespace QDLIB
 {
@@ -46,28 +47,31 @@ namespace QDLIB
    void Reporter::Analyze( WaveFunction * Psi )
    {
       QDClock *clock = QDGlobalClock::Instance();
+      Logger& log = Logger::InstanceRef();
+      
       dcomplex proj;
    
       /* Write header */
       if (_step == 0){
  	 _specbuf.newsize(clock->Steps()+1);
-	 cout << "Step\tTime[au]";
-	 if (_norm) cout << "\tNorm";
-	 if (_proj0 && !_proj0Sq) cout << "\t\t<Psi0|PsiT>";
-	 if (_proj0 && _proj0Sq) cout << "\t\t|<Psi0|PsiT>|^2";
-	 if (_energy) cout << "\t\tEnergy[au]";
-	 cout << endl;
+	 log.cout() << "Step\tTime[au]";
+	 if (_norm) log.cout() << "\tNorm";
+	 if (_proj0 && !_proj0Sq) log.cout() << "\t\t<Psi0|PsiT>";
+	 if (_proj0 && _proj0Sq) log.cout() << "\t\t|<Psi0|PsiT>|^2";
+	 if (_energy) log.cout() << "\t\tEnergy[au]";
+	 log.cout() << endl;
+	 log.flush();
       }
       _step++;
       
       /* Write time */
-      cout.precision(1);
-      cout << clock->TimeStep() << "\t" << fixed << clock->Time()<< "\t";
+      log.cout().precision(1);
+      log.cout() << clock->TimeStep() << "\t" << fixed << clock->Time()<< "\t";
    
       /* Norm */
       if (_norm){
-	 cout.precision(8);
-	 cout << "\t" << fixed << Psi->Norm();
+	 log.cout().precision(8);
+	 log.cout() << "\t" << fixed << Psi->Norm();
       } 
    
       /* projection and spectrum */
@@ -75,9 +79,9 @@ namespace QDLIB
 	 proj = *_psi0 * Psi;
 	 
 	 if (_proj0Sq) /* Squared - Normal*/
-	    cout << "\t" << cabs(proj)*cabs(proj);
+	    log.cout() << "\t" << cabs(proj)*cabs(proj);
 	 else
-	    cout << "\t" << proj;
+	    log.cout() << "\t" << proj;
 	 
 	 if (_spectrum)
 	 {
@@ -91,10 +95,11 @@ namespace QDLIB
       /* Energy */
       if (_energy)
       {
-	 cout << "\t\t" << _H->Expec(Psi);
+	 log.cout() << "\t\t" << _H->Expec(Psi);
       }
    
-      cout << endl;
+      log.cout() << endl;
+      log.flush();
    }
 
    /**
@@ -105,8 +110,10 @@ namespace QDLIB
    void Reporter::Finalize( )
    {
       QDClock *clock = QDGlobalClock::Instance();
+      Logger& log = Logger::InstanceRef();
       
-      cout << "\n\n" << clock->Steps() << " step done (" << clock->Steps() *  clock->Dt() << " au)\n";
+      
+      log.cout() << "\n\n" << clock->Steps() << " step done (" << clock->Steps() *  clock->Dt() << " au)\n\n";
       
       if (_spectrum){
          cVec spec(_specbuf.size());
@@ -133,11 +140,11 @@ namespace QDLIB
 	     ofile << "\t"<< cabs(spec[i]) / (clock->Steps()/2) << endl;
 	  }
 	  ofile.close();
-	  cout << "Autocorellation power spectrum written to file: " << _specname.c_str() << endl << endl;
+	  log.cout() << "Autocorellation power spectrum written to file: " << _specname.c_str() << endl << endl;
 	 }  catch (...)
-	 {cout << "!!! Can't write auto correlation spectrum\n\n";}
-	  
+	 {log.cout() << "!!! Can't write auto correlation spectrum\n\n";}
       }
+      log.flush();
    }
 
    

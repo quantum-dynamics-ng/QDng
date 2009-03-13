@@ -78,10 +78,11 @@ namespace QDLIB {
       log.cout().precision(2);
       log.cout() << "Time step: " << fixed << clock->Dt() << endl;
       log.cout() << "Write cycles: " << _wcycle << endl;
-      log.cout() << "\tOverall time: " << fixed << clock->Steps() * clock->Dt() << endl;
-      log.cout() << "\tBasename for wave function output: " << _fname << endl;
+      log.cout() << "Overall time: " << fixed << clock->Steps() * clock->Dt() << endl;
+      log.cout() << "Basename for wave function output: " << _fname << endl;
+      log.flush();
+      
       log.IndentDec();
-
       log.cout().precision(6); log.cout() << scientific;
       
       /* Check the reporter values */
@@ -130,6 +131,10 @@ namespace QDLIB {
       /* fetch the ChildNodes */
       _ContentNodes = _propaNode.NextChild();
       
+      log.Header( "QM Initialization", Logger::Section);
+      log.Header( "Propagator: ", Logger::SubSection);
+      
+      
       /* Load & Init the propagator */
       section = _ContentNodes->FindNode( "propagator" );
       if (section == NULL)
@@ -139,7 +144,6 @@ namespace QDLIB {
       delete section;
             
       /* Load the initial Wavefunction */
-      cout << "Initalize Wave function:\n";
       WaveFunction *Psi;
       section = _ContentNodes->FindNode( "wf" );
       if (section == NULL)
@@ -153,10 +157,12 @@ namespace QDLIB {
       section = _ContentNodes->FindNode( "filterpre" );
       if (section != NULL) {
 	 string s(_dir+DEFAULT_EXPEC_PRE_FILENAME);
-	 log.cout() << "Using pre propagation step filters:\n\n";
+	 log.Header( "Using pre propagation step filters", Logger::SubSection);
+	 log.IndentInc();
 	 _prefilter.SetDefaultName(s);
 	 _prefilter.Init( section );
 	 _usepre = true;
+	 log.IndentDec();
 	 delete section;
       }
 
@@ -164,10 +170,12 @@ namespace QDLIB {
       section = _ContentNodes->FindNode( "filterpost" );
       if (section != NULL) {
 	 string s(_dir+DEFAULT_EXPEC_POST_FILENAME);
-	 log.cout() << "Using post propagation step filters:\n\n";
+	 log.Header("Using post propagation step filters", Logger::SubSection);
+	 log.IndentInc();
 	 _postfilter.SetDefaultName(s);
 	 _postfilter.Init( section );
 	 _usepost = true;
+	 log.IndentDec();
 	 delete section;
       }
       
@@ -207,6 +215,7 @@ namespace QDLIB {
       wfile << Psi;
       
       /* The propagation loop */
+      log.Header( "Free propagation", Logger::Section);
       for (lint i=0; i <= clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */

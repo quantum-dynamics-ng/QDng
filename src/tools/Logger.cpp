@@ -166,6 +166,7 @@ namespace QDLIB {
     */
    void Logger::Header(const string &title, SectionType type)
    {
+      flush();
       switch(type){
 	 case Chapter:
 	       *_global_out << "\n\n";

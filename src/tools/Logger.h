@@ -135,17 +135,17 @@ namespace QDLIB {
       /**
        * Set the number of indents.
        */
-      void SetIndent(int indent) { if (indent >=0) _indent = indent;}
+      void SetIndent(int indent) { if (indent >=0) {flush();_indent = indent;}}
       
       /**
        * Increase Indent.
        */
-      void IndentInc() { _indent++;}
+      void IndentInc() { flush(); _indent++;}
       
       /**
        * Decrease Indent.
        */
-      void IndentDec() { if (_indent>0) _indent--;}
+      void IndentDec() { if (_indent>0) {flush(); _indent--;}}
 
    };
 

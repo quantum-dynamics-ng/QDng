@@ -1,5 +1,6 @@
 #include "FiltersList.h"
 #include "ChainLoader.h"
+#include "tools/Logger.h"
 
 namespace QDLIB {
 
@@ -54,6 +55,8 @@ namespace QDLIB {
     */
    void FiltersList::Init( XmlNode *section )
    {
+      Logger& log = Logger::InstanceRef();
+      
       ParamContainer params;
       XmlNode *filters;
       
@@ -102,7 +105,7 @@ namespace QDLIB {
       }
       
       if (_writefile){
-	 cout << _fname << "<- logfile\n";
+	 log.cout() << "Filter expectation value file: " << _fname << endl; log.flush();
          _ofile.open(_fname.c_str());
       }
    }

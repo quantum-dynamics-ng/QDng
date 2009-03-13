@@ -28,6 +28,8 @@ int main(int argc, char **argv)
    Getopt cmdline;
    string fname, dir;
    
+   int retval = EXIT_SUCCESS;
+   
    Logger& log = Logger::InstanceRef();
    
    XmlParser XMLfile;
@@ -65,7 +67,7 @@ int main(int argc, char **argv)
 	 mods->UserPath( fname );
       }
       
-      /* Provide a user path for module loading */
+      /* The global output path */
       if (cmdline.GetOption('d')){
 	 cmdline.GetOption('d', dir);
 	 if (dir[dir.length()-1] != '/' && ! dir.empty())
@@ -132,12 +134,15 @@ int main(int argc, char **argv)
 	 
 	 prognodes->NextNode();
       }
-      
+      log.cout() << "Normal termination\n\n";
    } catch (Exception e) {
       cerr << "\n\n\t!!!A problematic error occured:\n\t";
       cerr << e.GetMessage() << "\n\n\n";
+      log.cout() << "Error termination\n\n";
+      retval = EXIT_FAILURE;
    }
   
   delete mods;
-  return EXIT_SUCCESS;
+  log.Close();
+  exit(retval);
 }

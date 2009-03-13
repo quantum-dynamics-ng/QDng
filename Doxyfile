@@ -76,7 +76,9 @@ FILE_PATTERNS          = *.h \
 RECURSIVE              = YES
 EXCLUDE                = src/tnt-3.0.8-mod1/ \
                          /home/markus/src/QDng/devel-main/src/cppunit-1.12.1 \
-                         /home/markus/src/QDng/devel-main/src/tests
+                         /home/markus/src/QDng/devel-main/src/tests \
+                         src/tnt \
+                         src/cppunit
 EXCLUDE_SYMLINKS       = YES
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = 

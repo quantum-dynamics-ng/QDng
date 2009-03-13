@@ -3,6 +3,7 @@
 #include "tools/FileSingleDefs.h"
 #include "modules/ModuleLoader.h"
 #include "tools/QDGlobalClock.h"
+#include "tools/Logger.h"
 
 #include "qdlib/OSum.h"
 #include "qdlib/OGridSum.h"
@@ -16,11 +17,12 @@ namespace QDLIB
    /**
     * Recursive method to load an operator chain.
     * 
-    * Should recognize collective operators (OSum, OGridSum, OMultistate)
+    * Should recognize special collective operators (OSum, OGridSum, OMultistate)
     */
    Operator* ChainLoader::LoadOperatorChain( XmlNode * Onode )
    {
       ModuleLoader* mods = ModuleLoader::Instance();
+      Logger& log = Logger::InstanceRef();
       ParamContainer pm;
       string name;
       Operator *O=NULL;
@@ -30,7 +32,8 @@ namespace QDLIB
       pm.GetValue( "name", name );
       
       if (name == "Sum"){ /* Sum operator */
-	 cout << "Sum of operators: " << endl;
+	 log.cout() << "Sum of operators:\n";
+	 log.IndentInc();
 	 child = Onode->NextChild();
 	 Operator *osub;
 	 OSum *sum = new OSum();
@@ -41,6 +44,8 @@ namespace QDLIB
 	    sum->Add( osub );
 	    child->NextNode();
 	 }
+	 log.flush();
+	 log.IndentDec();
 	 return sum;	 
       } else if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
@@ -58,8 +63,8 @@ namespace QDLIB
 	 }
 	 return sum;
       } else if (name == "Multistate") { /* Matrix of operators */
-	 cout << "Multistate operator: " << endl;
-	 
+	 log.cout() << "Multistate operator:\n";
+	 log.IndentInc();
 	 child = Onode->NextChild();
 	 Operator *osub;
 	 OMultistate *matrix = new OMultistate();
@@ -68,23 +73,27 @@ namespace QDLIB
 	    stringstream ss_row, ss_col;
 	    int row, col;
 	    
-	    osub = LoadOperatorChain( child );
-	    if (osub == NULL)
-	       throw ( EParamProblem("Can't load operator") );
-	    
 	    name = child->Name();
 	    ss_row << name.substr(1, name.find('.')-1);
 	    ss_col << name.substr(name.find('.')+1);
 	    ss_row >> row;
 	    ss_col >> col;
 	    
+	    log.cout() << "H(" << row << "," << col << ")\n";
+	    
+	    osub = LoadOperatorChain( child );
+	    if (osub == NULL)
+	       throw ( EParamProblem("Can't load operator") );
+	    
 	    matrix->Add(osub, row, col);
 	    child->NextNode();
 	 }
+	 log.flush();
+	 log.IndentDec();
 	 return matrix;
       } else { 
 	 O = mods->LoadOp( name );
-	 cout << pm << "---------------\n";
+	 log.cout() << pm << "---------------\n";
 	 O->Init(pm);
       }
       return O;
@@ -102,6 +111,8 @@ namespace QDLIB
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, bool empty)
    {
       ModuleLoader* mods = ModuleLoader::Instance();
+      Logger& log = Logger::InstanceRef();
+      
       ParamContainer pm;
       string name;
       WaveFunction *WF=NULL;
@@ -111,7 +122,8 @@ namespace QDLIB
       pm.GetValue( "name", name );
       
       if (name == "Multistate"){ /* Further recursion for multistate WF */
-	 cout << "Multi state wave function:" << endl;
+	 log.cout() << "Multi state wave function:" << endl;
+	 log.IndentInc();
 	 child = WFNode->NextChild();
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
@@ -131,12 +143,14 @@ namespace QDLIB
 	 }
 	 multi->Init(pm);
 	 if ( pm.isPresent("normalize") ) {
-	    cout << "Normalizing...\n";
+	    log.cout() << "Normalized\n";
 	    multi->Normalize();
 	 }
+	 log.IndentDec();
 	 return multi;
       } else if (name == "LC"){ /* Further recursion for linear combination */
-	 cout << "Build linear combination from wave functions:" << endl;
+	 log.cout() << "Build linear combination from wave functions:" << endl;
+	 log.IndentInc();
 	 child = WFNode->NextChild();
 	 WaveFunction *wfadd;
 	 double coeff;
@@ -158,9 +172,10 @@ namespace QDLIB
 	    child->NextNode();
 	 }
 	 if ( pm.isPresent("normalize") ) {
-	    cout << "Normalizing...\n";
+	    log.cout() << "Normalized\n";
 	    WF->Normalize();
 	 }
+	 log.IndentDec();
 	 return WF; 
       } else { /* load a specific wf */
 	 
@@ -184,7 +199,7 @@ namespace QDLIB
 	    }
 	 }
 	 
-	 cout << pm << "------------------\n" << endl;
+	 log.cout() << pm << "------------------\n" << endl;
       }
       return WF;
    }
@@ -201,6 +216,7 @@ namespace QDLIB
    {
       ModuleLoader* mods = ModuleLoader::Instance();
       QDClock *clock = QDGlobalClock::Instance();
+      Logger& log = Logger::InstanceRef();
       
       ParamContainer pm, needs;
       string name, s;
@@ -230,7 +246,7 @@ namespace QDLIB
       needs.ResetPosition();
       
       /* For the logfile... */
-      cout << "\tPropagator: " << U->Name() << endl << endl;
+      log.cout() << "Loading : " << U->Name() << endl << endl;
       
       
       XmlNode *child = Unode->NextChild();
@@ -241,14 +257,18 @@ namespace QDLIB
       OSum *sum = new OSum();
       
       cout << "Intialize Operators:\n\n";
+      
+      
       while (needs.GetNextValue( name, s )){
 	 if (i > 0) sum->Add(h);
 	 ops = child->FindNode( name );
 	 if ( ops == NULL )
 	    throw ( EParamProblem ("Can't find an operator for the propagation", name) );
-	 cout << "->" << name <<endl;
+	 log.Header( name, Logger::SubSection );
+	 log.IndentInc();
 	 h = LoadOperatorChain( ops );
-	 cout << endl;
+	 log.IndentDec();
+	 log.cout() << endl;
 	 U->AddNeeds( name, h );
 	 delete ops;
 	 i++;
@@ -260,6 +280,9 @@ namespace QDLIB
 	 *Hamiltonian = h;
 	 delete sum;
       }
+      
+      log.flush();
+      log.IndentDec();
       
       return U;
    }
