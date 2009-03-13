@@ -116,12 +116,14 @@ namespace QDLIB
    double OMultistate::Expec( WaveFunction * Psi )
    {
       dcomplex c;
-      WaveFunction* opPsi;
+      WaveFunction *opPsi;
       
-      opPsi=Psi->NewInstance();
+          
+      opPsi = Psi->NewInstance();
       Apply( opPsi, Psi);
-      c = *opPsi * Psi;
       
+      c = *opPsi * Psi;
+
       delete opPsi;
       
       return c.real();

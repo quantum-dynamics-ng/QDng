@@ -142,7 +142,6 @@ int main(int argc, char **argv)
       retval = EXIT_FAILURE;
    }
   
-  delete mods;
   log.Close();
   exit(retval);
 }

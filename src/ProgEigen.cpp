@@ -1,5 +1,7 @@
 #include "ProgEigen.h"
 
+#include "tools/Logger.h"
+
 #include "tools/QDGlobalClock.h"
 #include "tools/FileSingleDefs.h"
 #include "tools/helpers.h"
@@ -66,6 +68,8 @@ namespace QDLIB
    void ProgEigen::_InitParams()
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
+      Logger& log = Logger::InstanceRef();
+      
       ParamContainer attr;
    
       attr = _EigenNode.Attributes();
@@ -137,17 +141,18 @@ namespace QDLIB
       clock->Dt(_dt);
       clock->Steps(_MaxSteps);
       
-      cout << "Eigenfunction calculation parameters:\n\n";
-      cout << "\tNumber of steps: " <<  clock->Steps() << endl;
-      cout.precision(2); cout << "\tTime step: " << fixed << clock->Dt() << endl;
-      cout.precision(2); cout << "\tCheck cycles: " << _ncycle << endl;
-      cout.precision(2); cout << "\tMaximum propagation  time: " 
-	                      << fixed << _MaxSteps * clock->Dt() << endl;
-      cout.precision(2); cout <<  "\tRequestet convergence: " 
-	                      << scientific << _convergence << endl;
-      cout << "\tName for eigenenergy file: " << _ename << endl;
-      cout << "\tBasename for wave function output: " << _fname << endl;
-      cout.precision(6); cout << scientific;
+      log.Header("Eigenfunction calculation parameters", Logger::Section);
+      
+      log.cout() << "Number of steps: " <<  clock->Steps() << endl;
+      log.cout().precision(2);
+      log.cout() << "Time step: " << fixed << clock->Dt() << endl;
+      log.cout() << "Check cycles: " << _ncycle << endl;
+      log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
+      log.cout() <<  "Requestet convergence: " << scientific << _convergence << endl;
+      log.cout() << "Name for eigenenergy file: " << _ename << endl;
+      log.cout() << "Basename for wave function output: " << _fname << endl;
+      log.cout().precision(6); cout << scientific;
+      log.flush();
    }
 
    
@@ -162,11 +167,15 @@ namespace QDLIB
       FileWF efile;
       
       QDClock *clock = QDGlobalClock::Instance();
+      Logger& log = Logger::InstanceRef();
       
       _InitParams();
       
       /* Load & Init the propagator */
       _ContentNodes = _EigenNode.NextChild();
+      
+      log.Header( "QM Initialization", Logger::Section);
+      log.Header( "Propagator: ", Logger::SubSection);
       
       section = _ContentNodes->FindNode( "propagator" );
       if (section == NULL)
@@ -176,7 +185,6 @@ namespace QDLIB
       delete section;
       
       /* Load the initial Wavefunction */
-      cout << "Initalize Wave function:\n";
       section = _ContentNodes->FindNode( "wf" );
       if (section == NULL)
 	 throw ( EParamProblem ("No inital wave function found") );
@@ -187,7 +195,7 @@ namespace QDLIB
       
       /* Make sure our hamiltonian is initalized */
       h->Init(Psi_initial);
-      cout << "Initial Norm & energy: " << Psi_initial->Norm() << "\t" << h->Expec(Psi_initial) << endl;
+      log.cout() << "Initial Norm & energy: " << Psi_initial->Norm() << "\t" << h->Expec(Psi_initial) << endl;
       
       /* Copy, since the propagator will propably scale it/modify etc. */
       _H = h->NewInstance();
@@ -205,7 +213,8 @@ namespace QDLIB
       ParamContainer Upm;
     
       Upm = _U->Params();
-      cout << "Propagators init parameters:\n\n" << Upm << endl;
+      
+      log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
       
       /* Init file writer for wf output */
       efile.Name(_dir+_fname);
@@ -214,7 +223,7 @@ namespace QDLIB
       
       _Energies_raw.newsize(_Nef);
       
-      cout << "Eigenfunction\tEnergy\n";
+      log.cout() << "Eigenfunction\tEnergy\n";
      
    
       Psi_initial->Normalize();
@@ -254,8 +263,8 @@ namespace QDLIB
 	 efile << Psi;
 	 
 	 _Energies_raw[i] = _H->Expec(Psi);
-	 cout.precision(8);
-	 cout << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
+	 log.cout().precision(8);
+	 log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
       }
       
 

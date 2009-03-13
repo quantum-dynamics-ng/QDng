@@ -181,9 +181,15 @@ namespace QDLIB
    dcomplex WFMultistate::operator *( WaveFunction * Psi )
    {
       dcomplex c(0,0);
+      WFMultistate *psi;
+      
+      psi = dynamic_cast<WFMultistate*>(Psi);
+      
+      if (psi == NULL)
+	 throw( EIncompatible("Not a Multistate wave function", Psi->Name()) ) ;
       
       for(lint i=0; i < _nstates; i++){
-	 c += *(_states[i]) * _states[i];
+	 c += *(_states[i]) * psi->_states[i];
       }
       
       return c;
