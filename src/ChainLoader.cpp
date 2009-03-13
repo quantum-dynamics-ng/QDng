@@ -107,6 +107,7 @@ namespace QDLIB
     * This method also recognizes Multistate, LC (Linear combination).
     * Works recursive.
     * 
+    * \todo clean up meta data handling of multistate wfs.
     */
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, bool empty)
    {
@@ -137,7 +138,6 @@ namespace QDLIB
 	    name = child->Name();
 	    ss << name.substr(2);
 	    ss >> state;
-	    cout << name << " "<< state << endl;
 	    multi->Add( wfsub, state);
 	    child->NextNode();
 	 }
@@ -147,6 +147,7 @@ namespace QDLIB
 	    multi->Normalize();
 	 }
 	 log.IndentDec();
+	 
 	 return multi;
       } else if (name == "LC"){ /* Further recursion for linear combination */
 	 log.cout() << "Build linear combination from wave functions:" << endl;
@@ -184,7 +185,7 @@ namespace QDLIB
 	    throw ( EParamProblem("WaveFunction module loading failed") );
 	 
 	 if (!pm.isPresent("file") && !empty)
-	    throw ( EParamProblem("File for loading wave function given") );
+	    throw ( EParamProblem("No file for loading wave function given") );
 	 
 	 /* load wf */
 	 if (!empty){

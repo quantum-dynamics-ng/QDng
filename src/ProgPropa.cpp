@@ -4,6 +4,8 @@
 #include "ChainLoader.h"
 #include "tools/Logger.h"
 
+#include "qdlib/WFMultistate.h"
+
 namespace QDLIB {
 
    ProgPropa::ProgPropa(XmlNode & PropaNode) :
@@ -149,6 +151,7 @@ namespace QDLIB {
       if (section == NULL)
 	 throw ( EParamProblem ("No inital wave function found") );
       
+      log.Header( "Initial wave function", Logger::SubSection);
       Psi = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
       
@@ -207,6 +210,15 @@ namespace QDLIB {
       
       /* Init file writer for wf output */
       FileWF wfile;
+      
+      /* Dirty hack to get meta data right for multistate WFs */
+      /** \todo Remove this hack => make clean File Class */
+      WFMultistate *wfm;
+      wfm = dynamic_cast<WFMultistate*>(Psi);
+      if (wfm != NULL){
+	 ParamContainer& pfm = wfm->Params();
+	 pfm = wfm->State(0)->Params();
+      }
       
       wfile.Name(_dir+_fname);
      
