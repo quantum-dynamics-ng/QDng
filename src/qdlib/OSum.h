@@ -35,6 +35,9 @@ namespace QDLIB {
          
          void Add(Operator *O);
          
+	 /* Overide Clock setter */
+	 virtual void Clock (QDClock *cl);
+	 
          /* Interface implementation, Operator */
          virtual Operator* NewInstance();
 	 	 

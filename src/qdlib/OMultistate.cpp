@@ -45,21 +45,33 @@ namespace QDLIB
       _matrix[row][col] = O;
    }
    
-   Operator * QDLIB::OMultistate::NewInstance( )
+   
+   void OMultistate::Clock( QDClock * cl )
+   {
+      clock = cl;
+      for(int i=0; i < _nstates; i++){
+	 for(int j=0;  j < _nstates; j++){
+	    if (_matrix[i][j] != NULL)
+	       _matrix[i][j]->Clock(clock);
+	 }
+      }
+   } 
+   
+   Operator * OMultistate::NewInstance( )
    {
       OMultistate *r = new OMultistate();
    
       return r;
    }
 
-   void QDLIB::OMultistate::Init( ParamContainer & params )
+   void OMultistate::Init( ParamContainer & params )
    {
       _params = params;
    }
 
    
 
-   void QDLIB::OMultistate::Init( WaveFunction * Psi )
+   void OMultistate::Init( WaveFunction * Psi )
    {
       WFMultistate *psi;
       
@@ -194,12 +206,16 @@ namespace QDLIB
 	       if ( (i >= j && _hermitian) || !_hermitian){
 		  _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
 		  AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
-
-		  /* Calculate symm. elements only once */
-		  if (i != j && _hermitian){
-		     AddElements((cVec*) (dPsi->State(j)), (cVec*) (_buf1->State(i)));
-		  }
+//  		  cout << i << " " << j << endl;
 	       }
+	       if (i != j && _hermitian){
+		  _matrix[i][j]->Apply(_buf1->State(j), psi->State(i));
+		  AddElements((cVec*) (dPsi->State(j)), (cVec*) (_buf1->State(j)));
+// 		  cout << j << " " << i << endl;
+	       }
+		  
+
+		  
 	    }
 	 }
       }
@@ -304,4 +320,5 @@ namespace QDLIB
       return this;
    }
 
-} /* namespace QDLIB */
+}
+/* namespace QDLIB */

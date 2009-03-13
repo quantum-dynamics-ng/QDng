@@ -186,6 +186,7 @@ namespace QDLIB {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
            
       /* Make sure our hamiltonian is initalized */
+      _h->Clock( clock );
       _h->Init(Psi);
       log.cout() << "Initial engergy: " << _h->Expec(Psi) << endl;
       
@@ -193,6 +194,8 @@ namespace QDLIB {
       _H = _h->NewInstance();
       *_H = _h; 
 
+       _H->Clock( clock );
+      
       /* Give the reporter module what it needs */
       _reporter.PsiInitial( Psi );
       _reporter.Hamilton( _H );

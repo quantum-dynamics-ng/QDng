@@ -56,12 +56,19 @@ namespace QDLIB {
       }
       
       if (O->isTimeDep()) _isTimedependent = true;
-      O->Clock(clock);
-      
+     
       _O[_size] = O;
       _size++;
       
       
+   }
+   
+   void OSum::Clock( QDClock * cl )
+   {
+      clock = cl;
+      for(int i=0; i < _size; i++){
+	 _O[i]->Clock(clock);
+      }
    }
    
    /* Interface implementation, Operator */
@@ -237,6 +244,8 @@ namespace QDLIB {
    }
 
    
-} /* namespace QDLIB */
+}
+
+ /* namespace QDLIB */
 
 

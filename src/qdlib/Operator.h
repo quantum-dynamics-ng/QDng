@@ -105,7 +105,7 @@ namespace QDLIB {
 	  * 
 	  * Do this after everything is initialized and the operator tells that it is time dependent.
 	  */
-	 void Clock (QDClock *cl)
+	 virtual void Clock (QDClock *cl)
 	 {
 	    clock = cl;
 	 }

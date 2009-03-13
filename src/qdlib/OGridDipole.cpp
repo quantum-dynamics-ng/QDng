@@ -6,7 +6,13 @@
 namespace QDLIB {
    
    
-   OGridDipole::OGridDipole() : _name("OGridDipole") {}
+   OGridDipole::OGridDipole() : _name("OGridDipole"), _init(false) {}
+   
+   void QDLIB::OGridDipole::Clock( QDClock * cl )
+   {
+      clock = cl;
+      _laser.Clock(cl);
+   }
    
    void OGridDipole::SetLaser(Laser & laser)
    {
@@ -20,23 +26,30 @@ namespace QDLIB {
 
    void OGridDipole::Init(ParamContainer &params)
    {
+      cout << params << endl;
+      /* Protect from double initalization */
+      if (!_init){
+	 /* Read the laser field */
+	 string name;
+	 Laser::FileLaser file = _laser.File();
+	 
+	 if (!params.isPresent("laser"))
+	    throw (EParamProblem("No laser file name given"));
+	 params.GetValue("laser", name);
+	 cout << "Laserfile: " <<name<<endl;
+	 file.Suffix(BINARY_O_SUFFIX);
+	 file.Name(name);
+	 file >> &_laser;
+      }
+      _init = true;
+     
       /* Let parents do initialisation */
       OGridPotential::Init(params);
-      
-      /* Read the laser field */
-      string name;
-      Laser::FileLaser file = _laser.File();
-      
-      if (_params.isPresent("laser"))
-	 throw (EParamProblem("No laser file name given"));
-      _params.GetValue("laser", name);
-      file.Name(name);
-      file >> &_laser;
+
    }
    
    void OGridDipole::UpdateTime()
    {
-      _laser.Clock(clock);
    }
 
    
@@ -53,10 +66,7 @@ namespace QDLIB {
    
    WaveFunction * OGridDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      *destPsi = sourcePsi;
-      
-      MultElements((cVec*) destPsi, (dVec*) this, _laser.Get());
-      
+      MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, _laser.Get());
       return destPsi;
    }
    
@@ -81,4 +91,6 @@ namespace QDLIB {
    }
 
 }
+
+
 

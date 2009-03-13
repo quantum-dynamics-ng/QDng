@@ -4,7 +4,7 @@
 namespace QDLIB {
    
    Laser::Laser() : _name("Laser"), _clock(NULL), _fft(NULL),
-      _spectrum(NULL), _file(FileLaser::StorageType(1), "Laserfield", "")
+      _spectrum(NULL)
    {}
 
    Laser::~ Laser()
@@ -14,6 +14,12 @@ namespace QDLIB {
       
    }
 
+   Laser::FileLaser& Laser::File( )
+   {
+      return _file;
+   }
+
+   
    /**
     * Initialize the laser.
     *
@@ -126,6 +132,7 @@ namespace QDLIB {
 
    
 }
+
 
 
 

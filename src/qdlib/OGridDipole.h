@@ -19,11 +19,14 @@ namespace QDLIB {
 	       
 	 string _name;
          Laser _laser;
+	 bool _init;
       public:
          void SetLaser(Laser &laser);
 	 Laser& GetLaser();
 	 
 	 OGridDipole();
+	 
+	 virtual void Clock ( QDClock *cl);
 	 
 	 virtual void Init(ParamContainer &params);
 	 
