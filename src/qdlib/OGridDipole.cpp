@@ -50,6 +50,7 @@ namespace QDLIB {
    
    void OGridDipole::UpdateTime()
    {
+     cout << _laser.Get() << endl;
    }
 
    
@@ -73,7 +74,6 @@ namespace QDLIB {
    WaveFunction * OGridDipole::Apply(WaveFunction *Psi)
    {
       MultElements((cVec*) Psi, (dVec*) this, _laser.Get());
-      
       return Psi;
    }
    

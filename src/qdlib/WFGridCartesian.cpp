@@ -73,12 +73,12 @@ namespace QDLIB {
    
       c = *this * this;
    
-      return sqrt(c.real());
+      return c.real();
    }
 
    void WFGridCartesian::Normalize()
    {
-      MultElements( (cVec*) this, 1/Norm() );
+      MultElements( (cVec*) this, 1/sqrt(Norm()) );
    }
 
    WaveFunction * WFGridCartesian::operator =(WaveFunction * Psi)

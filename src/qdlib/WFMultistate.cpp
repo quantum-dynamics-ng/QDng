@@ -146,13 +146,13 @@ namespace QDLIB
 	 d += *(_states[i]) * _states[i];
       }
       
-      return sqrt(d.real());
+      return d.real();
    }
 
    void WFMultistate::Normalize( )
    {
       for(lint i=0; i < _nstates; i++){
-	 MultElements( (cVec*) _states[i] , 1/Norm() );
+	 MultElements( (cVec*) _states[i] , 1/sqrt(Norm()) );
       }
    }
 
