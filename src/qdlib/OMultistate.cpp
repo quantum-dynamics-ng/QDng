@@ -43,6 +43,9 @@ namespace QDLIB
 	 _nstates = col+1;
       
       _matrix[row][col] = O;
+
+      if ( (_matrix[row][col] != NULL && _matrix[col][row] != NULL) && row != col )
+	_hermitian = false;
    }
    
    
