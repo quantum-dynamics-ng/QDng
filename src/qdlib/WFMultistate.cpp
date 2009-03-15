@@ -25,7 +25,6 @@ namespace QDLIB
       for (lint i=0; i < _nstates; i++){
 	 if (_states[i] != NULL) { 
 	    delete _states[i];
-	    _states[i] = NULL;
 	 }
       }
       _nstates = 0;
@@ -159,7 +158,6 @@ namespace QDLIB
    WaveFunction * WFMultistate::operator =( WaveFunction * Psi )
    {
       WFMultistate *psi = dynamic_cast<WFMultistate*>(Psi);
-      WaveFunction *add;
       
       if (psi == NULL)
 	 throw( EIncompatible("Incompatible in assignment", this->Name(), Psi->Name()) ) ;

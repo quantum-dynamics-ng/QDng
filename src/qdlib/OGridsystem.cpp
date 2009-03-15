@@ -2,12 +2,10 @@
 
 namespace QDLIB {
    
-   OGridSystem::OGridSystem() : _file(NULL) {cout << "OGridSystem::OGridSystem()\n";}
+   OGridSystem::OGridSystem() : _file(NULL) {}
    
    OGridSystem::~OGridSystem()
    {
-      cout << "OGridSystem::~OGridSystem()\n";
-      cout << "_file: " << _file << endl;
       if (_file != NULL) delete _file;
    }
 	 

@@ -26,7 +26,7 @@ namespace QDLIB {
 	 
 	 OGridDipole();
 	 
-	 ~OGridDipole() {cout << "~OGridDipole()\n";}
+	 ~OGridDipole() {}
 	 
 	       virtual void Clock ( QDClock *cl);
 	 

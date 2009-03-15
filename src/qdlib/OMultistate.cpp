@@ -17,6 +17,8 @@ namespace QDLIB
 
    OMultistate::~OMultistate()
    {
+      if (_buf1 != NULL) delete _buf1;
+      if (_buf2 != NULL) delete _buf2;
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j< _nstates; j++){
 	    if (_matrix[i][j] != NULL && i <= j)
@@ -25,8 +27,6 @@ namespace QDLIB
 	       delete _matrix[i][j];
 	 }
       }
-      if (_buf1 != NULL) delete _buf1;
-      if (_buf2 != NULL) delete _buf2;
    }
 
    /**
@@ -248,7 +248,7 @@ namespace QDLIB
       
       _hermitian = o->_hermitian;
       _nstates = o->_nstates;
-            
+
       _buf1 =  dynamic_cast<WFMultistate*>(o->_buf1->NewInstance());
       _buf2 =  dynamic_cast<WFMultistate*>(o->_buf2->NewInstance());
       

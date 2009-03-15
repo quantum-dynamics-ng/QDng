@@ -1,7 +1,7 @@
 #ifndef QDLIBREPORTER_H
 #define QDLIBREPORTER_H
 
-#include "qdlib/WaveFunction.h"
+#include "qdlib/WFMultistate.h"
 #include "qdlib/Operator.h"
 
 namespace QDLIB
@@ -21,8 +21,12 @@ namespace QDLIB
 	 bool _proj0;
 	 bool _proj0Sq;
 	 bool _spectrum;
+	 bool _multistate;
+	 
 	 
 	 WaveFunction *_psi0;
+	 WFMultistate *_psims0;
+	 
 	 Operator *_H;
 	 string _specname;
 	 ofstream _rfile;

@@ -8,7 +8,8 @@ namespace QDLIB
 
    Reporter::Reporter() :
 	 _wcycle(10), _norm(true), _energy(false), _proj0(false), _proj0Sq(false),
-         _spectrum(false), _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
+		 _spectrum(false), _multistate(false),
+	         _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
    {}
 
 
@@ -28,8 +29,20 @@ namespace QDLIB
     */
    void Reporter::PsiInitial( WaveFunction * Psi )
    {
-      _psi0 = Psi->NewInstance();
-      *_psi0 = Psi;
+      WFMultistate *mpsi;
+      
+      /* Check for Multistate WF*/
+      mpsi = dynamic_cast<WFMultistate*>(Psi);
+      if (mpsi != NULL){
+	 _psims0 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
+	 *_psims0 = Psi;
+	 _psi0 = _psims0;
+	 _multistate = true;
+      } else {
+	 _psi0 = Psi->NewInstance();
+	 *_psi0 = Psi;
+      }
+      
    }
 
    /**
@@ -48,17 +61,26 @@ namespace QDLIB
    {
       QDClock *clock = QDGlobalClock::Instance();
       Logger& log = Logger::InstanceRef();
+      WFMultistate *mspsi;
       
       dcomplex proj;
-   
+  
+      /* Multistate support */
+      if (_multistate)
+	 mspsi = dynamic_cast<WFMultistate*>(Psi);
+
       /* Write header */
       if (_step == 0){
  	 _specbuf.newsize(clock->Steps()+1);
 	 log.cout() << "Step\tTime[au]";
 	 if (_norm) log.cout() << "\tNorm";
-	 if (_proj0 && !_proj0Sq) log.cout() << "\t\t<Psi0|PsiT>";
-	 if (_proj0 && _proj0Sq) log.cout() << "\t\t|<Psi0|PsiT>|^2";
+	 if (_multistate && _norm){
+	    for (int i=0; i < mspsi->States(); i++)
+	       if (_norm) log.cout() << "\t\tNorm_" << i;
+	 }
 	 if (_energy) log.cout() << "\t\tEnergy[au]";
+	 if (_proj0 && !_proj0Sq) log.cout() << "\t<Psi0|PsiT>";
+	 if (_proj0 && _proj0Sq) log.cout() << "\t|<Psi0|PsiT>|^2";
 	 log.cout() << endl;
 	 log.flush();
       }
@@ -67,13 +89,24 @@ namespace QDLIB
       /* Write time */
       log.cout().precision(1);
       log.cout() << clock->TimeStep() << "\t" << fixed << clock->Time()<< "\t";
-   
+         
       /* Norm */
       if (_norm){
 	 log.cout().precision(8);
 	 log.cout() << "\t" << fixed << Psi->Norm();
+	 if (_multistate){ /* Norm of single states */
+	    for (int i=0; i< mspsi->States(); i++)
+	       log.cout() << "\t" << fixed << mspsi->State(i)->Norm();
+	 }
+	 
       } 
    
+      /* Energy */
+      if (_energy)
+      {
+	 log.cout() << "\t" << _H->Expec(Psi);
+      }
+
       /* projection and spectrum */
       if (_proj0){
 	 proj = *_psi0 * Psi;
@@ -91,13 +124,7 @@ namespace QDLIB
 	       _specbuf[_step-1] = proj;
 	 }
       }
-   
-      /* Energy */
-      if (_energy)
-      {
-	 log.cout() << "\t\t" << _H->Expec(Psi);
-      }
-   
+      
       log.cout() << endl;
       log.flush();
    }
