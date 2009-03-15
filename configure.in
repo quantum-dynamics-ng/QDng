@@ -20,19 +20,20 @@ AC_CHECK_LIB(fftw3, fftw_plan_dft,,AC_MSG_ERROR(fftw3 libs are missing))
 
 dnl blas/lapack
 sinclude([acx_blas.m4])
+sinclude([acx_lapack.m4])
 ACX_BLAS(,AC_MSG_ERROR(BLAS libs are missing/not working))
-AC_CHECK_LIB(lapack, dlamch_ ,,AC_MSG_ERROR(LAPACK is missing))
+ACX_LAPACK(,AC_MSG_ERROR(LAPACK is missing))
 
 dnl Configure C/F77 mixed mode (RT libs)
 AC_F77_LIBRARY_LDFLAGS
 
-AC_ARG_ENABLE([mpi],
-	    [AS_HELP_STRING([--enable-mpi],[Build with support for mpi parallization])],
-	    [],enable_mpi=no)
+dnl AC_ARG_ENABLE([mpi],
+dnl	    [AS_HELP_STRING([--enable-mpi],[Build with support for mpi parallization])],
+dnl	    [],enable_mpi=no)
 
-AC_ARG_WITH([mpi-prefix],
-	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation])],
-	    [],with_mpi-prefix=no)
+dnl AC_ARG_WITH([mpi-prefix],
+dnl	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation])],
+dnl	    [],with_mpi-prefix=no)
 
 
 AC_OUTPUT(Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile)
