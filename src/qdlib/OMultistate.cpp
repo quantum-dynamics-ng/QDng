@@ -95,8 +95,10 @@ namespace QDLIB
       if (_hermitian){
 	 for(int i=0; i< _nstates; i++){
 	    for(int j=0; j<= i; j++){
-	       if (_matrix[i][j] != NULL)
+	       if (_matrix[i][j] != NULL){
 		  _matrix[i][j]->Init(psi->State(j));
+		  if (i != j) _matrix[j][i] = _matrix[i][j];
+	       }
 	    }
 	 }
       } else {
@@ -209,19 +211,11 @@ namespace QDLIB
 	       if ( (i >= j && _hermitian) || !_hermitian){
 		  _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
 		  AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
-//  		  cout << i << " " << j << endl;
 	       }
-	       if (i != j && _hermitian){
-		  _matrix[i][j]->Apply(_buf1->State(j), psi->State(i));
-		  AddElements((cVec*) (dPsi->State(j)), (cVec*) (_buf1->State(j)));
-// 		  cout << j << " " << i << endl;
-	       }
-		  
-
-		  
 	    }
 	 }
       }
+     
       
       return dPsi;
    }
