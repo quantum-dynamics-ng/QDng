@@ -1,8 +1,8 @@
 AC_INIT(configure.in)
 
-
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE(QDng, 0.1)
+
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
@@ -10,13 +10,17 @@ AC_PROG_F77
 
 AM_PROG_LIBTOOL
 
-dnl lib/header checks
-AC_CHECK_HEADER(libxml/parser.h,,AC_MSG_ERROR(libxml2 headers are missing))
-AC_CHECK_LIB(xml2, fftw_plan_dft,,AC_MSG_ERROR(libxml is missing))
+dnl libxml2
+sinclude([acx_libxml2.m4])
+ACX_CHECK_LIBXML2
 
+dnl fftw3
 AC_CHECK_HEADER(fftw3.h,,AC_MSG_ERROR(fftw3 headers are missing))
 AC_CHECK_LIB(fftw3, fftw_plan_dft,,AC_MSG_ERROR(fftw3 libs are missing))
 
+dnl blas/lapack
+sinclude([acx_blas.m4])
+ACX_BLAS(,AC_MSG_ERROR(BLAS libs are missing/not working))
 AC_CHECK_LIB(lapack, dlamch_ ,,AC_MSG_ERROR(LAPACK is missing))
 
 dnl Configure C/F77 mixed mode (RT libs)
