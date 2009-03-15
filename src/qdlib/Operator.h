@@ -163,6 +163,15 @@ namespace QDLIB {
 	  */
          virtual Operator* operator=(Operator* O) = 0;
 	 
+ 	 /**
+	  * Copy function.
+	  * 
+	  * Alternative to copy operator to provide full
+	  * polymorphism.
+	  */
+	 virtual Operator* Copy(Operator* O) = 0;
+
+	 
 	 /**
 	  * Apply Operator to another operator.
 	  * 

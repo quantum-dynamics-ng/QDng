@@ -36,6 +36,7 @@ namespace QDLIB
     */
    void ProgEigen::WriteEnergyFile( )
    {
+      Logger& log = Logger::InstanceRef();
       /* Write energy dat */
       ofstream enfile;
       string sn;
@@ -56,7 +57,7 @@ namespace QDLIB
 	 }
 	 enfile.close();
       } catch (...){
-	 cout << "!!! Can't write energy file\n\n";
+	 log.cout() << "!!! Can't write energy file\n\n";
       }
    }
 

@@ -62,6 +62,8 @@ namespace QDLIB {
 	 virtual WaveFunction* Apply(WaveFunction *Psi);
 		  
 	 virtual Operator* operator=(Operator* O);
+	 
+	 virtual Operator* Copy(Operator* O);
 	    
 	 virtual Operator* operator*(Operator* O);
       

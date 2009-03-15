@@ -207,6 +207,12 @@ namespace QDLIB {
    
    Operator* OSum::operator=(Operator* O)
    {
+      Copy(O);
+      return this;
+   }
+   
+   Operator * QDLIB::OSum::Copy(Operator * O)
+   {
       OSum *r;
       
       r = dynamic_cast<OSum*> (O);
@@ -245,7 +251,4 @@ namespace QDLIB {
 
    
 }
-
  /* namespace QDLIB */
-
-

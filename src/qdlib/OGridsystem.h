@@ -30,6 +30,8 @@ namespace QDLIB {
 	 virtual Operator* Offset(const double d);
 
 	 virtual Operator* Scale(const double d);
+	 
+	 virtual Operator* Copy(Operator* O);
    };
 
    

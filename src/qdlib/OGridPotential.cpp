@@ -1,4 +1,5 @@
 #include "OGridPotential.h"
+#include "WFGridSystem.h"
 #include "math/math_functions.h"
 #include "tools/Exception.h"
 #include <cstdio>
@@ -89,6 +90,8 @@ namespace QDLIB
 	 
    void OGridPotential::Init( WaveFunction *Psi)
    {
+      if( dynamic_cast<WFGridSystem*>(Psi) == NULL)
+	 throw ( EIncompatible ("GridPotential can't operate on ", Psi->Name()));
    }
    
    const string& OGridPotential::Name()
@@ -142,21 +145,24 @@ namespace QDLIB
 	 
    Operator* OGridPotential::operator=(Operator* O)
    {
-      OGridPotential *n = dynamic_cast<OGridPotential*> (O);
-      if (n == NULL)
-	 throw ( EIncompatible("O is not of type OGridPotential", O->Name()) );
-      
-      _params = n->_params;
-      
-      /* Copy vector */
-      *((dVec*) this) = *((dVec*) n);
-      
-      /* Copy Grid description */
-      *((GridSystem*) this) = *((GridSystem*) n);
-      
-      return n;
+      Copy(O);
+      return this;
    }
 	 
+   Operator * OGridPotential::Copy(Operator * O)
+   {
+      OGridPotential *o = dynamic_cast<OGridPotential*> (O);
+      if (o == NULL)
+	 throw ( EIncompatible("O is not of type OGridPotential", O->Name()) );
+      
+      _params = o->_params;
+
+      /* Copy Parents */
+      OGridSystem::Copy(O);
+
+      return this;
+   }
+   
    /**
     * This is compatible to dVec and cVec
     */
@@ -192,6 +198,8 @@ namespace QDLIB
    }
    
 }
+
+
 
 
 

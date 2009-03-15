@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 	    propa.Run();
 	 } else if (progname == "auto"){
 /*	    ProgAuto autoc(rnodes);
-	    cout << "\n\t\t\t*** Run Autocorrelation ***\n\n";
+	    log.Header("Run Autocorrelation", Logger::Chapter);
 	    autoc.Run();*/
 	    throw ( EParamProblem ("Autocorrelation not implementet yet") );
 	 } else if (progname == "eigen") {

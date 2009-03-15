@@ -136,6 +136,12 @@ namespace QDLIB {
    
    Operator* OGridSum::operator =( Operator * O )
    {
+      Copy(O);
+      return this;
+   }
+
+   Operator * QDLIB::OGridSum::Copy(Operator * O)
+   {
       OGridSum *org;
       
       org = dynamic_cast<OGridSum*>(O);
@@ -143,21 +149,19 @@ namespace QDLIB {
 	 throw ( EIncompatible("O is not of type OGridSum", O->Name()) );
       
       /* Copy the parent */
-      *((dVec*) this) = *org;
+      OGridSystem::Copy(O);
+      
       _isTimedependent = org->_isTimedependent;
-      
-      /* Copy the stuff of OGridSystem */
-      *((GridSystem*) this) = *((GridSystem*) org);
-      
+            
       /* copy our stuff */
       _size = org->_size;
       for (int i=0; i< MAX_OPS; i++)
-         _O[i] = org->_O[i];
+	 _O[i] = org->_O[i];
       _isUpTodate = org->_isUpTodate;
       
       return this;
    }
-
+   
    Operator* OGridSum::operator *( Operator * O )
    {
       /** \todo implement OGridSum*O. How should this work? */
@@ -226,15 +230,3 @@ namespace QDLIB {
    
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

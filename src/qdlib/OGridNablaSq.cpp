@@ -148,6 +148,12 @@ namespace QDLIB {
    
    Operator * OGridNablaSq::operator =(Operator * O)
    {
+      Copy(O);
+      return this;
+   }
+   
+   Operator * QDLIB::OGridNablaSq::Copy(Operator * O)
+   {
       OGridNablaSq *org = dynamic_cast<OGridNablaSq*>(O);
       
       if (org == NULL)
@@ -224,3 +230,5 @@ namespace QDLIB {
    }
 
 } /* namespace QDLIB */
+
+

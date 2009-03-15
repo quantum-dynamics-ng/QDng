@@ -331,7 +331,7 @@ namespace QDLIB {
      // } /* parallel */
    }
    
-      /**
+   /**
     * Multiply vectors by elements.
     * 
     * You strongly to encouraged to use this, since all optimizations and

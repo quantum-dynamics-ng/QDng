@@ -6,7 +6,7 @@
 namespace QDLIB {
    
    
-   OGridDipole::OGridDipole() : _name("OGridDipole"), _init(false) {}
+   OGridDipole::OGridDipole() : OGridPotential(), _name("OGridDipole"), _init(false) {}
    
    void QDLIB::OGridDipole::Clock( QDClock * cl )
    {
@@ -24,9 +24,14 @@ namespace QDLIB {
       return _laser;
    }
 
+   Operator* OGridDipole::NewInstance()
+   {
+      OGridDipole *r = new OGridDipole();
+      return r;
+   }
+   
    void OGridDipole::Init(ParamContainer &params)
    {
-      cout << params << endl;
       /* Protect from double initalization */
       if (!_init){
 	 /* Read the laser field */
@@ -36,7 +41,6 @@ namespace QDLIB {
 	 if (!params.isPresent("laser"))
 	    throw (EParamProblem("No laser file name given"));
 	 params.GetValue("laser", name);
-	 cout << "Laserfile: " <<name<<endl;
 	 file.Suffix(BINARY_O_SUFFIX);
 	 file.Name(name);
 	 file >> &_laser;
@@ -50,7 +54,6 @@ namespace QDLIB {
    
    void OGridDipole::UpdateTime()
    {
-     cout << _laser.Get() << endl;
    }
 
    
@@ -79,18 +82,26 @@ namespace QDLIB {
    
    Operator * OGridDipole::operator =(Operator * O)
    {
+      Copy(O);
+      return this;
+   }
+
+   Operator* OGridDipole::Copy(Operator* O)
+   {
       OGridDipole* o=dynamic_cast<OGridDipole*>(O);
       if (o == NULL)
 	 throw (EIncompatible("Error in assignment", Name(), O->Name() ));
       
-      /* Copy parents */
-      *((OGridPotential*) this) = *((OGridPotential*) o);
       _laser = o->_laser;
+      clock = o->clock;
+
+      /* Copy parents */
+      OGridPotential::Copy(O);
       
       return this;
    }
-
 }
+
 
 
 

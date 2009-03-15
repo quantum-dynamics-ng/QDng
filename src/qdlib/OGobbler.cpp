@@ -211,6 +211,39 @@ namespace QDLIB {
       return O;
    }
    
+   Operator * QDLIB::OGobbler::Copy(Operator * O)
+   {
+      string _name;
+      bool _lp[MAX_DIMS];    /* build left pass for dim */
+      double _lpx[MAX_DIMS];  /* cut-off center */
+      bool _rp[MAX_DIMS];    /* build right pass for dim */
+      double _rpx[MAX_DIMS];  /* cut-off center */
+      int _order;           /* filter order */
+      bool _nip;            /* Negative imaginary potential */
+      
+      OGobbler *o;
+      
+      o = dynamic_cast<OGobbler*>(O);
+      if (o == NULL)
+	 throw(EIncompatible("Not a Gobbler", O->Name()));
+      
+      _nip = o->_nip;
+      _order = o->_order;
+	    
+      
+      for (int i=0; i < Dim(); i++){
+	 _lp[i] = o->_lp[i];
+	 _lpx[i] = o->_lpx[i];
+	 _rp[i] = o->_rp[i];
+	 _rpx[i] = o->_rpx[i];
+	 
+      }
+      /* Copy Parents */
+      OGridSystem::Copy(O);
+      
+      return this;
+   }
+   
    /**
     * We can gobble other OGridSystem operators.
     * 
@@ -233,6 +266,3 @@ namespace QDLIB {
    }
 
 }
-
-
-

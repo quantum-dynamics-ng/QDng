@@ -10,6 +10,7 @@ namespace QDLIB {
       for (int i=0; i < MAX_FILTERS; i++){
 	 _olist[i] = NULL;
       }
+      _clock = QDGlobalClock::Instance();
    }
    
    
@@ -117,8 +118,10 @@ namespace QDLIB {
    {
       if (_size == 0) return;
       
+      /* Check for initializations of the operators */
       if (! _initalized){
 	 for(int i=0; i < _size; i++){
+	    _olist[i]->Clock(_clock);
 	    _olist[i]->Init(Psi);
 	    if (_writefile)
 	       _ofile << _olist[i]->Name() << "\t";
@@ -127,6 +130,7 @@ namespace QDLIB {
 	    _ofile << endl;
       }
       	 
+      /* Apply filters */
       for(int i=0; i < _size; i++){
 	 if (_action[i] == expec || _action[i] == expeconly){
 	    _ofile << _olist[i]->Expec(Psi) << "\t";

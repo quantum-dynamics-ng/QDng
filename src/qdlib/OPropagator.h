@@ -133,13 +133,15 @@ namespace QDLIB {
 	 virtual double Emax(){return 0;}
 	 virtual double Emin(){return 0;}
 	 
-	 OPropagator* operator=(OPropagator *P)
+	 virtual Operator* Copy(Operator *O)
 	 {
+	   
+	    OPropagator *P = dynamic_cast<OPropagator*>(O);
 	    clock = P->clock;
 	    _c0 = P->_c0;
 	    forward = P->forward;
 	    imaginary = P->imaginary;
-	    
+	   
 	    return this;
 	 }
 	 

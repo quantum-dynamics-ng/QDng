@@ -251,6 +251,13 @@ namespace QDLIB {
    
    Operator * OGridGMat::operator =( Operator * O )
    {
+      Copy(O);
+      return this;
+   }
+   
+   
+   Operator * OGridGMat::Copy(Operator * O)
+   {
       OGridGMat *o = dynamic_cast<OGridGMat*>(O);
       if (o == NULL)
 	 throw ( EIncompatible("Error in Assignment", Name(), O->Name()) );
@@ -259,6 +266,7 @@ namespace QDLIB {
       *((GridSystem*) this) = *((GridSystem*) o);
       _params = o->_params;
       _size = o->_size;
+      
       if(_kspace == NULL) _kspace = new dVec[_size];
       if (_Gmat == NULL) _Gmat = new OGridPotential**[_size];
       if (_wfbuf == NULL) _wfbuf = new WFGridSystem*[_size];
@@ -290,8 +298,3 @@ namespace QDLIB {
    }
 
 }
-
-
-
-
-

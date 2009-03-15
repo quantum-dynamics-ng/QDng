@@ -13,7 +13,8 @@ namespace QDLIB
     * Takes several operators as matrix elementsments and acts as a hermitian
     * operator with real matrix elements.
     * 
-    * \todo do implementation
+    * parameters:
+    * \li nonhermitian   Explicitly define a non-hermitian operator 
     * 
     *	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
@@ -64,14 +65,13 @@ namespace QDLIB
 	 
 	 virtual double Emin();
 	 
-// 	 virtual WaveFunction* operator*(WaveFunction *Psi);
 	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
-// 	 virtual WaveFunction* operator*=(WaveFunction *Psi);
 	 virtual WaveFunction* Apply(WaveFunction *Psi);
-
 	 
          virtual Operator* operator=(Operator* O);
+	 
+	 virtual Operator* Copy(Operator* O);
 	 
 	 virtual Operator* operator*(Operator* O);
 

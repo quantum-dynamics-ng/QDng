@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 $(all_includes)
+INCLUDES = -I$(top_srcdir)/src $(LIBXML2_CFLAGS) $(all_includes)
 METASOURCES = AUTO
 noinst_LTLIBRARIES = libtools.la
 libtools_la_SOURCES = Getopt.cpp KeyValFile.cpp ParamContainer.cpp QDClock.cpp \

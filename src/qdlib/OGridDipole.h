@@ -26,7 +26,11 @@ namespace QDLIB {
 	 
 	 OGridDipole();
 	 
-	 virtual void Clock ( QDClock *cl);
+	 ~OGridDipole() {cout << "~OGridDipole()\n";}
+	 
+	       virtual void Clock ( QDClock *cl);
+	 
+	 virtual Operator* NewInstance();
 	 
 	 virtual void Init(ParamContainer &params);
 	 
@@ -40,8 +44,9 @@ namespace QDLIB {
 	
 	 virtual WaveFunction* Apply(WaveFunction *Psi);
 
-	 
 	 virtual Operator* operator=(Operator* O);
+	 
+	 virtual Operator* Copy(Operator* O);
 
    };
 

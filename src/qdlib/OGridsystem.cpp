@@ -2,10 +2,12 @@
 
 namespace QDLIB {
    
-   OGridSystem::OGridSystem() : _file(NULL) {}
+   OGridSystem::OGridSystem() : _file(NULL) {cout << "OGridSystem::OGridSystem()\n";}
    
    OGridSystem::~OGridSystem()
    {
+      cout << "OGridSystem::~OGridSystem()\n";
+      cout << "_file: " << _file << endl;
       if (_file != NULL) delete _file;
    }
 	 
@@ -34,6 +36,21 @@ namespace QDLIB {
    }
    
    
+   Operator* OGridSystem::Copy(Operator * O)
+   {
+      OGridSystem *o = dynamic_cast<OGridSystem*>(O);
+      
+      /* Copy vector */
+      *((dVec*) this) = *((dVec*) o);
+      
+      /* Copy Grid description */
+      *((GridSystem*) this) = *((GridSystem*) o);
+      
+      return this;
+   }
+
+   
 } /* namespace QDLIB */
+
 
 

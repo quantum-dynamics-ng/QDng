@@ -52,6 +52,8 @@ namespace QDLIB
 	 
 	 virtual Operator* operator=(Operator* O);
 	 
+	 virtual Operator* Copy(Operator* O);
+	 
 	 virtual Operator* operator*(Operator* O);
    
    };

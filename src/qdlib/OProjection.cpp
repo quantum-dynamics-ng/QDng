@@ -102,6 +102,12 @@ namespace QDLIB {
    
    Operator * QDLIB::OProjection::operator =( Operator * O )
    {
+      Copy(O);
+      return this;
+   }
+   
+   Operator * QDLIB::OProjection::Copy(Operator * O)
+   {
       OProjection* o;
       
       o = dynamic_cast<OProjection*>(O);
@@ -115,6 +121,7 @@ namespace QDLIB {
       for (int i=0; i < _size; i++){
 	 *(_wfbuf[i]) = o->_wfbuf[i];
       }
+      return this;
    }
    
    dcomplex OProjection::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
@@ -163,4 +170,3 @@ namespace QDLIB {
 
 
 }
-

@@ -68,6 +68,8 @@ namespace QDLIB
 	 child = Onode->NextChild();
 	 Operator *osub;
 	 OMultistate *matrix = new OMultistate();
+	 
+	 matrix->Init(pm);
 	 while (child->EndNode()){
 	    string name;
 	    stringstream ss_row, ss_col;
@@ -84,6 +86,7 @@ namespace QDLIB
 	    osub = LoadOperatorChain( child );
 	    if (osub == NULL)
 	       throw ( EParamProblem("Can't load operator") );
+	    
 	    
 	    matrix->Add(osub, row, col);
 	    child->NextNode();
@@ -195,7 +198,7 @@ namespace QDLIB
 	    file.Name(name);
 	    file >> WF;
 	    if ( pm.isPresent("normalize") ) {
-	       cout << "Normalizing...\n";
+	       log.cout() << "Normalizing...\n";
 	       WF->Normalize();
 	    }
 	 }
@@ -257,7 +260,7 @@ namespace QDLIB
       int i=0;
       OSum *sum = new OSum();
       
-      cout << "Intialize Operators:\n\n";
+      log.cout() << "Intialize Operators:\n\n";
       
       
       while (needs.GetNextValue( name, s )){

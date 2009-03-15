@@ -185,6 +185,12 @@ namespace QDLIB {
    
    Operator * OSPO::operator =(Operator * O)
    {
+      Copy(O);
+      return this;
+   }
+   
+   Operator * QDLIB::OSPO::Copy(Operator * O)
+   {
       OSPO *org;
       
       org = dynamic_cast<OSPO*>(O);
@@ -201,9 +207,11 @@ namespace QDLIB {
       *clock = *(org->clock);
       OPropagator::Exponent(org->Exponent());
       
+      /* Copy parents */
+      OPropagator::Copy(O);
+      
       return this;
    }
-   
    
    Operator * OSPO::operator *(Operator * O)
    {
@@ -251,4 +259,6 @@ namespace QDLIB {
    
    
 }
+
+
 

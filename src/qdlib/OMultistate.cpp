@@ -70,6 +70,7 @@ namespace QDLIB
    void OMultistate::Init( ParamContainer & params )
    {
       _params = params;
+      if (_params.isPresent("nonhermitian")) _hermitian = false;
    }
 
    
@@ -92,9 +93,12 @@ namespace QDLIB
       _buf1 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
       _buf2 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
       
+      
+      
       if (_hermitian){
 	 for(int i=0; i< _nstates; i++){
 	    for(int j=0; j<= i; j++){
+	       if (i != j && _matrix[j][i] != NULL) _matrix[i][j] = _matrix[j][i];
 	       if (_matrix[i][j] != NULL){
 		  _matrix[i][j]->Init(psi->State(j));
 		  if (i != j) _matrix[j][i] = _matrix[i][j];
@@ -208,15 +212,12 @@ namespace QDLIB
       for(int i=0; i< _nstates; i++){ 
 	 for(int j=0; j< _nstates; j++){
 	    if (_matrix[i][j] != NULL){
-	       if ( (i >= j && _hermitian) || !_hermitian){
-		  _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
-		  AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
-	       }
+	       _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
+	       AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
 	    }
 	 }
       }
      
-      
       return dPsi;
    }
 
@@ -230,6 +231,13 @@ namespace QDLIB
    }
    
    Operator * OMultistate::operator =( Operator * O )
+   {
+      Copy(O);
+      return this;
+   }
+
+   
+   Operator * QDLIB::OMultistate::Copy(Operator * O)
    {
       OMultistate *o;
       
@@ -253,6 +261,8 @@ namespace QDLIB
 	       if (o->_matrix[i][j] != NULL){
 		  _matrix[i][j] = o->_matrix[i][j]->NewInstance();
 		  *(_matrix[i][j]) = o->_matrix[i][j];
+		  if (i !=j)
+		     _matrix[j][i] = _matrix[i][j];
 	       }
 	    }
 	 }
@@ -268,7 +278,7 @@ namespace QDLIB
       }
       return this;
    }
-
+   
    Operator * OMultistate::operator *( Operator * O )
    {
       throw (EIncompatible("Multistate operator can't be applied to other operators"));

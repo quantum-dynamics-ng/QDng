@@ -137,7 +137,12 @@ namespace QDLIB
 
    Operator * OCheby::operator =( Operator * O )
    {
+      Copy(O);
+      return this;
+   }
 
+   Operator * QDLIB::OCheby::Copy(Operator * O)
+   {
       OCheby *P;
       
       P = dynamic_cast<OCheby*>(O);
@@ -145,7 +150,8 @@ namespace QDLIB
 	 throw ( EIncompatible("Incompat in copy", this->Name(), O->Name()) );
       
       /* Copy parents */
-      *((OPropagator*) this) = (OPropagator*) P;
+      OPropagator::Copy(O);
+      
       _isTimedependent = P->_isTimedependent;
       _params = P->_params;
       clock = P->clock;
@@ -159,7 +165,7 @@ namespace QDLIB
       
       return this;
    }
-
+   
    Operator * OCheby::operator *( Operator * O )
    {
       throw ( EIncompatible ("Can't apply the Chebychev propagator to another operator") );
@@ -273,6 +279,8 @@ namespace QDLIB
    }
 
 } /* namespace QDLIB */
+
+
 
 
 
