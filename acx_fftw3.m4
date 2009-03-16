@@ -1,6 +1,6 @@
 AC_DEFUN([ACX_FFTW3],[
   AC_ARG_WITH([fftw3],[AS_HELP_STRING([--with-fftw3=PATH],[Prefix fftw installation])])
-  if test $with_fftw3 = no; then
+  if test "x$with_fftw3" = x; then
     AC_CHECK_HEADER(fftw3.h,,AC_MSG_ERROR(fftw3 headers are missing))
     AC_CHECK_LIB(fftw3, fftw_plan_dft,[FFTW_LIBS="-lfftw3"],AC_MSG_ERROR(fftw3 libs are missing))
   else
