@@ -19,8 +19,8 @@ qdng_SOURCES = ChainLoader.cpp FiltersList.cpp ProgPropa.cpp Reporter.cpp \
 	qdng.cpp ProgEigen.cpp
 qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/tools/libtools.la $(top_builddir)/src/math/libmath.la \
-	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la -L/opt/adm/fftw-latest/lib \
-	$(LAPACK_LIBS) -lfftw3 $(LIBXML2_LIBS)
+	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la \
+	$(LAPACK_LIBS) $(FLIBS) $(FFTW_LIBS) $(LIBXML2_LIBS)
 noinst_HEADERS = ChainLoader.h FiltersList.h ProgAutocorr.h ProgEigen.h \
 	ProgPropa.h Reporter.h
 AM_CXXFLAGS = -O3 -ansi -pedantic-errors

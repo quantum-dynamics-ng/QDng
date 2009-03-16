@@ -15,14 +15,15 @@ sinclude([acx_libxml2.m4])
 ACX_CHECK_LIBXML2
 
 dnl fftw3
-AC_CHECK_HEADER(fftw3.h,,AC_MSG_ERROR(fftw3 headers are missing))
-AC_CHECK_LIB(fftw3, fftw_plan_dft,,AC_MSG_ERROR(fftw3 libs are missing))
+sinclude([acx_fftw3.m4])
+ACX_FFTW3
 
 dnl blas/lapack
 sinclude([acx_blas.m4])
 sinclude([acx_lapack.m4])
 ACX_BLAS(,AC_MSG_ERROR(BLAS libs are missing/not working))
-ACX_LAPACK(,AC_MSG_ERROR(LAPACK is missing))
+ACX_LAPACK(,AC_MSG_ERROR(LAPACK is missing/not working))
+
 
 dnl Configure C/F77 mixed mode (RT libs)
 AC_F77_LIBRARY_LDFLAGS
