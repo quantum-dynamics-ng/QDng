@@ -98,10 +98,10 @@ namespace QDLIB
       if (_hermitian){
 	 for(int i=0; i< _nstates; i++){
 	    for(int j=0; j<= i; j++){
-	       if (i != j && _matrix[j][i] != NULL) _matrix[i][j] = _matrix[j][i];
+	       if (i != j && _matrix[j][i] != NULL) _matrix[i][j] = _matrix[j][i]; /* Copy pointer only */
 	       if (_matrix[i][j] != NULL){
 		  _matrix[i][j]->Init(psi->State(j));
-		  if (i != j) _matrix[j][i] = _matrix[i][j];
+		  if (i != j) _matrix[j][i] = _matrix[i][j]; /* Copy pointer only */
 	       }
 	    }
 	 }
@@ -169,6 +169,7 @@ namespace QDLIB
       }
    }
    
+   /** \todo Diagonalize Matrix => allow large couplings with Cheby */
    double OMultistate::Emax()
    {
       double d=0;
@@ -289,22 +290,27 @@ namespace QDLIB
    Operator* OMultistate::Offset(const double d)
    {
       
-      if (_hermitian){
-	 for(int i=0; i< _nstates; i++){
-	    for(int j=0; j<= i; j++){
-	       if (_matrix[i][j] != NULL)
-		  _matrix[i][j]->Offset(d);
-	    }
-	 }
-      } else {
-	 for(int i=0; i< _nstates; i++){
-	    for(int j=0; j< _nstates; j++){
-	       if (_matrix[i][j] != NULL)
-		  _matrix[i][j]->Offset(d);
-	    }
-	 }
+      for(int i=0; i< _nstates; i++){
+	 if (_matrix[i][i] != NULL)
+	    _matrix[i][i]->Offset(d);
       }
-      return this;
+      
+//       if (_hermitian){
+// 	 for(int i=0; i< _nstates; i++){
+// 	    for(int j=0; j<= i; j++){
+// 	       if (_matrix[i][j] != NULL)
+// 		  _matrix[i][j]->Offset(d);
+// 	    }
+// 	 }
+//       } else {
+// 	 for(int i=0; i< _nstates; i++){
+// 	    for(int j=0; j< _nstates; j++){
+// 	       if (_matrix[i][j] != NULL)
+// 		  _matrix[i][j]->Offset(d);
+// 	    }
+// 	 }
+//       }
+//       return this;
    }
 
    Operator* OMultistate::Scale(const double d)
