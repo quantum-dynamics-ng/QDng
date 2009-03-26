@@ -10,6 +10,18 @@ AC_PROG_F77
 
 AM_PROG_LIBTOOL
 
+dnl Check for standard functions
+AC_CHECK_FUNCS([pow],,AC_MSG_ERROR(power function not found))
+AC_CHECK_FUNCS([sqrt],,AC_MSG_ERROR(sqrt function not found))
+AC_C_INLINE
+AC_HEADER_STDBOOL
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+AC_TYPE_SIZE_T
+
 dnl libxml2
 sinclude([acx_libxml2.m4])
 ACX_CHECK_LIBXML2
