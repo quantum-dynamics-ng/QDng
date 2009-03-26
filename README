@@ -1,0 +1,9 @@
+The following software ist required:
+ * libxml2
+ * fftw3
+ * lapack
+ * blas
+
+Use ./genbs to generate the build system (configure)
+
+

@@ -1,0 +1,140 @@
+#include "math.h"
+#include "math_functions.h"
+
+
+namespace QDLIB {
+   
+   /**
+    * Returns the minimum value in the vector.
+    */
+   double VecMin(dVec &v)
+   {
+      double d;
+      d = v[0];
+      for (int i=1; i < v.size(); i++){
+	 if (v[i] <  d) d = v[i];
+      }
+      return d;
+   }
+   
+   /**
+    * Returns the maximum value in the vector.
+    */
+   double VecMax(dVec &v)
+   {
+      double d;
+      d = v[0];
+      for (int i=1; i < v.size(); i++){
+	 if (v[i] >  d) d = v[i];
+      }
+      return d;
+   }
+   
+   /**
+    * Faculty function.
+    */
+   double Faculty (int arg)
+   {
+      double r;
+      
+      if (arg==0) return 1;
+      
+      r=1.;
+      for (int i=1; i <= arg; i++){
+         r *= double(i);
+      }
+	 
+      return r;
+   }
+   
+   /**
+    * Bessel function of first kind with initial order zero.
+    * 
+    * \f$ J_n^{\alpha}(x) with \alpha=0 \f$
+    * 
+    * \param n order of the bessel function
+    * \param arg the x value
+    * \param coeffs values of the sum evaluation
+    * \param zeroes Number of coeficients set to zero due to underun
+    * 
+    * \return Slatec error code. Should be zero.
+    */
+   int BesselJ0 (int n, double arg, dVec &coeffs, int &zeroes)
+   {
+      double alpha =0;
+      double argIm =0;
+      int nz;
+      dVec bRe, bIm;
+      int kode=1;    /* taken from qdmpi*/
+      int ierr;
+      
+      if (n==0) return -1;
+      
+      coeffs.newsize(n);
+      bIm.newsize(n);
+//       (ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)
+      zbesj_(&arg, &argIm, &alpha, &kode, &n, (double*) coeffs.begin(0), (double*) bIm.begin(0), &zeroes, &ierr);
+      
+      //if (nz > 0) cout << "\n\n*** Bessel underflow warning : " << nz << "\n";
+      switch (ierr) {
+	 case 0: break;
+	 case 1:
+	    cout << "\n\n*** Bessel error : Input error\n";
+	    break;
+	 case 2:
+	    cout << "\n\n*** Bessel error : Overflow\n";
+	    break;
+	 case 3:
+	    cout << "\n\n*** Bessel warning : Precision warning\n";
+	    break;
+	 case 4:
+	    cout << "\n\n*** Bessel warning : Precision error\n";
+	    break;
+	 case 5:
+	    cout << "\n\n*** Bessel warning : Algorithmic error\n";
+	    break;
+	    
+      }
+      return ierr;
+   }
+   
+   int BesselI0( int n, double arg, dVec & coeffs, int & zeroes )
+   {
+      double alpha =0;
+      double argIm =0;
+      int nz;
+      dVec bRe, bIm;
+      int kode=1;    /* taken from qdmpi*/
+      int ierr;
+      
+      if (n==0) return -1;
+      
+      coeffs.newsize(n);
+      bIm.newsize(n);
+//       (ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)
+      zbesi_(&arg, &argIm, &alpha, &kode, &n, (double*) coeffs.begin(0), (double*) bIm.begin(0), &zeroes, &ierr);
+      
+      //if (nz > 0) cout << "\n\n*** Bessel underflow warning : " << nz << "\n";
+      switch (ierr) {
+	 case 0: break;
+	 case 1:
+	    cout << "\n\n*** Bessel error : Input error\n";
+	    break;
+	 case 2:
+	    cout << "\n\n*** Bessel error : Overflow\n";
+	    break;
+	 case 3:
+	    cout << "\n\n*** Bessel warning : Precision warning\n";
+	    break;
+	 case 4:
+	    cout << "\n\n*** Bessel warning : Precision error\n";
+	    break;
+	 case 5:
+	    cout << "\n\n*** Bessel warning : Algorithmic error\n";
+	    break;
+	    
+      }
+      return ierr;
+   }
+}
+

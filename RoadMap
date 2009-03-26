@@ -1,0 +1,43 @@
+* MPI
+ * Vector Classes
+ * Matrix Classes
+ * Check loops over elements
+ * transparent task/calc level scheme
+
+* I/O
+ * MPI-IO
+ * HDF5
+ * Mem-chached file buffer (in FileSingle)
+ * Compressed storage => k-space, set zero, gzip/bzip2 compression
+ * Seperate FileSingle class into specialized parts (WaveFunction->Multistate, other types of data)
+
+* Propgramm types
+ * Eigen (=> SPO,Cheby with real exponents) (DONE)
+ * OCT (Krotov, freq-shape)
+ * Pump Probe Spectroscopy simulation
+
+* Matrix Class
+ * Efficient Storage Scheme for Symmetric
+ * -"- Hermitian 
+ * Band Matrix
+
+* Operators to implement
+ * Dipole Operator (DONE)
+ * SIL
+ * SOD
+ * Projection Operator (DONE)
+
+* Multistate System
+ * efficient SPO Scheme
+ * matrix system (DONE)
+
+* FFT
+ * Decouple Intialiazation
+ * Plan buffering
+ * MPI-FFT (how to combine with data distribution?)
+
+* Density Matrix operations
+ * Faber propagator
+ * basic operations types for density matrices
+
+
