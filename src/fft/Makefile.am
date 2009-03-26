@@ -3,4 +3,4 @@ METASOURCES = AUTO
 noinst_LTLIBRARIES = libfft.la
 libfft_la_SOURCES = fft.cpp
 
-AM_CXXFLAGS = -ansi -O3
+AM_CXXFLAGS = -ansi -O3 -pedantic -Werror

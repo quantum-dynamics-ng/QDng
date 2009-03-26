@@ -48,7 +48,6 @@ namespace QDLIB {
 	    fclose(pFile);
 	 }
 	 fftwFlag = FFTW_PATIENT;
-	 cerr << "FFTW run init" << endl;
 #ifdef _OPENMP
 	 nthreads = omp_get_num_procs();
 	 cerr << "FFTW run init" << endl;

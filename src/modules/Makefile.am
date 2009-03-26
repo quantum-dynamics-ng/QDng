@@ -18,3 +18,6 @@ libqd_OSPO_la_SOURCES = mod-OSPO.cpp
 libqd_OSOD_la_SOURCES = mod-OSOD.cpp
 libqdWFGridCartesian_la_SOURCES = mod-WFGridCartesian.cpp
 AM_CXXFLAGS = -O3
+libqd_OGridNablaSq_la_LIBADD = $(top_builddir)/src/tools/libtools.la \
+	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS)

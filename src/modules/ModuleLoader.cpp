@@ -227,8 +227,8 @@ namespace QDLIB {
       
       
       /* try user path */
-      s = _user_path + MOD_BASENAME_OP + name;
-      handle = dlopen(s.c_str(), RTLD_NOW );
+      s = _user_path + MOD_BASENAME_OP + name + ".so";
+      handle = dlopen(s.c_str(), RTLD_NOW);
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);
@@ -236,7 +236,7 @@ namespace QDLIB {
       }
       
       /* try system path */
-      s = MOD_BASENAME_OP + name;
+      s = MOD_BASENAME_OP + name + ".so";
       handle = dlopen(s.c_str(), RTLD_NOW );
       if ( handle != NULL )
       {
