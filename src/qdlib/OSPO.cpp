@@ -25,7 +25,7 @@ namespace QDLIB {
    /**
     * Set the kinetic energy operator.
     */
-   void OSPO::AddTkin( OKSpace *T )
+   void OSPO::AddTkin( ODSpace *T )
    {
       _Tkin = T;
    }
@@ -43,7 +43,7 @@ namespace QDLIB {
    /** Init expT. */
    void OSPO::_InitT( )
    {
-      _Tkin_kspace = _Tkin->Kspace();
+      _Tkin_kspace = _Tkin->Dspace();
       if (_Tkin_kspace == NULL)
 	 throw ( Exception("SPO got uninitialized KSpace") );
       
@@ -84,7 +84,7 @@ namespace QDLIB {
 	 throw ( EParamProblem("Tkin or Vpot not initialized") );
       
       if (_Tkin_kspace == NULL)
-	 _Tkin_kspace = _Tkin->Kspace();
+	 _Tkin_kspace = _Tkin->Dspace();
 	 
       if (_Vpot->size() != _Tkin_kspace->size())
 	 throw ( EParamProblem("Tkin and Vpot differ in size") );
@@ -238,7 +238,7 @@ namespace QDLIB {
 	 throw ( EParamProblem("SPO only knows Tkin or Vpot") );
       
       if (Key == "Tkin") {
-	 _Tkin = dynamic_cast<OKSpace*>(O);
+	 _Tkin = dynamic_cast<ODSpace*>(O);
 	 if (_Tkin == NULL)
 	    throw ( EParamProblem("Tkin is invalid", O->Name()) );
       }

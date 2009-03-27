@@ -1,7 +1,7 @@
 #ifndef BESSEL_H
 #define BESSEL_H
 
-#include "math/typdefs.h"
+#include "math/typedefs.h"
 
 namespace QDLIB {
 

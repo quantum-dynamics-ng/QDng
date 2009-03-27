@@ -1,7 +1,7 @@
 #ifndef QDLIBOGRIDNABLASQ_H
 #define QDLIBOGRIDNABLASQ_H
 
-#include "OKSpace.h"
+#include "ODSpace.h"
 #include "Kspace.h"
 #include "GridSystem.h"
 
@@ -21,7 +21,7 @@ namespace QDLIB {
     * mass for a dimension means not to apply it for this coordinate.
     *	@author Markus Kowalewski
     */
-   class OGridNablaSq : public OKSpace, public GridSystem
+   class OGridNablaSq : public ODSpace, public GridSystem
    {
       private:
 	 string _name;
@@ -63,8 +63,8 @@ namespace QDLIB {
 
 	 
 	 
-	 /*Interface implementation, OKSpace  */ 
-	 virtual void InitKspace();
+	 /*Interface implementation, ODSpace  */ 
+	 virtual void InitDspace();
    };
 
 }

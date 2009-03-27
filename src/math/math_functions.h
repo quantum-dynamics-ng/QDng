@@ -7,16 +7,8 @@ namespace QDLIB {
    
    extern double Faculty (int arg);
    
-   extern "C" { int dbesj_(double *x, double *alpha, int *n, double *coeffs, int *nz); }
-   
-   extern "C" { void zbesj_(double *re, double *im, double *alpha, int *kode, int *n,
-      double *cRe, double *cIm, int *nz, int *ierr); }
-   extern "C" { void zbesi_(double *re, double *im, double *alpha, int *kode, int *n,
-      double *cRe, double *cIm, int *nz, int *ierr); }
-   
-   extern int BesselJ0 (int n, double arg, dVec &coeffs, int &zeroes);
-   extern int BesselI0 (int n, double arg, dVec &coeffs, int &zeroes);
-   
+   //extern "C" { int dbesj_(double *x, double *alpha, int *n, double *coeffs, int *nz); }
+      
    
    /**
     * Diagonalize a symmetric 2x2 matrix
