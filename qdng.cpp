@@ -1,1 +1,1 @@
-/home/mko/src/QDng/devel-main/src/qdng.cpp
+src/qdng.cpp
