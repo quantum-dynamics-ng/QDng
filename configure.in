@@ -40,6 +40,11 @@ ACX_LAPACK(,AC_MSG_ERROR(LAPACK is missing/not working))
 dnl Configure C/F77 mixed mode (RT libs)
 AC_F77_LIBRARY_LDFLAGS
 
+AC_ARG_ENABLE([mods],
+	      [AS_HELP_STRING([--enable-mods],[Enable dynamic loadable modules])],
+	      AC_DEFINE([USE_DYNMODS], [1], [Enable dynamic loadable modules]),)
+
+
 dnl AC_ARG_ENABLE([mpi],
 dnl	    [AS_HELP_STRING([--enable-mpi],[Build with support for mpi parallization])],
 dnl	    [],enable_mpi=no)

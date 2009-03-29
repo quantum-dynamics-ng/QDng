@@ -1,4 +1,8 @@
-#include <dlfcn.h>
+
+#ifdef USE_DYNMODS
+ #include <dlfcn.h>
+#endif 
+
 #include "ModuleLoader.h"
 #include "qdlib/InternalMods.h"
 
@@ -7,9 +11,8 @@ namespace QDLIB {
    /* Static member initalisation */
    ModuleLoader*  ModuleLoader::_ref=0;
    
-   ModuleLoader::ModuleLoader() : _user_path()
+   ModuleLoader::ModuleLoader() : _user_path("~/qdmods/")
    {
-      _user_path = "~/qdmods/";
    }
    
    /**
@@ -32,6 +35,7 @@ namespace QDLIB {
 
    ModuleLoader::~ModuleLoader()
    {
+#ifdef USE_DYNMODS
       map<string, module>::iterator it;
       
       /* Unload the modules */
@@ -40,6 +44,7 @@ namespace QDLIB {
 	 dlclose( it->second.handle );
 	 it++;
       }
+#endif
    }
    
    /**
@@ -79,6 +84,7 @@ namespace QDLIB {
    /**
     * Register a WF module.
     */
+#ifdef USE_DYNMODS
    void ModuleLoader::_RegisterWF(void *handle, const string &name)
    {
 
@@ -94,13 +100,13 @@ namespace QDLIB {
 	 throw ( Exception("Invalid WaveFunction module") );
       }
    }
+#endif
    
-   
-      /**
+   /**
     * Load an compiled in WF module.
     * 
     * \return true if compiled in module was found
-       */
+    */
    bool ModuleLoader::_InternalOP(const string &name)
    {
       string s;
@@ -124,6 +130,7 @@ namespace QDLIB {
    /**
     * Register an operator module.
     */
+#ifdef USE_DYNMODS
    void ModuleLoader::_RegisterOP(void *handle, const string &name)
    {
     
@@ -138,12 +145,14 @@ namespace QDLIB {
 	 throw ( Exception("Invalid Operator module") );
       }
    }
+#endif
    
    /**
     * Set the user-defined module search path.
     * 
     * Only one path is allowed. Must be an absolute path (not a relative!)
     */
+#ifdef USE_DYNMODS
    void ModuleLoader::UserPath( const string &path )
    {
       _user_path = path;
@@ -151,7 +160,7 @@ namespace QDLIB {
 	 _user_path += '/';
      
    }
-
+#endif
    
    /**
     * Load a WaveFunction Module.
@@ -166,18 +175,18 @@ namespace QDLIB {
       void* handle;
       string s;
       
-      
+#ifdef USE_DYNMODS
       /* is already loaded? */
       if (_isLoaded(name)) {
 	 _mod_map[name].link_count++;
 	 return _mod_map[name].InstanceWF();
       }
-	 
+#endif
       /* try compiled in module */
       if (_InternalWF(name)){
 	 return _mod_map[name].InstanceWF();
       }
-      
+#ifdef USE_DYNMODS   
       /* try user path */
       s = _user_path + MOD_BASENAME_WF + name;
    
@@ -198,7 +207,11 @@ namespace QDLIB {
       } else {
 	 throw ( Exception( dlerror() ) );
       }
-      
+#elif
+      string s = "Module not found: " + name;
+      throw ( Exception( s.c_str() ) );
+#endif
+
    }
    
    /**
@@ -214,18 +227,19 @@ namespace QDLIB {
       string s;
       void *handle;
       
+#ifdef USE_DYNMODS
       /* is already loaded? */
       if (_isLoaded(name)) {
 	 _mod_map[name].link_count++;
 	 return _mod_map[name].InstanceOP();
       }
-	 
+#endif
       /* try compiled in module */
       if (_InternalOP(name)){
 	 return _mod_map[name].InstanceOP();
       }
       
-      
+#ifdef USE_DYNMODS
       /* try user path */
       s = _user_path + MOD_BASENAME_OP + name + ".so";
       handle = dlopen(s.c_str(), RTLD_NOW);
@@ -245,6 +259,10 @@ namespace QDLIB {
       } else {
 	 throw ( Exception( dlerror() ) );
       }
+#elif
+      string s = "Module not found: " + name;
+      throw ( Exception( s.c_str() ) );
+#endif
    }
 
 

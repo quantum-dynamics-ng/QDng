@@ -4,6 +4,8 @@
 #include "qdlib/WaveFunction.h"
 #include "qdlib/Operator.h"
 
+#include "config.h"
+
 #define INTERNAL_BASENAME_WF "INT_WF"
 #define INTERNAL_BASENAME_OP "INT_O"
 
@@ -43,10 +45,11 @@ namespace QDLIB {
 	 
 	 bool _isLoaded( const string &name );
 	 
+#ifdef USE_DYNMODS
 	 void _RegisterWF(void *handle, const string &name);
-	 bool _InternalWF(const string &name);
-	 
 	 void _RegisterOP(void *handle, const string &name);
+#endif
+	 bool _InternalWF(const string &name);
 	 bool _InternalOP(const string &name);
 	 
 	 static ModuleLoader *_ref;
@@ -60,7 +63,9 @@ namespace QDLIB {
 	 
 	 static ModuleLoader* Instance();
 	 
+#ifdef USE_DYNMODS
 	 void UserPath(const string &path);
+#endif
 	 WaveFunction* LoadWF(const string &name);
 	 Operator* LoadOp(const string &name);
       
