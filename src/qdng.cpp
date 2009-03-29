@@ -40,8 +40,11 @@ int main(int argc, char **argv)
    ModuleLoader *mods = ModuleLoader::Instance();
    
    cmdline.SetDescription("QD next generation");
+   
+#ifdef USE_DYNMODS
    cmdline.SetHelp( 'm', "module path", false,
 		    "User defined path to the wave function and operator modules", "");
+#endif
    
    cmdline.SetHelp( 'd', "output directory path", false,
 		    "All output files are saved in this directory", "");
@@ -61,11 +64,13 @@ int main(int argc, char **argv)
       /*Show the help ?*/
       if ( cmdline.GetOption('h') ) throw (Exception());
       
+#ifdef USE_DYNMODS
       /* Provide a user path for module loading */
       if (cmdline.GetOption('m')){
 	 cmdline.GetOption('m', fname);
 	 mods->UserPath( fname );
       }
+#endif
       
       /* The global output path */
       if (cmdline.GetOption('d')){
