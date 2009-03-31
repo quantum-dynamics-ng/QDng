@@ -110,6 +110,77 @@ namespace QDLIB {
    
    
    
+/*   inline void MultMatTranspose(dMat *A, cVec* B)
+   {
+      int rows = A->num_rows();
+      int cols = A->num_cols();
+      lint strides = A->strides();
+      
+      dcomplex c;
+      dcomplex *a;
+      
+      for (int i=0; i < rows; i++){
+// 	 for (s=0; s < strides; s++){
+	    dcomplex *a;
+	    for (int i=0; i < cols; i++){
+	       
+	    }
+	 }
+      }
+   }*/
+   
+   
+   /**
+    * Exponentiate elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void ExpElements(cVec *A, cVec *B, dcomplex c)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+      
+      dcomplex *a=NULL;
+      dcomplex *b=NULL;
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 b = B->begin(s);
+	 for (lint i=0; i < size; i++){
+	    {
+	       a[i] = cexp(b[i] * c);
+	    }
+	 }
+      }
+   }
+
+      /**
+    * Exponentiate elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+       */
+   inline void ExpElements(cVec *A, dVec *B, dcomplex c)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+      
+      dcomplex *a=NULL;
+      double *b=NULL;
+      
+      lint s;
+      for (s=0; s < strides; s++){
+	 a = A->begin(s);
+	 b = B->begin(s);
+	 for (lint i=0; i < size; i++){
+	    {
+	       a[i] = cexp(b[i] * c);
+	    }
+	 }
+      }
+   }
    
     /**
     * Add vectors by elements.
@@ -192,7 +263,6 @@ namespace QDLIB {
       }
 
    }
-   
    
    /**
     * Multiply vectors by elements.
