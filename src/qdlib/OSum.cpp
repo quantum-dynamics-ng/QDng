@@ -156,23 +156,15 @@ namespace QDLIB {
    WaveFunction* OSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       if (_WFbuf[0] == NULL) _WFbuf[0] = sourcePsi->NewInstance();
-      
+
       _O[0]->Apply(destPsi, sourcePsi);
       
-      dcomplex *d = destPsi->begin(0), *b = _WFbuf[0]->begin(0);
-      int size = destPsi->lsize();
-      int strides = destPsi->strides();
       for (int i=1; i < _size; i++)
       {
-	 _O[i]->Apply(_WFbuf[0], sourcePsi);	 
-	 for (int s=0; s < strides; s++){
-	    
-	    for (int j=0; j < size; j++){
-	       d[j] += b[j];
-	    }
-	 }
+	 _O[i]->Apply(_WFbuf[0], sourcePsi);
+	 AddElements(destPsi, _WFbuf[0]);
       }
-   
+
       return destPsi;
    }
    
@@ -183,22 +175,12 @@ namespace QDLIB {
       if (_WFbuf[1] == NULL) _WFbuf[1] = Psi->NewInstance();
       
       _WFbuf[0]->FastCopy(*Psi);
-      
       _O[0]->Apply(Psi);
-      
-      dcomplex *d = Psi->begin(0), *b = _WFbuf[1]->begin(0);
-      int size = Psi->lsize();
-      int strides = Psi->strides();
-      
+            
       for (int i=1; i < _size; i++)
       {
 	 _O[i]->Apply(_WFbuf[1], _WFbuf[0]);
-	 for (int s=0; s < strides; s++){
-	    #pragma omp parallel for
-	    for (int j=0; j < size; j++){
-	       d[j] += b[j];
-	    }
-	 }
+	 AddElements(Psi, _WFbuf[1]);
       }
       
       return Psi;
