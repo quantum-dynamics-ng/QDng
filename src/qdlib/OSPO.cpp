@@ -10,13 +10,14 @@ namespace QDLIB {
                   _Tkin(NULL), _Tkin_kspace(NULL), _Vcoup(NULL),
                   _expT(NULL), _expV(NULL), _expVcoup(NULL), _buf(NULL),
 		  _cV(0,0), _cT(0,0), _coupling(false), _last_time(0)
-   {}
+   {
+      _Vpot[0] = NULL;
+      _Vpot[1] = NULL;
+   }
    
    
    OSPO::~OSPO()
    {
-      _Vpot[0] = NULL;
-      _Vpot[1] = NULL;
       if (_expT != NULL) delete _expT;
       if (_expV != NULL) delete _expV;
       if (_needs != NULL) delete _needs;
@@ -125,8 +126,12 @@ namespace QDLIB {
       if (_Tkin_kspace == NULL)
 	 _Tkin_kspace = _Tkin->Dspace();
 	 
-      if (_Vpot[0]->size() != _Tkin_kspace->size() || (_Vpot[0]->size() != _Vpot[1]->size() && _coupling) )
+      if (_Vpot[0]->size() != _Tkin_kspace->size()) 
 	 throw ( EParamProblem("Tkin and Vpot differ in size") );
+      
+      if (_coupling)
+         if (_Vpot[0]->size() != _Vpot[1]->size())
+	    throw ( EParamProblem("Ground and excited state potential differ in size") );
       
       if (_coupling && _Vcoup != NULL)
 	 if(_Vcoup->size() != _Tkin_kspace->size())
