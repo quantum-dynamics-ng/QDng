@@ -132,6 +132,7 @@ namespace QDLIB
 	 log.cout() << "Multi state wave function:" << endl;
 	 log.IndentInc();
 	 child = WFNode->NextChild();
+	 child->AdjustElementNode();
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
 	 while (child->EndNode()){
@@ -159,6 +160,7 @@ namespace QDLIB
 	 log.cout() << "Build linear combination from wave functions:" << endl;
 	 log.IndentInc();
 	 child = WFNode->NextChild();
+	 child->AdjustElementNode();
 	 WaveFunction *wfadd;
 	 double coeff;
 	 ParamContainer pm_child;
