@@ -48,6 +48,17 @@ namespace QDLIB
 	_hermitian = false;
    }
    
+   /**
+    * Direct access to the containing operators.
+    * 
+    */
+   Operator * QDLIB::OMultistate::State(int i, int j)
+   {
+      if (_nstates > i && _nstates > j)
+	 return _matrix[i][j];
+      else
+	 return NULL;
+   }
    
    void OMultistate::Clock( QDClock * cl )
    {
@@ -335,3 +346,4 @@ namespace QDLIB
 
 }
 /* namespace QDLIB */
+
