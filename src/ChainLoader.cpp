@@ -35,6 +35,7 @@ namespace QDLIB
 	 log.cout() << "Sum of operators:\n";
 	 log.IndentInc();
 	 child = Onode->NextChild();
+	 child->AdjustElementNode();
 	 Operator *osub;
 	 OSum *sum = new OSum();
 	 while (child->EndNode()){
@@ -49,6 +50,7 @@ namespace QDLIB
 	 return sum;	 
       } else if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
+	 child->AdjustElementNode();
 	 Operator *osub;
 	 OGridSystem *gsub;
 	 OGridSum *sum = new OGridSum;
@@ -66,6 +68,7 @@ namespace QDLIB
 	 log.cout() << "Multistate operator:\n";
 	 log.IndentInc();
 	 child = Onode->NextChild();
+	 child->AdjustElementNode();
 	 Operator *osub;
 	 OMultistate *matrix = new OMultistate();
 	 

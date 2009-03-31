@@ -40,6 +40,8 @@ namespace QDLIB
 	 bool EndChild();
 	 
          void NextNode();
+	 void AdjustElementNode();
+	 
 	 bool EndNode();
 
 	 XmlNode* FindNode( const string &name);
