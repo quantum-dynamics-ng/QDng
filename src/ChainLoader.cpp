@@ -263,7 +263,7 @@ namespace QDLIB
       
       /* Search for needs and add it */
       int i=0;
-      OSum *sum = new OSum();
+      OSum *sum = new OSum(); /* Add single parts to sum operator (if more than one part) */
       
       log.cout() << "Intialize Operators:\n\n";
       
@@ -271,18 +271,20 @@ namespace QDLIB
       while (needs.GetNextValue( name, s )){
 	 if (i > 0) sum->Add(h);
 	 ops = child->FindNode( name );
-	 if ( ops == NULL )
+	 if ( ops == NULL && s != "opt") /* N error if need is an option */
 	    throw ( EParamProblem ("Can't find an operator for the propagation", name) );
-	 log.Header( name, Logger::SubSection );
-	 log.IndentInc();
-	 h = LoadOperatorChain( ops );
-	 log.IndentDec();
-	 log.cout() << endl;
-	 U->AddNeeds( name, h );
-	 delete ops;
-	 i++;
+	 if ( ops != NULL ) { 
+	    log.Header( name, Logger::SubSection );
+	    log.IndentInc();
+	    h = LoadOperatorChain( ops );
+	    log.IndentDec();
+	    log.cout() << endl;
+	    U->AddNeeds( name, h );
+	    delete ops;
+	    i++;
+	 }
       }
-      if ( i > 1 ) {
+      if ( i > 1 ) { /* need for a sum or single operator ? */
 	 sum->Add(h);
 	 *Hamiltonian = sum;
       } else {
