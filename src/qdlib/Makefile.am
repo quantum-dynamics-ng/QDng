@@ -7,7 +7,7 @@ libqd_la_SOURCES = GridSystem.cpp InternalMods.cpp Kspace.cpp Laser.cpp \
 					WFMultistate.cpp OGridGMat.cpp OGobbler.cpp OProjection.cpp OGridDipole.cpp
 noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h \
 		OGridDipole.h OGridNablaSq.h OGridPotential.h OGridSum.h OGridsystem.h OHerMat.h \
-		OKSpace.h OPropagator.h OSOD.h OSPO.h OSum.h Operator.h \
+		OPropagator.h OSOD.h OSPO.h OSum.h Operator.h \
 		WFGridCartesian.h WFGridSystem.h WFLevel.h WFMultistate.h WaveFunction.h WFMultistate.h \
 	OMultistate.h
 
