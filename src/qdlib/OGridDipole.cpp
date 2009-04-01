@@ -6,7 +6,10 @@
 namespace QDLIB {
    
    
-   OGridDipole::OGridDipole() : OGridPotential(), _name("OGridDipole"), _init(false) {}
+   OGridDipole::OGridDipole() : OGridPotential(), _name("OGridDipole"), _init(false)
+   {
+      _isTimedependent = true;
+   }
    
    void QDLIB::OGridDipole::Clock( QDClock * cl )
    {
