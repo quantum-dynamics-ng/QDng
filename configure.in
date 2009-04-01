@@ -1,6 +1,6 @@
 AC_INIT(configure.in)
 
-AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(src/config.h)
 AM_INIT_AUTOMAKE(QDng, 0.1)
 
 
@@ -39,6 +39,12 @@ ACX_LAPACK(,AC_MSG_ERROR(LAPACK is missing/not working))
 
 dnl Configure C/F77 mixed mode (RT libs)
 AC_F77_LIBRARY_LDFLAGS
+AC_F77_WRAPPERS
+
+AC_ARG_ENABLE([mods],
+	      [AS_HELP_STRING([--enable-mods],[Enable dynamic loadable modules])],
+	      AC_DEFINE([USE_DYNMODS], [1], [Enable dynamic loadable modules]),)
+
 
 AC_ARG_ENABLE([mods],
 	      [AS_HELP_STRING([--enable-mods],[Enable dynamic loadable modules])],
@@ -54,4 +60,4 @@ dnl	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation
 dnl	    [],with_mpi-prefix=no)
 
 
-AC_OUTPUT(Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile)
+AC_OUTPUT(Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile)

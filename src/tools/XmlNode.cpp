@@ -75,6 +75,15 @@ namespace QDLIB {
    }
 	
    /**
+    * Step over to the next ELEMENT node.
+    * 
+    */
+   void XmlNode::AdjustElementNode()
+   {
+      if ( _cur_node->type != XML_ELEMENT_NODE ) NextNode();
+   }   
+   
+   /**
     * \return false if no further element nodes left in the list.
     */   
    bool XmlNode::EndNode()

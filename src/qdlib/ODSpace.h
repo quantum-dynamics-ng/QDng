@@ -1,5 +1,5 @@
-#ifndef OKSPACE_H
-#define OKSPACE_H
+#ifndef ODSPACE_H
+#define ODSPACE_H
 
 #include "Operator.h"
 
@@ -12,17 +12,18 @@ namespace QDLIB {
     * 
     * \todo add support for complex k-space operators.
     */
-   class OKSpace: public Operator
+   template<typename T>
+   class ODSpaceT: public Operator
    {
       protected:
          /** k-Space representation is stored here */
-         dVec *_kspace;
+         Vector<T> *_dspace;
       public:
-         OKSpace() : _kspace(NULL) {}
+	 ODSpaceT() : _dspace(NULL) {}
          
-         ~OKSpace()
+	 ~ODSpaceT()
          {
-            if (_kspace != NULL) delete _kspace;
+            if (_dspace != NULL) delete _dspace;
          }
          
          /**
@@ -31,30 +32,33 @@ namespace QDLIB {
           * 
           * \return Pointer to the diagonal space rep. of the operator
           */
-         dVec* Kspace()
+	 Vector<T>* Dspace()
          {
-            if (_kspace == NULL) InitKspace();
-            return _kspace;
+            if (_dspace == NULL) InitDspace();
+            return _dspace;
          }
          
          /**
           * Initialize the diagonal respresentation.
           */
-         virtual void InitKspace() = 0;
+         virtual void InitDspace() = 0;
 	 
 	 /** We don't do offsetting. */
 	 virtual Operator* Offset(const double d){return this;}
 
 	 virtual Operator* Scale(const double d)
 	 {
-	    if (_kspace == NULL)
+	    if (_dspace == NULL)
 	       throw ( EParamProblem("k-space not initialized", Name()) );
-	    MultElements(_kspace, d);
+	    MultElements(_dspace, d);
 	    return this;
 	 }
 	 
    };
    
+   /* Provide types for complex and real numbers */
+   typedef ODSpaceT<double> ODSpace;
+   typedef ODSpaceT<dcomplex> ODSpaceCplx;
    
 } /* namespace QDLIB */
 

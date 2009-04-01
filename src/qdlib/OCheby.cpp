@@ -1,6 +1,7 @@
 #include "tools/Exception.h"
 #include "OCheby.h"
 #include "math/math_functions.h"
+#include "linalg/Bessel.h"
 
 #ifdef _OPENMP
 #include <omp.h>

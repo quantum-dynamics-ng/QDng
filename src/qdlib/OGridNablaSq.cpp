@@ -5,7 +5,7 @@
 namespace QDLIB {
 
    OGridNablaSq::OGridNablaSq()
-   : OKSpace(), _name("OGridNablaSq")
+   : ODSpace(), _name("OGridNablaSq")
    {
       for (int i=0; i < MAX_DIMS; i++){
 	 _mass[i] = -1;
@@ -61,9 +61,9 @@ namespace QDLIB {
 	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
 
       /* re-Init k-space ?*/
-      if (*this != *((GridSystem*) opPsi)  || _kspace == NULL) {
+      if (*this != *((GridSystem*) opPsi)  || _dspace == NULL) {
 	 *((GridSystem*) this) = *((GridSystem*) opPsi);
-	 InitKspace();
+	 InitDspace();
       }
      
    }
@@ -125,7 +125,7 @@ namespace QDLIB {
       
       ket->ToKspace();
       opPsi->isKspace(true);
-      MultElements((cVec*) opPsi, (cVec*) ket, _kspace, 1/double(GridSystem::Size()));
+      MultElements((cVec*) opPsi, (cVec*) ket, _dspace, 1/double(GridSystem::Size()));
       ket->isKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
       opPsi->ToXspace();
       
@@ -139,7 +139,7 @@ namespace QDLIB {
       opPsi = dynamic_cast<WFGridSystem*>(Psi);
 
       opPsi->ToKspace();
-      MultElements((cVec*) opPsi, _kspace, 1/double(GridSystem::Size()));
+      MultElements((cVec*) opPsi, _dspace, 1/double(GridSystem::Size()));
       opPsi->ToXspace();
       
       return opPsi;
@@ -163,9 +163,9 @@ namespace QDLIB {
       /* Copy parents */
       *((GridSystem*) this) = *((GridSystem*) org);
       
-      if (_kspace == NULL && org->_kspace != NULL){
-	 _kspace = new dVec();
-	 *_kspace = *(org->_kspace);
+      if (_dspace == NULL && org->_dspace != NULL){
+	 _dspace = new dVec();
+	 *_dspace = *(org->_dspace);
       }
          
       
@@ -186,47 +186,32 @@ namespace QDLIB {
     * \todo clean Vector view.
     * \bug dimensions are inverse => x (lowest number ) is the fastest!
     */
-   void OGridNablaSq::InitKspace()
+   void OGridNablaSq::InitDspace()
    {
    
       if (GridSystem::Dim() == 0) throw ( EParamProblem("Missing GridSystem parameters") );
    
       dVec *kspace1;
    
-      if (_kspace == NULL ) _kspace = new dVec(GridSystem::Size(), true);
-      else _kspace->newsize(GridSystem::Size());
+      if (_dspace == NULL ) _dspace = new dVec(GridSystem::Size(), true);
+      else _dspace->newsize(GridSystem::Size());
       
       
-      *_kspace = 0;
-      dVecView view(*_kspace, GridSystem::Dim(), GridSystem::DimSizes());
+      *_dspace = 0;
+      dVecView view(*_dspace, GridSystem::Dim(), GridSystem::DimSizes());
    
-//       ofstream kfile;
       /* Init k-space for every dimension */
       for (int i=0; i < GridSystem::Dim(); i++){ 
 	 if (_mass[i] > 0) {
-// 	    stringstream ss;
-// 	    ss << "kfile_";
-// 	    ss << i;
-// 	    kfile.open(ss.str().c_str());
+
 	    kspace1 = Kspace::Init1Dd2dx2(_mass[i], GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i) );
-// 	    kfile << *kspace1;
+
 	    view.ActiveDim(i);
 	    view += *kspace1;
 	    delete kspace1;
-// 	    kfile.close();
+
 	 }
       }
-      
-//       kfile.open("kfile_all");
-//       int k=0;
-//       for (int i=0; i < GridSystem::DimSizes(1); i++){
-// 	 for (int j=0; j < GridSystem::DimSizes(0); j++){
-// 	    kfile << i << " " << j << " " << (*_kspace)[k] << endl;
-// 	    k++;
-// 	 }
-//       }
-//       kfile.close();
-      
    }
 
 } /* namespace QDLIB */

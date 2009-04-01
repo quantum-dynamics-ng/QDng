@@ -35,6 +35,7 @@ namespace QDLIB
 	 log.cout() << "Sum of operators:\n";
 	 log.IndentInc();
 	 child = Onode->NextChild();
+	 child->AdjustElementNode();
 	 Operator *osub;
 	 OSum *sum = new OSum();
 	 while (child->EndNode()){
@@ -49,6 +50,7 @@ namespace QDLIB
 	 return sum;	 
       } else if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
+	 child->AdjustElementNode();
 	 Operator *osub;
 	 OGridSystem *gsub;
 	 OGridSum *sum = new OGridSum;
@@ -66,6 +68,7 @@ namespace QDLIB
 	 log.cout() << "Multistate operator:\n";
 	 log.IndentInc();
 	 child = Onode->NextChild();
+	 child->AdjustElementNode();
 	 Operator *osub;
 	 OMultistate *matrix = new OMultistate();
 	 
@@ -129,6 +132,7 @@ namespace QDLIB
 	 log.cout() << "Multi state wave function:" << endl;
 	 log.IndentInc();
 	 child = WFNode->NextChild();
+	 child->AdjustElementNode();
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
 	 while (child->EndNode()){
@@ -156,6 +160,7 @@ namespace QDLIB
 	 log.cout() << "Build linear combination from wave functions:" << endl;
 	 log.IndentInc();
 	 child = WFNode->NextChild();
+	 child->AdjustElementNode();
 	 WaveFunction *wfadd;
 	 double coeff;
 	 ParamContainer pm_child;
@@ -258,26 +263,28 @@ namespace QDLIB
       
       /* Search for needs and add it */
       int i=0;
-      OSum *sum = new OSum();
+      OSum *sum = new OSum(); /* Add single parts to sum operator (if more than one part) */
       
       log.cout() << "Intialize Operators:\n\n";
       
-      
+      int ilast; 
       while (needs.GetNextValue( name, s )){
-	 if (i > 0) sum->Add(h);
 	 ops = child->FindNode( name );
-	 if ( ops == NULL )
+	 if ( ops == NULL && s != "opt") /* N error if need is an option */
 	    throw ( EParamProblem ("Can't find an operator for the propagation", name) );
-	 log.Header( name, Logger::SubSection );
-	 log.IndentInc();
-	 h = LoadOperatorChain( ops );
-	 log.IndentDec();
-	 log.cout() << endl;
-	 U->AddNeeds( name, h );
-	 delete ops;
-	 i++;
+	 if ( ops != NULL ) { 
+	    if (i > 0) sum->Add(h);
+	    log.Header( name, Logger::SubSection );
+	    log.IndentInc();
+	    h = LoadOperatorChain( ops );
+	    log.IndentDec();
+	    log.cout() << endl;
+	    U->AddNeeds( name, h );
+	    delete ops;
+	    i++;
+	 }
       }
-      if ( i > 1 ) {
+      if ( i > 1 ) { /* need for a sum or single operator ? */
 	 sum->Add(h);
 	 *Hamiltonian = sum;
       } else {

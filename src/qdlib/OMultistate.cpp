@@ -43,11 +43,24 @@ namespace QDLIB
 	 _nstates = col+1;
       
       _matrix[row][col] = O;
-
+      
+      if (O->isTimeDep()) _isTimedependent = true;
+      
       if ( (_matrix[row][col] != NULL && _matrix[col][row] != NULL) && row != col )
 	_hermitian = false;
    }
    
+   /**
+    * Direct access to the containing operators.
+    * 
+    */
+   Operator * QDLIB::OMultistate::State(int i, int j)
+   {
+      if (_nstates > i && _nstates > j)
+	 return _matrix[i][j];
+      else
+	 return NULL;
+   }
    
    void OMultistate::Clock( QDClock * cl )
    {
@@ -335,3 +348,4 @@ namespace QDLIB
 
 }
 /* namespace QDLIB */
+

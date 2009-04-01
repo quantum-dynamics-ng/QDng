@@ -207,8 +207,8 @@ namespace QDLIB {
       } else {
 	 throw ( Exception( dlerror() ) );
       }
-#elseif
-      string s = "Module not found: " + name;
+#else
+      s = "Module not found: " + name;
       throw ( Exception( s.c_str() ) );
 #endif
 
@@ -259,8 +259,8 @@ namespace QDLIB {
       } else {
 	 throw ( Exception( dlerror() ) );
       }
-#elseif
-      string s = "Module not found: " + name;
+#else
+      s = "Module not found: " + name;
       throw ( Exception( s.c_str() ) );
 #endif
    }

@@ -43,6 +43,8 @@ namespace QDLIB
 	 
 	 int States() {return _nstates;}
 	 
+	 Operator* State(int i, int j);
+	 
 	 /* Overide Clock setter */
 	 virtual void Clock (QDClock *cl);
 	 
