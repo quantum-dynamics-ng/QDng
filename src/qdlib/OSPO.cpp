@@ -206,7 +206,7 @@ namespace QDLIB {
    WaveFunction* OSPO::Apply(WaveFunction *Psi)
    {
 
-      if (_last_time != clock->TimeStep() && _Vpot[0]->isTimeDep() || _coupling) /* Re-init Vpot if is time dep.*/
+      if (_last_time != clock->TimeStep() && _isTimedependent) /* Re-init Vpot if is time dep.*/
       {  
 	 _last_time = clock->TimeStep();
 	 _InitV();
@@ -229,24 +229,22 @@ namespace QDLIB {
 	 /* exp(-i V dt) */
 	 MultElements( (cVec*) psi,  (cVec*) _expV);
 	 
-	 /* transform psi to Vcoup diag basis */
-	 *(buf->State(0)) = psi->State(1); 
-	 *(buf->State(0)) -= psi->State(0);
-	 *(buf->State(1)) = psi->State(1);
-	 *(buf->State(1)) += psi->State(0);
-	 
 	 /* exp(-i Vcoup dt) */
 	 if (expVcoup != NULL){
-/*	    MultElements( (cVec*) buf->State(0),  (cVec*) expVcoup->State(0), -1);
-	    MultElements( (cVec*) buf->State(1),  (cVec*) expVcoup->State(1));*/
-	    MultElements( (cVec*) buf,  (cVec*) expVcoup);
-	 }
+	    /* transform psi to Vcoup diag basis */
+	    *(buf->State(0)) = psi->State(1); 
+	    *(buf->State(0)) -= psi->State(0);
+	    *(buf->State(1)) = psi->State(1);
+	    *(buf->State(1)) += psi->State(0);
 	 
-	 /* transform psi back from  Vcoup diag basis */
-	 *(psi->State(0)) = buf->State(1); 
-	 *(psi->State(0)) -= buf->State(0);
-	 *(psi->State(1)) = buf->State(1);
-	 *(psi->State(1)) += buf->State(0);
+	    MultElements( (cVec*) buf,  (cVec*) expVcoup);
+	 
+	    /* transform psi back from  Vcoup diag basis */
+	    *(psi->State(0)) = buf->State(1); 
+	    *(psi->State(0)) -= buf->State(0);
+	    *(psi->State(1)) = buf->State(1);
+	    *(psi->State(1)) += buf->State(0);
+	 }
 	 
 	 /* exp(-i/2 T dt) */
 	 for (int i=0; i < 2; i++){
@@ -344,6 +342,7 @@ namespace QDLIB {
 	    _Vpot[0] = dynamic_cast<OGridSystem*>(O);
 	    if (_Vpot[0] == NULL)
 	       throw ( EParamProblem("Vpot is invalid", O->Name()) );
+	    if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
 	 } else {
 	    if (mpot->States() > 2)
 	       throw ( EParamProblem("SPO only supports two states") );
@@ -351,12 +350,13 @@ namespace QDLIB {
 	    _Vpot[0] = dynamic_cast<OGridSystem*>(mpot->State(0,0));
 	    if (_Vpot[0] == NULL)
 	       throw ( EParamProblem("Vpot is invalid", O->Name()) );
-	    
+	    if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
 	    if (mpot->States() == 2){
 	       _Vpot[1] = dynamic_cast<OGridSystem*>(mpot->State(1,1));
 	       if (_Vpot[1] == NULL)
 		  throw ( EParamProblem("Vpot is invalid", O->Name()) );
 	       _coupling = true;
+	       if (_Vpot[1]->isTimeDep()) _isTimedependent=true;
 	    }
 	 }
       }
@@ -372,6 +372,7 @@ namespace QDLIB {
 	    if (_Vcoup == NULL)
 	       throw ( EParamProblem("Vcoup is invalid ", mcoup->Name()) );
 	 }
+	 if (_Vcoup->isTimeDep()) _isTimedependent=true;
 	 _coupling = true;
       }
       
