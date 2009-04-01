@@ -242,7 +242,6 @@ namespace QDLIB
 	 int s=0;
 	 double diff=1;
  	 while (s < _MaxSteps && diff > _convergence){
-// 	 while (s < _MaxSteps){
 	    *Psi_old = Psi;
 	    _U->Apply(Psi);
 	    /* Remove lower states */
@@ -254,8 +253,6 @@ namespace QDLIB
 	    if (s % _ncycle == 0){
 	       Psi->Normalize();
 	       diff = cabs(1-*Psi_old * Psi);
-	       //cout << "  " << s << "\t" << Psi->Norm() <<  "\tdiff: " << diff << endl;
-	       //diff=1;
 	    }
 	    ++(*clock);                     /* Step the clock */
 	    s++;
@@ -266,6 +263,7 @@ namespace QDLIB
 	 _Energies_raw[i] = _H->Expec(Psi);
 	 log.cout().precision(8);
 	 log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
+	 log.flush();
       }
       
 
