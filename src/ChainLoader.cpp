@@ -273,7 +273,7 @@ namespace QDLIB
 	 if ( ops == NULL && s != "opt") /* N error if need is an option */
 	    throw ( EParamProblem ("Can't find an operator for the propagation", name) );
 	 if ( ops != NULL ) { 
-	    if (i > 0) { sum->Add(h); cout << i << "" << h->Name() << endl;}
+	    if (i > 0) sum->Add(h);
 	    log.Header( name, Logger::SubSection );
 	    log.IndentInc();
 	    h = LoadOperatorChain( ops );
@@ -286,7 +286,6 @@ namespace QDLIB
       }
       if ( i > 1 ) { /* need for a sum or single operator ? */
 	 sum->Add(h);
-	 cout << h->Name() << endl;
 	 *Hamiltonian = sum;
       } else {
 	 *Hamiltonian = h;
