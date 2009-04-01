@@ -63,11 +63,12 @@ namespace QDLIB {
    /** Init expV. */
    void OSPO::_InitV( )
    {
-      if (_coupling) { /* Excited state PES*/
+      if (_coupling) { /* Multistate */
 	 WFMultistate *expV = dynamic_cast<WFMultistate*>(_expV);
 	 WFMultistate *expVcoup = dynamic_cast<WFMultistate*>(_expVcoup);
 	 WFMultistate *V1 = dynamic_cast<WFMultistate*>(_V1);
 	 
+	 /* Gen: V(t) * 1  =  V_t */
 	 ((Operator*) (_Vpot[1]))->UpdateTime();
 	 _Vpot[0]->Apply(expV->State(0), V1->State(0));
 	 ExpElements((cVec*) expV->State (0), (cVec*) expV->State(0), _cV);
@@ -76,10 +77,12 @@ namespace QDLIB {
 	 /* Coupling - only held once */
 	 if (_Vcoup != NULL){
 	    ((Operator*) (_Vcoup))->UpdateTime();
-	    _Vcoup->Apply(expV->State(0), V1->State(0));
-	    ExpElements((cVec*) expVcoup->State(0), (cVec*) expVcoup->State(0), _cV);
+	    _Vcoup->Apply(expVcoup->State(0), V1->State(0));
+	    _Vcoup->Apply(expVcoup->State(1), V1->State(1));
+	    ExpElements((cVec*) expVcoup->State(0), (cVec*) expVcoup->State(0), -1*_cV);
+	    ExpElements((cVec*) expVcoup->State(1), (cVec*) expVcoup->State(1), _cV);
 	 }
-      } else {
+      } else { /* Single state */
 	 ((Operator*) (_Vpot[0]))->UpdateTime();
 	 _Vpot[0]->Apply(_expV, _V1);
 	 ExpElements((cVec*) _expV, (cVec*) _expV, _cV);
@@ -147,7 +150,7 @@ namespace QDLIB {
 	 _V1 = Psi->NewInstance();
 	 *_V1 = 1;
       }
-      if (_expV == NULL) {
+      if (_expVcoup == NULL) {
 	 _expVcoup = Psi->NewInstance();
 	 _Vcoup1 = Psi->NewInstance();
 	 *_Vcoup1 = 1;
@@ -203,11 +206,12 @@ namespace QDLIB {
    WaveFunction* OSPO::Apply(WaveFunction *Psi)
    {
 
-      if (_last_time != clock->TimeStep() && _Vpot[0]->isTimeDep()) /* Re-init Vpot if is time dep.*/
+      if (_last_time != clock->TimeStep() && _Vpot[0]->isTimeDep() || _coupling) /* Re-init Vpot if is time dep.*/
       {  
 	 _last_time = clock->TimeStep();
 	 _InitV();
       }
+      
       
       
       if (_coupling){ /* With coupling */
@@ -233,8 +237,9 @@ namespace QDLIB {
 	 
 	 /* exp(-i Vcoup dt) */
 	 if (expVcoup != NULL){
-	    MultElements( (cVec*) buf->State(0),  (cVec*) expVcoup->State(0), -1);
-	    MultElements( (cVec*) buf->State(1),  (cVec*) expVcoup->State(0));
+/*	    MultElements( (cVec*) buf->State(0),  (cVec*) expVcoup->State(0), -1);
+	    MultElements( (cVec*) buf->State(1),  (cVec*) expVcoup->State(1));*/
+	    MultElements( (cVec*) buf,  (cVec*) expVcoup);
 	 }
 	 
 	 /* transform psi back from  Vcoup diag basis */
@@ -311,7 +316,7 @@ namespace QDLIB {
       
       _needs->SetValue( "Tkin", "");
       _needs->SetValue( "Vpot", "");
-      _needs->SetValue( "VCoup", "opt");
+      _needs->SetValue( "Vcoup", "opt");
       
       return *_needs;
    }
@@ -357,9 +362,16 @@ namespace QDLIB {
       }
 	  
       if (Key == "Vcoup") {
-	 _Vcoup = dynamic_cast<OGridSystem*>(O);
-	 if (_Vcoup == NULL)
-	    throw ( EParamProblem("Vcoup is invalid", O->Name()) );
+	 OMultistate *mcoup = dynamic_cast<OMultistate*>(O);
+	 if (mcoup == NULL)
+	    throw ( EParamProblem("SPO: Expected a Multistate operator for the coupling ", O->Name()) );
+	 else {
+	    _Vcoup = dynamic_cast<OGridSystem*>(mcoup->State(0,1));
+	    if (_Vcoup == NULL)
+	       _Vcoup = dynamic_cast<OGridSystem*>(mcoup->State(1,0));
+	    if (_Vcoup == NULL)
+	       throw ( EParamProblem("Vcoup is invalid ", mcoup->Name()) );
+	 }
 	 _coupling = true;
       }
       
