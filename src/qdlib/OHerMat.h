@@ -57,8 +57,6 @@ namespace QDLIB {
 	 void Diag();
 	 
 	 OHerMat& operator=(OHerMat &O);
-	 
-         
    };
 
 }

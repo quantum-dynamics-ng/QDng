@@ -12,23 +12,20 @@ namespace QDLIB {
    {
       private:
 	 string _name;
+	 bool _isDspace;
+	 dMat *_D;      /* Matrix that transfroms to diagonal basis */
+	 
       public:
          /* Interface implementation */
 	 WFLevel();
 	 
- 	 virtual ~WFLevel();
+ 	 ~WFLevel();
 	 
-	 WFLevel(ParamContainer &params);
-	 
-	 WFLevel(int size);
-
 	 WaveFunction* NewInstance();
 	 
 	 void Init(ParamContainer &params);
 	 
 	 const string& Name();
-	 
-	 int ID();
 	 
 	 double Norm();
 	 
@@ -38,9 +35,23 @@ namespace QDLIB {
 	 
 	 dcomplex operator*(WaveFunction *Psi);
 	 
+	 
+	 /* Own methods */
 	 void Size(int size);
 	 
 	 WFLevel& operator=(WFLevel &Psi);
+	 
+	 /** Check if in diagonal representation */
+	 bool isDspace() { return _isDspace; }
+	 
+	 /** Set to representation */
+	 void isDspace(bool is) { _isDspace = is; }
+         
+	 void SetTransform(dMat *mat) { _D = mat; }
+	 
+	 void ToDspace();
+         
+	 void ToXspace();
 	
    }; /* class WFLevel */
    

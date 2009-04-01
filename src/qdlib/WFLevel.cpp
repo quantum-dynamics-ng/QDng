@@ -4,39 +4,15 @@
 using namespace TNT;
 namespace QDLIB {
    
-   WFLevel::WFLevel(): _name("WFLevel") {}
+   WFLevel::WFLevel(): _name("WFLevel"), _isDspace(false), _D(NULL)  {}
    
    WFLevel::~WFLevel() {}
-   
-   /**
-    * Init with params.
-    * 
-    * Parameters needed:
-    * -size
-    * 
-    * \bug if size is missing, what should happen?
-    */
-   WFLevel::WFLevel(ParamContainer &params): WaveFunction(params), _name("WFLevel")
-   {
-      int size;
-      
-      _params.GetValue(string("size"), size);
-      cVec::newsize(size);
-   }
-   
-   /**
-    * Init with size of vector.
-    */
-   WFLevel::WFLevel(int size) : _name("WFLevel")
-   {
-      _params.SetValue("size",  size);
-      cVec::newsize(size);
-   }
    
    
    WaveFunction* WFLevel::NewInstance()
    {
-      WFLevel *r =  new WFLevel(_params);
+      WFLevel *r =  new WFLevel();
+      r->Init(_params);
       return r;
    }
    
@@ -62,17 +38,11 @@ namespace QDLIB {
       cVec::newsize(size);
    }
    
-   
    const string& WFLevel::Name()
    {
       return _name;
    }
-   
-   int WFLevel::ID()
-   {
-      return 0;
-   }
-   
+      
    /**
     * Calcualte the Norm of the vector.
     */
@@ -127,6 +97,17 @@ namespace QDLIB {
       _params.SetValue("size",  size);
       cVec::newsize(size);
    }
+   
+   
+   void WFLevel::ToDspace( )
+   {
+      
+   }
+
+   void WFLevel::ToXspace( )
+   {
+   }
+   
    
 } /* namespace QDLIB */
 
