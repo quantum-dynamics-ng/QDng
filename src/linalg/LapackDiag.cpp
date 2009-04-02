@@ -103,10 +103,10 @@ namespace LAPACK {
       int info;
       WsList *ws = WsList::Instance();
       
-      if (mat->num_rows() != mat->num_cols()) return;
+      if (mat->rows() != mat->cols()) return;
       if (evals->strides()) return;
       
-      size = mat->num_rows();
+      size = mat->rows();
       ws_size = size * 3;
       
       evals->newsize(size);
@@ -125,10 +125,10 @@ namespace LAPACK {
       int info;
       WsList *ws = WsList::Instance();
       
-      if (mat->num_rows() != mat->num_cols()) return;
+      if (mat->rows() != mat->cols()) return;
       if (evals->strides()) return;
       
-      size = mat->num_rows();
+      size = mat->rows();
       ws_size = size * 3;
       
       evals->newsize(size);

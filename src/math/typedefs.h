@@ -80,7 +80,7 @@ namespace QDLIB {
       for (int i=0; i<N; i++){
 	 r[i] = 0;
 	 for (int j=0; j<N; j++){
-            r[i] += A[i][j] * B[j];
+            r[i] += A(i,j) * B[j];
 	 }
       }
    
