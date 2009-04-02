@@ -45,6 +45,7 @@ int main(int argc, char **argv)
    cmdline.SetDescription("QD next generation");
    
 #ifdef USE_DYNMODS
+   ModuleLoader *mods = ModuleLoader::Instance();
    cmdline.SetHelp( 'm', "module path", false,
 		    "User defined path to the wave function and operator modules", "");
 #endif

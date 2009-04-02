@@ -286,7 +286,6 @@ namespace QDLIB
    OPropagator* ChainLoader::LoadPropagator( XmlNode *Unode, Operator **Hamiltonian)
    {
       ModuleLoader* mods = ModuleLoader::Instance();
-//       QDClock *clock = QDGlobalClock::Instance();
       Logger& log = Logger::InstanceRef();
       
       ParamContainer pm, needs;

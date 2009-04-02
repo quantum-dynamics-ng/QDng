@@ -63,7 +63,6 @@ namespace QDLIB {
     */
    bool ModuleLoader::_InternalWF(const string &name)
    {
-      void* handle=NULL;
       string s;
       
       if (name.substr(0,2)  == "WF") /* check for prefix WF & remove it */
@@ -77,7 +76,7 @@ namespace QDLIB {
 	 _mod_map[name].InstanceWF = InstanceWF;
 	 _mod_map[name].InstanceOP = NULL;
 	 _mod_map[name].link_count++;
-	 _mod_map[name].handle = handle;
+	 _mod_map[name].handle = NULL;
 	 return true;
       } else {
 	 return false;
@@ -176,7 +175,6 @@ namespace QDLIB {
     */
    WaveFunction * ModuleLoader::LoadWF(const string &name )
    {
-
       string s;
       
 #ifdef USE_DYNMODS
@@ -230,10 +228,9 @@ namespace QDLIB {
    Operator * ModuleLoader::LoadOp(const string & name )
    {
       string s;
-      
-      
 #ifdef USE_DYNMODS
       void *handle;
+
       /* is already loaded? */
       if (_isLoaded(name)) {
 	 _mod_map[name].link_count++;

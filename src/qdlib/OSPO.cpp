@@ -9,7 +9,7 @@ namespace QDLIB {
    OSPO::OSPO() : OPropagator(), _name("OSPO"), _needs(NULL),
                   _Tkin(NULL), _Tkin_kspace(NULL), _Vcoup(NULL),
                         _expT(NULL), _expV(NULL), _V1(NULL), _expVcoup(NULL), _expVcoupI(NULL),_buf(NULL),
-                        _coupling(false), _coupdiag(false),_cV(0,0), _cT(0,0), _last_time(0)
+                        _coupling(false), _coupdiag(false),_cT(0,0), _cV(0,0), _last_time(0)
    {
       _Vpot[0] = NULL;
       _Vpot[1] = NULL;
@@ -20,6 +20,7 @@ namespace QDLIB {
    {
       if (_expT != NULL) delete _expT;
       if (_expV != NULL) delete _expV;
+      if (_expVcoup != NULL) delete _expVcoup;
       if (_V1 != NULL) delete _V1;
       if (_needs != NULL) delete _needs;
       if (_buf != NULL) delete _buf;
@@ -147,8 +148,6 @@ namespace QDLIB {
       }
       if (_expVcoup == NULL) {
 	 _expVcoup = Psi->NewInstance();
-	 _Vcoup1 = Psi->NewInstance();
-	 *_Vcoup1 = 1;
       }
 	 
       if (_expVcoupI == NULL && _coupdiag){

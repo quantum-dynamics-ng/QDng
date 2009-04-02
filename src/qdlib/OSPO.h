@@ -51,7 +51,7 @@ namespace QDLIB {
          bool _coupling;        /* coupling */
          bool _coupdiag;        /* Coupling on diagonal in Vpot*/
 	 
-	 dcomplex _cV, _cT;
+	 dcomplex _cT, _cV;
 	 int _last_time;
 	 
 	 void _InitV();

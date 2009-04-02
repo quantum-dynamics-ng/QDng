@@ -324,6 +324,7 @@ namespace QDLIB
 	 if (_matrix[i][i] != NULL)
 	    _matrix[i][i]->Offset(d);
       }
+      return this;
       
 //       if (_hermitian){
 // 	 for(int i=0; i< _nstates; i++){
