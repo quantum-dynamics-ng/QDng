@@ -14,6 +14,7 @@ namespace QDLIB {
     *
     * The matrix is not initialized with values by default.
     * 
+    * \todo Add support for strides & strided vectors
     *	 @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
    template <class T>
@@ -56,7 +57,9 @@ namespace QDLIB {
    };
 
    
-   /* Implementations */
+   /* 
+    * Class Implementations
+    */
    
    /**
     * Array initialization.
@@ -214,7 +217,8 @@ namespace QDLIB {
 #ifdef HAVE_STRING_H
       memcpy( (void*) _v, (void*) M._v, sizeof(T) * _mn);
 #else
-#error Missing memcpy support in <string.h>
+      for (int i=0; i < _mn; i++)
+	 _v[i] = M._v[i];
 #endif
    }
    
@@ -228,6 +232,39 @@ namespace QDLIB {
 	 _v[i] = scalar;
    }
    
+   /*
+    * Matrix operations
+    */
+   
+   /**
+    * b = M*a
+    */
+   template <class T, class U>
+   inline void MatVecMult(Vector<T> *B, Matrix<U> *M, Vector<T> *A, bool transpose = false)
+   {
+      int cols = M->cols();
+      int rows = M->rows();
+      
+      T *b = B->begin(0);
+      T *a = A->begin(0);
+      U** m = M->begin();
+      
+      if (transpose){
+	 for(int i=0; i < rows; i++){
+	    b[i] = 0;
+	    for(int j=0; j < cols; j++){
+	       b[i] += m[i][j] * a[i];
+	    }
+	 }
+      } else {
+	 for(int i=0; i < rows; i++){
+	    b[i] = 0;
+	    for(int j=0; j < cols; j++){
+	       b[i] += m[j][i] * a[i];
+	    }
+	 }
+      }
+   }
    
 }
 
