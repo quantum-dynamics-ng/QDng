@@ -52,6 +52,7 @@ namespace QDLIB {
 	 
 	 void operator=(T scalar);
 	 
+	 void operator*=(T scalar);
 	 
    
    };
@@ -230,6 +231,16 @@ namespace QDLIB {
    {
       for (int i=0; i < _mn; i++)
 	 _v[i] = scalar;
+   }
+   
+   /**
+    * Scale the matrix.
+    */
+   template <class T>
+   void Matrix<T>::operator*=(T scalar)
+   {
+      for (int i=0; i < _mn; i++)
+	 _v[i] *= scalar;
    }
    
    /*

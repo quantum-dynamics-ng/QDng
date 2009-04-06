@@ -25,36 +25,36 @@ namespace QDLIB {
       public:
 	 /* Interface implementation , Operator */
 	 virtual Operator* NewInstance();
-	 virtual void Init(ParamContainer &params);
+         virtual void Init(ParamContainer &params);
+	 virtual void Init(WaveFunction *Psi);
 	 virtual const string& Name();
-	 virtual void UpdateTime();
+         virtual void UpdateTime() {};
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	 virtual double Expec(WaveFunction *Psi);
 	 virtual double Emax();
 	 virtual double Emin();
-	 
-	 virtual WaveFunction* operator*(WaveFunction *Psi);	 
-	 virtual WaveFunction* operator*=(WaveFunction *Psi);
-	 
-	 virtual Operator* operator=(Operator *O);
-	 virtual Operator* operator*(Operator *O);
-	 
-	 virtual Operator* Offset(const double d);
-	 virtual Operator* operator-=(const double d);
+	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
+	 virtual WaveFunction* Apply(WaveFunction *Psi);
+         virtual Operator* operator=(Operator* O);
+	 virtual Operator* Copy(Operator* O);
+	 virtual Operator* operator*(Operator* O);
+         virtual Operator* Offset(const double d);
 	 virtual Operator* Scale(const double d);
+
 
          
          
 	 /* Specific methods */
 	 OHerMat();
 	 OHerMat(int size);
-	 OHerMat(ParamContainer &params);
 	 ~OHerMat();
 	 
 	 void Size(int size);
 	 int Size();
 	 
 	 void Diag();
+	 dVec* Eval();
+	 dVec* Evec();
 	 
 	 OHerMat& operator=(OHerMat &O);
    };

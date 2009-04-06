@@ -11,25 +11,8 @@ namespace QDLIB {
       if (_E == NULL) delete _X;
    }
    
-   OHerMat::OHerMat() : _name("OHermitianRealMatrix"), _X(NULL), _E(NULL) {}
+   OHerMat::OHerMat() : dMat(), Operator(), _name("OHermitianRealMatrix"), _X(NULL), _E(NULL) {}
    
-   /**
-    * Initialieses a size x size matrix.
-    */
-   OHerMat::OHerMat(int size) : _name("OHermitianRealMatrix"), _X(NULL), _E(NULL) 
-   {
-      _params.SetValue("size", size);
-      dMat::newsize(size,size);
-   }
-   
-   OHerMat::OHerMat(ParamContainer &params) :Operator(params),  _name("OHermitianRealMatrix")
-   {
-      int size;
-      
-      _params.GetValue("size", size);
-      
-      dMat::newsize(size,size);
-   }
    
    /**
     * Return a fresh instance.
@@ -40,8 +23,6 @@ namespace QDLIB {
       r->newsize(num_rows(), num_rows());
       return r;
    }
-   
-   void OHerMat::UpdateTime() {}
    
    /**
     * Initializer.
