@@ -206,6 +206,12 @@ namespace QDLIB
 	       log.cout() << "Normalizing...\n";
 	       WF->Normalize();
 	    }
+	    if (pm.isPresent("phase")){
+	       double phase;
+	       pm.GetValue("phase", phase);
+	       log.cout() << "Apply phase factor: " << phase << " pi\n";
+	       *WF *= cexpI(phase * M_PI);
+	    }
 	 }
 	 
 	 log.cout() << pm << "------------------\n" << endl;
@@ -224,7 +230,7 @@ namespace QDLIB
    OPropagator* ChainLoader::LoadPropagator( XmlNode *Unode, Operator **Hamiltonian)
    {
       ModuleLoader* mods = ModuleLoader::Instance();
-      QDClock *clock = QDGlobalClock::Instance();
+//       QDClock *clock = QDGlobalClock::Instance();
       Logger& log = Logger::InstanceRef();
       
       ParamContainer pm, needs;
@@ -267,7 +273,6 @@ namespace QDLIB
       
       log.cout() << "Intialize Operators:\n\n";
       
-      int ilast; 
       while (needs.GetNextValue( name, s )){
 	 ops = child->FindNode( name );
 	 if ( ops == NULL && s != "opt") /* N error if need is an option */

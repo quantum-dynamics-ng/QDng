@@ -4,8 +4,8 @@
 
 namespace QDLIB {
 
-   FiltersList::FiltersList() : _size(0), _initalized(false),  _writefile(false),
-			    _fname(DEFAULT_EXPEC_FILENAME)
+   FiltersList::FiltersList() : _size(0), _initalized(false),
+                                 _fname(DEFAULT_EXPEC_FILENAME), _writefile(false)
    {
       for (int i=0; i < MAX_FILTERS; i++){
 	 _olist[i] = NULL;

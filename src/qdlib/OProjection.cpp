@@ -2,7 +2,7 @@
 
 namespace QDLIB {
 
-   OProjection::OProjection() : _size(0), _name("OProjection"), _buf(NULL)
+   OProjection::OProjection() : _name("OProjection"), _size(0),  _buf(NULL)
    {
       
    }
@@ -91,6 +91,7 @@ namespace QDLIB {
       for (int i=0; i < _size; i++){
 	 *(_wfbuf[i]) *= d;
       }
+      return this;
    }
       
    Operator * QDLIB::OProjection::operator *( Operator * O )

@@ -198,9 +198,6 @@ namespace QDLIB {
    
    WaveFunction * OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
-      WFGridSystem *psi;
-      
-      
       /* Make a copy from Psi */
       for (int i=0; i < GridSystem::Dim(); i++)
 	 _wfbuf[i]->FastCopy (*sourcePsi);

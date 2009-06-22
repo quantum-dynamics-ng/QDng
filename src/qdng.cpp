@@ -36,8 +36,10 @@ int main(int argc, char **argv)
    XmlNode   rnodes;
    XmlNode   *prognodes;
    string progname;
-   
+
+#ifdef USE_DYNMODS  
    ModuleLoader *mods = ModuleLoader::Instance();
+#endif
    
    cmdline.SetDescription("QD next generation");
    
@@ -130,7 +132,10 @@ int main(int argc, char **argv)
 	    log.Header("Imaginary Time Eigenfunctions", Logger::Chapter);
 	    eigen.Run();
 	 } else if (progname == "oct") {
-	    throw ( EParamProblem ("OCT not implementet yet") );
+/*	    ProgOCT oct(*prognodes);
+	    oct.SetDirectory(dir);
+	    log.Header("Optimal control theory", Logger::Chapter);
+	    oct.Run();*/
 	 } else if (progname == "densmat") {
 	    throw ( EParamProblem ("Density matrix propagation not implementet yet") );
 	 } else {

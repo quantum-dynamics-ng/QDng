@@ -19,7 +19,6 @@ namespace QDLIB {
    {
       double alpha =0;
       double argIm =0;
-      int nz;
       dVec bRe, bIm;
       int kode=1;    /* taken from qdmpi*/
       int ierr;
@@ -59,7 +58,6 @@ namespace QDLIB {
    {
       double alpha =0;
       double argIm =0;
-      int nz;
       dVec bRe, bIm;
       int kode=1;    /* taken from qdmpi*/
       int ierr;

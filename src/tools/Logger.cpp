@@ -9,8 +9,9 @@ namespace QDLIB {
    Logger* Logger::_ref = 0;
    
    
-   Logger::Logger() : _global_out(&std::cout), _supress(false), _debug(false),
-		  _line_length(LOGGER_LINE_LENGTH), _indent(0), _laststream(0)
+   Logger::Logger() :_laststream(0), _supress(false), _debug(false),
+                     _line_length(LOGGER_LINE_LENGTH),  _indent(0),
+                     _global_out(&std::cout)
    {
       /* Set the string objects for the output streams */
       _sout = _cout.rdbuf();
@@ -29,7 +30,7 @@ namespace QDLIB {
 	 sind += " ";
       }
       
-      int spos;
+      unsigned long int spos;
       
       s.insert(0, sind);
       spos = s.find("\n");
@@ -173,7 +174,7 @@ namespace QDLIB {
 	       for(int i=0; i < _line_length; i++)
 		  *_global_out << "*";
 	       *_global_out << "\n";
-	       for(int i=0; i < (_line_length-title.length())/2; i++)
+	       for(unsigned long int i=0; i < (_line_length-title.length())/2; i++)
 		  *_global_out << " ";
 	       *_global_out << title<<endl;
 	       for(int i=0; i < _line_length; i++)
@@ -182,11 +183,11 @@ namespace QDLIB {
 	    break;
 	 case Section:
 	       *_global_out << "\n*";
-	       for(int i=0; i < (_line_length-title.length())/2-2; i++)
+	       for(unsigned long int i=0; i < (_line_length-title.length())/2-2; i++)
 		  *_global_out << "*";
 	       *_global_out << " ";
 	       *_global_out << title << " ";
-	       for(int i=0; i < (_line_length-title.length())/2-2; i++)
+	       for(unsigned long int i=0; i < (_line_length-title.length())/2-2; i++)
 		  *_global_out << "*";
 	       *_global_out << "\n\n";
 	    break;

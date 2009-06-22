@@ -23,6 +23,6 @@ qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS) $(FLIBS) $(FFTW_LIBS) \
 	$(LIBXML2_LIBS)
 noinst_HEADERS = ChainLoader.h FiltersList.h ProgAutocorr.h ProgEigen.h \
-	ProgPropa.h Reporter.h
+		ProgPropa.h Reporter.h ProgOCT.h
 AM_CXXFLAGS = -O3 -ansi -pedantic-errors -Werror
 

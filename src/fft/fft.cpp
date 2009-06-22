@@ -43,7 +43,7 @@ namespace QDLIB {
       if (!_planed){
          inbuf = in;
 	 FILE * pFile;
-	 if (pFile = fopen("wisdom", "r")){
+	 if ((pFile = fopen("wisdom", "r"))){
 	    fftw_import_wisdom_from_file(pFile);
 	    fclose(pFile);
 	 }
@@ -107,7 +107,7 @@ namespace QDLIB {
 	 in = inbuf;
 	 _planed = true;
 	 FILE * pFile;
-	 if (pFile = fopen("wisdom", "w")){
+	 if ((pFile = fopen("wisdom", "w"))){
 	    fftw_export_wisdom_to_file(pFile);
 	    fclose(pFile);
 	 }

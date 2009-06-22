@@ -47,8 +47,8 @@ namespace LAPACK {
 	    }
 	    /* resize smallest buffer */
 	    i=0;
-	    int min = 1;
-	    int min_idx = 0;
+	    unsigned int min = 1;
+	    unsigned int min_idx = 0;
 	    while (i < LAPACK_MAX_WSLIST){
 	       if (sized[i] < min) {
 		  min_idx = i;
@@ -70,8 +70,8 @@ namespace LAPACK {
 	    }
 	    /* resize smallest buffer */
 	    i=0;
-	    int min = 1;
-	    int min_idx = 0;
+	    unsigned int min = 1;
+	    unsigned int min_idx = 0;
 	    while (i < LAPACK_MAX_WSLIST){
 	       if (sizec[i] < min) {
 		  min_idx = i;

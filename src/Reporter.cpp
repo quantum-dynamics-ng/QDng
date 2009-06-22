@@ -61,7 +61,7 @@ namespace QDLIB
    {
       QDClock *clock = QDGlobalClock::Instance();
       Logger& log = Logger::InstanceRef();
-      WFMultistate *mspsi;
+      WFMultistate *mspsi=NULL;
       
       dcomplex proj;
   

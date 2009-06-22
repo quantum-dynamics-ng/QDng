@@ -323,7 +323,7 @@ namespace QDLIB
 // 	    }
 // 	 }
 //       }
-//       return this;
+       return this;
    }
 
    Operator* OMultistate::Scale(const double d)
