@@ -16,7 +16,7 @@ libqdng_la_LIBADD = $(top_builddir)/src/tools/libtools.la \
 
 bin_PROGRAMS = qdng
 qdng_SOURCES = ChainLoader.cpp FiltersList.cpp ProgPropa.cpp Reporter.cpp \
-	qdng.cpp ProgEigen.cpp
+	qdng.cpp ProgEigen.cpp ProgOCT.cpp
 qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/linalg/liblinalg.a \
 	$(top_builddir)/src/tools/libtools.la $(top_builddir)/src/math/libmath.la \

@@ -21,6 +21,16 @@ namespace QDLIB{
       SetMessage(s);
    }
    
+   EParamProblem::EParamProblem(const char *message, const int reason) : Exception()
+   {
+      stringstream sst;
+      string s;
+
+      sst << message << ": " << reason;
+      sst >> s;
+      SetMessage(s);
+   }
+   
 
    EIOError::EIOError( const char * message, string &name ) : Exception()
    {
