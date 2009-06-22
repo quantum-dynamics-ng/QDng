@@ -21,6 +21,7 @@ namespace QDLIB {
 	 string _name;
 	 dMat *_X;       /* Eigenvector Matrix */
 	 dVec *_E;       /* Eigenvalues */
+	 bool valid;      /* Diag representation valid */
 	 
       public:
 	 /* Interface implementation , Operator */

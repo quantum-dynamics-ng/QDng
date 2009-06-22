@@ -1,6 +1,6 @@
 #include "OHerMat.h"
 #include "tools/Exception.h"
-
+#include "linalg/LapackDiag.h"
 
 
 namespace QDLIB {
@@ -11,7 +11,7 @@ namespace QDLIB {
       if (_E == NULL) delete _X;
    }
    
-   OHerMat::OHerMat() : dMat(), Operator(), _name("OHermitianRealMatrix"), _X(NULL), _E(NULL) {}
+   OHerMat::OHerMat() : dMat(), Operator(), _name("OHermitianRealMatrix"), _X(NULL), _E(NULL), valid(false) {}
    
    
    /**
@@ -164,6 +164,7 @@ namespace QDLIB {
       *(dMat*) this = (dMat) O;
       _params =  O.Params();
       
+      valid = false;
       return *this;
    }
    
@@ -174,7 +175,12 @@ namespace QDLIB {
     */
    void OHerMat::Diag()
    {
-      throw ( Exception("Diag not implemented yet.") );
+      if (_X == NULL || _E == NULL)
+      {
+	 _X
+      }
+      FullDiagHermitian();
+      valid = true;
    }
    
    /**
