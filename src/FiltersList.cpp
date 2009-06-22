@@ -53,6 +53,7 @@ namespace QDLIB {
     * \li expec      Apply the operator and show the expectation value
     * \li apply      Just Apply the operator
     * \li expeconly  Only calculate and show the expectation value
+    * \li normalize  Simple normalization of wave function
     */
    void FiltersList::Init( XmlNode *section )
    {
