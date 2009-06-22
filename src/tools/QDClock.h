@@ -27,6 +27,9 @@ namespace QDLIB
 	 
 	 void Steps(int Steps); 
 	 
+	 void Begin();
+	 void End();
+	 
 	 QDClock& operator++();
 	 QDClock& operator--();
 	 QDClock& operator=(const QDClock &clock);
