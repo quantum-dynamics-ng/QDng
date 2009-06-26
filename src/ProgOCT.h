@@ -60,7 +60,8 @@ namespace QDLIB {
 	 int _ntargets;
 	 double _alpha;
 	 
-	 OPropagator *_U;
+	 OPropagator *_Uf;
+	 OPropagator *_Ub;
 	 Operator *_H;
 	 Operator *_Coup;
 	 
