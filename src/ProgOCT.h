@@ -5,9 +5,13 @@
 #include "tools/XmlNode.h"
 #include "tools/QDGlobalClock.h"
 #include "qdlib/OPropagator.h"
-
+#include "qdlib/OGridDipole.h"
 
 #define DEFAULT_BASENAME_LASER "laser"
+#define DEFAULT_ITERATIONS 50
+#define DEFAULT_CONVERGENCE 1e-6
+#define MAX_TARGETS 16
+#define MAX_LASERS 4
 
 namespace QDLIB {
 
@@ -27,6 +31,9 @@ namespace QDLIB {
    * \li phase    phase sensitive objective (true|false, default false)
    * \li ntargets Number of targets
    * \li alpha    The Field restriction value
+   * \li iterations Maximum number of iterations
+   * \li conv     Target convergence. Stop iterating if below convergence
+   * \li shape    Name of shapefile
    * 
    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
    */
@@ -42,6 +49,9 @@ namespace QDLIB {
 	 string _fname;
 	 string _dir;
 	 
+	 int _iterations;
+	 double _convergence;
+	 
 	 _method_t _method;
 	 _coupling_t _coupling;
 	 _ttype_t _ttype;
@@ -50,10 +60,20 @@ namespace QDLIB {
 	 int _ntargets;
 	 double _alpha;
 	 
+	 OPropagator *_U;
+	 Operator *_H;
+	 Operator *_Coup;
+	 
+	 Laser _laser[MAX_LASERS];
+	 Laser _shape[MAX_LASERS];
+	 
+	 WaveFunction* PsiI[MAX_TARGETS];
+	 WaveFunction* PsiT[MAX_TARGETS];
+	 
 	 void _InitParams();
 	 
       protected:
-	 void CalcLaserField();
+	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
 	 
       public:
 	 ProgOCT(XmlNode &OCTNode);
