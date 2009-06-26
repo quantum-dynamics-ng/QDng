@@ -6,8 +6,8 @@
 namespace QDLIB {
 
    ProgOCT::ProgOCT(XmlNode &OCTNode) : _octNode(OCTNode), _ContentNodes(NULL),
-   _fname(DEFAULT_BASENAME), _dir(""),
-   _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),  _ntargets(1)
+   _fname(DEFAULT_BASENAME_LASER), _dir(""),
+   _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),  _ntargets(1), _alpha(1)
    {
    }
    
@@ -23,7 +23,7 @@ namespace QDLIB {
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       ParamContainer attr;
-//       Logger& log = Logger::InstanceRef();
+       Logger& log = Logger::InstanceRef();
       
       attr = _octNode.Attributes();
       double dt;
@@ -96,6 +96,60 @@ namespace QDLIB {
 	    throw (EParamProblem("Number of targets to small", _ntargets));
       }
 
+      if (attr.isPresent("alpha")){
+	 attr.GetValue("alpha", _alpha);
+      }
+      
+      /* Get alpha */
+      if (abs(_alpha) == 0)
+	 throw (EParamProblem("Invalid alpha parameter", _alpha));
+      
+      
+      /* Print parameter summary */
+      log.Header("OCT parameters", Logger::Section);
+    
+      log.IndentInc();
+      log.cout() << "Number of steps: " <<  clock->Steps() << endl;
+      log.cout().precision(2);
+      log.cout() << "Time step: " << fixed << clock->Dt() << endl;
+      log.cout() << "Overall time: " << fixed << clock->Steps() * clock->Dt() << endl;
+      log.cout() << "Basename for wave function output: " << _fname << endl;
+      log.cout() << endl;
+      
+      log.cout() << "OCT - Style: ";
+      switch(_method){
+	 case krotov:
+	    log.cout() << "Krotov";
+	 break;
+	 case rabitz:
+	    log.cout() << "Rabitz";
+	 break;
+      }
+      
+      switch(_ttype){
+         case ov:
+	    log.cout() << " - Overlapp";
+	    break;
+	 case op:
+	    log.cout() << " - Excpectation values";
+	    break;
+      }
+      
+      if (_phase)
+	 log.cout() << " - phase sensitive" << endl;
+      else 
+	 log.cout() << endl;
+      
+      log.cout().precision(3);
+      log.cout() << "alpha : " << _alpha << endl;
+      log.cout() << "Number of targets: " << _ntargets << endl;
+      
+      switch (_coupling){
+	 case dipole:
+	    log.cout() << "Optimize laserfield for dipole coupling" << endl;
+      }
+      
+      log.flush();
    }
   
    /**
@@ -103,5 +157,6 @@ namespace QDLIB {
     */
    void ProgOCT::Run()
    {
+      _InitParams( );
    }
 }

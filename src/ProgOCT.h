@@ -7,7 +7,7 @@
 #include "qdlib/OPropagator.h"
 
 
-#define DEFAULT_BASENAME "laser"
+#define DEFAULT_BASENAME_LASER "laser"
 
 namespace QDLIB {
 
@@ -26,6 +26,7 @@ namespace QDLIB {
    * \li ttype    target type (operator,overlap)
    * \li phase    phase sensitive objective (true|false, default false)
    * \li ntargets Number of targets
+   * \li alpha    The Field restriction value
    * 
    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
    */
@@ -47,8 +48,12 @@ namespace QDLIB {
 	 bool _phase;
 	 
 	 int _ntargets;
+	 double _alpha;
 	 
 	 void _InitParams();
+	 
+      protected:
+	 void CalcLaserField();
 	 
       public:
 	 ProgOCT(XmlNode &OCTNode);
