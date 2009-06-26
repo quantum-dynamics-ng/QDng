@@ -298,7 +298,7 @@ namespace QDLIB {
       if (section == NULL)
 	 throw ( EParamProblem ("No propagator found") );
       
-      _U = ChainLoader::LoadPropagator( section, &_h );
+      _Uf = ChainLoader::LoadPropagator( section, &_h );
       delete section;
       
       
@@ -340,10 +340,19 @@ namespace QDLIB {
       *_H = _h; 
       _H->Clock( clock );
             
-      /* Let the Propagator do it's initalisation */
-      _U->Clock( clock );
+      /* Let the Propagator do it's initalisation
+       *   Copy Propagator to seperate forward & backward Propagation
+       */
+      _Ub = dynamic_cast<OPropagator*>(_Uf->NewInstance());
+      _Ub->Copy(_Uf);
+      
+      _Uf->Clock( clock );
+      _Ub->Clock( clock );
       _H->UpdateTime();
-      _U->Init(PsiI[0]);
+      _Uf->Init(PsiI[0]);
+      
+      _Ub->Backward();
+      _Ub->Init(PsiI[0]);
 
       /* Check & reference the coupling operator */
       bool coupling_ok = false;
@@ -400,7 +409,7 @@ namespace QDLIB {
 	 clock->End();
 	 for (int s=0; s < clock->Steps(); s++){
 	    for (int t=0; t < _ntargets; t++){
-	       _U->Apply(phit[t]);
+	       _Ub->Apply(phit[t]);
 	    }
 	    *(clock)--;
 	 }
@@ -410,8 +419,8 @@ namespace QDLIB {
 	 for (int s=0; s < clock->Steps(); s++){
 	    _laser[0][clock->TimeStep()] = CalcLaserField(phii,phit);
 	    for (int t=0; t < _ntargets; t++){
-	       _U->Apply(phit[t]);
-	       _U->Apply(phii[t]);
+	       _Uf->Apply(phit[t]);
+	       _Uf->Apply(phii[t]);
 	    }
 	    *(clock)++;
 	 }
