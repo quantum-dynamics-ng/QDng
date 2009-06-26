@@ -244,8 +244,38 @@ namespace QDLIB {
       return res;
    }
    
+
    /**
-    * Run the OCT-Programm
+    * Write Norm and Yield.
+    * 
+    * \return Target overlap
+    */
+   double ProgOCT::Report(WaveFunction **wfi, int interation)
+   {
+      Logger& log = Logger::InstanceRef();
+      dcomplex overlap;
+      dcomplex ov_sum(0,0);
+      
+      for (int t=0; t < _ntargets; t++){
+	 log.cout().precision(6);
+	 log.cout() << wfi[t]->Norm() << "\t";
+	 overlap = *wfi[t] * PsiT[t];
+	 ov_sum += cabs(overlap);
+	 log.cout() << cabs(overlap) << "\t";
+	 if (_phase){
+	    log.cout() << overlap << "\t";
+	    ov_sum += overlap;
+	 } else
+	    ov_sum._real += cabs(overlap);
+      }
+      log.cout() << _laser[0].PulseEnergy() << endl;
+      
+      return cabs(ov_sum);
+   }
+   
+   
+   /**
+    * Run the OCT-Programm.
     */
    void ProgOCT::Run()
    {
@@ -326,7 +356,6 @@ namespace QDLIB {
 	       _Coup = (Operator*) CoupOGridDipole;
 	       coupling_ok=true;
 	    }
-	    
 	    break;
       }
       
@@ -342,10 +371,22 @@ namespace QDLIB {
 	 phit[i] = PsiT[i]->NewInstance();
       }
 
+      /* Write Header for iteration table */
+      log.SetIndent(0);
+      log.cout() << "OCT Iterations:" << endl;
+      log.cout() << "iteration\t";
+      for (int t=0; t < _ntargets; t++){
+	 log.cout() << "Norm " << t << "\t";
+	 if (_phase)
+	    log.cout() << "Overlapp " << t << "\t";
+      }
+      log.cout() << "Pulse Energy" << endl;
+
       
       /* Iteration loop */
       int i=0;
-      double deltaTarget=1;
+      double deltaTargetOld=1;
+      double deltaTarget;
             
       while (i < _iterations && deltaTarget > _convergence){
 	 /* Init with fresh wfs */
@@ -375,10 +416,20 @@ namespace QDLIB {
 	    *(clock)++;
 	 }
 	 
-	 /* Write Laserfield */
+	 /* Write Report */
+	 deltaTarget = abs(deltaTargetOld - Report(phii, i));
+	 
+	 
 	 i++; 
-      }
+      } /* while (i < _iterations && deltaTarget > _convergence) */
 
+      /* Write laserfile */
+      Laser::FileLaser file = _laser[0].File();
+	 
+      file.Suffix(BINARY_O_SUFFIX);
+      file.Name(_fname);
+      file << &(_laser[0]);
+      
       /* Remove tmp WFs */
       for (int i=0; i < _ntargets; i++){
 	 delete phii[i];
@@ -390,3 +441,4 @@ namespace QDLIB {
 
 
 } /* namespace QDLIB */
+

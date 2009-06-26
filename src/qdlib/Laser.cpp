@@ -131,7 +131,21 @@ namespace QDLIB {
    }
 
    
+   double Laser::PulseEnergy()
+   {
+      double d = 0;
+
+      for(int i=0; i < size(); i++){
+	 d += (*this)[i] * (*this)[i];
+      }
+
+      return ( 137.0359996  / (4 * M_PI) * d * _dt );
+      /*       c0 in au          eps_0 in au             */
+   }
+
+   
 }
+
 
 
 

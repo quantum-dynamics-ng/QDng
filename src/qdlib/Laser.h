@@ -35,6 +35,9 @@ namespace QDLIB {
 	 
 	 void Init(ParamContainer &params);
 	 
+	 /* Return the parameter container */
+	 ParamContainer& Params() { return _params; };
+	 
 	 string& Name();
 	 
          dVec* PowerSpectrum();
@@ -50,6 +53,8 @@ namespace QDLIB {
 	 double Get();
 	 
 	 Laser& operator=(const Laser &laser);
+	 
+	 double PulseEnergy();
    };
 
 } /* namespace QDLIB */

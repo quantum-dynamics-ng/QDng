@@ -74,7 +74,7 @@ namespace QDLIB {
 	 
       protected:
 	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
-	 
+	 double Report(WaveFunction **wfi, int interation);
       public:
 	 ProgOCT(XmlNode &OCTNode);
 	 ~ProgOCT();
