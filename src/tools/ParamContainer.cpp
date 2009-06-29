@@ -334,7 +334,7 @@ namespace QDLIB {
    /**
     * Copy operator.
     */
-   ParamContainer& ParamContainer::operator=(ParamContainer &params)
+   ParamContainer& ParamContainer::operator=(const ParamContainer &params)
    {
 
       _param_map = params._param_map;

@@ -158,6 +158,8 @@ namespace QDLIB
       clock = P->clock;
       
       /* Copy own stuff */
+      if (_hamilton != NULL) delete _hamilton;
+      _hamilton = P->_hamilton->NewInstance();
       *_hamilton = P->_hamilton;
       _order = P->_order;
       _coeff = P->_coeff;

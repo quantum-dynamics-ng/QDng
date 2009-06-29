@@ -123,7 +123,7 @@ namespace QDLIB {
    {
       *((dVec*) this) = (dVec) laser;
       _clock = laser._clock;
-//       _params = laser._params;
+       _params = laser._params;
       _dt = laser._dt;
       if (_spectrum != NULL) *_spectrum = *(laser._spectrum);
       
