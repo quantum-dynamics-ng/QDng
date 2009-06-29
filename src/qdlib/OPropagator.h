@@ -80,7 +80,7 @@ namespace QDLIB {
 	    if (imaginary)
 	       _c0 = -clock->Dt();
 	    else
-	       _c0 = (1)* I *clock->Dt();
+	       _c0 = (-1)* I *clock->Dt();
 	    forward = false;
 	 }
 	 	 
