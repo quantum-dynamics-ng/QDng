@@ -227,7 +227,7 @@ namespace QDLIB {
       for (int i=0; i < _size; i++){
 	 _O[i]->Scale(d);
       }
-      
+      scaling=d;
       return this;
    }
 

@@ -28,7 +28,7 @@ namespace QDLIB {
 	 static QDClock* Instance()
 	 {
 	    
-	    if (!_ref){
+	    if (_ref == 0){
 	       _ref = new QDClock();
 	    }
 	    return _ref;

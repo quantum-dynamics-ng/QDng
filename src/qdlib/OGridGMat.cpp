@@ -291,6 +291,7 @@ namespace QDLIB {
    {
       for (lint i=0; i < _size; i++)
          MultElements(&_kspace[i], sqrt(d));
+      scaling=d;
       return this;
    }
 

@@ -225,6 +225,8 @@ namespace QDLIB {
       for (int i=0; i < num_rows() ; i++)
 	 for (int j=0; j < num_cols() ; j++)
 	  (*this)[i][j] *= d;
+      
+      scaling=d;
       return this;
    }
 

@@ -41,6 +41,11 @@ namespace QDLIB {
 	  */
 	 QDClock *clock;
 	 
+	 /**
+	  * The applied scaling factor.
+	  * This must be set by the implementing class.
+	  */
+	 double scaling;
       public:
 	 /**
           * Make class pure virtual
@@ -50,7 +55,7 @@ namespace QDLIB {
 	 /**
 	  * Standard constructor
 	  */
-	 Operator() :  _isTimedependent(false), clock(NULL){}
+	 Operator() :  _isTimedependent(false), clock(NULL), scaling(1){}
 	  
 	 /**
 	  * Constructor with full parameter set.
@@ -192,6 +197,10 @@ namespace QDLIB {
 	  */
 	 virtual Operator* Scale(const double d) = 0;
 
+	 /**
+	  * Returns the applied scaling factor.
+	  */
+	 double Scaling() {return scaling;}
          
          typedef WaveFunction* (Operator::*METHODWF) (WaveFunction*);
 	 typedef WaveFunction* (Operator::*METHODWF2) (WaveFunction*, dcomplex);
