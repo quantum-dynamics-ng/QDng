@@ -34,6 +34,7 @@ namespace QDLIB {
    * \li iterations Maximum number of iterations
    * \li conv     Target convergence. Stop iterating if below convergence
    * \li shape    Name of shapefile
+   * \li writel   Write laser in every iteration
    * 
    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
    */
@@ -51,6 +52,7 @@ namespace QDLIB {
 	 
 	 int _iterations;
 	 double _convergence;
+	 bool _writel;
 	 
 	 _method_t _method;
 	 _coupling_t _coupling;
@@ -65,7 +67,8 @@ namespace QDLIB {
 	 Operator *_H;
 	 Operator *_Coup;
 	 
-	 Laser _laser[MAX_LASERS];
+	 Laser _laserf[MAX_LASERS];
+	 Laser _laserb[MAX_LASERS];
 	 Laser _shape[MAX_LASERS];
 	 
 	 WaveFunction* PsiI[MAX_TARGETS];
@@ -75,7 +78,7 @@ namespace QDLIB {
 	 
       protected:
 	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
-	 double Report(WaveFunction **wfi, int interation);
+	 double Report(WaveFunction **wfi, int iteration);
       public:
 	 ProgOCT(XmlNode &OCTNode);
 	 ~ProgOCT();
