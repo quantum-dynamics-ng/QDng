@@ -113,9 +113,7 @@ namespace QDLIB {
       if (name.empty())
 	 throw( EParamProblem ("No G-matrix elements given"));
       
-      if (_params.isPresent("coup")) {
-	 _params.GetValue( "coup", _NoKinCoup);
-      }
+      _params.GetValue("coup", _NoKinCoup);
       
       OGridSystem::FileOGrid file;
       file.Suffix(BINARY_O_SUFFIX);

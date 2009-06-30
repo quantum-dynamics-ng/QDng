@@ -88,25 +88,24 @@ namespace QDLIB {
       log.cout().precision(6); log.cout() << scientific;
       
       /* Check the reporter values */
+      bool onoff;
       if ( attr.isPresent("norm") ) {
-	 attr.GetValue("norm", s);
-	 if (s == "yes") _reporter.Norm( true );
-	 else _reporter.Norm( false );
+	 attr.GetValue("norm", onoff);
+	 _reporter.Norm( onoff );
+	 
       }
       if ( attr.isPresent("energy") ) {
 	 attr.GetValue("energy", s);
-	 if (s == "yes") _reporter.Energy( true );
-	 else _reporter.Energy(  false );
+	 _reporter.Energy(onoff);
       }
       if ( attr.isPresent("proj0") ) {
-	 attr.GetValue("proj0", s);
-	 if (s == "yes") _reporter.Proj0( true );
-	 else _reporter.Proj0( false );
+	 attr.GetValue("proj0", onoff);
+	 _reporter.Proj0(onoff);
       }
       if ( attr.isPresent("proj0Abs") ) {
-	 attr.GetValue("proj0Abs", s);
-	 if (s == "yes") _reporter.Proj0Square( true );
-	 else _reporter.Proj0( false );
+	 attr.GetValue("proj0Abs", onoff);
+	 _reporter.Proj0Square(onoff);
+	 
       }
       if ( attr.isPresent("spectrum") ) {
 	 attr.GetValue("spectrum", s);

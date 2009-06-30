@@ -35,7 +35,7 @@ namespace QDLIB
     *  \li dir    Output directory
     *  \li fname  Base name for ef output
     *  \li ename  Name for energy.dat
-    *  \li diag   yes/no diagonalize the eigen basis
+    *  \li diag   true/false diagonalize the eigen basis
     * 
     *  \todo diagonalization
     *  @author Markus Kowalewski

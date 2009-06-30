@@ -124,6 +124,7 @@ namespace QDLIB
       string name;
       WaveFunction *WF=NULL;
       XmlNode *child;
+      bool onoff;
       
       pm = WFNode->Attributes();
       pm.GetValue( "name", name );
@@ -149,7 +150,8 @@ namespace QDLIB
 	    child->NextNode();
 	 }
 	 multi->Init(pm);
-	 if ( pm.isPresent("normalize") ) {
+	 pm.GetValue( "normalize", onoff);
+	 if ( onoff) {
 	    log.cout() << "Normalized\n";
 	    multi->Normalize();
 	 }
@@ -180,7 +182,8 @@ namespace QDLIB
 	    delete wfadd;
 	    child->NextNode();
 	 }
-	 if ( pm.isPresent("normalize") ) {
+	 pm.GetValue( "normalize", onoff);
+	 if ( onoff) {
 	    log.cout() << "Normalized\n";
 	    WF->Normalize();
 	 }
@@ -202,7 +205,8 @@ namespace QDLIB
 	    file.Suffix(BINARY_WF_SUFFIX);
 	    file.Name(name);
 	    file >> WF;
-	    if ( pm.isPresent("normalize") ) {
+	    pm.GetValue( "normalize", onoff);
+	    if ( onoff) {
 	       log.cout() << "Normalizing...\n";
 	       WF->Normalize();
 	    }
