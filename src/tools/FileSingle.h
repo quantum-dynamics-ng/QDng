@@ -100,6 +100,8 @@ namespace QDLIB {
 	 
 	 void ActivateSequence();
 	
+	 void StopSequence();
+	 
 	 void ResetCounter();
          
 	 int Counter();
@@ -216,6 +218,15 @@ namespace QDLIB {
       _sequence = true;
    }
 
+   /**
+    * Stop Sequence writing.
+    */
+   template <class C>
+   void FileSingle<C>::StopSequence()
+   {
+      _sequence = false;
+   }
+   
    /**
     * Reset the file sequence counter.
     */
