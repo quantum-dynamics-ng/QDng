@@ -231,7 +231,7 @@ namespace QDLIB {
       
       /* The propagation loop */
       log.Header( "Free propagation", Logger::Section);
-      for (lint i=0; i <= clock->Steps(); i++){
+      for (lint i=0; i < clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
 	_U->Apply(Psi);                 /* Propagate */
