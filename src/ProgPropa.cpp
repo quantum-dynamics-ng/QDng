@@ -10,7 +10,7 @@ namespace QDLIB {
 
    ProgPropa::ProgPropa(XmlNode & PropaNode) :
 	 _propaNode(PropaNode), _ContentNodes(NULL),
-	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _dir(""),
+	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _dir(""), _nfile(DEFAULT_NORMFILE), _writenorm(false),
          _U(NULL), _H(NULL), _usepost(false), _usepre(false)
    {
    }
@@ -113,6 +113,11 @@ namespace QDLIB {
 	 _reporter.Spectrum( _dir+s );
       }
 
+      if (attr.isPresent("nfile")){
+	 _writenorm = true;
+	 attr.GetValue("nfile",s);
+	 if (! s.empty() ) _nfile = s;
+      }
       
    }
 
@@ -231,6 +236,8 @@ namespace QDLIB {
       
       /* The propagation loop */
       log.Header( "Free propagation", Logger::Section);
+      log.flush();
+      if( _writenorm ) log.FileOutput( _nfile );
       for (lint i=0; i < clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
@@ -239,7 +246,7 @@ namespace QDLIB {
 	if (i % _wcycle == 0) wfile << Psi;  /* Write wavefunction */
 	++(*clock);                     /* Step the clock */
       }
-      
+      if( _writenorm )  log.FileClose();
       _reporter.Finalize();
       
       delete _h;

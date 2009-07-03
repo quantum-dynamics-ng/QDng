@@ -70,7 +70,11 @@ namespace QDLIB {
    
       void FileOutput (string& filename );
       
+      void FileClose();
+      
       void SetRedirect (ostream &redirect);
+      
+      void ConsoleOutput();
       
       stringstream& cout ( );
    

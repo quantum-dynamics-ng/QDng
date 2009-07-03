@@ -101,12 +101,31 @@ namespace QDLIB {
       _global_out = &_ofile;
    }
 
+   /**
+    * Close output file and switch back to console output.
+    */
+   void Logger::FileClose()
+   {
+      flush();
+      _ofile.close();
+      _global_out = &std::cout;
+   }
+   
+   
    /** 
     * Set redirect to arbitrary stream.
     */
    void Logger::SetRedirect(ostream &redirect)
    {
       _global_out = &redirect;
+   }
+   
+   /**
+    * Set output to console. This is the default behavior.
+    */
+   void Logger::ConsoleOutput()
+   {
+      _global_out = &std::cout;
    }
    
    /**
