@@ -17,8 +17,7 @@ namespace QDLIB
     * \li order   desired order of recursion, if left empty it's chosen automatically.
     * \li scaling The scaling of the Hamiltonian. Can only be used in combination with order.
     * \li prec    The lower limit precission of the bessel coeffcients (mutual exclusive with order)
-    * 
-    * \todo implement imaginary time propagation.
+    *
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
    class OCheby : public OPropagator

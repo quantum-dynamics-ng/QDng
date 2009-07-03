@@ -113,7 +113,6 @@ namespace QDLIB
     * This method also recognizes Multistate, LC (Linear combination).
     * Works recursive.
     * 
-    * \todo clean up meta data handling of multistate wfs.
     */
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, bool empty)
    {
