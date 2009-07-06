@@ -116,7 +116,7 @@ namespace QDLIB {
       if (attr.isPresent("nfile")){
 	 _writenorm = true;
 	 attr.GetValue("nfile",s);
-	 if (! s.empty() ) _nfile = s;
+	 if (! s.empty() ) _nfile = _dir+s;
       }
       
    }
