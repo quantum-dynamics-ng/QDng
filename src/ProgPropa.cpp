@@ -248,6 +248,16 @@ namespace QDLIB {
       }
       if( _writenorm )  log.FileClose();
       _reporter.Finalize();
+
+      ParamContainer p;
+      p.SetValue("CLASS", "Propagation" );
+      p.SetValue("WFCLASS", wfm->Name() );
+      p.SetValue("Nt", clock->Steps() );
+      p.SetValue("dt", clock->Dt() );
+      p.SetValue("States", wfm->States() );
+      p.SetValue("WFBaseName", _fname );
+      KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
+      if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
       
       delete _h;
       delete Psi;
