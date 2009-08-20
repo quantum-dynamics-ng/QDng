@@ -83,7 +83,8 @@ namespace QDLIB
    void OMultistate::Init( ParamContainer & params )
    {
       _params = params;
-      if (_params.isPresent("nonhermitian")) _hermitian = false;
+      
+      _params.GetValue( "nonhermitian", _hermitian);
    }
 
    

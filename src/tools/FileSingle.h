@@ -35,6 +35,9 @@ namespace QDLIB {
     * - ParamContainer& C.GetParams()
     * - C.Init(ParamContainer)
     * - string& C.Name()
+    * - strides()
+    * 
+    * Basic support for strided vectors.
     * 
     * The class needs a base name and file suffix.
     * In the case of binary or ASCII files a meta will be created

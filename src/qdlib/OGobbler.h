@@ -17,8 +17,7 @@ namespace QDLIB {
     * \li order   filter order. determines the cutoff sharpness.
     * \li nip     If present use the gobbler as negative imaginary potential.
     * \li gain    Supply a gain value. 1 per default. Only makes sense in combination with nip
-    * 
-    * \todo TEST
+    *
     * 
     * @author Markus Kowalewski
     */

@@ -22,7 +22,7 @@ namespace QDLIB {
 	 bool _init;
       public:
          void SetLaser(Laser &laser);
-	 Laser& GetLaser();
+	 Laser* GetLaser();
 	 
 	 OGridDipole();
 	 

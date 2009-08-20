@@ -22,9 +22,9 @@ namespace QDLIB {
       _laser = laser;
    }
 
-   Laser & OGridDipole::GetLaser()
+   Laser* OGridDipole::GetLaser()
    {
-      return _laser;
+      return &_laser;
    }
 
    Operator* OGridDipole::NewInstance()

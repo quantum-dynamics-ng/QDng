@@ -42,8 +42,8 @@ namespace QDLIB
 	 File()->Suffix(BINARY_O_SUFFIX);
 	 File()->Name(s);
 	 
-	 bool set_zero=false;
-	 if (_params.isPresent("setzero")) set_zero = true;
+	 bool set_zero;
+	 _params.GetValue("setzero", set_zero);
 	 *( (FileOGrid*) File()) >> (OGridSystem*) this; /* Read potential */
 	 
 	 /* Put grid minimum to zero */

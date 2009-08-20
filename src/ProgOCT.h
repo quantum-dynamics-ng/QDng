@@ -67,8 +67,8 @@ namespace QDLIB {
 	 Operator *_H;
 	 Operator *_Coup;
 	 
-	 Laser _laserf[MAX_LASERS];
-	 Laser _laserb[MAX_LASERS];
+	 Laser* _laserf[MAX_LASERS];
+	 Laser* _laserb[MAX_LASERS];
 	 Laser _shape[MAX_LASERS];
 	 
 	 WaveFunction* PsiI[MAX_TARGETS];
