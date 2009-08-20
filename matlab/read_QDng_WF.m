@@ -22,6 +22,11 @@ if optargin == 1
    meta_file=fopen(meta_in,'r');
    data_in=[WF_in_filename '_' int2str(number) '.wf'];
    wf_file=fopen(data_in,'rb');
+   if wf_file == -1
+       class=-1;
+       WF=struct('class',class);
+       return;
+   end
    
 elseif optargin == 2
    
@@ -31,7 +36,11 @@ elseif optargin == 2
    meta_file=fopen(meta_in,'r');
    data_in=[WF_in_filename '-' int2str(state) '_' int2str(number) '.wf'];
    wf_file=fopen(data_in,'rb');
-    
+   if wf_file == -1
+       class=-1;
+       WF=struct('class',class);
+       return;
+   end
 end
 
 while 1
@@ -65,7 +74,7 @@ if dims == 1
     end
     
     fclose(meta_file);
-    if strncmp('WFGrid', class,6) || strncmp('WFMultistate', class,12)
+    if strncmp('WFGrid', class,6) || strncmp('WFMultistate', class,12) || strncmp('Grid', class,4)
         WF_all=fread(wf_file,'double');
         data=zeros(grid(1,1),1);
         for i=2:2:2*grid(1,1)

@@ -20,7 +20,7 @@ if strncmp('Grid', OP.class,4)
         meta_file=fopen(meta_out,'w');
         op_file=fopen(data_out,'wb');
         fprintf(meta_file,'%s\n','# Generated file');
-        fprintf(meta_file,'%s%d \n','CLASS = ',OP.class);
+        fprintf(meta_file,'%s%s \n','CLASS = ',OP.class);
         fprintf(meta_file,'%s%d \n','dims = ',OP.dims);
         fprintf(meta_file,'%s%d \n','N0 = ',OP.grid(1,1));
         fprintf(meta_file,'%s%g \n','xmax0 = ',OP.grid(1,3));

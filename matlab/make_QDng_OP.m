@@ -16,6 +16,10 @@ function OP=make_QDng_OP(OP_in,class,varargin)
 
 optargin = size(varargin,2);
 
+if optargin == 0
+    error('Wrong inputarguments');
+end
+
 if optargin == 1
     
     x=varargin{1};
@@ -41,19 +45,21 @@ if optargin == 1
             data=OP_in;
         end    
     end
-
+    OP=struct('class',class,'dims',dims,'grid',grid,'data',data);
 elseif optargin == 3
-    
+   disp(Hallo);
    dims=1;
    grid=zeros(dims,3);
    grid(1,1)=varargin{1};
    grid(1,2)=varargin{2};
    grid(1,3)=varargin{3};
+   if  grid(1,1)~=max(size(OP_in))
+      error('Dimension mismatch in make_QDng_OP'); 
+   end
    if strncmp('Grid', class,4)
        data=OP_in;
    end
-   
+   OP=struct('class',class,'dims',dims,'grid',grid,'data',data);
 else
     disp('Error! Check inputarguments');
 end
-OP=struct('class',class,'dims',dims,'grid',grid,'data',data);

@@ -12,7 +12,7 @@
 
 function WF=write_QDng_WF(WF,outfilename)
 
-if strncmp('WFGrid', WF.class,6) || strncmp('WFMultistate', WF.class,12)
+if strncmp('WFGrid', WF.class,6) || strncmp('WFMultistate', WF.class,12) || strncmp('Grid', WF.class,4)
     if WF.dims == 1
         meta_out=[outfilename '.meta'];
         data_out=[outfilename '.wf'];

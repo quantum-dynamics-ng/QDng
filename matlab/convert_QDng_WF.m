@@ -14,6 +14,9 @@
 function WF=convert_QDng_WF(infilename,class,varargin)
 
 optargin = size(varargin,2);
+if optargin == 0
+    error('Wrong inputarguments');
+end
 
 if optargin == 3
    dims=1;

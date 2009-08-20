@@ -256,6 +256,7 @@ namespace QDLIB {
       p.SetValue("dt", clock->Dt() );
       p.SetValue("States", wfm->States() );
       p.SetValue("WFBaseName", _fname );
+      p.SetValue("Wcycle", _wcycle );
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
       if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
       
