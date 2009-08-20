@@ -343,6 +343,7 @@ namespace QDLIB
 	    }
 	 }
       }
+      scaling=d;
       return this;
    }
 

@@ -51,6 +51,7 @@ namespace QDLIB {
 	    if (_dspace == NULL)
 	       throw ( EParamProblem("k-space not initialized", Name()) );
 	    MultElements(_dspace, d);
+	    scaling=d;
 	    return this;
 	 }
 	 

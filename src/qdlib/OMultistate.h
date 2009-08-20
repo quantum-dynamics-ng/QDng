@@ -35,13 +35,22 @@ namespace QDLIB
 
          ~OMultistate();
 	 
+	 /** Set hermitian/symmetric behavior.
+	  * The default is to act as symmetric operator if only one diag. element is used.
+	  */
 	 void Hermitian(bool hermit) {_hermitian = hermit;}
 	 
 	 bool Hermitian() {return _hermitian;}
 	 
 	 void Add(Operator *O, int row, int col);
 	 
+	 /** Number of states */
 	 int States() {return _nstates;}
+	 
+	 /** Explictly set the number of states. 
+	  *  Usually this is done automaticly in the add method.
+	  */
+	 void States(int n) { _nstates = n; }
 	 
 	 Operator* State(int i, int j);
 	 

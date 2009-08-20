@@ -79,6 +79,7 @@ namespace QDLIB {
 	string _suffix;
 	bool _sequence;
 	int _counter;
+	int _increment;
       public:
 	 	 
 	 FileSingle();
@@ -97,11 +98,14 @@ namespace QDLIB {
          void DropMeta(bool drop);
          bool DropMeta();
          
-	 
 	 void ActivateSequence();
-	
+	 void StopSequence();
+	 
 	 void ResetCounter();
          
+	 void ReverseSequence(){ _increment = -1; }
+	 void ForwardSequence(){ _increment = +1; }
+	 
 	 int Counter();
 	 void Counter(int counter);
 	 
@@ -128,7 +132,7 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle() :
-	 _drop_meta(false), _type(binary),  _name("default"), _suffix(""), _sequence(false),  _counter(0) {}
+	 _drop_meta(false), _type(binary),  _name("default"), _suffix(""), _sequence(false),  _counter(0), _increment(1) {}
    
    /**
     * Constructor with type initialisation.
@@ -136,14 +140,14 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, bool Sequence) :
-	 _type(type), _drop_meta(false), _name("default"), _suffix(""), _sequence(Sequence), _counter(0) {}
+	 _type(type), _drop_meta(false), _name("default"), _suffix(""), _sequence(Sequence), _counter(0),_increment(1) {}
    
    /**
     * Constructor with type and name initialisation.
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence) :
-	 _type(type), _name(name), _suffix(suffix), _sequence(Sequence), _counter(0){}
+	 _type(type), _name(name), _suffix(suffix), _sequence(Sequence), _counter(0), _increment(1){}
    
    
    /**
@@ -216,6 +220,15 @@ namespace QDLIB {
       _sequence = true;
    }
 
+   /**
+    * Stop Sequence writing.
+    */
+   template <class C>
+   void FileSingle<C>::StopSequence()
+   {
+      _sequence = false;
+   }
+   
    /**
     * Reset the file sequence counter.
     */
@@ -298,7 +311,7 @@ namespace QDLIB {
 	 stringstream ss;
 	 ss << _counter;
 	 s = _name + "_" + ss.str() + _suffix;
-	 _counter++;
+	 _counter += _increment;
       } else {
 	 s = _name + _suffix;
       }
@@ -352,7 +365,7 @@ namespace QDLIB {
       
       }
       
-      if (_sequence) _counter++;
+      if (_sequence) _counter += _increment;
    }
    
    template <class C>
@@ -391,30 +404,42 @@ namespace QDLIB {
       /* We need some parameters for reading */
       if (data->sizeBytes() <= 0) throw( EParamProblem("Wrong size") ) ;
       
-      /* Build file name */
-      if (_sequence) {
-	 stringstream ss;
-	 ss << _counter;
-	 s = _name + "_" + ss.str() + _suffix;
-	 _counter++;
-      } else {
-	 s = _name + _suffix;
-      }
-      
-      file.open(s.c_str(), ios::binary);
-      if( file.fail() ) {
-	 throw ( EIOError("Can not open binary file for reading") );
-      }
       
       /* Read multiple strides */
-      for(int i=0; i < data->strides(); i++){
+      for (int i=0; i < data->strides(); i++){
+	 /* Build file name */
+	 if (_sequence) {
+	    stringstream ss;
+	    
+	    if (data->strides() > 1)
+	       ss << "-" << i << "_" << _counter;
+	     else 
+	       ss << "_" << _counter;
+
+	    s = _name +  ss.str() + _suffix;
+	    _counter += _increment;
+	 } else {
+	    if (data->strides() > 1){
+	       stringstream ss;
+	       ss << "-" << i;
+	       s = _name + ss.str() + _suffix;
+	    } else {
+	       s = _name + _suffix;
+	    }
+	 }
+	 
+	 file.open(s.c_str(), ios::binary);
+	 if( file.fail() ) {
+	    throw ( EIOError("Can not open binary file for reading", s) );
+	 }
+	 
 	 file.read((char*) data->begin(i), data->sizeBytes());
 	 if( file.fail() || file.eof() ){
 	    throw( EIOError("Can not read binary file", s) );
 	 }
+	 
+	 file.close();
       }
-	  
-      file.close();
    
    }
 

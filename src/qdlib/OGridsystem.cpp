@@ -30,9 +30,9 @@ namespace QDLIB {
    Operator* OGridSystem::Scale(const double d)
    {
       MultElements( (dVec*) this, d );
+      scaling = d;
       return this;
    }
-   
    
    Operator* OGridSystem::Copy(Operator * O)
    {

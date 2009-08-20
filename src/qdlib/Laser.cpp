@@ -123,7 +123,7 @@ namespace QDLIB {
    {
       *((dVec*) this) = (dVec) laser;
       _clock = laser._clock;
-//       _params = laser._params;
+       _params = laser._params;
       _dt = laser._dt;
       if (_spectrum != NULL) *_spectrum = *(laser._spectrum);
       
@@ -131,7 +131,21 @@ namespace QDLIB {
    }
 
    
+   double Laser::PulseEnergy()
+   {
+      double d = 0;
+
+      for(int i=0; i < size(); i++){
+	 d += (*this)[i] * (*this)[i];
+      }
+
+      return ( 137.0359996  / (4 * M_PI) * d * _dt );
+      /*       c0 in au          eps_0 in au             */
+   }
+
+   
 }
+
 
 
 

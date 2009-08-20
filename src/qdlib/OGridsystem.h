@@ -19,7 +19,6 @@ namespace QDLIB {
 	 typedef FileSingle<OGridSystem> FileOGrid;
       private:
 	 FileOGrid *_file;
-	 
       public:
 	 
 	 OGridSystem();

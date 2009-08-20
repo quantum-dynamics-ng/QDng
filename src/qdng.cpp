@@ -18,6 +18,7 @@
 
 #include "ProgPropa.h"
 #include "ProgEigen.h"
+#include "ProgOCT.h"
 
 using namespace std;
 using namespace QDLIB;
@@ -132,10 +133,10 @@ int main(int argc, char **argv)
 	    log.Header("Imaginary Time Eigenfunctions", Logger::Chapter);
 	    eigen.Run();
 	 } else if (progname == "oct") {
-/*	    ProgOCT oct(*prognodes);
+	    ProgOCT oct(*prognodes);
 	    oct.SetDirectory(dir);
 	    log.Header("Optimal control theory", Logger::Chapter);
-	    oct.Run();*/
+	    oct.Run();
 	 } else if (progname == "densmat") {
 	    throw ( EParamProblem ("Density matrix propagation not implementet yet") );
 	 } else {

@@ -54,6 +54,23 @@ namespace QDLIB
       _nsteps = Steps;
    }
 	 
+   
+   /**
+    * Set the clock to zero time.
+    */
+   void QDClock::Begin()
+   {
+      _step = 0;
+   }
+   
+   /**
+    * Set the clock to final time.
+    */
+   void QDClock::End()
+   {
+      _step = _nsteps-1;
+   }
+   
    /**
     * Increase the clock by one time step.
     */

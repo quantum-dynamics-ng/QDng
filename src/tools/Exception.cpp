@@ -14,11 +14,17 @@ namespace QDLIB{
    EParamProblem::EParamProblem(const char *message, const double reason) : Exception()
    {
       stringstream sst;
-      string s;
 
       sst << message << ": " << reason;
-      sst >> s;
-      SetMessage(s);
+      SetMessage(sst.str());
+   }
+   
+   EParamProblem::EParamProblem(const char *message, const int reason) : Exception()
+   {
+      stringstream sst;
+
+      sst << message << ": " << reason;
+      SetMessage(sst.str());
    }
    
 
