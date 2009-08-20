@@ -7,4 +7,4 @@ libslatecmin_a_SOURCES = d1mach.f dgamln.f fdump.f i1mach.f j4save.f \
 	zrati.f zs1s2.f zseri.f zshch.f zsqrt.f zuchk.f zunhj.f	zuni1.f zuni2.f zunik.f \
 	zuoik.f zwrsk.f zbesi.f
 
-AM_FFLAGS = -fPIC
+AM_FFLAGS = -fPIC $(BLAS_LIBS)

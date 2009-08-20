@@ -94,7 +94,8 @@ class Vector
       
       for (lint i=0; i < nstrides_; i++){
 	 if (align_){
-	    posix_memalign((void**) &v_[i], QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
+	    if ( (posix_memalign((void**) &v_[i], QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_)) != 0)
+	       v_[i] = new T[stride_size_];
 	 } else {
             v_[i] = new T[stride_size_];
 	 }

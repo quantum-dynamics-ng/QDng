@@ -22,7 +22,7 @@ AC_DEFUN([ACX_CHECK_LIBXML2], [
     LIBXML2_LIBS=`$LIBXML2_CONFIG --libs`
     AC_MSG_RESULT(["$LIBXML2_LIBS"])
   fi
-  AC_CHECK_LIB(xml2, xmlDocGetRootElement,,AC_MSG_ERROR(libxml is missing))
+dnl  AC_CHECK_LIB(xml2, xmlDocGetRootElement,,AC_MSG_ERROR(libxml is missing))
   AC_SUBST(LIBXML2_LIBS)
   AC_SUBST(LIBXML2_CFLAGS)
 

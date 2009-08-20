@@ -56,7 +56,7 @@ namespace LAPACK {
 	       }
 	    }
 	    if (sized[min_idx] > 0) delete dbuf[min_idx];
-	    posix_memalign((void**) &dbuf[min_idx], 2*sizeof(double), size*sizeof(double));
+	    i=posix_memalign((void**) &dbuf[min_idx], 2*sizeof(double), size*sizeof(double));
 	    return dbuf[min_idx];
 	 }
 	 
@@ -79,7 +79,7 @@ namespace LAPACK {
 	       }
 	    }
 	    if (sizec[min_idx] > 0) delete cbuf[min_idx];
-	    posix_memalign((void**) &cbuf[min_idx], 2*sizeof(dcomplex), size*sizeof(dcomplex));
+	    i=posix_memalign((void**) &cbuf[min_idx], 2*sizeof(dcomplex), size*sizeof(dcomplex));
 	    return cbuf[min_idx];
 	 }
     };
