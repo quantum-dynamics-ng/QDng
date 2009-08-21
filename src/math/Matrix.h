@@ -45,7 +45,8 @@ namespace QDLIB {
 	 
 	 Vector<T>* coloumn(lint c) const;
 	 Vector<T>* diag() const;
-	 
+	 void transpose();
+         
 	 T& operator() (int i, int j);
 	 
 	 void operator=(const Matrix<T> &M);
@@ -191,6 +192,24 @@ namespace QDLIB {
 	 (*diagvec)[i] = _col[i][i];
       }
       return diagvec;
+   }
+   
+   /**
+    * Returns a copy of the diagonal.
+    * 
+    * Only works if number of rows and cols are equal.
+    */
+   template <class T>
+   void Matrix<T>::transpose()
+   {
+      T swap;
+      for (int i=0; i < _m; i++) {
+         for (int j=1; j < _n; j++) {
+            swap=_v[i][j];
+            _v[i][j] = _v[j][i];
+            _v[j][i] = swap;
+         }
+      }
    }
    
    /**

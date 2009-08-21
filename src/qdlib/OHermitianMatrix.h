@@ -1,7 +1,7 @@
 #ifndef OHERMAT_H
 #define OHERMAT_H
 
-#include "Operator.h"
+#include "ODSpace.h"
 
 namespace QDLIB {
    
@@ -9,22 +9,25 @@ namespace QDLIB {
     * This simple class represents a real, hermitian Hamiltonian Matrix.
     * 
     * Use it for matrix representation of Hamiltonians.
-    * It is compaible with every WaveFunction but is
-    * intended to use with WFLevel.
     * 
-    * \see OHerOMat for the general case.
     * \todo modify matrix classes to provide real, efficient hermitian matrices.
     */
-   class OHerMat: public dMat, public Operator
+   template <class T>
+   class OHermitianMatrixT: public Matrix<T>, public ODSpaceT<T>
    {
+      public:
+         typedef FileSingle< OHermitianMatrixT<T> > FileMatrix;
+      
       private:
-	 string _name;
-	 dMat *_X;       /* Eigenvector Matrix */
-	 dVec *_E;       /* Eigenvalues */
-	 bool valid;      /* Diag representation valid */
+	 dMat *_X;           /* Eigenvector Matrix */
+	 bool _valid;        /* Diag representation valid */
+         FileMatrix *_file;  /* FileReader for the operator */
+         
+      protected:
+         string _name;
 	 
       public:
-	 /* Interface implementation , Operator */
+	 /* Interface implementation, Operator */
 	 virtual Operator* NewInstance();
          virtual void Init(ParamContainer &params);
 	 virtual void Init(WaveFunction *Psi);
@@ -42,7 +45,8 @@ namespace QDLIB {
          virtual Operator* Offset(const double d);
 	 virtual Operator* Scale(const double d);
 
-
+         /* Interface implementation, ODSpace */
+         virtual void InitDspace();
          
          
 	 /* Specific methods */
@@ -62,6 +66,7 @@ namespace QDLIB {
 
 }
 
+#include "OHermitianMatrix.cpp"
 
 #endif /* #ifndef OHERMAT_H */
 
