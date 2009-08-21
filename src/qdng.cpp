@@ -98,6 +98,13 @@ int main(int argc, char **argv)
       exit(0);
    }
    
+   /* Version Info */
+   log.cout() << endl;
+   log.cout() << "QDng " << VERSION;
+   log.cout() << " (build " << QDNG_BUILD_DATE;
+   log.cout() << ", " << QDNG_BUILD_HOST;
+   log.cout() << ", " << QDNG_BUILD_MACH << ")" << endl; log.flush();
+   
    /* This is the global try-catch block */
    try {    
       /* Open input file and check programm nodes */

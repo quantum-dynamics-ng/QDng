@@ -1,8 +1,8 @@
 AC_INIT
 AC_CONFIG_SRCDIR([configure.in])
 
-AC_CONFIG_HEADERS([src/config.h])
-AM_INIT_AUTOMAKE(QDng, 0.1)
+AM_CONFIG_HEADER(src/config.h)
+AM_INIT_AUTOMAKE([QDng], [alpha-0.2])
 
 
 AC_LANG([C++])

@@ -29,8 +29,8 @@ namespace QDLIB {
     * \li dir     Output directory
     * 
     * printing options:
-    * \li norm    true/false  print norm in the report.
-    * \li energy  true/false  print the Energy in the report.
+    * \li norm    true/false  print norm in the report. [true]
+    * \li energy  true/false  print the Energy in the report. [true]
     * \li proj0   true/false  print the projection against in the initial wave function.
     * \li proj0Abs  true/false  print the absolute square of the projection against in the initial wave function.
     * \li spectrum   filename  if given a the projection against the inital wavefunction is turned on.

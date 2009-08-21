@@ -64,7 +64,7 @@ namespace QDLIB
 	 void Proj0(bool on) { _proj0 = on; }
 	 
 	 /** Absolute square off the Autocorrelation **/
-	 void Proj0Square(bool on) {_proj0Sq = on; _proj0 = on; }
+	 void Proj0Square(bool on) {_proj0Sq = on; _proj0 = on | _proj0; }
 	 
 	 /** Absolute square off the Autocorrelation **/
 	 bool Proj0Square() { return _proj0Sq; }
