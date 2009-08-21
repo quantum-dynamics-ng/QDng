@@ -145,25 +145,27 @@ namespace QDLIB {
    /** 
     * Get a boolean value.
     * 
-    * If the value is not written correct ("true") then result will be "false".
+    * If the value is not written correct ("true") then result will be the default value.
     * 
     * \param name  Name of parameter
     * \param value Referenze to value
+    * \param def   Set the default value for the case key is not found
     */
-   bool ParamContainer::GetValue(const string name, bool &value)
+   bool ParamContainer::GetValue(const string name, bool &value, bool def)
    {
       if ( _param_map.find(name) != _param_map.end()){
          if (_param_map[name] == string("true")) value = true;
-	 else value = false;
+         else if (_param_map[name] == string("false")) value = false;
+         else value=def; /* Value misspelled or empty */
          return true;
-      }
+      } /* value not found */
       else {
-         value = 0;
+         value=def;
          return false;
       }
-   
    }
-   
+
+
    /**
     * Reset the position pointer.
     */

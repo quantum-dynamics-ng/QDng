@@ -85,6 +85,8 @@ namespace QDLIB
       _params = params;
       
       _params.GetValue( "nonhermitian", _hermitian);
+      /* Invert since NON Hermitian is given */
+      _hermitian = !_hermitian;
    }
 
    

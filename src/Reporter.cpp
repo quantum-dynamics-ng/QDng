@@ -104,13 +104,13 @@ namespace QDLIB
       /* Energy */
       if (_energy)
       {
+         log.cout().precision(8);
 	 log.cout() << "\t" << _H->Expec(Psi);
       }
 
       /* projection and spectrum */
       if (_proj0){
 	 proj = *_psi0 * Psi;
-	 
 	 if (_proj0Sq) /* Squared - Normal*/
 	    log.cout() << "\t" << cabs(proj)*cabs(proj);
 	 else
