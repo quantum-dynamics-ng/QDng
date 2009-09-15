@@ -5,9 +5,6 @@
 #include "tools/ParamContainer.h"
 #include "math/typedefs.h"
 #include "tools/Exception.h"
-#include "Operator.h"
-
-
 
 
 namespace QDLIB { 
@@ -76,12 +73,12 @@ namespace QDLIB {
          /**
           * Check if WF is in different representation/basis.
          */
-         virtual bool isKspace() {return _IsKspace;}
+         virtual bool IsKspace() {return _IsKspace;}
          
          /**
           * Tell the WF that it is in different representation/basis.
           */
-         virtual void isKspace(bool is) {_IsKspace = is;}
+         virtual void IsKspace(bool is) {_IsKspace = is;}
                   
          /**
           * Transform WF into basis of an Operator.
@@ -89,14 +86,14 @@ namespace QDLIB {
           * The Implementation has to decide into which basis the transformation is done.
           * The choice may depend on O. 
           */
-         virtual void ToKSpace(Operator *O) = 0;
+//          virtual void ToKSpace(Operator *O) = 0;
          
          /**
           * Transform back into the original representation or basis.
           * 
           * This is the inverse of ToKSpace.
           */
-         virtual void ToXSpace(Operator *O) = 0;
+//          virtual void ToXSpace(Operator *O) = 0;
 
          
 	 /** Copy. */

@@ -2,6 +2,7 @@
 #define ODSPACE_H
 
 #include "Operator.h"
+#include "Transform.h"
 
 namespace QDLIB {
    
@@ -42,6 +43,11 @@ namespace QDLIB {
           */
          virtual void InitDspace() = 0;
 	 
+         /**
+          * Returns a pointer to the transformation object (into diag. basis)
+          */
+         virtual Transform* Transformation() = 0;
+         
 	 /** We don't do offsetting. */
 	 virtual Operator* Offset(const double d){return this;}
 

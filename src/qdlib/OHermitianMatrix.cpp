@@ -74,7 +74,7 @@ namespace QDLIB {
       bool initDiag;
       _params.GetValue("qdiag", initDiag, true);
       if (initDiag){
-         if (_X == NULL) _X = new dMat(*this);
+         if (_X == NULL) _X = new dMat(rows(),rows());
          LAPACK::FullDiagHermitian(_X, _dspace);
       }
       
@@ -215,12 +215,12 @@ namespace QDLIB {
     */
    void OHermitianMatrix::Diag()
    {
-      if (_X == NULL || _dspace == NULL)
-      {
-	 _X;
-      }
-      FullDiagHermitian();
-      _valid = true;
+//       if (_X == NULL || _dspace == NULL)
+//       {
+//          LAPACK::FullDiagHermitian(_X, _dspace);
+//       }
+//       FullDiagHermitian();
+//       _valid = true;
    }
    
    /**
@@ -241,17 +241,17 @@ namespace QDLIB {
    
    Operator * OHermitianMatrix::Offset(const double d)
    {
-      for (int i=0; i < num_rows() ; i++)
-	 (*this)[i][i] += d;
+      for (int i=0; i < rows() ; i++)
+	 (*this)(i,i) += d;
       return this;
    }
 
 
    Operator * OHermitianMatrix::Scale(const double d)
    {
-      for (int i=0; i < num_rows() ; i++)
-	 for (int j=0; j < num_cols() ; j++)
-	  (*this)[i][j] *= d;
+      for (int i=0; i < rows() ; i++)
+	 for (int j=0; j < cols() ; j++)
+	  (*this)(i,j) *= d;
       
       scaling=d;
       return this;
@@ -260,7 +260,7 @@ namespace QDLIB {
    void OHermitianMatrix::InitDspace()
    {
       if (_dspace == NULL) {
-         _space = new dVec(rows)
+         _dspace = new dVec(rows());
       }
    }
 

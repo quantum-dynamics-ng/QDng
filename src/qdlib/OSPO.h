@@ -37,6 +37,7 @@ namespace QDLIB {
 	 ParamContainer *_needs;
 	 
 	 ODSpace *_Tkin;
+         Transform* _X;             /* Transformation into diags space of Tkin */
 	 dVec    *_Tkin_kspace;
 	 OGridSystem* _Vpot[2];
 	 OGridSystem* _Vcoup;

@@ -31,11 +31,6 @@ namespace QDLIB {
 	 
          virtual void Normalize();
 	 
-         virtual void ToKSpace(Operator *O);
-         
-         virtual void ToXSpace(Operator *O);
-
-         
 	 WaveFunction* operator=(WaveFunction *Psi);
 	 
 	 dcomplex operator*(WaveFunction *Psi);

@@ -121,6 +121,8 @@ namespace QDLIB {
       if (_Tkin_kspace == NULL)
 	 _Tkin_kspace = _Tkin->Dspace();
 	 
+      _X = _Tkin->Transformation();
+      
       if (_Vpot[0]->size() != _Tkin_kspace->size()) 
 	 throw ( EParamProblem("Tkin and Vpot differ in size") );
       
@@ -218,9 +220,9 @@ namespace QDLIB {
 	 
 	 /* exp(-i/2 T dt) */
 	 for (int i=0; i < 2; i++){
-	    dynamic_cast<WFGridSystem*>(psi->State(i))->ToKspace(); 
-            MultElements( (cVec*) psi->State(i),  (cVec*) _expT, 1/ double(psi->State(i)->size()) );
-	    dynamic_cast<WFGridSystem*>(psi->State(i))->ToXspace();
+	    _X->Forward(dynamic_cast<WFGridSystem*>(psi->State(i))); 
+	    MultElements( (cVec*) psi->State(i),  (cVec*) _expT, 1/ double(psi->State(i)->size()) );
+            _X->Backward(dynamic_cast<WFGridSystem*>(psi->State(i)));
 	 }
 	 	 
 	 /* exp(-i Vcoup dt) */
@@ -252,9 +254,9 @@ namespace QDLIB {
             
 	 /* exp(-i/2 T dt) */
 	 for (int i=0; i < 2; i++){
-	    dynamic_cast<WFGridSystem*>(psi->State(i))->ToKspace(); 
+            _X->Forward(dynamic_cast<WFGridSystem*>(psi->State(i))); 
 	    MultElements( (cVec*) psi->State(i),  (cVec*) _expT, 1/ double(psi->State(i)->size()) );
-	    dynamic_cast<WFGridSystem*>(psi->State(i))->ToXspace();
+            _X->Backward(dynamic_cast<WFGridSystem*>(psi->State(i)));
 	 }
 	 return psi;
       } else { /* Without coupling */
@@ -265,9 +267,9 @@ namespace QDLIB {
             MultElements( (cVec*) psi, (cVec*) _expVcoupI );
 	 
 	 /* exp(-i T dt) */
-	 psi->ToKspace();
+         _X->Forward(psi);
 	 MultElements( (cVec*) psi,  (cVec*) _expT, 1/ double(psi->size()) );
-	 psi->ToXspace();
+         _X->Backward(psi);
 	 
 	 /* exp(-i/2 V dt) */
 	 MultElements( (cVec*) psi,  (cVec*) _expV );

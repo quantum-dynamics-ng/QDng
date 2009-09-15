@@ -21,54 +21,15 @@ namespace QDLIB {
       if (GridSystem::Dim() == 0 || GridSystem::Dim() > MAX_DIMS)
 	 throw( EParamProblem("Dims not initialized or to large") );
 
-      if (_spacebuffer == NULL) _spacebuffer = new cVec(GridSystem::Size());
-      
+      bool nofft;
+      params.GetValue("NoFFT", nofft, false);
       /* Initialize FFT */
-      if (fft == NULL){
+      if (_spacebuffer == NULL && !nofft) _spacebuffer = new cVec(cVec::size());
+      if (fft == NULL && !nofft){
 	 fft = new FFT(*((GridSystem*) this), *((cVec*) this), *_spacebuffer);
       }
    }
-   
-   
-   /**
-    * \return true if wave function is in Kspace representation.
-    */
-   bool WFGridSystem::isKspace()
-   {
-      return _isKspace;
-   }
-   
-   /**
-    * Tell the WF that it is in k-Space representation.
-    */
-   void WFGridSystem::isKspace( bool is )
-   {
-      if (_isKspace != is){
-	 cVec::swap(*_spacebuffer);
-      }
-      _isKspace = is;
-   }
-      
-   /**
-    * Transform the wavefunction into momentum space.
-    */
-   void WFGridSystem::ToKspace(Operator* O)
-   {
-      fft->forward();
-      cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
-      IsKspace(true);
-   }
-   
-   /**
-    * Transform the wavefunction back into real space.
-    */
-   void WFGridSystem::ToXspace(Operator* O)
-   {
-      fft->backward();
-      cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
-      IsKspace(false);
-      
-   }
+
    
    /**
     * Copy own content.
@@ -77,7 +38,7 @@ namespace QDLIB {
     */
    void WFGridSystem::operator =(WFGridSystem *G)
    {
-      _isKspace = G->_isKspace;
+      IsKspace(G->IsKspace());
       *((GridSystem*) this) = *((GridSystem*) G);
       *((cVec*) this) = *((cVec*) G);
    }

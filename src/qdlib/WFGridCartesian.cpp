@@ -110,7 +110,7 @@ namespace QDLIB {
       }
    
       /* k-space has different Norm! */
-      if (isKspace())
+      if (IsKspace())
       {
 	 for(int i=0; i < GridSystem::Dim(); i++){
 	    c *= 2*M_PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i)) ;

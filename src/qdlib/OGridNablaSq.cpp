@@ -123,11 +123,11 @@ namespace QDLIB {
       ket = dynamic_cast<WFGridSystem*>(sourcePsi);
       opPsi = dynamic_cast<WFGridSystem*>(destPsi);
       
-      ket->ToKspace();
-      opPsi->isKspace(true);
+      _FFT.Forward(ket);
+      opPsi->IsKspace(true);
       MultElements((cVec*) opPsi, (cVec*) ket, _dspace, 1/double(GridSystem::Size()));
-      ket->isKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
-      opPsi->ToXspace();
+      ket->IsKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
+      _FFT.Backward(opPsi);
       
       return destPsi;
    }
@@ -138,9 +138,9 @@ namespace QDLIB {
       
       opPsi = dynamic_cast<WFGridSystem*>(Psi);
 
-      opPsi->ToKspace();
+//       _FFT.Forward((opPsi);
       MultElements((cVec*) opPsi, _dspace, 1/double(GridSystem::Size()));
-      opPsi->ToXspace();
+      _FFT.Backward(opPsi);
       
       return opPsi;
    }

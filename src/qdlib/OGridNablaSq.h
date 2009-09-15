@@ -4,6 +4,7 @@
 #include "ODSpace.h"
 #include "Kspace.h"
 #include "GridSystem.h"
+#include "TransformFFT.h"
 
 namespace QDLIB {
 
@@ -26,7 +27,8 @@ namespace QDLIB {
       private:
 	 string _name;
 	 double _mass[MAX_DIMS];
-
+         TransformFFT _FFT;
+         
       public:
 	 OGridNablaSq();
       
@@ -62,6 +64,9 @@ namespace QDLIB {
 	 virtual Operator* operator*(Operator* O);
 
          virtual bool Valid(WaveFunction *Psi);
+         
+	 virtual Transform* Transformation() { return &_FFT; }
+	 
 	 
 	 /*Interface implementation, ODSpace  */ 
 	 virtual void InitDspace();

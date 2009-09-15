@@ -3,6 +3,7 @@
 
 #include "OGridPotential.h"
 #include "WFGridSystem.h"
+#include "TransformFFT.h"
 
 namespace QDLIB {
 
@@ -33,7 +34,8 @@ namespace QDLIB {
 	 WFGridSystem* buf;
 	 
 	 void _InitKspace (WFGridSystem *Psi);
-	 
+	 TransformFFT _FFT;
+         
 	 bool _NoKinCoup;
       public:
 	 OGridGMat();

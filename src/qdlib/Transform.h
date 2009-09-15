@@ -16,12 +16,12 @@ namespace QDLIB {
       /**
        * Forward transformation into foreign basis.
        */
-      virtual void Forward(Wavefunction *Psi) = 0;
+      virtual void Forward(WaveFunction *Psi) = 0;
       
       /**
        * Inverse transformation back into original basis.
        */      
-      virtual void Inverse(Wavefunction *Psi) = 0;
+      virtual void Backward(WaveFunction *Psi) = 0;
    
    }; /* class Transform */
 

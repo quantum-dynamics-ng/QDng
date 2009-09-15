@@ -285,12 +285,12 @@ namespace QDLIB {
        lint AN, BN;
       
        
-      if (B->num_rows() != A->num_cols()){
+      if (B->rows() != A->cols()){
 	 throw( EIncompatible("num_cols != num_rows of Matrices") );
       }
 	  
-      AN = A->num_cols();
-      BN = A->num_rows();
+      AN = A->cols();
+      BN = A->rows();
       
       for (int k=0; k < BN ; k++){      //Spalte O
 	 for (int i=0; i < BN ; i++){      // Zeile O

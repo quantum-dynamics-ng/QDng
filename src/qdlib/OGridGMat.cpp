@@ -206,9 +206,9 @@ namespace QDLIB {
       lint i;
       for (i=0; i < _size; i++){ /* Loop over dims*/
 	 /* d/dx from WF */ 
-	 _wfbuf[i]->ToKspace();
+	 _FFT.Forward(_wfbuf[i]);
 	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(buf->size()) );
-	 _wfbuf[i]->ToXspace();
+         _FFT.Backward(_wfbuf[i]);
  	 for (lint j=0; j < _size; j++){
 	    if (!(i != j && _NoKinCoup)){ /* Kinetic coupling ?*/
 	       *((cVec*) buf) = *((cVec*) _wfbuf[i]);
@@ -218,9 +218,9 @@ namespace QDLIB {
 	       else
 	         MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
 	       /* d/dx from G* d/dx WF */
-	       buf->ToKspace();
+               _FFT.Forward(buf);
 	       MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
-	       buf->ToXspace();
+               _FFT.Backward(buf);
 	       
 	       *destPsi += buf;
 	    }

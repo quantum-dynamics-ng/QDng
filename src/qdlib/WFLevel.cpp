@@ -99,15 +99,5 @@ namespace QDLIB {
    }
    
    
-   void WFLevel::ToDspace( )
-   {
-      
-   }
-
-   void WFLevel::ToXspace( )
-   {
-   }
-   
-   
 } /* namespace QDLIB */
 

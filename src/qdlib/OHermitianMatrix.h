@@ -57,7 +57,7 @@ namespace QDLIB {
 
          /* Interface implementation, ODSpace */
          virtual void InitDspace();
-         
+         virtual Transform* Transformation(); 
          
 	 /* Specific methods */
 	 void Size(int size);

@@ -1,7 +1,7 @@
 #ifndef QDLIBTRANSFORMFFT_H
 #define QDLIBTRANSFORMFFT_H
 
-#include <Transform.h>
+#include "Transform.h"
 
 namespace QDLIB
 {
@@ -18,8 +18,8 @@ namespace QDLIB
          TransformFFT();
          ~TransformFFT();
          
-         virtual void Forward(Wavefunction *Psi);
-         virtual void Inverse(Wavefunction *Psi);
+         virtual void Forward(WaveFunction *Psi);
+         virtual void Backward(WaveFunction *Psi);
          
          
    };
