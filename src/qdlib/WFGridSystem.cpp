@@ -52,22 +52,21 @@ namespace QDLIB {
    /**
     * Transform the wavefunction into momentum space.
     */
-   void WFGridSystem::ToKspace()
+   void WFGridSystem::ToKspace(Operator* O)
    {
       fft->forward();
       cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
-      _isKspace = true;
-      
+      IsKspace(true);
    }
    
    /**
     * Transform the wavefunction back into real space.
     */
-   void WFGridSystem::ToXspace()
+   void WFGridSystem::ToXspace(Operator* O)
    {
       fft->backward();
       cVec::swap(*_spacebuffer);    /* The fft ouput is in _spacebuffer => exchange it to data space of WF class  */
-      _isKspace = false;
+      IsKspace(false);
       
    }
    

@@ -1,59 +1,65 @@
+#include "OHermitianMatrix.h"
 #include "tools/Exception.h"
 #include "linalg/LapackDiag.h"
-
 
 namespace QDLIB {
    
    OHermitianMatrix::~OHermitianMatrix()
    {
       if (_X == NULL) delete _X;
-      if (_E == NULL) delete _X;
    }
    
-   OHermitianMatrix::OHermitianMatrix() : dMat(), Operator(), _name("OHermitianMatrix"), _X(NULL), _E(NULL), _valid(false) {}
+   
+   OHermitianMatrix::OHermitianMatrix() : dMat(), ODSpaceT<double>(), _X(NULL),  _valid(false), _init(false), _name("OHermitianMatrix") {}
    
    
    /**
     * Return a fresh instance.
     */
-   Operator* OHermitianMatrix::NewInstance()
+    Operator* OHermitianMatrix::NewInstance()
    {
       OHermitianMatrix *r =  new OHermitianMatrix();
-      r->newsize(num_rows(), num_rows());
+      r->newsize(rows(), rows());
       return r;
    }
    
    /**
     * Initializer.
+    *
     */
    void OHermitianMatrix::Init(ParamContainer &params)
    {
       int size;
+      string name;
       
-      _params = params;
+      Operator::_params = params;
       
+      _params.GetValue("file", name);
       _params.GetValue("size", size);
       
-      if (size <= 0 && s.size() != 0 && !_init){
+      /* Init from file - Set recursion indicator _init */
+      if (size <= 0 && name.size() != 0 && !_init){
          _init = true;
          File()->Suffix(BINARY_O_SUFFIX);
-         File()->Name(s);
+         File()->Name(name);
 	 
+         *File() >> (OHermitianMatrix*) this; /* Read Matrix */
+
+         /* Adjust min. diag value to zero */
          bool set_zero;
          _params.GetValue("setzero", set_zero);
-         *( (FileOGrid*) File()) >> (OGridSystem*) this; /* Read Matrix */
-
-         /* Put grid minimum to zero */
          if (set_zero){
             double min = Emin();
-            for (lint i=0; i < size(); i++){
-               (*this)[i] -= min;
+            for (lint i=0; i < Size(); i++){
+               (*this)(i,i) -= min;
             }
          }
 
          _init = false;
          return;
       }
+      
+      /* Init with params */
       
       /* Zero size matrix doesn't make sense */
       if (size == 0) {
@@ -62,17 +68,14 @@ namespace QDLIB {
 	 throw( EParamProblem(missing, "Missing size") );
       }
       
-      Matrix<T>::newsize(size,size);
-      
-      /** \todo add recursive init protection*/
+      dMat::newsize(size,size);
       
       /* Check if we diagonalize imidiately */
       bool initDiag;
       _params.GetValue("qdiag", initDiag, true);
       if (initDiag){
-         if (_X != NULL) _X = new Matrix<T>(*this);
-         Vector<T> *ev;
-         LAPACK::FullDiagHermitian(_X, ev);
+         if (_X == NULL) _X = new dMat(*this);
+         LAPACK::FullDiagHermitian(_X, _dspace);
       }
       
       
@@ -89,14 +92,17 @@ namespace QDLIB {
       
       if (s != size) {
          _params.SetValue("size", size);
-         Matrix<T>:::newsize(size,size);
+         dMat::newsize(size,size);
       }
       
    }
    
+   /**
+    * \return size of matrix
+    */
    int OHermitianMatrix::Size()
    {
-      return num_rows();
+      return rows();
    }
    
    /**
@@ -132,20 +138,20 @@ namespace QDLIB {
    
    double OHermitianMatrix::Emax()
    {      
-      double d = (*this)[0][0];
+      double d = (*this)(0,0);
       
-      for (int i=1; i < num_rows() ; i++)
-	 if ((*this)[0][0] > d) d = (*this)[0][0];
+      for (int i=1; i < rows() ; i++)
+         if ((*this)(i,i) > d) d = (*this)(i,i);
 	 
       return d;
    }
 	 
    double OHermitianMatrix::Emin()
    {      
-      double d = (*this)[0][0];
+      double d = (*this)(0,0);
       
-      for (int i=1; i < num_rows() ; i++)
-	 if ((*this)[0][0] < d) d = (*this)[0][0];
+      for (int i=1; i < rows() ; i++)
+         if ((*this)(0,0) < d) d = (*this)(0,0);
       
       return d;
    }
@@ -155,13 +161,10 @@ namespace QDLIB {
     * 
     * Works with every type of WaveFunction (relies only on cVec).
     */
-   WaveFunction* OHermitianMatrix::operator*(WaveFunction *Psi)
+   WaveFunction* OHermitianMatrix::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WaveFunction *result;
-      
-      result = Psi->NewInstance();
-      MatrixVectorMult(result, *this, *Psi);
-      return result;
+      MatVecMult((cVec*) destPsi, (dMat*) this, (cVec*) sourcePsi);
+      return destPsi;
    }
    
    /**
@@ -171,14 +174,15 @@ namespace QDLIB {
     * 
     * \todo Optimize for real inplace.
     */   
-   WaveFunction* OHermitianMatrix::operator*=(WaveFunction *Psi)
+   WaveFunction* OHermitianMatrix::Apply(WaveFunction *Psi)
    {
       WaveFunction *result;
       
       result = Psi->NewInstance();
-      MatrixVectorMult(result, *this, *Psi);
-      delete Psi;
-      return result;
+      MatVecMult((cVec*) result, (dMat*) this, (cVec*) Psi);
+      *Psi = result;
+      delete result;
+      return Psi;
    }
    
    /**
@@ -211,7 +215,7 @@ namespace QDLIB {
     */
    void OHermitianMatrix::Diag()
    {
-      if (_X == NULL || _E == NULL)
+      if (_X == NULL || _dspace == NULL)
       {
 	 _X;
       }
@@ -235,7 +239,7 @@ namespace QDLIB {
       return result;
    }
    
-   Operator * QDLIB::OHermitianMatrix::Offset(const double d)
+   Operator * OHermitianMatrix::Offset(const double d)
    {
       for (int i=0; i < num_rows() ; i++)
 	 (*this)[i][i] += d;
@@ -243,7 +247,7 @@ namespace QDLIB {
    }
 
 
-   Operator * QDLIB::OHermitianMatrix::Scale(const double d)
+   Operator * OHermitianMatrix::Scale(const double d)
    {
       for (int i=0; i < num_rows() ; i++)
 	 for (int j=0; j < num_cols() ; j++)
@@ -253,6 +257,12 @@ namespace QDLIB {
       return this;
    }
 
+   void OHermitianMatrix::InitDspace()
+   {
+      if (_dspace == NULL) {
+         _space = new dVec(rows)
+      }
+   }
 
 } /* namespace QDLIB */
 

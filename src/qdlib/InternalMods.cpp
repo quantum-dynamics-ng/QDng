@@ -13,6 +13,8 @@
 #include "OGridPosition.h"
 #include "OGridNAC.h"
 
+#include "OHermitianMatrix.h"
+
 #include "OGobbler.h"
 #include "OProjection.h"
 #include "OScalar.h"
@@ -125,6 +127,12 @@ namespace QDLIB
       return p;
    }
 
+   Operator* INT_OHermitianMatrix()
+   {
+      OHermitianMatrix *p;
+      p = new OHermitianMatrix ();
+      return p;
+   }
    
    WaveFunction* INT_WFGridCartesian()
    {
@@ -163,6 +171,7 @@ namespace QDLIB
       if (name == "INT_OGridNabla") return &INT_OGridNabla;
       if (name == "INT_OGridNAC") return &INT_OGridNAC;
       
+      if (name == "INT_OHermitianMatrix") return &INT_OHermitianMatrix;
       if (name == "INT_OGobbler") return &INT_OGobbler;
       if (name == "INT_OProjection") return &INT_OProjection;
       if (name == "INT_OScalar") return &INT_OScalar;

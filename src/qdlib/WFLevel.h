@@ -23,14 +23,19 @@ namespace QDLIB {
 	 
 	 WaveFunction* NewInstance();
 	 
-	 void Init(ParamContainer &params);
+         virtual void Init(ParamContainer &params);
 	 
-	 const string& Name();
+         virtual const string& Name();
 	 
-	 double Norm();
+         virtual double Norm();
 	 
-	 void Normalize();
+         virtual void Normalize();
 	 
+         virtual void ToKSpace(Operator *O);
+         
+         virtual void ToXSpace(Operator *O);
+
+         
 	 WaveFunction* operator=(WaveFunction *Psi);
 	 
 	 dcomplex operator*(WaveFunction *Psi);
@@ -41,17 +46,7 @@ namespace QDLIB {
 	 
 	 WFLevel& operator=(WFLevel &Psi);
 	 
-	 /** Check if in diagonal representation */
-	 bool isDspace() { return _isDspace; }
-	 
-	 /** Set to representation */
-	 void isDspace(bool is) { _isDspace = is; }
          
-	 void SetTransform(dMat *mat) { _D = mat; }
-	 
-	 void ToDspace();
-         
-	 void ToXspace();
 	
    }; /* class WFLevel */
    

@@ -16,7 +16,6 @@ namespace QDLIB {
    class WFGridSystem : public WaveFunction, public GridSystem
    {
       private:
-         bool _isKspace;
          cVec *_spacebuffer;  /* buffer for FFT*/
          
       protected:
@@ -29,13 +28,9 @@ namespace QDLIB {
 	 
 	 virtual void Init(ParamContainer &params);
 	 
-         bool isKspace();
-	 
-	 void isKspace(bool is);
+         virtual void ToKspace(Operator* O);
          
-         void ToKspace();
-         
-         void ToXspace();
+         virtual void ToXspace(Operator* O);
 	 
 	 void operator=(WFGridSystem *G);
 

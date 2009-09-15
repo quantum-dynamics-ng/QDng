@@ -7,9 +7,6 @@
 #include "qdlib/WaveFunction.h"
 #include "qdlib/OGridsystem.h"
 
-#include "qdlib/OHerMat.h"
-
-
 
 namespace QDLIB {
    typedef FileSingle<OHerMat> FileOHerMat;

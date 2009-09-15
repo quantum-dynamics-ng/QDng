@@ -2,6 +2,7 @@
 #define OHERMAT_H
 
 #include "ODSpace.h"
+#include "tools/FileSingle.h"
 
 namespace QDLIB {
    
@@ -10,23 +11,32 @@ namespace QDLIB {
     * 
     * Use it for matrix representation of Hamiltonians.
     * 
+    * Parameters:
+    * \li size
+    * \li diag
+    * \li setzero
+    * \li file
+    * 
     * \todo modify matrix classes to provide real, efficient hermitian matrices.
     */
-   template <class T>
-   class OHermitianMatrixT: public Matrix<T>, public ODSpaceT<T>
+   class OHermitianMatrix: public dMat, public ODSpaceT<double>
    {
       public:
-         typedef FileSingle< OHermitianMatrixT<T> > FileMatrix;
+         typedef FileSingle< OHermitianMatrix > FileMatrix;
       
       private:
 	 dMat *_X;           /* Eigenvector Matrix */
 	 bool _valid;        /* Diag representation valid */
          FileMatrix *_file;  /* FileReader for the operator */
+         bool _init;         /* indicator for recursion in Init */
          
       protected:
          string _name;
 	 
       public:
+         OHermitianMatrix();
+         ~OHermitianMatrix();
+         
 	 /* Interface implementation, Operator */
 	 virtual Operator* NewInstance();
          virtual void Init(ParamContainer &params);
@@ -50,10 +60,6 @@ namespace QDLIB {
          
          
 	 /* Specific methods */
-	 OHerMat();
-	 OHerMat(int size);
-	 ~OHerMat();
-	 
 	 void Size(int size);
 	 int Size();
 	 
@@ -61,12 +67,13 @@ namespace QDLIB {
 	 dVec* Eval();
 	 dVec* Evec();
 	 
-	 OHerMat& operator=(OHerMat &O);
+         FileMatrix* File();
+         
+         OHermitianMatrix& operator=(OHermitianMatrix &O);
    };
 
 }
 
-#include "OHermitianMatrix.cpp"
 
 #endif /* #ifndef OHERMAT_H */
 

@@ -5,7 +5,7 @@
 #include "tools/ParamContainer.h"
 #include "math/typedefs.h"
 #include "tools/Exception.h"
-
+#include "Operator.h"
 
 
 
@@ -25,10 +25,12 @@ namespace QDLIB {
     */
    class WaveFunction: public cVec
    {
+      private:
+         bool _IsKspace;
       protected:
 	 ParamContainer _params;
       public:
-	 WaveFunction() :cVec() {}
+         WaveFunction() :cVec() ,_IsKspace(false) {}
 	 WaveFunction(ParamContainer &params) : _params(params) {}
 	 /**
 	  * Make the class pure virtual.
@@ -71,7 +73,32 @@ namespace QDLIB {
 	 
 	 virtual void Normalize() = 0;
       
-	 
+         /**
+          * Check if WF is in different representation/basis.
+         */
+         virtual bool isKspace() {return _IsKspace;}
+         
+         /**
+          * Tell the WF that it is in different representation/basis.
+          */
+         virtual void isKspace(bool is) {_IsKspace = is;}
+                  
+         /**
+          * Transform WF into basis of an Operator.
+          * 
+          * The Implementation has to decide into which basis the transformation is done.
+          * The choice may depend on O. 
+          */
+         virtual void ToKSpace(Operator *O) = 0;
+         
+         /**
+          * Transform back into the original representation or basis.
+          * 
+          * This is the inverse of ToKSpace.
+          */
+         virtual void ToXSpace(Operator *O) = 0;
+
+         
 	 /** Copy. */
 	 virtual WaveFunction* operator=(WaveFunction* Psi) = 0;
 	 
@@ -102,22 +129,6 @@ namespace QDLIB {
 	    return this;
 	 }
 
-	 
-         /** Multiply with scalar */
-//          WaveFunction* operator*(const double d)
-//          {
-//             WaveFunction *wf;
-//       
-//             wf = this->NewInstance();
-//       
-//             for (int i=0; i < cVec::size(); i++){
-//                (*wf)[i] = (*this)[i] * d;
-//             }
-// 	    
-// 	    return wf;
-//          }
-
-	 
 	 /** Multiply with complex number */
 	 WaveFunction* operator*=(const dcomplex d)
 	 {
