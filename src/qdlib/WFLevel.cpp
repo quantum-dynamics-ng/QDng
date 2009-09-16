@@ -1,10 +1,10 @@
 #include "WFLevel.h"
 #include "tools/Exception.h"
 
-using namespace TNT;
+
 namespace QDLIB {
    
-   WFLevel::WFLevel(): _name("WFLevel"),   {}
+   WFLevel::WFLevel(): _name("WFLevel")   {}
    
    WFLevel::~WFLevel() {}
    

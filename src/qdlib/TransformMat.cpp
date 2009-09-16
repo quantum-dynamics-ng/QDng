@@ -14,12 +14,15 @@ namespace QDLIB {
 
    void TransformMat::Forward(WaveFunction * Psi)
    {
-      MatVecMult((cVec*) Psi, _X, (cVec*) Psi);
+      MatVecMult(Psi->GetSpaceBuffer(), _X, (cVec*) Psi, true, true);
+      Psi->IsKspace(true);
    }
    
    
    void TransformMat::Backward(WaveFunction * Psi)
    {
+      MatVecMult(Psi->GetSpaceBuffer(), _X, (cVec*) Psi);
+      Psi->IsKspace(false);
    }
 
    /** 

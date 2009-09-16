@@ -29,11 +29,10 @@ namespace QDLIB {
 	 ParamContainer _params;
       public:
          WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) {}
-	 WaveFunction(ParamContainer &params) : _params(params) {}
 	 /**
 	  * Make the class pure virtual.
 	  */
- 	 virtual ~WaveFunction() {}
+         virtual ~WaveFunction() {if (_spacebuffer != NULL) delete _spacebuffer;}
 	 
 	 /**
 	  * This method should create a new instance.
@@ -78,9 +77,16 @@ namespace QDLIB {
          
          /**
           * Tell the WF that it is in different representation/basis.
+          * 
+          * This also switches the buffer space.
           */
-         void IsKspace(bool is) {_IsKspace = is;}
-                  
+         void IsKspace(bool is)
+         {  
+            if (_IsKspace != is){
+               cVec::swap(*_spacebuffer);
+               _IsKspace = is;
+            }
+         }
          
          /**
           * Returns the buffer for different basis.
@@ -92,26 +98,6 @@ namespace QDLIB {
             if (!_spacebuffer) _spacebuffer = new cVec(size());
             return _spacebuffer;
          }
-         
-         /**
-          * Switch buffer to different basis.
-          */
-         void SwitchSpaceBuffer() {cVec::swap(_spacebuffer);}
-         
-         /**
-          * Transform WF into basis of an Operator.
-          * 
-          * The Implementation has to decide into which basis the transformation is done.
-          * The choice may depend on O. 
-          */
-//          virtual void ToKSpace(Operator *O) = 0;
-         
-         /**
-          * Transform back into the original representation or basis.
-          * 
-          * This is the inverse of ToKSpace.
-          */
-//          virtual void ToXSpace(Operator *O) = 0;
 
          
 	 /** Copy. */

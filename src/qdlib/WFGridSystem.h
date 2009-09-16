@@ -17,7 +17,6 @@ namespace QDLIB {
    {
       private:
          bool _isKspace;
-         cVec *_spacebuffer;  /* buffer for FFT*/
          FFT *fft;
          friend class TransformFFT;
       public:
