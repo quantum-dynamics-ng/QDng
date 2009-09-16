@@ -82,6 +82,7 @@ namespace QDLIB {
           */
          void IsKspace(bool is)
          {  
+            if (!_spacebuffer) _spacebuffer = new cVec(size());
             if (_IsKspace != is){
                cVec::swap(*_spacebuffer);
                _IsKspace = is;
