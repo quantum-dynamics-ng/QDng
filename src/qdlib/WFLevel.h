@@ -12,8 +12,6 @@ namespace QDLIB {
    {
       private:
 	 string _name;
-	 bool _isDspace;
-	 dMat *_D;      /* Matrix that transfroms to diagonal basis */
 	 
       public:
          /* Interface implementation */

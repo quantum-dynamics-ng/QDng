@@ -37,12 +37,14 @@ namespace QDLIB {
 	 
 	 T* begin();
 	 T* begin(lint col);
+         
 	 
 	 lint rows() const { return _m;}
 	 lint cols() const { return _n;}
 	 
 	 lint sizeBytes();
-	 
+	 lint strides() {return 1;}
+         
 	 Vector<T>* coloumn(lint c) const;
 	 Vector<T>* diag() const;
 	 void transpose();
@@ -219,9 +221,9 @@ namespace QDLIB {
     * \param j coloumn
     */
    template <class T> 
-   T& Matrix<T>::operator()(int i, int j)
+   inline T& Matrix<T>::operator()(int i, int j)
    {
-      return _v[j][i];
+      return _col[j][i];
    }
    
    /**
@@ -267,30 +269,42 @@ namespace QDLIB {
     */
    
    /**
-    * b = M*a
+    * Matrix - Vector Multiplication.
+    * 
+    * \f$ b = M*a \f$
+    * 
+    * \param transpose Use the transpose of M
+    * \param adjoint   Use adjoint matrix.
     */
    template <class T, class U>
-   inline void MatVecMult(Vector<T> *B, Matrix<U> *M, Vector<T> *A, bool transpose = false)
+   inline void MatVecMult(Vector<T> *B, Matrix<U> *M, Vector<T> *A, bool transpose = false, bool adjoint = false)
    {
       int cols = M->cols();
       int rows = M->rows();
       
       T *b = B->begin(0);
       T *a = A->begin(0);
-      U** m = M->begin();
       
-      if (transpose){
+      if (transpose && !adjoint){
 	 for(int i=0; i < rows; i++){
 	    b[i] = 0;
 	    for(int j=0; j < cols; j++){
-	       b[i] += m[i][j] * a[i];
+	       b[i] += (*M)(i,j) * a[i];
 	    }
 	 }
-      } else {
+      } else if (transpose && adjoint){
+         for(int i=0; i < rows; i++){
+            b[i] = 0;
+            for(int j=0; j < cols; j++){
+               b[i] += conj((*M)(i,j)) * a[i];
+            }
+         }         
+      }
+      else {
 	 for(int i=0; i < rows; i++){
 	    b[i] = 0;
 	    for(int j=0; j < cols; j++){
-	       b[i] += m[j][i] * a[i];
+               b[i] += (*M)(j,i) * a[i];
 	    }
 	 }
       }

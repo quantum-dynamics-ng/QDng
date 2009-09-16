@@ -10,8 +10,6 @@ namespace QDLIB {
     */
    class Transform {
    public:
-      Transform();
-      ~Transform();
       
       /**
        * Forward transformation into foreign basis.

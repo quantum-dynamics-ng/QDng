@@ -3,6 +3,7 @@
 
 #include "ODSpace.h"
 #include "tools/FileSingle.h"
+#include "TransformMat.h"
 
 namespace QDLIB {
    
@@ -26,6 +27,7 @@ namespace QDLIB {
       
       private:
 	 dMat *_X;           /* Eigenvector Matrix */
+         TransformMat _XT;    /* Transformer object */
 	 bool _valid;        /* Diag representation valid */
          FileMatrix *_file;  /* FileReader for the operator */
          bool _init;         /* indicator for recursion in Init */
@@ -57,7 +59,7 @@ namespace QDLIB {
 
          /* Interface implementation, ODSpace */
          virtual void InitDspace();
-         virtual Transform* Transformation(); 
+         virtual Transform* Transformation() { return &_XT;}
          
 	 /* Specific methods */
 	 void Size(int size);
@@ -67,7 +69,7 @@ namespace QDLIB {
 	 dVec* Eval();
 	 dVec* Evec();
 	 
-         FileMatrix* File();
+         FileMatrix* File() {return _file;}
          
          OHermitianMatrix& operator=(OHermitianMatrix &O);
    };

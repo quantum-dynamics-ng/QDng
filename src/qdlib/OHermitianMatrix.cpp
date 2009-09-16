@@ -1,4 +1,5 @@
 #include "OHermitianMatrix.h"
+#include "WFLevel.h"
 #include "tools/Exception.h"
 #include "linalg/LapackDiag.h"
 
@@ -79,6 +80,17 @@ namespace QDLIB {
       }
       
       
+   }
+   
+   void QDLIB::OHermitianMatrix::Init(WaveFunction * Psi)
+   {
+      WFLevel *psi=dynamic_cast<WFLevel*>(Psi);
+      
+      if (!psi)
+         throw ( EIncompatible("Matrix operator not compatible with wavefunction ",Name(), Psi->Name()) );
+      
+      if (psi->size() != rows())
+         throw ( EIncompatible("Wavefunction has wrong size") );
    }
    
    /**
@@ -188,6 +200,17 @@ namespace QDLIB {
    /**
     * Copy operator.
     */
+   Operator* OHermitianMatrix::Copy(Operator *O)
+   {
+      *((dMat*) this) = *((dMat*) O);
+      _params =  O->Params();
+      
+      return this;
+   }
+   
+      /**
+    * Copy operator.
+       */
    Operator* OHermitianMatrix::operator=(Operator *O)
    {
       *((dMat*) this) = *((dMat*) O);
@@ -265,5 +288,7 @@ namespace QDLIB {
    }
 
 } /* namespace QDLIB */
+
+
 
 

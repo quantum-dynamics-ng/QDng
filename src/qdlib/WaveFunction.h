@@ -23,11 +23,12 @@ namespace QDLIB {
    class WaveFunction: public cVec
    {
       private:
-         bool _IsKspace;
+         bool _IsKspace;      /* To remember in which basis we are */
+         cVec *_spacebuffer;   /* transformation buffer for different basis */
       protected:
 	 ParamContainer _params;
       public:
-         WaveFunction() :cVec() ,_IsKspace(false) {}
+         WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) {}
 	 WaveFunction(ParamContainer &params) : _params(params) {}
 	 /**
 	  * Make the class pure virtual.
@@ -73,13 +74,30 @@ namespace QDLIB {
          /**
           * Check if WF is in different representation/basis.
          */
-         virtual bool IsKspace() {return _IsKspace;}
+         bool IsKspace() {return _IsKspace;}
          
          /**
           * Tell the WF that it is in different representation/basis.
           */
-         virtual void IsKspace(bool is) {_IsKspace = is;}
+         void IsKspace(bool is) {_IsKspace = is;}
                   
+         
+         /**
+          * Returns the buffer for different basis.
+          * 
+          * Initialization (size) is done automatically.
+          */
+         cVec* GetSpaceBuffer()
+         {
+            if (!_spacebuffer) _spacebuffer = new cVec(size());
+            return _spacebuffer;
+         }
+         
+         /**
+          * Switch buffer to different basis.
+          */
+         void SwitchSpaceBuffer() {cVec::swap(_spacebuffer);}
+         
          /**
           * Transform WF into basis of an Operator.
           * 

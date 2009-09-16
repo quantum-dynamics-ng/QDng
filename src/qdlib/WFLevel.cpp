@@ -4,7 +4,7 @@
 using namespace TNT;
 namespace QDLIB {
    
-   WFLevel::WFLevel(): _name("WFLevel"), _isDspace(false), _D(NULL)  {}
+   WFLevel::WFLevel(): _name("WFLevel"),   {}
    
    WFLevel::~WFLevel() {}
    

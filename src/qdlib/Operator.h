@@ -280,7 +280,7 @@ namespace QDLIB {
     * \todo find the right place.
     */
    template <class T, class U>
-   void MatrixMatrixMult(Matrix<T> *O, const Matrix<T> *A, const Matrix<U> *B)
+   void MatrixMatrixMult(Matrix<T> *O, Matrix<T> *A, Matrix<U> *B)
    {
        lint AN, BN;
       
@@ -294,9 +294,9 @@ namespace QDLIB {
       
       for (int k=0; k < BN ; k++){      //Spalte O
 	 for (int i=0; i < BN ; i++){      // Zeile O
-	   ( *O)[i][k] = 0;
+	   (*O)(i,k) = 0;
 	    for (int j=0; j< AN; j++){   // Spalte A
-	       (*O)[i][k] += (*A)[i][j] * (*B)[j][k];
+	       (*O)(i,k) += (*A)(i,j) * (*B)(j,k);
 	    }
 	 }
       }

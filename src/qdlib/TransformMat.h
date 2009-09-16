@@ -14,6 +14,7 @@ namespace QDLIB {
    {
       private:
          dMat *_X;
+         bool _adjoint;
       public:
          TransformMat();
          ~TransformMat();
@@ -22,13 +23,7 @@ namespace QDLIB {
          virtual void Forward(WaveFunction *Psi);
          virtual void Backward(WaveFunction *Psi);
       
-         /** 
-          * Set the transformation matrix.
-          * 
-          * \param adjoint Inverse matrix equals the adjoint matrix.
-          * This is the case with hermitian matrix and much faster, than a full matrix inversion
-          */
-         void SetMatrix(dMat *, bool adjoint = true);
+         void SetMatrix(dMat *X, bool adjoint = true);
          
          /** Get the transformation matrix.*/
          dMat* GetMatrix() {return _X;}
