@@ -69,7 +69,7 @@ namespace QDLIB {
 	 dVec* Eval();
 	 dVec* Evec();
 	 
-         FileMatrix* File() {return _file;}
+         FileMatrix* File() {if (_file == NULL) _file = new FileMatrix(); return _file;}
          
          OHermitianMatrix& operator=(OHermitianMatrix &O);
    };

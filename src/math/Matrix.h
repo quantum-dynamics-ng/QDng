@@ -50,6 +50,7 @@ namespace QDLIB {
 	 void transpose();
          
 	 T& operator() (int i, int j);
+         T& operator() (int i, int j) const;
 	 
 	 void operator=(const Matrix<T> &M);
 	 
@@ -93,13 +94,14 @@ namespace QDLIB {
    template <class T>
 	 void Matrix<T>::_destroy()
    {
-#ifdef HAVE_STDLIB_H
-      free( (void*) _v);
-#else
-      delete[] _v;
-#endif
-      delete[] _col;
-      
+      if (_v != NULL) {
+   #ifdef HAVE_STDLIB_H
+         free( (void*) _v);
+   #else
+         delete[] _v;
+   #endif
+         delete[] _col;
+      }
       _mn=0;
       _m=0;
       _n=0;
@@ -109,14 +111,14 @@ namespace QDLIB {
     * Default constructor
     */
    template <class T>
-   Matrix<T>::Matrix() : _m(0), _n(0), _mn(0)
+   Matrix<T>::Matrix() : _m(0), _n(0), _mn(0), _v(NULL), _col(NULL)
    {}
    
    /**
     * Constructor with init size.
     */
    template <class T>
-   Matrix<T>::Matrix(int i, int j) : _m(i), _n(j), _mn(i*j)
+         Matrix<T>::Matrix(int i, int j) : _m(i), _n(j), _mn(i*j), _v(NULL), _col(NULL)
    {
       _init(i,j);
    }
@@ -226,6 +228,12 @@ namespace QDLIB {
       return _col[j][i];
    }
    
+   template <class T> 
+   inline T& Matrix<T>::operator()(int i, int j) const
+   {
+      return _col[j][i];
+   }
+   
    /**
     * Copy operator.
     */
@@ -287,29 +295,52 @@ namespace QDLIB {
       
       if (transpose && !adjoint){
 	 for(int i=0; i < rows; i++){
-	    b[i] = 0;
+            b[i] = T(0);
 	    for(int j=0; j < cols; j++){
-	       b[i] += (*M)(i,j) * a[i];
+	       b[i] += (*M)(i,j) * a[j];
 	    }
 	 }
       } else if (transpose && adjoint){
          for(int i=0; i < rows; i++){
-            b[i] = 0;
+            b[i] = T(0);
             for(int j=0; j < cols; j++){
-               b[i] += conj((*M)(i,j)) * a[i];
+               b[i] += conj((*M)(i,j)) * a[j];
             }
          }         
       }
       else {
 	 for(int i=0; i < rows; i++){
-	    b[i] = 0;
+	    b[i] = T(0);
 	    for(int j=0; j < cols; j++){
-               b[i] += (*M)(j,i) * a[i];
+               b[i] += (*M)(j,i) * a[j];
 	    }
 	 }
       }
    }
    
+   
+   /**
+    * ASCII output.
+    */
+   template <class T>
+   std::ostream& operator<<(std::ostream &s, const Matrix<T> &A)
+   {
+      lint M=A.rows();
+      lint N=A.cols();
+
+      s << M << " " << N << "\n";
+      for (lint i=0; i<M; i++)
+      {
+         for (lint j=0; j<N; j++)
+         {
+            s << A(i,j) << " ";
+         }
+         s << "\n";
+      }
+
+
+      return s;
+   }
 }
 
 #endif

@@ -7,11 +7,13 @@ namespace QDLIB {
    
    OHermitianMatrix::~OHermitianMatrix()
    {
-      if (_X == NULL) delete _X;
+      if (_X != NULL) delete _X;
+      if (_file != NULL) delete _file;
    }
    
    
-   OHermitianMatrix::OHermitianMatrix() : dMat(), ODSpaceT<double>(), _X(NULL),  _valid(false), _init(false), _name("OHermitianMatrix") {}
+   OHermitianMatrix::OHermitianMatrix() : dMat(), ODSpaceT<double>(), _X(NULL),  _valid(false),
+                                      _file(NULL) ,_init(false), _name("OHermitianMatrix") {}
    
    
    /**
@@ -37,7 +39,7 @@ namespace QDLIB {
       
       _params.GetValue("file", name);
       _params.GetValue("size", size);
-      
+      cout << size << endl;
       /* Init from file - Set recursion indicator _init */
       if (size <= 0 && name.size() != 0 && !_init){
          _init = true;
@@ -55,7 +57,7 @@ namespace QDLIB {
                (*this)(i,i) -= min;
             }
          }
-
+         cout << *((dMat*) this) << endl;
          _init = false;
          return;
       }
@@ -76,7 +78,9 @@ namespace QDLIB {
       _params.GetValue("qdiag", initDiag, true);
       if (initDiag){
          if (_X == NULL) _X = new dMat(rows(),rows());
+         InitDspace();
          LAPACK::FullDiagHermitian(_X, _dspace);
+         _XT.SetMatrix(_X);
       }
       
       
@@ -136,6 +140,7 @@ namespace QDLIB {
    {
       WaveFunction *ket = PsiKet->NewInstance();
       
+      *ket = PsiKet;
       Apply(ket, PsiKet);
       return *PsiBra * ket;
    }
@@ -175,6 +180,7 @@ namespace QDLIB {
     */
    WaveFunction* OHermitianMatrix::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
+      cout << rows() << " " << cols() << endl;
       MatVecMult((cVec*) destPsi, (dMat*) this, (cVec*) sourcePsi);
       return destPsi;
    }
@@ -202,8 +208,15 @@ namespace QDLIB {
     */
    Operator* OHermitianMatrix::Copy(Operator *O)
    {
-      *((dMat*) this) = *((dMat*) O);
-      _params =  O->Params();
+      OHermitianMatrix* op = dynamic_cast<OHermitianMatrix*>(O);
+      
+      cout << "Copy!" << endl;
+      if (op==NULL)
+         throw ( EIncompatible ("Copy, not of type OHermitianMatrix", O->Name() ) );
+      *((dMat*) this) = *((dMat*) op);
+//       *_X = *(op->_X);
+      op->_XT.SetMatrix(op->_X);
+      _params =  op->Params();
       
       return this;
    }
@@ -213,9 +226,7 @@ namespace QDLIB {
        */
    Operator* OHermitianMatrix::operator=(Operator *O)
    {
-      *((dMat*) this) = *((dMat*) O);
-      _params =  O->Params();
-      
+     Copy(O);
       return this;
    }
    

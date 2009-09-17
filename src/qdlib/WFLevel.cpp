@@ -67,7 +67,11 @@ namespace QDLIB {
    
    WaveFunction* WFLevel::operator=(WaveFunction *Psi)
    {
-      *(cVec*) this = (cVec) *Psi;
+      WFLevel *psi = dynamic_cast<WFLevel*>(Psi);
+      
+      if (!psi) throw ( EIncompatible("WFLevel can't copy from", Psi->Name()) );
+      
+      (*(cVec*) this) = (cVec) *Psi;
       _params =  Psi->Params();
       
       return this;

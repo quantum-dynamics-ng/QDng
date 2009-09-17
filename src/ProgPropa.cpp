@@ -161,6 +161,7 @@ namespace QDLIB {
       Psi = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
       log.IndentDec();
+      log.flush();
       
       /* Pre step filters */
       section = _ContentNodes->FindNode( "filterpre" );

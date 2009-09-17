@@ -142,17 +142,17 @@ namespace QDLIB
    }
    
    
-/*   WaveFunction* INT_WFLevel()
+   WaveFunction* INT_WFLevel()
    {
       WFLevel* p;
       p = new WFLevel();
       return p;
-   }	    */
+}
    
    instWF* InternalWF(const string &name)
    {
       if (name == "INT_WFGridCartesian") return &INT_WFGridCartesian;
-//       if (name == "INT_WFLevel") return &INT_WFLevel;
+      if (name == "INT_WFLevel") return &INT_WFLevel;
       return NULL;
    }
    
