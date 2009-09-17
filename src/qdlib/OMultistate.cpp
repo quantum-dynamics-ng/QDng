@@ -5,7 +5,7 @@ namespace QDLIB
 {
 
    OMultistate::OMultistate() : Operator(), _name("OMultistate"), _hermitian(true),
-				 _nstates(0), _buf1(NULL), _buf2(NULL)
+                            _nstates(0), _unity(0), _buf1(NULL), _buf2(NULL)
    {
       for(int i=0; i< QD_MAX_STATES; i++){
 	 for(int j=0; j< QD_MAX_STATES; j++){
@@ -35,7 +35,7 @@ namespace QDLIB
    void OMultistate::Add(Operator *O, int row, int col)
    {
       if (row >= QD_MAX_STATES || col >= QD_MAX_STATES)
-	 throw (EOverflow("More than QD_MAX_STATES not possible"));
+	 throw (EOverflow("Multistate: More than QD_MAX_STATES not possible"));
       
       if (row+1 > _nstates)
 	 _nstates = row+1;
@@ -87,6 +87,17 @@ namespace QDLIB
       _params.GetValue( "nonhermitian", _hermitian);
       /* Invert since NON Hermitian is given */
       _hermitian = !_hermitian;
+      
+      /* Not needed but good for spare operators (e.g. filters) */
+      if (_params.isPresent("states")){
+         _params.GetValue( "states", _nstates);
+         if (_nstates > QD_MAX_STATES)
+            throw (EOverflow("More than QD_MAX_STATES not possible"));
+      }
+     _params.GetValue( "unity",_unity,true);
+
+      
+      
    }
 
    
@@ -231,7 +242,9 @@ namespace QDLIB
 	    if (_matrix[i][j] != NULL){
 	       _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
 	       AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
-	    }
+	    } else if (i==j && _unity) { /* Diagonal without operator means 1 */
+               AddElements((cVec*) (dPsi->State(i)), (cVec*) (psi->State(j)));
+            }
 	 }
       }
      

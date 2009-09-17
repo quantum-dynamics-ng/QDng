@@ -108,6 +108,7 @@ namespace QDLIB {
       if (_writefile){
 	 log.cout() << "Filter expectation value file: " << _fname << endl; log.flush();
          _ofile.open(_fname.c_str());
+         _ofile.precision(10);
       }
    }
    
@@ -123,7 +124,7 @@ namespace QDLIB {
 	 for(int i=0; i < _size; i++){
 	    _olist[i]->Clock(_clock);
 	    _olist[i]->Init(Psi);
-	    if (_writefile)
+	    if (_writefile && (_action[i] == expec || _action[i] == expeconly))
 	       _ofile << _olist[i]->Name() << "\t";
 	 }
 	 if (_writefile)

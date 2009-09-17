@@ -25,6 +25,7 @@ namespace QDLIB
 	 
 	 bool _hermitian;
 	 int _nstates;
+         bool _unity;   /* treat empty diagonal as unity */
 	 
 	 Operator* _matrix[QD_MAX_STATES][QD_MAX_STATES];
 	 
