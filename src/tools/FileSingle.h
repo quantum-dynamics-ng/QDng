@@ -383,7 +383,7 @@ namespace QDLIB {
 	 ParamContainer p;
 	 if ( !file.Parse(p) ) {
 	    /* try again, but remove trailing underscore + further chars */
-	    name = _name.substr(0,_name.find('_')) + METAFILE_SUFFIX;
+	    name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
 	    file.SetName( name );
 	    if ( !file.Parse(p) ) 
 	       throw( EIOError("Can not read meta file", name) );

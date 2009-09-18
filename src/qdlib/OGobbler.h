@@ -17,6 +17,7 @@ namespace QDLIB {
     * \li order   filter order. determines the cutoff sharpness.
     * \li nip     If present use the gobbler as negative imaginary potential.
     * \li gain    Supply a gain value. 1 per default. Only makes sense in combination with nip
+    * \li residue Don't calculate a expectation value but the residue after application
     *
     * 
     * @author Markus Kowalewski
@@ -31,6 +32,7 @@ namespace QDLIB {
 	 double _rpx[MAX_DIMS];  /* cut-off center */
 	 int _order;           /* filter order */
 	 bool _nip;            /* Negative imaginary potential */
+         bool _residue;        /* Don't calculate a expectation value but the residue after application */
 	 
 	 void _Init();
       public:

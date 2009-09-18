@@ -232,7 +232,12 @@ namespace QDLIB {
       /* The propagation loop */
       log.Header( "Free propagation", Logger::Section);
       log.flush();
-      if( _writenorm ) log.FileOutput( _nfile );
+      /* redirect to to normfile */
+      if( _writenorm ) {
+         log.cout() << "Propagation table is redirected to Norm file: " << _nfile << endl;
+         log.flush();
+         log.FileOutput( _nfile );
+      }
       for (lint i=1; i <= clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
