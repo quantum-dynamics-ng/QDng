@@ -114,9 +114,20 @@ namespace QDLIB {
       return _clock;
    }
 
+   /**
+    * Get laser value at actual timestep
+    */
    double Laser::Get()
    {
       return (*this)[_clock->TimeStep()];
+   }
+   
+   /**
+    * Set laser value at actual timestep
+    */
+   void Laser::Set(double value)
+   {
+      (*this)[_clock->TimeStep()] = value;
    }
    
    Laser& Laser::operator =(const Laser &laser)

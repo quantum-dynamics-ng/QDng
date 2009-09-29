@@ -258,8 +258,18 @@ class Vector
        initialize(A.n_, A.nstrides_);
         copy(A.v_);
     }
-
-    Vector(lint N, const bool align = false, const T& value = T()) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(align)
+   
+    Vector(lint N) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
+    {
+       initialize(N, nstrides_);
+    }
+    
+    Vector(lint N, const bool align) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(align)
+    {
+       initialize(N, nstrides_);
+    }
+    
+    Vector(lint N, const bool align, const T& value) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(align)
     {
         initialize(N, nstrides_);
         set(value);

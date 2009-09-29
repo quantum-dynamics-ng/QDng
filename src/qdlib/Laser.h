@@ -51,6 +51,8 @@ namespace QDLIB {
 	 QDClock* Clock();
 	 
 	 double Get();
+         
+         void Set(double value);
 	 
 	 Laser& operator=(const Laser &laser);
 	 

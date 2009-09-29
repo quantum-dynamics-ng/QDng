@@ -171,7 +171,7 @@ namespace QDLIB
 	 *(_states[i]) = psi->_states[i];
 	 //cVec::StrideRef(*(_states[i]), 0, i);
       }
-      
+      _params = psi->_params;
       return this;
    }
 

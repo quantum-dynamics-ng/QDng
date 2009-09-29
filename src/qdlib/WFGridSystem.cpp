@@ -6,7 +6,7 @@
 
 namespace QDLIB {
          
-   WFGridSystem::WFGridSystem() :
+   WFGridSystem::WFGridSystem() : WaveFunction(),
 	 _isKspace(false), _spacebuffer(NULL), fft(NULL)
    {}
 	    
@@ -21,7 +21,7 @@ namespace QDLIB {
       if (GridSystem::Dim() == 0 || GridSystem::Dim() > MAX_DIMS)
 	 throw( EParamProblem("Dims not initialized or to large") );
 
-      if (_spacebuffer == NULL) _spacebuffer = new cVec(cVec::size());
+      if (_spacebuffer == NULL) _spacebuffer = new cVec(GridSystem::Size());
       
       /* Initialize FFT */
       if (fft == NULL){
