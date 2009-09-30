@@ -73,6 +73,7 @@ namespace QDLIB {
 	 
 	 WaveFunction* PsiI[MAX_TARGETS];
 	 WaveFunction* PsiT[MAX_TARGETS];
+         WaveFunction* _opwf;             /* Buffer for mu*psi */
 	 
 	 void _InitParams();
 	 

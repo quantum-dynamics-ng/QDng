@@ -20,6 +20,7 @@ namespace QDLIB {
    {
       if (_expT != NULL) delete _expT;
       if (_expV != NULL) delete _expV;
+      if (_V1 != NULL) delete _V1;
       if (_needs != NULL) delete _needs;
       if(_buf != NULL) delete _buf;
    }

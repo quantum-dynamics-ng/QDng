@@ -8,7 +8,7 @@ namespace QDLIB {
 
    ProgOCT::ProgOCT(XmlNode &OCTNode) : _octNode(OCTNode), _ContentNodes(NULL),
    _fname(DEFAULT_BASENAME_LASER), _dir(""), _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE),
-   _writel(false), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),  _ntargets(1), _alpha(1)
+          _writel(false), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),  _ntargets(1), _alpha(1), _opwf(NULL)
    {
       for(int i=0; i < MAX_TARGETS; i++){
 	 PsiI[i] = NULL;
@@ -23,6 +23,9 @@ namespace QDLIB {
 	 if (PsiI[i] != NULL) delete PsiI[i];
 	 if (PsiT[i] != NULL) delete PsiT[i];
       }
+      if (_Uf != NULL) delete _Uf;
+      if (_Ub != NULL) delete _Ub;
+      if (_opwf != NULL) delete _opwf;
    }
 
    /**
@@ -209,24 +212,24 @@ namespace QDLIB {
    {
       double res=0;
       dcomplex im(0,0);
-      WaveFunction *opwf;
-      
-      opwf = wfi[0]->NewInstance();
+
+      if( _opwf == NULL)
+         _opwf = wfi[0]->NewInstance();
       
       for (int t=0; t < _ntargets; t++){
 	 
 	 /* Imaginary term */
 	 switch(_coupling){
 	    case dipole:
-	       _Coup->Apply( opwf, wfi[t]);
+               _Coup->Apply( _opwf, wfi[t]);
 	       break;
 	 }
 	 
 	 /* Phase sensitive */
 	 if (_phase)
-	    im = *wft[t] * opwf;
+            im = *wft[t] * _opwf;
 	 else
-	    im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * opwf );
+            im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
 		 
 	 res = im.imag();
       }
