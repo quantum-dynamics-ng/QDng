@@ -101,6 +101,7 @@ namespace QDLIB {
     */
    void Laser::Clock(QDClock * clock)
    {
+      if (clock==NULL) return;
       _clock = clock;
       if (clock->Dt() != _dt || clock->Steps() > dVec::size())
 	 throw ( EParamProblem("Clock values doesn't fit the laser field") );

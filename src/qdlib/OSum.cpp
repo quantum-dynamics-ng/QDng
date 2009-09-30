@@ -30,9 +30,17 @@ namespace QDLIB {
     */
    Operator* OSum::operator[](int i)
    {
-      if (i >= _size)
-	 throw( EIncompatible("Access to empty element") );
-      return _O[i];
+      return Get(i);
+   }
+   
+   /**
+    * Access elements.
+    */
+   Operator * OSum::Get(int index)
+   {
+      if (index >= _size)
+         throw( EIncompatible("Access to empty element") );
+      return _O[index];
    }
    
    /**
@@ -234,3 +242,5 @@ namespace QDLIB {
    
 }
  /* namespace QDLIB */
+
+
