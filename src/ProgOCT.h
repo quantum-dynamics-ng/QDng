@@ -62,10 +62,10 @@ namespace QDLIB {
 	 int _ntargets;
 	 double _alpha;
 	 
-	 OPropagator *_Uf;
-	 OPropagator *_Ub;
-	 Operator *_H;
-	 Operator *_Coup;
+	 OPropagator *_Uf;  /* Forward Propagation */
+         OPropagator *_Ub;  /* Backward Propagation */
+	 Operator *_H;      /* Hamiltonian */
+	 Operator *_Coup;   /* The coupling to optimize */
 	 
 	 Laser* _laserf[MAX_LASERS];
 	 Laser* _laserb[MAX_LASERS];
@@ -78,7 +78,7 @@ namespace QDLIB {
 	 
       protected:
 	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
-	 double Report(WaveFunction **wfi, int iteration);
+         double Report(WaveFunction **wfi, WaveFunction** wft, int iteration);
       public:
 	 ProgOCT(XmlNode &OCTNode);
 	 ~ProgOCT();

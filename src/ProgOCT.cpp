@@ -211,8 +211,6 @@ namespace QDLIB {
       dcomplex im(0,0);
       WaveFunction *opwf;
       
-      double scaling;
-      
       opwf = wfi[0]->NewInstance();
       
       for (int t=0; t < _ntargets; t++){
@@ -220,10 +218,7 @@ namespace QDLIB {
 	 /* Imaginary term */
 	 switch(_coupling){
 	    case dipole:
-	       scaling = _Coup->Scaling();
-	       //_Coup->Scale( 1/scaling );
 	       _Coup->Apply( opwf, wfi[t]);
-	       
 	       break;
 	 }
 	 
@@ -238,7 +233,7 @@ namespace QDLIB {
       
       /* Method */
       switch(_method){
-	 case krotov:
+	 case krotov: /* Add New Laser to previous field */
 		  res = _laserb[0]->Get() -
 			_shape[0].Get() / (_alpha * double(_ntargets)) * res;
 	    break;
@@ -256,7 +251,7 @@ namespace QDLIB {
     * 
     * \return Target overlap
     */
-   double ProgOCT::Report(WaveFunction **wfi, int iteration)
+   double ProgOCT::Report(WaveFunction **wfi, WaveFunction **wft, int iteration)
    {
       Logger& log = Logger::InstanceRef();
       dcomplex overlap;
@@ -266,7 +261,7 @@ namespace QDLIB {
       for (int t=0; t < _ntargets; t++){
 	 log.cout().precision(6);
 	 log.cout() << wfi[t]->Norm() << "\t";
-	 overlap = *wfi[t] * PsiT[t];
+	 overlap = *wfi[t] * wft[t];
 	 ov_sum += cabs(overlap);
 	 log.cout() << cabs(overlap) << "\t";
 	 if (_phase){
@@ -275,7 +270,7 @@ namespace QDLIB {
 	 } else
 	    ov_sum._real += cabs(overlap);
       }
-      log.cout() << _laserf[0]->PulseEnergy() << endl;
+      log.cout() << _laserb[0]->PulseEnergy() << endl;
       
       return cabs(ov_sum);
    }
@@ -344,11 +339,11 @@ namespace QDLIB {
       _hf->Clock( clock );
       _hf->Init(PsiI[0]);
       _hb->Clock( clock );
-      _hb->Init(PsiT[0]);      
+      _hb->Init(PsiT[0]);
       log.cout() << "Initial engergy: " << _hf->Expec(PsiI[0]) << endl;
       log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
       log.cout() << "Initial Overlapp: " << *(PsiT[0]) * (PsiI[0])<< endl;
-      
+      log.flush();
       /* Copy, since the propagator will propably scale it/modify etc. */
       _H = _hf->NewInstance();
       *_H = _hf; 
@@ -369,17 +364,34 @@ namespace QDLIB {
 	       coupling_ok=true;
 	    }
 	    break;
+         default:
+            throw(EIncompatible("Unknown coupling type") );
       }
-      section = _ContentNodes->FindNode( "coupling" );
-      _Coup = ChainLoader::LoadOperatorChain(section);
-      delete section;
-      
-//       cout << "laser refs: " << _laserf[0] << " " << _laserb[0] << endl;
       
       if (!coupling_ok)
-	 throw ( EParamProblem ("No suitable coupling operator found in hamiltonian") );
+         throw ( EParamProblem ("Given type of coupling operator not found in hamiltonian"));
       
-      _Coup->Init( PsiI[0] );
+      section = _ContentNodes->FindNode( "coupling" );
+      if (section == NULL)
+         throw( EParamProblem ("No labeled coupling operator found in hamiltonian") );
+      
+      _Coup = ChainLoader::LoadOperatorChain(section);
+      if (_Coup == NULL)
+         throw( EParamProblem ("No coupling operator") );
+      
+      switch(_coupling){
+         case dipole:
+            OGridPotential* test;
+            FindOperatorType<OGridPotential>(_Coup, &test);
+            if (test == NULL)
+               throw( EParamProblem ("Invalid coupling operator") );
+            break;
+      }
+      
+      _Coup->Clock(clock);
+      delete section;
+
+       _Coup->Init( PsiI[0] );
       
       /* Let the Propagator do it's initalisation */
       _Uf->Clock( clock );
@@ -396,7 +408,7 @@ namespace QDLIB {
       Upm = _Uf->Params();
       log.cout() << "Forward Propagators init parameters:\n\n" << Upm << endl;
       Upm = _Ub->Params();
-      log.cout() << "Forward Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << "Backward Propagators init parameters:\n\n" << Upm << endl;
 
       
       /* Objects for propagation */
@@ -433,13 +445,13 @@ namespace QDLIB {
       FileWF wfile;
       wfile.Name(_dir+string("wfb"));
       wfile.ActivateSequence();
-
+      
       /* Iteration loop */
-      int i=0;
+      int i=1;
       double deltaTargetOld=1;
       double deltaTarget=1;
-      
-      while (i < _iterations && deltaTarget > _convergence){
+
+      while (i <= _iterations && deltaTarget > _convergence){
 	 /* Init with fresh wfs */
 	 for (int t=0; t < _ntargets; t++){
 	    *(phii[t]) = PsiI[t];
@@ -459,38 +471,52 @@ namespace QDLIB {
 	 }
 	 
 	 /* Backpropagation of targets */
-	 /** \todo prepare operator for fast forward/backward switching */
 	 clock->End();
 	 for (int s=0; s < clock->Steps(); s++){
 	    for (int t=0; t < _ntargets; t++){
 	       _Ub->Apply(phit[t]);
-	       wfile << phit[t];
+	       //wfile << phit[t];
 	    }
 	    --(*clock);
 	 }
-
+         
+         /* Write Report & Calculate change */
+         deltaTarget = abs(deltaTargetOld - Report(phii,phit, i-1));
+         
 	 /* Forward Propagation */
 	 wfile.ResetCounter();
 	 wfile.Counter((clock->Steps()));
 	 wfile.ReverseSequence();
 	 clock->Begin();
 	 for (int s=0; s < clock->Steps(); s++){
-	    for (int t=0; t < _ntargets; t++)
-	        wfile >> phit[t];
-	    (*(_laserf[0]))[s] = CalcLaserField(phii,phit);
+	    /*for (int t=0; t < _ntargets; t++)
+	        wfile >> phit[t];*/
+            /* Target with old field */
+            for (int t=0; t < _ntargets; t++){
+               _Uf->Apply(phit[t]);
+            }
+            
+//             switch(_coupling){
+//                case dipole:
+//                   OGridDipole *CoupOGridDipole;
+//                   FindOperatorType<OGridDipole>(_Coup, &CoupOGridDipole);
+//                   CoupOGridDipole->GetLaser()->Set((*(_laserb[0]))[s]);
+//                   break;
+//             }
+            /* Get new field */
+	    _laserf[0]->Set(CalcLaserField(phii,phit));
+            
+            /* Propagate initial with new field */
 	    for (int t=0; t < _ntargets; t++){
 	       _Uf->Apply(phii[t]);
 	    }
 	    ++(*clock);
 	 }
 	 
-	 /* Write Report & Calculate change */
-	 deltaTarget = abs(deltaTargetOld - Report(phii, i));
-	 
 	 /* Write laserfields */
 	 if(_writel){
+	    //file << _laserb[0];
 	    file << _laserf[0];
-	    file << _laserb[0];
 	 }
 	 
 	 /* Exchange laserfields */
@@ -506,6 +532,7 @@ namespace QDLIB {
       
       /* Remove tmp WFs */
       for (int i=0; i < _ntargets; i++){
+         
 	 delete phii[i];
 	 delete phit[i];
       }
