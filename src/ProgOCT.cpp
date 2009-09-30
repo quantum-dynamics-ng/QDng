@@ -8,7 +8,8 @@ namespace QDLIB {
 
    ProgOCT::ProgOCT(XmlNode &OCTNode) : _octNode(OCTNode), _ContentNodes(NULL),
    _fname(DEFAULT_BASENAME_LASER), _dir(""), _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE),
-          _writel(false), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),  _ntargets(1), _alpha(1), _opwf(NULL)
+          _writel(false),_membuf(true), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false), 
+                  _ntargets(1), _alpha(1), _opwf(NULL), _membuf_init(false)
    {
       for(int i=0; i < MAX_TARGETS; i++){
 	 PsiI[i] = NULL;
@@ -19,6 +20,7 @@ namespace QDLIB {
    
    ProgOCT::~ProgOCT()
    {
+      QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       for(int i=0; i < _ntargets; i++){
 	 if (PsiI[i] != NULL) delete PsiI[i];
 	 if (PsiT[i] != NULL) delete PsiT[i];
@@ -26,6 +28,12 @@ namespace QDLIB {
       if (_Uf != NULL) delete _Uf;
       if (_Ub != NULL) delete _Ub;
       if (_opwf != NULL) delete _opwf;
+      
+      if (_membuf && _membuf_init){
+         for (int s=0; s < clock->Steps(); s++)
+            for (int t=0; t < _ntargets; t++)
+               delete _memwfbuf[s][t];
+      }
    }
 
    /**
@@ -110,6 +118,8 @@ namespace QDLIB {
       if(attr.isPresent("writel"))
 	 attr.GetValue("writel", _writel);
       
+      /* Use memory buffer for backpropagation */
+      attr.GetValue("membuf", _membuf, true);
       
       /* Type of coupling to use */
       if (attr.isPresent("coup")){
@@ -449,11 +459,23 @@ namespace QDLIB {
       wfile.Name(_dir+string("wfb"));
       wfile.ActivateSequence();
       
+
+
+      /* Initialize Buffer for backpropagation */
+      if (_membuf){
+         _memwfbuf = new WaveFunction**[clock->Steps()];
+         for (int s=0; s < clock->Steps(); s++){
+            _memwfbuf[s] = new WaveFunction*[_ntargets];
+            for (int t=0; t < _ntargets; t++)
+               _memwfbuf[s][t] = PsiI[t]->NewInstance();
+         }
+      }
+      
+      
       /* Iteration loop */
       int i=1;
       double deltaTargetOld=1;
       double deltaTarget=1;
-
       while (i <= _iterations && deltaTarget > _convergence){
 	 /* Init with fresh wfs */
 	 for (int t=0; t < _ntargets; t++){
@@ -478,6 +500,8 @@ namespace QDLIB {
 	 for (int s=0; s < clock->Steps(); s++){
 	    for (int t=0; t < _ntargets; t++){
 	       _Ub->Apply(phit[t]);
+               if (_membuf)
+                  *(_memwfbuf[clock->Steps()-s-1][t]) = phit[t];
 	       //wfile << phit[t];
 	    }
 	    --(*clock);
@@ -494,10 +518,14 @@ namespace QDLIB {
 	 for (int s=0; s < clock->Steps(); s++){
 	    /*for (int t=0; t < _ntargets; t++)
 	        wfile >> phit[t];*/
+            
             /* Target with old field */
-            for (int t=0; t < _ntargets; t++){
-               _Uf->Apply(phit[t]);
+            if (! _membuf){
+               for (int t=0; t < _ntargets; t++){
+                  _Uf->Apply(phit[t]);
+               }
             }
+         
             
 //             switch(_coupling){
 //                case dipole:
@@ -507,7 +535,10 @@ namespace QDLIB {
 //                   break;
 //             }
             /* Get new field */
-	    _laserf[0]->Set(CalcLaserField(phii,phit));
+            if (_membuf)
+	        _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
+            else
+               _laserf[0]->Set(CalcLaserField(phii,phit));
             
             /* Propagate initial with new field */
 	    for (int t=0; t < _ntargets; t++){

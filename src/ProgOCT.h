@@ -35,6 +35,7 @@ namespace QDLIB {
    * \li conv     Target convergence. Stop iterating if below convergence
    * \li shape    Name of shapefile
    * \li writel   Write laser in every iteration
+   * \li membuf   Buffer back propagated targets in memory (default true)
    * 
    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
    */
@@ -53,6 +54,7 @@ namespace QDLIB {
 	 int _iterations;
 	 double _convergence;
 	 bool _writel;
+         bool _membuf;
 	 
 	 _method_t _method;
 	 _coupling_t _coupling;
@@ -74,7 +76,9 @@ namespace QDLIB {
 	 WaveFunction* PsiI[MAX_TARGETS];
 	 WaveFunction* PsiT[MAX_TARGETS];
          WaveFunction* _opwf;             /* Buffer for mu*psi */
-	 
+         WaveFunction*** _memwfbuf;       /* memory buffer for backpropagation */
+	 bool _membuf_init;               /* indicate initailized membuf */
+         
 	 void _InitParams();
 	 
       protected:
