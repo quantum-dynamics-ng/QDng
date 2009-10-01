@@ -1,4 +1,6 @@
 #include "OProjection.h"
+#include "WFMultistate.h"
+#include "tools/FileSingleDefs.h"
 
 namespace QDLIB {
 
@@ -78,11 +80,49 @@ namespace QDLIB {
    {
       if (Psi == NULL)
 	 throw ( EIncompatible("Projector got a void wave function") );
+      
+      /** \todo dirty hack to handle Multistate WFs */
+      if (_size == 0){
+         WFMultistate* wfm;
+         wfm = dynamic_cast<WFMultistate*>(Psi);
+         if (wfm == NULL)
+            _buf = Psi->NewInstance();
+         else
+            _buf = wfm->State(0)->NewInstance();
+      }
+      
+      /* Read a WF sequence from disk (Has to be here because we need to know the WF type) */
+      if (_params.isPresent("files")){
+         string files;
+         FileWF wfs;
+         int num;
+         int start;
+         
+         _params.GetValue("files", files);
+         _params.GetValue("num", num);
+         _params.GetValue("start", start);
+         if (num < 1)
+            throw(EParamProblem("No file count specified for Projector"));
+         
+         wfs.Suffix(BINARY_WF_SUFFIX);
+         wfs.Name(files);
+         wfs.ActivateSequence();
+         wfs.Counter(start);
+         for (int i=0; i < num; i++){ /* Read the sequence */
+            if (_size == MAX_WFSPACE)
+               throw( EOverflow("Projector has reached max capaticity: MAX_WFSPACE"));
+            wfs >> _buf;
+            _wfbuf[_size] = _buf->NewInstance();
+            *(_wfbuf[_size]) = _buf;
+            _size++;
+         }
+      }
    }
    
    void QDLIB::OProjection::Init( ParamContainer & params )
    {
       _params = params;
+
    }
 
   

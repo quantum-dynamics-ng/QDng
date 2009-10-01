@@ -10,7 +10,7 @@ namespace QDLIB {
    /**
     * Projection operator.
     * 
-    * \f$ \sum_i |\Psi_i><\Psi_i> \f$
+    * \f$ \sum_i |\Psi_i><\Psi_i| \f$
     * 
     * 
     * @author Markus Kowalewski
