@@ -23,9 +23,9 @@ namespace QDLIB
       private:
 	 string _name;
 	 
-	 bool _hermitian;
+	 bool _hermitian;  /* Assume hermiticity for missing elements */
 	 int _nstates;
-         bool _unity;   /* treat empty diagonal as unity */
+         bool _unity;      /* treat empty diagonal as unity */
 	 
 	 Operator* _matrix[QD_MAX_STATES][QD_MAX_STATES];
 	 
@@ -37,12 +37,23 @@ namespace QDLIB
          ~OMultistate();
 	 
 	 /** Set hermitian/symmetric behavior.
+          * 
 	  * The default is to act as symmetric operator if only one diag. element is used.
 	  */
 	 void Hermitian(bool hermit) {_hermitian = hermit;}
 	 
 	 bool Hermitian() {return _hermitian;}
 	 
+         /**
+          * Set behavior for missing diagonal elements.
+          * 
+          * The default is true.
+          * \param unity If true, assume 1 for missing elements
+          */
+         void Unity(bool unity) {_unity= unity;}
+	 
+         bool Unity() {return _hermitian;}
+         
 	 void Add(Operator *O, int row, int col);
 	 
 	 /** Number of states */

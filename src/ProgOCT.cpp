@@ -241,7 +241,7 @@ namespace QDLIB {
 	 else
             im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
 		 
-	 res = im.imag();
+	 res += im.imag();
       }
       
       /* Method */
@@ -401,6 +401,14 @@ namespace QDLIB {
             break;
       }
       
+      /* Unset unity in Multistate => Otherwise Operator will be wrong */
+      OMultistate* ms;
+      ms = dynamic_cast<OMultistate*>(_Coup);
+      if (ms != NULL){
+         log.cout() << "Switching of unity\n";
+         ms->Unity(false);
+      }
+      
       _Coup->Clock(clock);
       delete section;
 
@@ -516,13 +524,11 @@ namespace QDLIB {
 	 wfile.ReverseSequence();
 	 clock->Begin();
 	 for (int s=0; s < clock->Steps(); s++){
-	    /*for (int t=0; t < _ntargets; t++)
-	        wfile >> phit[t];*/
             
             /* Target with old field */
             if (! _membuf){
                for (int t=0; t < _ntargets; t++){
-                  _Uf->Apply(phit[t]);
+                  _Ub->Apply(phit[t]);
                }
             }
          
