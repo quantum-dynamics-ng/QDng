@@ -13,6 +13,7 @@
 
 #include "OGobbler.h"
 #include "OProjection.h"
+#include "OScalar.h"
 
 /* Wavefunction list */
 #include "WFGridCartesian.h"
@@ -87,6 +88,13 @@ namespace QDLIB
       return p;
    }
 
+   Operator* INT_OScalar()
+   {
+      OScalar *p;
+      p = new OScalar ();
+      return p;
+   }
+
    
    WaveFunction* INT_WFGridCartesian()
    {
@@ -120,8 +128,10 @@ namespace QDLIB
       if (name == "INT_OGridGmat") return &INT_OGridGMat;
       if (name == "INT_OGridPotential") return &INT_OGridPotential;
       if (name == "INT_OGridDipole") return &INT_OGridDipole;
+      
       if (name == "INT_OGobbler") return &INT_OGobbler;
       if (name == "INT_OProjection") return &INT_OProjection;
+      if (name == "INT_OScalar") return &INT_OScalar;
       
       return NULL;
    }

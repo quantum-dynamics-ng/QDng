@@ -578,7 +578,7 @@ namespace QDLIB {
     * You strongly to encouraged to use this, since all optimizations and
     * parallelistation will be done here.
     */
-   inline void MultElementsAdd(cVec *A, cVec *B, dcomplex c)
+   inline void MultElementsCopy(cVec *A, cVec *B, double d)
    {
       lint size = A->lsize();
       lint strides = A->strides();
@@ -592,9 +592,36 @@ namespace QDLIB {
 	 b = B->begin(s);
 	 for (lint i=0; i < size; i++){
 	    {
-	       a[i] += c * b[i];
+	       a[i] = d * b[i];
 	    }
 	 }
+      }
+
+   }
+   
+   /**
+    * Multiply vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElementsAdd(cVec *A, cVec *B, dcomplex c)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+      
+      dcomplex *a=NULL;
+      dcomplex *b=NULL;
+      
+      lint s;
+      for (s=0; s < strides; s++){
+         a = A->begin(s);
+         b = B->begin(s);
+         for (lint i=0; i < size; i++){
+            {
+               a[i] += c * b[i];
+            }
+         }
       }
 
    }
