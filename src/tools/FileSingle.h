@@ -102,6 +102,7 @@ namespace QDLIB {
          bool DropMeta();
          
 	 void ActivateSequence();
+         void ActivateSequence(int increment);
 	 void StopSequence();
 	 
 	 void ResetCounter();
@@ -222,7 +223,25 @@ namespace QDLIB {
    {
       _sequence = true;
    }
-
+ 
+   /**
+    * Turns on writing an interpretion of counters in file name.
+    * 
+    * Appends a counter number to the file name.
+    * This makes it possible to read write whole a whole set of file
+    * without thinking about the file numbers.
+    * 
+    * If switch between reading and the writing the counter will not be reseted.
+    * 
+    * \param increment The counters increment value
+    */
+   template <class C>
+   void FileSingle<C>::ActivateSequence(int increment)
+   {
+      _sequence = true;
+      _increment = increment;
+   }
+   
    /**
     * Stop Sequence writing.
     */

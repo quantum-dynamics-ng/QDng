@@ -4,7 +4,7 @@
 
 namespace QDLIB {
 
-   OProjection::OProjection() : _name("OProjection"), _size(0),  _buf(NULL)
+   OProjection::OProjection() : _name("OProjection"), _sign(1), _size(0),  _buf(NULL)
    {
       
    }
@@ -90,25 +90,29 @@ namespace QDLIB {
          else
             _buf = wfm->State(0)->NewInstance();
       }
-      
+            
       /* Read a WF sequence from disk (Has to be here because we need to know the WF type) */
       if (_params.isPresent("files")){
          string files;
          FileWF wfs;
          int num;
          int start;
+         int step=1;
          
          _params.GetValue("files", files);
          _params.GetValue("num", num);
          _params.GetValue("start", start);
+         if (_params.isPresent("step")){
+            _params.GetValue("step", step);
+         }
          if (num < 1)
             throw(EParamProblem("No file count specified for Projector"));
          
          wfs.Suffix(BINARY_WF_SUFFIX);
          wfs.Name(files);
-         wfs.ActivateSequence();
+         wfs.ActivateSequence(step);
          wfs.Counter(start);
-         for (int i=0; i < num; i++){ /* Read the sequence */
+         for (int i=0; i < num; i+=step){ /* Read the sequence */
             if (_size == MAX_WFSPACE)
                throw( EOverflow("Projector has reached max capaticity: MAX_WFSPACE"));
             wfs >> _buf;
@@ -122,6 +126,10 @@ namespace QDLIB {
    void QDLIB::OProjection::Init( ParamContainer & params )
    {
       _params = params;
+      
+      bool pos;
+      _params.GetValue("positive", pos,true);
+      Sign(pos);
 
    }
 
@@ -203,6 +211,7 @@ namespace QDLIB {
       for (int i=0; i < _size; i++){
 	 *_buf = _wfbuf[i];
 	 *_buf *= *(_wfbuf[i]) * sourcePsi;
+         *_buf *= _sign;
 	 *destPsi += _buf;
       }
       
