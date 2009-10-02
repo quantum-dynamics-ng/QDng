@@ -8,8 +8,8 @@ namespace QDLIB {
 
    ProgOCT::ProgOCT(XmlNode &OCTNode) : _octNode(OCTNode), _ContentNodes(NULL),
    _fname(DEFAULT_BASENAME_LASER), _dir(""), _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE),
-          _writel(false),_membuf(true), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false), 
-                  _ntargets(1), _alpha(1), _opwf(NULL), _membuf_init(false)
+          _writel(false),_membuf(true), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),
+                  _ntargets(1), _alpha(1), _Otarget(NULL), _opwf(NULL), _membuf_init(false)
    {
       for(int i=0; i < MAX_TARGETS; i++){
 	 PsiI[i] = NULL;
@@ -34,6 +34,7 @@ namespace QDLIB {
             for (int t=0; t < _ntargets; t++)
                delete _memwfbuf[s][t];
       }
+      if (_Otarget != NULL) delete _Otarget;
    }
 
    /**
@@ -185,7 +186,7 @@ namespace QDLIB {
       
       switch(_ttype){
          case ov:
-	    log.cout() << " - Overlapp";
+            log.cout() << " - Overlapp";
 	    break;
 	 case op:
 	    log.cout() << " - Excpectation values";
@@ -333,18 +334,30 @@ namespace QDLIB {
       log.cout() << endl;
       log.IndentDec();
       
-      /* Load Target Wavefunctions */
-      log.Header( "Target wave functions", Logger::SubSection);
-      log.IndentInc();
-      for (int i=0; i< _ntargets; i++){
-	 snprintf(num, 3, "%d", i);
-	 section = _ContentNodes->FindNode( "wft"+string(num) );
-	 if (section == NULL)
-	    throw ( EParamProblem ("Missing target wavefunction", i) );
-	 PsiT[i] = ChainLoader::LoadWaveFunctionChain( section );
-	 delete section;
+      if(_ttype == ov){
+         /* Load Target Wavefunctions */
+         log.Header( "Target wave functions", Logger::SubSection);
+         log.IndentInc();
+         for (int i=0; i< _ntargets; i++){
+            snprintf(num, 3, "%d", i);
+            section = _ContentNodes->FindNode( "wft"+string(num) );
+            if (section == NULL)
+               throw ( EParamProblem ("Missing target wavefunction", i) );
+            PsiT[i] = ChainLoader::LoadWaveFunctionChain( section );
+            delete section;
+         }
+         log.cout() << endl;
+      } else if (_ttype == op) {
+         log.Header( "Target operator", Logger::SubSection);
+         log.IndentInc();
+         section = _ContentNodes->FindNode( "target");
+         if (section == NULL)
+            throw ( EParamProblem ("Missing target operator") );
+         _Otarget = ChainLoader::LoadOperatorChain( section );
+         _Otarget->Clock(clock);
+         _Otarget->Init(PsiI[0]);
       }
-      log.cout() << endl;
+      
       log.IndentDec();
       
            
@@ -352,10 +365,12 @@ namespace QDLIB {
       _hf->Clock( clock );
       _hf->Init(PsiI[0]);
       _hb->Clock( clock );
-      _hb->Init(PsiT[0]);
+      _hb->Init(PsiI[0]);
       log.cout() << "Initial engergy: " << _hf->Expec(PsiI[0]) << endl;
-      log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
-      log.cout() << "Initial Overlapp: " << *(PsiT[0]) * (PsiI[0])<< endl;
+      if (_ttype == ov){
+         log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
+         log.cout() << "Initial Overlapp: " << *(PsiT[0]) * (PsiI[0])<< endl;
+      }
       log.flush();
       /* Copy, since the propagator will propably scale it/modify etc. */
       _H = _hf->NewInstance();
@@ -388,9 +403,14 @@ namespace QDLIB {
       if (section == NULL)
          throw( EParamProblem ("No labeled coupling operator found in hamiltonian") );
       
+      
+      log.Header( "Coupling operator", Logger::SubSection);
+      log.IndentInc();
       _Coup = ChainLoader::LoadOperatorChain(section);
       if (_Coup == NULL)
          throw( EParamProblem ("No coupling operator") );
+      
+      log.DecInc();
       
       switch(_coupling){
          case dipole:
@@ -405,7 +425,7 @@ namespace QDLIB {
       OMultistate* ms;
       ms = dynamic_cast<OMultistate*>(_Coup);
       if (ms != NULL){
-         log.cout() << "Switching of unity\n";
+         log.coutdbg() << "Switching of unity\n";
          ms->Unity(false);
       }
       
@@ -436,9 +456,13 @@ namespace QDLIB {
       WaveFunction* phii[MAX_TARGETS];
       WaveFunction* phit[MAX_TARGETS];
       
+      /* Init propa buffers */
       for (int i=0; i < _ntargets; i++){
 	 phii[i] = PsiI[i]->NewInstance();
-	 phit[i] = PsiT[i]->NewInstance();
+         if (_ttype == ov) 
+            phit[i] = PsiT[i]->NewInstance();
+         else
+            phit[i] = PsiI[i]->NewInstance();
       }
 
       /* Write Header for iteration table */
@@ -482,13 +506,17 @@ namespace QDLIB {
       
       /* Iteration loop */
       int i=1;
-      double deltaTargetOld=1;
+      double overlapNew=0;
+      double overlapOld=0;
       double deltaTarget=1;
-      while (i <= _iterations && deltaTarget > _convergence){
+      while (i <= _iterations){
 	 /* Init with fresh wfs */
 	 for (int t=0; t < _ntargets; t++){
 	    *(phii[t]) = PsiI[t];
-	    *(phit[t]) = PsiT[t];
+            if (_ttype == ov)
+               *(phit[t]) = PsiT[t];
+            else
+               *(phit[t]) = PsiI[t];
 	 }
 
 	 /* Dirty hack to get meta data right for multistate WFs */
@@ -503,21 +531,52 @@ namespace QDLIB {
 	    pfm.SetValue("states", s);
 	 }
 	 
-	 /* Backpropagation of targets */
-	 clock->End();
-	 for (int s=0; s < clock->Steps(); s++){
-	    for (int t=0; t < _ntargets; t++){
-	       _Ub->Apply(phit[t]);
-               if (_membuf)
-                  *(_memwfbuf[clock->Steps()-s-1][t]) = phit[t];
-	       //wfile << phit[t];
-	    }
-	    --(*clock);
-	 }
+         if (_ttype == ov){
+            /* Backpropagation of targets */
+            clock->End();
+            for (int s=0; s < clock->Steps(); s++){
+               for (int t=0; t < _ntargets; t++){
+                  _Ub->Apply(phit[t]);
+                  if (_membuf)
+                     *(_memwfbuf[clock->Steps()-s-1][t]) = phit[t];
+                  //wfile << phit[t];
+               }
+               --(*clock);
+            }
+         } else { /* Initialize Operator targets */
+            /* Exchange laserfields */
+            _laserb[0]->swap(*(_laserf[0]));
+            /* Propagate forward */
+            clock->Begin();
+            for (int s=0; s < clock->Steps(); s++){
+               for (int t=0; t < _ntargets; t++){
+                  _Uf->Apply(phit[t]);
+               }
+               ++(*clock);
+            }
+            /* Exchange laserfields */
+            _laserb[0]->swap(*(_laserf[0]));
+            for (int t=0; t < _ntargets; t++)
+               _Otarget->Apply(phit[t]);
+            /* Propagate Backward */
+            clock->End();
+            for (int s=0; s < clock->Steps(); s++){
+               for (int t=0; t < _ntargets; t++){
+                  _Ub->Apply(phit[t]);
+                  if (_membuf)
+                     *(_memwfbuf[clock->Steps()-s-1][t]) = phit[t];
+                  //wfile << phit[t];
+               }
+               --(*clock);
+            }
+            
+         }
          
          /* Write Report & Calculate change */
-         deltaTarget = abs(deltaTargetOld - Report(phii,phit, i-1));
-         
+         overlapNew = Report(phii,phit, i-1);
+         deltaTarget = abs(abs(overlapOld - overlapNew)-deltaTarget);
+         overlapOld = overlapNew;
+               
 	 /* Forward Propagation */
 	 wfile.ResetCounter();
 	 wfile.Counter((clock->Steps()));
@@ -528,7 +587,7 @@ namespace QDLIB {
             /* Target with old field */
             if (! _membuf){
                for (int t=0; t < _ntargets; t++){
-                  _Ub->Apply(phit[t]);
+                  _Uf->Apply(phit[t]);
                }
             }
          
@@ -563,7 +622,11 @@ namespace QDLIB {
 	 _laserb[0]->swap(*(_laserf[0]));
 	 
 	 log.flush();
-	 i++; 
+	 i++;
+         if (deltaTarget <= _convergence){
+            log.cout()  << "\nConvergence reached\n";
+            break;
+         }
       } /* while (i < _iterations && deltaTarget > _convergence) */
 
       /* Write the final laser */

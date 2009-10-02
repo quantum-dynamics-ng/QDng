@@ -59,8 +59,8 @@ namespace QDLIB {
 	 _method_t _method;
 	 _coupling_t _coupling;
 	 _ttype_t _ttype;
-	 bool _phase;
-	 
+	 bool _phase;       /* Phase sensitive OCT */
+         
 	 int _ntargets;
 	 double _alpha;
 	 
@@ -73,6 +73,8 @@ namespace QDLIB {
 	 Laser* _laserb[MAX_LASERS];
 	 Laser _shape[MAX_LASERS];
 	 
+         Operator* _Otarget;     /* Target operator for OPOC */
+         
 	 WaveFunction* PsiI[MAX_TARGETS];
 	 WaveFunction* PsiT[MAX_TARGETS];
          WaveFunction* _opwf;             /* Buffer for mu*psi */
