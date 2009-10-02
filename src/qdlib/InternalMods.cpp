@@ -12,6 +12,7 @@
 #include "OGridDipole.h"
 
 #include "OGobbler.h"
+#include "OProjection.h"
 
 /* Wavefunction list */
 #include "WFGridCartesian.h"
@@ -79,6 +80,13 @@ namespace QDLIB
       return p;
    }
 
+   Operator* INT_OProjection()
+   {
+      OProjection *p;
+      p = new OProjection ();
+      return p;
+   }
+
    
    WaveFunction* INT_WFGridCartesian()
    {
@@ -113,6 +121,7 @@ namespace QDLIB
       if (name == "INT_OGridPotential") return &INT_OGridPotential;
       if (name == "INT_OGridDipole") return &INT_OGridDipole;
       if (name == "INT_OGobbler") return &INT_OGobbler;
+      if (name == "INT_OProjection") return &INT_OProjection;
       
       return NULL;
    }
