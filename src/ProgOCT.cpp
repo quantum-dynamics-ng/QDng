@@ -239,9 +239,9 @@ namespace QDLIB {
 	 /* Phase sensitive */
 	 if (_phase)
             im = *wft[t] * _opwf;
-	 else
-            im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
-		 
+         else /** \todo clarify why it only works this way! should be wfi * wft !!! */
+            im = (*(wft[t]) * wfi[t] ) * (*(wft[t]) * _opwf );
+
 	 res += im.imag();
       }
       
@@ -269,20 +269,33 @@ namespace QDLIB {
    {
       Logger& log = Logger::InstanceRef();
       dcomplex overlap;
+      dcomplex opval;
       dcomplex ov_sum(0,0);
+      
+      if( _opwf == NULL)
+         _opwf = wfi[0]->NewInstance();
       
       log.cout() << iteration << "\t";
       for (int t=0; t < _ntargets; t++){
 	 log.cout().precision(6);
 	 log.cout() << wfi[t]->Norm() << "\t";
-	 overlap = *wfi[t] * wft[t];
-	 ov_sum += cabs(overlap);
-	 log.cout() << cabs(overlap) << "\t";
-	 if (_phase){
-	    log.cout() << overlap << "\t";
-	    ov_sum += overlap;
-	 } else
-	    ov_sum._real += cabs(overlap);
+	 
+         //if (_ttype == ov) { /* Print overlapp */
+            overlap = *wfi[t] * wft[t];
+            ov_sum += cabs(overlap);
+            log.cout() << cabs(overlap) << "\t";
+            if (_phase){
+               log.cout() << overlap << "\t";
+               ov_sum += overlap;
+            } else
+               ov_sum._real += cabs(overlap);
+//        } else { /* Print operator */
+//             _Otarget->Apply(_opwf, wfi[t]);
+//             opval = *wfi[t] * _opwf;
+//             ov_sum += cabs(opval);
+//             
+//          }
+         
       }
       log.cout() << _laserb[0]->PulseEnergy() << endl;
       
@@ -410,7 +423,7 @@ namespace QDLIB {
       if (_Coup == NULL)
          throw( EParamProblem ("No coupling operator") );
       
-      log.DecInc();
+      log.IndentDec();
       
       switch(_coupling){
          case dipole:
