@@ -25,7 +25,7 @@ namespace QDLIB {
    * \li dt       time step
    * \li steps    number of time steps
    * \li dir      Output directory
-   * \li method   OCT method to use (krotov, rabiz)
+   * \li method   OCT method to use (krotov, rabiz, rabitzfb)
    * \li coup     The type of coupling to optimize (dipole)
    * \li ttype    target type (operator,overlap)
    * \li phase    phase sensitive objective (true|false, default false)
@@ -37,11 +37,12 @@ namespace QDLIB {
    * \li writel   Write laser in every iteration
    * \li membuf   Buffer back propagated targets in memory (default true)
    * 
+   * rabitzfb = Rabitz feedback iterative scheme (W. Zhu and H. Rabitz, J. Chem. Phys 109, 385 (1998))
    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
    */
    class ProgOCT{
       private:
-	 typedef enum {krotov, rabitz} _method_t;
+	 typedef enum {krotov, rabitz, rabitzfb} _method_t;
 	 typedef enum {dipole} _coupling_t;
 	 typedef enum {op, ov} _ttype_t;
 	 
@@ -51,10 +52,10 @@ namespace QDLIB {
 	 string _fname;
 	 string _dir;
 	 
-	 int _iterations;
-	 double _convergence;
-	 bool _writel;
-         bool _membuf;
+	 int _iterations;      /* Maximum number of iterations */
+	 double _convergence;  /* Convergence ctriteria */
+	 bool _writel;         /* Write laser in every iteration */
+         bool _membuf;         /* Use mebuffer, don't do the same propagation twice */
 	 
 	 _method_t _method;
 	 _coupling_t _coupling;
@@ -86,6 +87,11 @@ namespace QDLIB {
       protected:
 	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
          double Report(WaveFunction **wfi, WaveFunction** wft, int iteration);
+         void PropagateForward(WaveFunction **wf, bool membuf);
+         void PropagateBackward(WaveFunction **wf, bool membuf);
+         void IterateOverlap(WaveFunction** phii, WaveFunction** phit, int step);
+         void IterateOperator(WaveFunction** phii, WaveFunction** phit, int step);
+         void IterateRabitzFB(WaveFunction** phii, WaveFunction** phit, int step);
       public:
 	 ProgOCT(XmlNode &OCTNode);
 	 ~ProgOCT();
