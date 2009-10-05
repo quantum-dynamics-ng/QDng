@@ -57,6 +57,14 @@ namespace QDLIB {
 	 Laser& operator=(const Laser &laser);
 	 
 	 double PulseEnergy();
+         
+         double Dt() {return _dt;}
+         
+         void Dt(double dt) {_dt = dt; _params.SetValue("dt",dt) ;}
+         
+         int Nt() {return dVec::size();}
+         
+         void Nt(int size)  {dVec::newsize(size); _params.SetValue("Nt",size) ;}
    };
 
 } /* namespace QDLIB */

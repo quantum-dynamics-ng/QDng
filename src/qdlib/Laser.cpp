@@ -92,7 +92,7 @@ namespace QDLIB {
     */
    void Laser::ToTimeDomain()
    {
-      if (_spectrum == NULL && _fft != NULL)
+      if (_spectrum != NULL && _fft != NULL)
 	 _fft->backward();
    }
 
