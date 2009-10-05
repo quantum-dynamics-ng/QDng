@@ -272,15 +272,32 @@ namespace QDLIB {
       dcomplex opval;
       dcomplex ov_sum(0,0);
       
+      /* Write Header for iteration table */
+      if (iteration == 0){
+         log.SetIndent(0);
+         log.Header("OCT Iterations:", Logger::SubSection);
+         
+         log.cout() << "iteration\t";
+         for (int t=0; t < _ntargets; t++){
+            log.cout() << "Norm_" << t << "\t\t";
+            if (_ttype == ov) log.cout() << "Overlapp_" << t << "\t\t";
+            else log.cout() << "Operator_" << t << "\t";
+            if (_phase && _ttype == ov)
+               log.cout() << "Phase_" << t << "\t\t";
+         }
+         log.cout() << "Pulse Energy" << endl;
+      }
+      
       if( _opwf == NULL)
          _opwf = wfi[0]->NewInstance();
       
-      log.cout() << iteration << "\t";
+      log.cout() << iteration << "\t\t";
       for (int t=0; t < _ntargets; t++){
-	 log.cout().precision(6);
+         log.cout() << fixed;
+	 log.cout().precision(8);
 	 log.cout() << wfi[t]->Norm() << "\t";
 	 
-         //if (_ttype == ov) { /* Print overlapp */
+         if (_ttype == ov) { /* Print overlapp */
             overlap = *wfi[t] * wft[t];
             ov_sum += cabs(overlap);
             log.cout() << cabs(overlap) << "\t";
@@ -289,16 +306,16 @@ namespace QDLIB {
                ov_sum += overlap;
             } else
                ov_sum._real += cabs(overlap);
-//        } else { /* Print operator */
-//             _Otarget->Apply(_opwf, wfi[t]);
-//             opval = *wfi[t] * _opwf;
-//             ov_sum += cabs(opval);
-//             
-//          }
+        } else { /* Print operator */
+            _Otarget->Apply(_opwf,wft[t]);
+            opval = *wft[t] * _opwf;
+            ov_sum += cabs(opval);
+            log.cout() << opval.real() << "\t";
+         }
          
       }
       log.cout() << _laserb[0]->PulseEnergy() << endl;
-      
+      log.flush();
       return cabs(ov_sum);
    }
    
@@ -478,17 +495,6 @@ namespace QDLIB {
             phit[i] = PsiI[i]->NewInstance();
       }
 
-      /* Write Header for iteration table */
-      log.SetIndent(0);
-      log.Header("OCT Iterations:", Logger::SubSection);
-      
-      log.cout() << "iteration\t";
-      for (int t=0; t < _ntargets; t++){
-	 log.cout() << "Norm " << t << "\t";
-	 log.cout() << "Overlapp " << t << "\t";
-      }
-      log.cout() << "Pulse Energy" << endl;
-      log.flush();
 
       /* Prepare laserfile writer */
       Laser::FileLaser file = _laserf[0]->File();
@@ -556,6 +562,10 @@ namespace QDLIB {
                }
                --(*clock);
             }
+            /* Write Report & Calculate change */
+            overlapNew = Report(phii,phit, i-1);
+            deltaTarget = abs(abs(overlapOld - overlapNew)-deltaTarget);
+            overlapOld = overlapNew;
          } else { /* Initialize Operator targets */
             /* Exchange laserfields */
             _laserb[0]->swap(*(_laserf[0]));
@@ -567,6 +577,10 @@ namespace QDLIB {
                }
                ++(*clock);
             }
+            /* Write Report & Calculate change */
+            overlapNew = Report(phii,phit, i-1);
+            deltaTarget = abs(abs(overlapOld - overlapNew)-deltaTarget);
+            overlapOld = overlapNew;
             /* Exchange laserfields */
             _laserb[0]->swap(*(_laserf[0]));
             for (int t=0; t < _ntargets; t++)
@@ -584,11 +598,6 @@ namespace QDLIB {
             }
             
          }
-         
-         /* Write Report & Calculate change */
-         overlapNew = Report(phii,phit, i-1);
-         deltaTarget = abs(abs(overlapOld - overlapNew)-deltaTarget);
-         overlapOld = overlapNew;
                
 	 /* Forward Propagation */
 	 wfile.ResetCounter();
@@ -605,13 +614,6 @@ namespace QDLIB {
             }
          
             
-//             switch(_coupling){
-//                case dipole:
-//                   OGridDipole *CoupOGridDipole;
-//                   FindOperatorType<OGridDipole>(_Coup, &CoupOGridDipole);
-//                   CoupOGridDipole->GetLaser()->Set((*(_laserb[0]))[s]);
-//                   break;
-//             }
             /* Get new field */
             if (_membuf)
 	        _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
