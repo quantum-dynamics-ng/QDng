@@ -479,8 +479,8 @@ namespace QDLIB {
       clock->End();
       for (int s=0; s < clock->Steps(); s++){
          /* Calc new laser field */
-         if (_membuf && _ttype == ov)
-            _laserb[0]->Set(CalcLaserField(phit,_memwfbuf[s]));
+         if (_membuf)
+            _laserb[0]->Set(CalcLaserField(_memwfbuf[s], phit));
          else {
             for (int t=0; t < _ntargets; t++)
                _Ub->Apply(phii[t]);
