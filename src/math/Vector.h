@@ -180,6 +180,15 @@ class Vector
 	  return true;
        }
         
+       /**
+        * Reduce the size of the vector.
+        * 
+        * This is an irreversibel action.
+        */
+       void downsize(int N)
+       {
+          if (N < n_) n_ = N;
+       }
        
   public:
 

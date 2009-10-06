@@ -60,12 +60,9 @@ namespace QDLIB {
     */
    dVec * Laser::PowerSpectrum()
    {
-      if (_spectrum == NULL) _spectrum = new cVec(_clock->Steps()/2+1);
-      if (_fft == NULL) _fft = new FFT( *this, *_spectrum );
+      Spectrum();
       
-      _fft->forward();
-      
-      dVec *power = new dVec(_clock->Steps());
+      dVec *power = new dVec(_clock->Steps()/2+1);
       for (int i=0; i < dVec::size(); i++){
 	 (*power)[i] = cabs((*_spectrum)[i]);
       }
@@ -79,7 +76,10 @@ namespace QDLIB {
     */
    cVec * Laser::Spectrum()
    {
-      if (_spectrum == NULL) _spectrum = new cVec(_clock->Steps()/2+1);
+      if (_spectrum == NULL){
+         downsize(_clock->Steps());
+         _spectrum = new cVec(_clock->Steps()/2+1);
+      }
       if (_fft == NULL) _fft = new FFT( *this, *_spectrum);
       
       _fft->forward();
@@ -137,8 +137,14 @@ namespace QDLIB {
       _clock = laser._clock;
        _params = laser._params;
       _dt = laser._dt;
-      if (_spectrum != NULL) *_spectrum = *(laser._spectrum);
-      
+      if (_spectrum != NULL){
+         delete _spectrum;
+         _spectrum = NULL;
+      }
+      if (_fft != NULL){
+         delete _fft;
+         _fft=NULL;
+      }
       return *this;
    }
 
