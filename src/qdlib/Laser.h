@@ -60,11 +60,12 @@ namespace QDLIB {
          
          double Dt() {return _dt;}
          
-         void Dt(double dt) {_dt = dt; _params.SetValue("dt",dt) ;}
+         void Dt(double dt);
          
          int Nt() {return dVec::size();}
          
-         void Nt(int size)  {dVec::newsize(size); _params.SetValue("Nt",size) ;}
+         void Nt(int size);
+         
    };
 
 } /* namespace QDLIB */
