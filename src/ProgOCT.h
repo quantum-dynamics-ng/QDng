@@ -42,7 +42,7 @@ namespace QDLIB {
    */
    class ProgOCT{
       private:
-	 typedef enum {krotov, rabitz, rabitzfb} _method_t;
+	 typedef enum {krotov, rabitz, rabitzfb, freq} _method_t;
 	 typedef enum {dipole} _coupling_t;
 	 typedef enum {op, ov} _ttype_t;
 	 
@@ -72,7 +72,9 @@ namespace QDLIB {
 	 
 	 Laser* _laserf[MAX_LASERS];
 	 Laser* _laserb[MAX_LASERS];
-	 Laser _shape[MAX_LASERS];
+	 Laser _shape[MAX_LASERS];     /* temporal shape function */
+         Laser _frqmask[MAX_LASERS];   /* freq. mask for freq. OCT*/
+         Laser _gamma[MAX_LASERS];     /* Correction field for freq. OCT*/
 	 
          Operator* _Otarget;     /* Target operator for OPOC */
          
@@ -85,13 +87,16 @@ namespace QDLIB {
 	 void _InitParams();
 	 
       protected:
+         double CalcCorr(WaveFunction** wfi, WaveFunction** wft);
 	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
          double Report(WaveFunction **wfi, WaveFunction** wft, int iteration);
          void PropagateForward(WaveFunction **wf, bool membuf);
          void PropagateBackward(WaveFunction **wf, bool membuf);
-         void IterateOverlap(WaveFunction** phii, WaveFunction** phit, int step);
-         void IterateOperator(WaveFunction** phii, WaveFunction** phit, int step);
+         void SyncTargetOverlap(WaveFunction** phii, WaveFunction** phit, int step);
+         void SyncTargetOperator(WaveFunction** phii, WaveFunction** phit, int step);
+         void Iterate(WaveFunction** phii, WaveFunction** phit, int step);
          void IterateRabitzFB(WaveFunction** phii, WaveFunction** phit, int step);
+         void IterateFreq(WaveFunction** phii, WaveFunction** phit, int step);
       public:
 	 ProgOCT(XmlNode &OCTNode);
 	 ~ProgOCT();
