@@ -76,6 +76,17 @@ namespace QDLIB {
 	 attr.GetValue("fname", _fname);
       }
       
+      /* Yield file */
+      attr.GetValue("writeyield", _writeyield, false);
+      if (_writeyield || attr.isPresent("yfile")) {
+         attr.GetValue("yfile", _yfile);
+         if (!_yfile.empty())
+            _yfile = _dir + _yfile;
+         else
+            _yfile = _dir + "Yield";
+         _writeyield = true;
+      }
+      
       /* Optimization method to use */
       if (attr.isPresent("method")){
 	 attr.GetValue("method", s);
@@ -135,10 +146,7 @@ namespace QDLIB {
                   throw ( EParamProblem("Lower frequency bound larger than Nyquist frequency") );
                Butterworth<dVec>::Highpass(mask, cutoff, 100);
                for (int i=0; i < steps/2+1; i++){
-                  //cout << (_frqmask[0])[i] << endl;
                   (_frqmask[0])[i] *= mask[i] ;
-                  //cout << (_frqmask[0])[i] << endl;
-                  //cout << mask[i] << endl;
                }
             }
             /* Higher cuttoff => Lowpass */
@@ -152,7 +160,6 @@ namespace QDLIB {
                Butterworth<dVec>::Lowpass(mask, cutoff, 100);
                for (int i=0; i < steps/2+1; i++){
                   (_frqmask[0])[i] *= mask[i];
-                  cout << (_frqmask[0])[i] << endl;
                }
             }            
          } else
@@ -329,6 +336,7 @@ namespace QDLIB {
          case freq:  /* like krotov - but subtract gamma */
             res = _laserb[0]->Get() +
                   _shape[0].Get() / (_alpha * double(_ntargets)) * (res-_gamma[0].Get());
+            /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
             break;
 	 case rabitz:
          case rabitzfb:
@@ -404,18 +412,21 @@ namespace QDLIB {
     * Propagate Forward from t= 0 => T all targets.
     * 
     * Using the _Uf and the corresponding Laserfield _laserf
-    * \param membuf Save the propagation in the memory buffer
+    * \param membuf Save the propagation in the memory buffer.
+    * membuf[0] => t=0 , membuf[Steps] => t=T
     */
    void ProgOCT::PropagateForward(WaveFunction ** wf, bool membuf)
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
+      _CopyWFs(_memwfbuf[0], wf); /* Save t=0 */
+      
       clock->Begin();
-      for (int s=0; s < clock->Steps(); s++){
+      for (int s=1; s < clock->Steps(); s++){ /* Save t=1..T */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(wf[t]);
             if (membuf)
-               *(_memwfbuf[clock->Steps()-s-1][t]) = wf[t];
+               *(_memwfbuf[s][t]) = wf[t];
          }
          ++(*clock);
       }
@@ -423,23 +434,26 @@ namespace QDLIB {
 
    /**
     * Propagate Backward from t= T => 0 all targets.
-    * 
-    * 
-    * Using the _Uf and the corresponding Laserfield _laserb
+    *
+    * Using the _Ub and the corresponding Laserfield _laserb
     * \param membuf Save the propagation in the memory buffer
+    * membuf[0] => t=0 , membuf[Steps] => t=T
     */
    void ProgOCT::PropagateBackward(WaveFunction **wf, bool membuf)
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
       clock->End();
-      for (int s=0; s < clock->Steps(); s++){
+      _CopyWFs(_memwfbuf[clock->TimeStep()], wf); /* Save t=T */
+      
+      for (int s=clock->TimeStep()-1; s >= 0; s--){
+         --(*clock);
          for (int t=0; t < _ntargets; t++){
             _Ub->Apply(wf[t]);
             if (membuf)
-               *(_memwfbuf[clock->Steps()-s-1][t]) = wf[t];
+               *(_memwfbuf[s][t]) = wf[t];
          }
-         --(*clock);
+         
       }
    }
    
@@ -453,9 +467,6 @@ namespace QDLIB {
       
       /* Backpropagation of targets */
       PropagateBackward(phit, _membuf);
-            
-      /* Write Report & Calculate change */
-      Report(phii,phit, step-1);
       
    }
 
@@ -537,53 +548,69 @@ namespace QDLIB {
          for (int t=0; t < _ntargets; t++)
             _Otarget->Apply(phit[t], phii[t]);
       
-      Report(phii, phit, step);
+      Report(phii, phit, step-1);
       
-      /* Propagate Target Backward with new field */
+      /* Propagate Target Backward with new field (1) */
       clock->End();
-      for (int s=0; s < clock->Steps(); s++){
+      //--(*clock);
+      cout << clock->TimeStep()+1 << " " << clock->Steps() << endl;
+      for (int s=0; s < clock->Steps()-1; s++){
          /* Calc new laser field */
          if (_membuf)
-            _laserb[0]->Set(CalcLaserField(_memwfbuf[s], phit));
+            _laserb[0]->Set(CalcLaserField(_memwfbuf[clock->TimeStep()], phit));
          else {
             for (int t=0; t < _ntargets; t++)
                _Ub->Apply(phii[t]);
             _laserb[0]->Set(CalcLaserField(phii,phit));
          }
          
+         /* Save back steps */
+         if (_membuf)
+            _CopyWFs(_memwfbuf[clock->TimeStep()], phit);
+
+         
          /* Do one step back */
          for (int t=0; t < _ntargets; t++)
             _Ub->Apply(phit[t]);
          
-         /* Save back steps */
-         if (_membuf)
-            _memwfbuf[clock->TimeStep()] = phit;
          
          --(*clock);
       }
+      /* Save back steps */
+      if (_membuf)
+         _CopyWFs(_memwfbuf[clock->TimeStep()+1], phit);
+
       
-      /* Propagate forward initial with new field */
+      cout << clock->TimeStep()+1 << " " << clock->Steps() << endl;
+      
+      /* Propagate forward initial with new field (2) */
       clock->Begin();
-      for (int s=0; s < clock->Steps(); s++){
+      for (int s=0; s < clock->Steps()-1; s++){
          /* Calc new laser field */
          if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
+            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[clock->TimeStep()]));
          else {
             for (int t=0; t < _ntargets; t++)
                _Uf->Apply(phit[t]);
             _laserf[0]->Set(CalcLaserField(phii,phit));
          }
          
+         /* Save forward steps */
+         if (_membuf)
+            _CopyWFs(_memwfbuf[clock->TimeStep()], phii);
+
+         
          /* Do one step forward */
          for (int t=0; t < _ntargets; t++)
             _Uf->Apply(phii[t]);
          
-         /* Save forward steps */
-         if (_membuf)
-            _memwfbuf[clock->TimeStep()] = phii;
          
          ++(*clock);
       }
+      /* Save forward steps */
+      if (_membuf)
+         _CopyWFs(_memwfbuf[clock->TimeStep()], phii);
+      cout << "F " <<clock->TimeStep() << " " << clock->Steps() << endl;
       
 
       
@@ -609,15 +636,11 @@ namespace QDLIB {
       freqbuf = _laserf[0]->Spectrum();
       
       for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
-         //cout << (*freqbuf)[s] << "\n";
-         //cout << (_frqmask[0])[s] << "\n";
          (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
-         //cout << (*freqbuf)[s] << "\n";
       }
       
       _laserf[0]->ToTimeDomain();
 
-      //cout << *(_laserf[0]);
       /* Determine correction field gamma (propagation with shaped lasers)*/
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
@@ -626,7 +649,6 @@ namespace QDLIB {
             _Uf->Apply(phii[t]);
          }
          _gamma[0].Set( CalcCorr(phii,phit) );
-         //cout << _gamma[0].Get() << "\n";
          ++(*clock);
       }
 
@@ -657,9 +679,11 @@ namespace QDLIB {
             
          /* Target with old field */
          if (! _membuf){
+            _laserb[0]->swap(*(_laserf[0]));
             for (int t=0; t < _ntargets; t++){
                _Uf->Apply(phit[t]);
             }
+            _laserb[0]->swap(*(_laserf[0]));
          }
          
          /* Get new field */
@@ -871,8 +895,8 @@ namespace QDLIB {
 
       /* Initialize Buffer for backpropagation */
       if (_membuf){
-         _memwfbuf = new WaveFunction**[clock->Steps()];
-         for (int s=0; s < clock->Steps(); s++){
+         _memwfbuf = new WaveFunction**[clock->Steps()+1];
+         for (int s=0; s < clock->Steps()+1; s++){
             _memwfbuf[s] = new WaveFunction*[_ntargets];
             for (int t=0; t < _ntargets; t++)
                _memwfbuf[s][t] = PsiI[t]->NewInstance();
@@ -886,11 +910,32 @@ namespace QDLIB {
          _gamma[0].Clock(clock);
       }
       
+      /* Write Report & Calculate change */
+      if (_ttype == ov){
+         _CopyWFs(phii, PsiI);
+         PropagateForward(phii,false);
+         Report(phii,PsiT, 0);
+      }
+      
+      /* Redirection to file */
+      if( _writeyield ) {
+         log.cout() << "Yield table is redirected to file: " << _yfile << endl;
+         log.flush();
+         log.FileOutput( _yfile );
+      }
+      
       /* Iteration loop */
       int i=1;
       while (i <= _iterations){
 	 /* Init with fresh wfs */
-         if ((_method == rabitzfb && i==1) || _method != rabitzfb)
+         if ((_method == rabitzfb && i==1) || _method != rabitzfb){
+            _CopyWFs(phii, PsiI);
+            if (_ttype == ov)
+               _CopyWFs(phit, PsiT);
+            else
+               _CopyWFs(phit, PsiI);
+         }
+            
 	 for (int t=0; t < _ntargets; t++){
 	    *(phii[t]) = PsiI[t];
             if (_ttype == ov)
@@ -907,12 +952,11 @@ namespace QDLIB {
          else {
             Iterate(phii, phit,i);
          }
-
-
-	 
+         
+         Report(phii,phit, i);
+         
 	 /* Write laserfields */
 	 if(_writel){
-	    //file << _laserb[0];
 	    file << _laserf[0];
 	 }
 	 
@@ -926,7 +970,9 @@ namespace QDLIB {
 //             break;
 //          }
       } /* while (i < _iterations && deltaTarget > _convergence) */
-
+      if( _writeyield )
+         log.FileClose();
+      
       /* Write the final laser */
       file.StopSequence();
       file << _laserb[0];

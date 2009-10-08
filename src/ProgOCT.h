@@ -35,6 +35,8 @@ namespace QDLIB {
    * \li conv     Target convergence. Stop iterating if below convergence
    * \li shape    Name of shapefile
    * \li writel   Write laser in every iteration
+   * \li writey   Write Norm and Yild to seperate file
+   * \li yfile    Name of the Yield file
    * \li membuf   Buffer back propagated targets in memory (default true)
    * 
    * rabitzfb = Rabitz feedback iterative scheme (W. Zhu and H. Rabitz, J. Chem. Phys 109, 385 (1998))
@@ -51,6 +53,8 @@ namespace QDLIB {
 	 	 
 	 string _fname;
 	 string _dir;
+         string _yfile;
+         bool _writeyield;
 	 
 	 int _iterations;      /* Maximum number of iterations */
 	 double _convergence;  /* Convergence ctriteria */
@@ -86,6 +90,11 @@ namespace QDLIB {
          
 	 void _InitParams();
 	 
+         inline void _CopyWFs(WaveFunction **wfa, WaveFunction **wfb)
+         {
+            for (int t=0; t < _ntargets; t++)
+               *(wfa[t]) = wfb[t];
+         }
       protected:
          double CalcCorr(WaveFunction** wfi, WaveFunction** wft);
 	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
