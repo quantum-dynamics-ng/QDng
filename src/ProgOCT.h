@@ -80,7 +80,7 @@ namespace QDLIB {
          Laser _frqmask[MAX_LASERS];   /* freq. mask for freq. OCT*/
          Laser _gamma[MAX_LASERS];     /* Correction field for freq. OCT*/
 	 
-         Operator* _Otarget;     /* Target operator for OPOC */
+         Operator* _Otarget[MAX_TARGETS];     /* Target operator for OPOC */
          
 	 WaveFunction* PsiI[MAX_TARGETS];
 	 WaveFunction* PsiT[MAX_TARGETS];

@@ -10,11 +10,12 @@ namespace QDLIB {
    ProgOCT::ProgOCT(XmlNode &OCTNode) : _octNode(OCTNode), _ContentNodes(NULL),
    _fname(DEFAULT_BASENAME_LASER), _dir(""), _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE),
           _writel(false),_membuf(true), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),
-                  _ntargets(1), _alpha(1), _Otarget(NULL), _opwf(NULL), _membuf_init(false)
+                  _ntargets(1), _alpha(1),  _opwf(NULL), _membuf_init(false)
    {
       for(int i=0; i < MAX_TARGETS; i++){
 	 PsiI[i] = NULL;
 	 PsiT[i] = NULL;
+         _Otarget[i] = NULL;
       }
    }
    
@@ -35,7 +36,8 @@ namespace QDLIB {
             for (int t=0; t < _ntargets; t++)
                delete _memwfbuf[s][t];
       }
-      if (_Otarget != NULL) delete _Otarget;
+      for(int i=0; i < _ntargets; i++)
+         if (_Otarget[i] != NULL) delete _Otarget;
    }
 
    /**
@@ -308,9 +310,9 @@ namespace QDLIB {
 	 
          /* Phase sensitive */
          if (_phase)
-            im = *wft[t] * _opwf;
+            im = -1* (*wft[t] * _opwf);
          else /** \todo clarify why it only works this way! should be wfi * wft !!! */
-            im = (*(wft[t]) * wfi[t] ) * (*(wft[t]) * _opwf );
+            im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
 
          res += im.imag();
       }
@@ -330,12 +332,12 @@ namespace QDLIB {
       /* Method */
       switch(_method){
 	 case krotov: /* Add New Laser to previous field */
-		  res = _laserb[0]->Get() +
+		  res = _laserb[0]->Get() -
 			_shape[0].Get() / (_alpha * double(_ntargets)) * res;
 	    break;
          case freq:  /* like krotov - but subtract gamma */
             res = _laserb[0]->Get() +
-                  _shape[0].Get() / (_alpha * double(_ntargets)) * (res-_gamma[0].Get());
+                  _shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get());
             /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
             break;
 	 case rabitz:
@@ -393,16 +395,16 @@ namespace QDLIB {
                log.cout() << overlap << "\t";
                ov_sum += overlap;
             } else
-               ov_sum._real += cabs(overlap);
+               ov_sum._real += cabs(overlap)*cabs(overlap);
         } else { /* Print operator */
-            _Otarget->Apply(_opwf,wft[t]);
+            _Otarget[t]->Apply(_opwf,wft[t]);
             opval = *wft[t] * _opwf;
             ov_sum += cabs(opval);
             log.cout() << opval.real() << "\t";
          }
          
       }
-      log.cout() << _laserb[0]->PulseEnergy() << endl;
+      log.cout() << _laserf[0]->PulseEnergy() << endl;
       log.flush();
       return cabs(ov_sum);
    }
@@ -482,14 +484,13 @@ namespace QDLIB {
       /* Propagate forward */
       PropagateForward(phit, false);
       /* Write Report & Calculate change */
-      Report(phii,phit, step-1);
       
       /* Exchange laserfields */
       _laserb[0]->swap(*(_laserf[0]));
       
       /* Apply */
       for (int t=0; t < _ntargets; t++)
-         _Otarget->Apply(phit[t]);
+         _Otarget[t]->Apply(phit[t]);
       
       /* Propagate Backward */
       PropagateBackward(phit, _membuf);
@@ -546,7 +547,7 @@ namespace QDLIB {
       /* Create target */
       if (_ttype == op)
          for (int t=0; t < _ntargets; t++)
-            _Otarget->Apply(phit[t], phii[t]);
+            _Otarget[t]->Apply(phit[t], phii[t]);
       
       Report(phii, phit, step-1);
       
@@ -749,24 +750,28 @@ namespace QDLIB {
          /* Load Target Wavefunctions */
          log.Header( "Target wave functions", Logger::SubSection);
          log.IndentInc();
-         for (int i=0; i< _ntargets; i++){
-            snprintf(num, 3, "%d", i);
+         for (int t=0; t< _ntargets; t++){
+            snprintf(num, 3, "%d", t);
             section = _ContentNodes->FindNode( "wft"+string(num) );
             if (section == NULL)
-               throw ( EParamProblem ("Missing target wavefunction", i) );
-            PsiT[i] = ChainLoader::LoadWaveFunctionChain( section );
+               throw ( EParamProblem ("Missing target wavefunction", t) );
+            PsiT[t] = ChainLoader::LoadWaveFunctionChain( section );
             delete section;
          }
          log.cout() << endl;
       } else if (_ttype == op) {
-         log.Header( "Target operator", Logger::SubSection);
+         log.Header( "Target operators", Logger::SubSection);
          log.IndentInc();
-         section = _ContentNodes->FindNode( "target");
-         if (section == NULL)
-            throw ( EParamProblem ("Missing target operator") );
-         _Otarget = ChainLoader::LoadOperatorChain( section );
-         _Otarget->Clock(clock);
-         _Otarget->Init(PsiI[0]);
+         for (int t=0; t< _ntargets; t++){
+            snprintf(num, 3, "%d", t);
+            section = _ContentNodes->FindNode( "target"+string(num));
+            if (section == NULL)
+               throw ( EParamProblem ("Missing target operator", t) );
+            _Otarget[t] = ChainLoader::LoadOperatorChain( section );
+            _Otarget[t]->Clock(clock);
+            _Otarget[t]->Init(PsiI[0]);
+            delete section;
+         }
       }
       
       log.IndentDec();
