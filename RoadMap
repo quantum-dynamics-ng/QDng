@@ -13,7 +13,7 @@
 
 * Propgramm types
  * Eigen (=> SPO,Cheby with real exponents) (DONE)
- * OCT (Krotov, freq-shape)
+ * OCT (Krotov, freq-shape) (DONE)
  * Pump Probe Spectroscopy simulation
 
 * Matrix Class
@@ -26,17 +26,19 @@
  * SIL
  * SOD
  * Projection Operator (DONE)
+ * Generalize Cheby to complex plane energy range
 
 * Multistate System
- * efficient SPO Scheme
+ * efficient SPO Scheme (DONE)
  * matrix system (DONE)
 
 * FFT
- * Decouple Intialiazation
- * Plan buffering
+ * Decouple Intialiazation (DONE)
+ * Plan buffering (DONE)
  * MPI-FFT (how to combine with data distribution?)
 
 * Density Matrix operations
+ * SPO propagator
  * Faber propagator
  * basic operations types for density matrices
 
