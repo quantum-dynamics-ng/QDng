@@ -37,7 +37,7 @@ namespace QDLIB {
                delete _memwfbuf[s][t];
       }
       for(int i=0; i < _ntargets; i++)
-         if (_Otarget[i] != NULL) delete _Otarget;
+         if (_Otarget[i] != NULL) delete _Otarget[i];
    }
 
    /**
@@ -310,7 +310,7 @@ namespace QDLIB {
 	 
          /* Phase sensitive */
          if (_phase)
-            im = -1* (*wft[t] * _opwf);
+            im = 1* (*wft[t] * _opwf);
          else /** \todo clarify why it only works this way! should be wfi * wft !!! */
             im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
 
@@ -397,8 +397,9 @@ namespace QDLIB {
             } else
                ov_sum._real += cabs(overlap)*cabs(overlap);
         } else { /* Print operator */
-            _Otarget[t]->Apply(_opwf,wft[t]);
-            opval = *wft[t] * _opwf;
+//             _Otarget[t]->Apply(_opwf,wft[t]);
+//             opval = *wft[t] * _opwf;
+            opval._real = _Otarget[t]->Expec(wfi[t]);
             ov_sum += cabs(opval);
             log.cout() << opval.real() << "\t";
          }
@@ -635,6 +636,7 @@ namespace QDLIB {
       /* Shape old Laser in the frequency domain & write result to new laser */
       _laserf[0]->FastCopy(*(_laserb[0]));
       freqbuf = _laserf[0]->Spectrum();
+      _laserb[0]->Spectrum(); /** \todo dirty hack to correct the time steps */
       
       for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
          (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
@@ -863,9 +865,9 @@ namespace QDLIB {
       ParamContainer Upm;
     
       Upm = _Uf->Params();
-      log.cout() << "Forward Propagators init parameters:\n\n" << Upm << endl;
+      log.coutdbg() << "Forward Propagators init parameters:\n\n" << Upm << endl;
       Upm = _Ub->Params();
-      log.cout() << "Backward Propagators init parameters:\n\n" << Upm << endl;
+      log.coutdbg() << "Backward Propagators init parameters:\n\n" << Upm << endl;
 
       
       /* Objects for propagation */
@@ -916,11 +918,9 @@ namespace QDLIB {
       }
       
       /* Write Report & Calculate change */
-      if (_ttype == ov){
-         _CopyWFs(phii, PsiI);
-         PropagateForward(phii,false);
-         Report(phii,PsiT, 0);
-      }
+      _CopyWFs(phii, PsiI);
+      PropagateForward(phii,false);
+      Report(phii,PsiT, 0);
       
       /* Redirection to file */
       if( _writeyield ) {
@@ -931,7 +931,9 @@ namespace QDLIB {
       
       /* Iteration loop */
       int i=1;
-      while (i <= _iterations){
+      double deltaTarget[] = {1,1,1}; /* buffer for convergency */
+      double delta = 1 ;
+      while (i <= _iterations && delta > _convergence){
 	 /* Init with fresh wfs */
          if ((_method == rabitzfb && i==1) || _method != rabitzfb){
             _CopyWFs(phii, PsiI);
@@ -940,14 +942,6 @@ namespace QDLIB {
             else
                _CopyWFs(phit, PsiI);
          }
-            
-	 for (int t=0; t < _ntargets; t++){
-	    *(phii[t]) = PsiI[t];
-            if (_ttype == ov)
-               *(phit[t]) = PsiT[t];
-            else
-               *(phit[t]) = PsiI[t];
-	 }
 
          /* The iteration step itself depends on the method */
 	 if (_method == rabitzfb)
@@ -958,7 +952,15 @@ namespace QDLIB {
             Iterate(phii, phit,i);
          }
          
-         Report(phii,phit, i);
+         /* Check for convergency  & Write Report */
+         for (int it=0; it < 3-1; it++)
+            deltaTarget[0] = deltaTarget[it+1];
+         
+         deltaTarget[2] = Report(phii,phit, i);
+         delta = 0;
+         
+         for (int it=0; it < 3; it++)
+            delta += abs(deltaTarget[it]);
          
 	 /* Write laserfields */
 	 if(_writel){
@@ -970,10 +972,6 @@ namespace QDLIB {
 	 
 	 log.flush();
 	 i++;
-//          if (deltaTarget <= _convergence){
-//             log.cout()  << "\nConvergence reached\n";
-//             break;
-//          }
       } /* while (i < _iterations && deltaTarget > _convergence) */
       if( _writeyield )
          log.FileClose();
