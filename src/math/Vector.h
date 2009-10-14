@@ -187,7 +187,7 @@ class Vector
         */
        void downsize(int N)
        {
-          if (N < n_) n_ = N;
+          if (N <= n_) n_ = N;
        }
        
   public:
