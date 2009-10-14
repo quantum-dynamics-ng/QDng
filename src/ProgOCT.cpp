@@ -550,12 +550,8 @@ namespace QDLIB {
          for (int t=0; t < _ntargets; t++)
             _Otarget[t]->Apply(phit[t], phii[t]);
       
-      Report(phii, phit, step-1);
-      
       /* Propagate Target Backward with new field (1) */
       clock->End();
-      //--(*clock);
-      cout << clock->TimeStep()+1 << " " << clock->Steps() << endl;
       for (int s=0; s < clock->Steps()-1; s++){
          /* Calc new laser field */
          if (_membuf)
@@ -581,9 +577,6 @@ namespace QDLIB {
       /* Save back steps */
       if (_membuf)
          _CopyWFs(_memwfbuf[clock->TimeStep()+1], phit);
-
-      
-      cout << clock->TimeStep()+1 << " " << clock->Steps() << endl;
       
       /* Propagate forward initial with new field (2) */
       clock->Begin();
@@ -612,7 +605,6 @@ namespace QDLIB {
       /* Save forward steps */
       if (_membuf)
          _CopyWFs(_memwfbuf[clock->TimeStep()], phii);
-      cout << "F " <<clock->TimeStep() << " " << clock->Steps() << endl;
       
 
       
@@ -673,9 +665,6 @@ namespace QDLIB {
       for (int t=0; t < _ntargets; t++){
          *(phii[t]) = PsiI[t];
       }
-
-      /* Replace forward to old field */
-      //_laserb[0]->swap(*(_laserf[0]));
       
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
