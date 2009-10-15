@@ -120,7 +120,7 @@ namespace QDLIB
     * \li coeff2  Coefficient squared  in LC
     * 
     */
-   WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, bool empty)
+   WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, int seqnum)
    {
       ModuleLoader* mods = ModuleLoader::Instance();
       Logger& log = Logger::InstanceRef();
@@ -142,6 +142,8 @@ namespace QDLIB
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
          if ( pm.isPresent("files") ){ /* Read from a Multistate set with basename <files> */
+            /** \todo implement multistate set file reading */
+            throw( EParamProblem("Multistate reading from file set not implemented") );
          } else { /* Read single WF definitions into Multistate */
             while (child->EndNode()){
                string name;
@@ -153,7 +155,7 @@ namespace QDLIB
                ss >> state;
                log.cout() << "-State " << state << endl;
                
-               wfsub = LoadWaveFunctionChain( child );
+               wfsub = LoadWaveFunctionChain( child, seqnum );
                
                multi->Add( wfsub, state);
                child->NextNode();
@@ -191,7 +193,7 @@ namespace QDLIB
                log.cout() << fixed << "Coefficient = " << coeff << endl;
             }
                     
-	    wfadd = LoadWaveFunctionChain( child );
+            wfadd = LoadWaveFunctionChain( child, seqnum );
             
             if(coeff > 0)
                MultElements((cVec*) wfadd, coeff);
@@ -218,28 +220,30 @@ namespace QDLIB
 	 if (WF == NULL)
 	    throw ( EParamProblem("WaveFunction module loading failed") );
 	 
-	 if (!pm.isPresent("file") && !empty)
+	 if (!pm.isPresent("file"))
 	    throw ( EParamProblem("No file for loading wave function given") );
 	 
 	 /* load wf */
-	 if (!empty){
-	    pm.GetValue( "file", name );
-	    FileWF file;
-	    file.Suffix(BINARY_WF_SUFFIX);
-	    file.Name(name);
-	    file >> WF;
-	    pm.GetValue( "normalize", onoff);
-	    if ( onoff) {
-	       log.cout() << "Normalizing...\n";
-	       WF->Normalize();
-	    }
-	    if (pm.isPresent("phase")){
-	       double phase;
-	       pm.GetValue("phase", phase);
-	       log.cout() << "Apply phase factor: " << phase << " pi\n";
-	       *WF *= cexpI(phase * M_PI);
-	    }
-	 }
+         pm.GetValue( "file", name );
+         FileWF file;
+         file.Suffix(BINARY_WF_SUFFIX);
+         file.Name(name);
+         if (seqnum > -1){ /* Read file from a sequence => only basename is given */
+            file.ActivateSequence();
+            file.Counter(seqnum);
+         }
+         file >> WF;
+         pm.GetValue( "normalize", onoff);
+         if ( onoff) {
+            log.cout() << "Normalizing...\n";
+            WF->Normalize();
+         }
+         if (pm.isPresent("phase")){
+            double phase;
+            pm.GetValue("phase", phase);
+            log.cout() << "Apply phase factor: " << phase << " pi\n";
+            *WF *= cexpI(phase * M_PI);
+         }
 	 
 	 log.cout() << pm << "------------------\n" << endl;
       }
