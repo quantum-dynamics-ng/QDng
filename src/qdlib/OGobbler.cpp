@@ -116,6 +116,10 @@ namespace QDLIB {
 	 _params.GetValue("gain", gain);
 	 MultElements((cVec*) this, gain);
       }
+      
+      /* Behavior of Expec() */
+      _params.GetValue("residue", _residue);
+      if (_residue) cout << "residue is on" << endl;
    }
    
    void OGobbler::Init(WaveFunction *Psi)
@@ -154,7 +158,7 @@ namespace QDLIB {
       Apply(ket, PsiKet);
       
       c = *PsiBra * ket;
-      delete ket;
+      
       
       return c;
    }
@@ -163,7 +167,15 @@ namespace QDLIB {
    {
       dcomplex c;
       
-      c = MatrixElement(Psi,Psi);
+      if (_residue){
+         WaveFunction *ket;
+         ket = Psi->NewInstance();
+         Apply(ket, Psi);
+         
+         c= *ket * ket;
+         delete ket;
+      } else 
+         c = MatrixElement(Psi, Psi);
       
       return c.real();
    }
@@ -182,7 +194,7 @@ namespace QDLIB {
 	 throw ( EIncompatible("Psi is not of type WFGridSystem", destPsi->Name()) );
       
       if (_nip) 
-	 MultElements( (cVec*) ket, (dVec*) this, dcomplex(0,-1));
+         MultElementsComplex((cVec*) opPsi, (cVec*) ket, (dVec*) this, -1);
       else 
 	 MultElements((cVec*) opPsi, (cVec*) ket, (dVec*) this);
       
@@ -229,6 +241,7 @@ namespace QDLIB {
       
       _nip = o->_nip;
       _order = o->_order;
+      _residue = o->_residue;
 	    
       
       for (int i=0; i < Dim(); i++){

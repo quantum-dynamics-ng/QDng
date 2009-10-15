@@ -10,8 +10,14 @@ namespace QDLIB {
    /**
     * Projection operator.
     * 
-    * \f$ \sum_i |\Psi_i><\Psi_i> \f$
+    * \f$ \sum_i |\Psi_i><\Psi_i| \f$
     * 
+    * parameters:
+    * \li positive Set the sign of the projector (false=negative)
+    * \li files   Read wavefunction set from a sequence of files
+    * \li num     number of files to read
+    * \li start   number to start with
+    * \li step    step size trough the sequence
     * 
     * @author Markus Kowalewski
     */
@@ -19,6 +25,7 @@ namespace QDLIB {
       private:
 	 string _name;
 	 
+         double _sign;
 	 int _size;
 	 WaveFunction* _wfbuf[MAX_WFSPACE];
 	 WaveFunction* _buf;
@@ -34,8 +41,14 @@ namespace QDLIB {
 	 
 	 WaveFunction* Get(int n);
 	 
+         /** Number of elements. */
 	 int Length() { return _size; };
 	 
+         /** Set sign of the sum */
+         void Sign(bool positive) {
+            if (positive) _sign=1;
+            else _sign=-1;
+         }
 	 
 	 /* Interface implementation, Operator */ 
    

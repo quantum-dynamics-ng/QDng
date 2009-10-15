@@ -111,7 +111,13 @@ namespace QDLIB
     * Load all wave functions from the input.
     * 
     * This method also recognizes Multistate, LC (Linear combination).
-    * Works recursive.
+    * Works infinetly recursive.
+    * 
+    * \li Special Parameter:
+    * \li normalize:  Works on every level (default false)
+    * 
+    * \li coeff   Coefficient in LC
+    * \li coeff2  Coefficient squared  in LC
     * 
     */
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, bool empty)
@@ -135,19 +141,24 @@ namespace QDLIB
 	 child->AdjustElementNode();
 	 WaveFunction *wfsub;
 	 WFMultistate *multi = new WFMultistate();
-	 while (child->EndNode()){
-	    string name;
-	    stringstream ss;
-	    int state;
-	    
- 	    wfsub = LoadWaveFunctionChain( child );
-	    
-	    name = child->Name();
-	    ss << name.substr(2);
-	    ss >> state;
-	    multi->Add( wfsub, state);
-	    child->NextNode();
-	 }
+         if ( pm.isPresent("files") ){ /* Read from a Multistate set with basename <files> */
+         } else { /* Read single WF definitions into Multistate */
+            while (child->EndNode()){
+               string name;
+               stringstream ss;
+               int state;
+               
+               name = child->Name();
+               ss << name.substr(2);
+               ss >> state;
+               log.cout() << "-State " << state << endl;
+               
+               wfsub = LoadWaveFunctionChain( child );
+               
+               multi->Add( wfsub, state);
+               child->NextNode();
+            }
+         }
 	 multi->Init(pm);
 	 pm.GetValue( "normalize", onoff);
 	 if ( onoff) {
@@ -163,18 +174,31 @@ namespace QDLIB
 	 child = WFNode->NextChild();
 	 child->AdjustElementNode();
 	 WaveFunction *wfadd;
-	 double coeff;
 	 ParamContainer pm_child;
 	 while (child->EndNode()){
+            double coeff=0;
+            
+            pm_child = child->Attributes();
+            if (pm_child.isPresent("coeff")){
+               pm_child.GetValue("coeff", coeff);
+               
+            } else if (pm_child.isPresent("coeff2")){
+               pm_child.GetValue("coeff2", coeff);
+               coeff *= coeff;
+            }
+            if(coeff > 0){
+               log.cout().precision(8);
+               log.cout() << fixed << "Coefficient = " << coeff << endl;
+            }
+                    
 	    wfadd = LoadWaveFunctionChain( child );
-	    pm_child = child->Attributes();
+            
+            if(coeff > 0)
+               MultElements((cVec*) wfadd, coeff);
+            
 	    if (WF == NULL){
 	       WF = wfadd->NewInstance();
 	       *((cVec*) WF) = dcomplex(0,0);
-	    }
-	    if (pm_child.isPresent("coeff")){
-	       pm_child.GetValue("coeff", coeff);
-	       MultElements((cVec*) wfadd, coeff);
 	    }
 	    
 	    *WF += wfadd;

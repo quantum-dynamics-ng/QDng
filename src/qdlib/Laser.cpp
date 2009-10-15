@@ -60,12 +60,9 @@ namespace QDLIB {
     */
    dVec * Laser::PowerSpectrum()
    {
-      if (_spectrum == NULL) _spectrum = new cVec(_clock->Steps());
-      if (_fft == NULL) _fft = new FFT( *this, *_spectrum );
+      Spectrum();
       
-      _fft->forward();
-      
-      dVec *power = new dVec(_clock->Steps());
+      dVec *power = new dVec(_clock->Steps()/2+1);
       for (int i=0; i < dVec::size(); i++){
 	 (*power)[i] = cabs((*_spectrum)[i]);
       }
@@ -79,7 +76,10 @@ namespace QDLIB {
     */
    cVec * Laser::Spectrum()
    {
-      if (_spectrum == NULL) _spectrum = new cVec(_clock->Steps());
+      if (_spectrum == NULL){
+         downsize(_clock->Steps());
+         _spectrum = new cVec(_clock->Steps()/2+1);
+      }
       if (_fft == NULL) _fft = new FFT( *this, *_spectrum);
       
       _fft->forward();
@@ -92,7 +92,7 @@ namespace QDLIB {
     */
    void Laser::ToTimeDomain()
    {
-      if (_spectrum == NULL && _fft != NULL)
+      if (_spectrum != NULL && _fft != NULL)
 	 _fft->backward();
    }
 
@@ -101,6 +101,7 @@ namespace QDLIB {
     */
    void Laser::Clock(QDClock * clock)
    {
+      if (clock==NULL) return;
       _clock = clock;
       if (clock->Dt() != _dt || clock->Steps() > dVec::size())
 	 throw ( EParamProblem("Clock values doesn't fit the laser field") );
@@ -114,9 +115,20 @@ namespace QDLIB {
       return _clock;
    }
 
+   /**
+    * Get laser value at actual timestep
+    */
    double Laser::Get()
    {
       return (*this)[_clock->TimeStep()];
+   }
+   
+   /**
+    * Set laser value at actual timestep
+    */
+   void Laser::Set(double value)
+   {
+      (*this)[_clock->TimeStep()] = value;
    }
    
    Laser& Laser::operator =(const Laser &laser)
@@ -125,12 +137,20 @@ namespace QDLIB {
       _clock = laser._clock;
        _params = laser._params;
       _dt = laser._dt;
-      if (_spectrum != NULL) *_spectrum = *(laser._spectrum);
-      
+      if (_spectrum != NULL){
+         delete _spectrum;
+         _spectrum = NULL;
+      }
+      if (_fft != NULL){
+         delete _fft;
+         _fft=NULL;
+      }
       return *this;
    }
 
-   
+   /**
+    * \return Energy of the Laserfield
+    */
    double Laser::PulseEnergy()
    {
       double d = 0;
@@ -143,8 +163,30 @@ namespace QDLIB {
       /*       c0 in au          eps_0 in au             */
    }
 
+  /**
+   * Set the timestep size.
+   */
+   void Laser::Dt(double dt)
+   {
+      _dt = dt;
+      _params.SetValue("dt",dt) ;
+   }  
+
+   /**
+    * Set the number of points.
+    * 
+    * Resize is destructive.
+    */
+   void Laser::Nt(int size)
+   {
+      dVec::newsize(size);
+      _params.SetValue("Nt",size) ;
+   }
+   
+   
    
 }
+
 
 
 

@@ -31,6 +31,8 @@ namespace QDLIB {
          
          Operator* operator[](int i);
          
+         Operator* Get(int index);
+         
          int Size();
          
          void Add(Operator *O);

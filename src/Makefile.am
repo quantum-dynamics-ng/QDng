@@ -24,5 +24,6 @@ qdng_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
 	$(LIBXML2_LIBS)
 noinst_HEADERS = ChainLoader.h FiltersList.h ProgAutocorr.h ProgEigen.h \
 		ProgPropa.h Reporter.h 
-AM_CXXFLAGS = -O3 -ansi -pedantic-errors -Werror
+AM_CXXFLAGS = -O3 -ansi -pedantic-errors -Werror -DQDNG_BUILD_DATE="\"`date`\"" -DQDNG_BUILD_HOST="\"`uname -n`\"" \
+	      -DQDNG_BUILD_MACH="\"`uname -m`\"" -DQDNG_REV="\"`git rev-list --max-count=1 HEAD`\""
 

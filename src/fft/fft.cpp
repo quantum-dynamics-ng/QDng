@@ -119,10 +119,9 @@ namespace QDLIB {
    
    /**
    * 1D real-to-complex FFT.
-   * \todo Check if backward FFT is the same as c2r.
    * 
    * \param in     input.
-   * \param out    output.
+   * \param out    output. Note that the outputsize must be n/2+1.
    * \param oneway If true only the forward plan will be created.
    */
    FFT::FFT(dVec &in, cVec &out, bool oneway) : _dims(NULL)

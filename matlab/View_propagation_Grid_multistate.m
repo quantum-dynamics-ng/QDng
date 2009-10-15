@@ -33,7 +33,7 @@ if view_ts=='Y'
          x=WF.grid(1,2):dx:WF.grid(1,3);
          subplot(states,1,states-s);
          plot(x,abs(WF.data),'-b',x,real(WF.data),'-g',x,imag(WF.data),'-r');
-         title(['WF-' int2str(s) '\_' int2str(t) ' Time = ' num2str(t/41.34) ' fs' ])
+         title(['WF-' int2str(s) '\_' int2str(t) ' Time = ' num2str(t*wcycle*dt/41.34) ' fs' ])
       end
       pause(0.1);
    end

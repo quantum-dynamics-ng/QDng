@@ -8,8 +8,8 @@ namespace QDLIB {
 
    OSPO::OSPO() : OPropagator(), _name("OSPO"), _needs(NULL),
                   _Tkin(NULL), _Tkin_kspace(NULL), _Vcoup(NULL),
-                  _expT(NULL), _expV(NULL), _expVcoup(NULL), _buf(NULL),
-		  _coupling(false), _cV(0,0), _cT(0,0), _last_time(0)
+                        _expT(NULL), _expV(NULL), _V1(NULL), _expVcoup(NULL), _expVcoupI(NULL),_buf(NULL),
+                        _coupling(false), _coupdiag(false),_cV(0,0), _cT(0,0), _last_time(0)
    {
       _Vpot[0] = NULL;
       _Vpot[1] = NULL;
@@ -20,8 +20,9 @@ namespace QDLIB {
    {
       if (_expT != NULL) delete _expT;
       if (_expV != NULL) delete _expV;
+      if (_V1 != NULL) delete _V1;
       if (_needs != NULL) delete _needs;
-      if(_buf != NULL) delete _buf;
+      if (_buf != NULL) delete _buf;
    }
    
    
@@ -31,24 +32,7 @@ namespace QDLIB {
       return O;
    }
    
-   /**
-    * Set the kinetic energy operator.
-    */
-   void OSPO::AddTkin( ODSpace *T )
-   {
-      _Tkin = T;
-   }
 
-   
-   /**
-    * Set the potential energy operator.
-    */
-   void OSPO::AddVpot( OGridSystem *V )
-   {
-      _Vpot[0] = V;
-   }
-   
-   
    /** Init expT. */
    void OSPO::_InitT( )
    {
@@ -86,6 +70,11 @@ namespace QDLIB {
 	 ((Operator*) (_Vpot[0]))->UpdateTime();
 	 _Vpot[0]->Apply(_expV, _V1);
 	 ExpElements((cVec*) _expV, (cVec*) _expV, _cV);
+         if (_coupdiag) {
+            _VcoupI->UpdateTime();
+            _VcoupI->Apply(_expVcoupI,_V1);
+            ExpElements((cVec*) _expVcoupI, (cVec*) _expVcoupI, _cV);
+         }
       }
    }
    
@@ -140,6 +129,10 @@ namespace QDLIB {
 	 if(_Vcoup->size() != _Tkin_kspace->size())
 	     throw ( EParamProblem("Vcoup differs in size") );
       
+      if (_coupdiag && _VcoupI != NULL)
+         if(_VcoupI->size() != _Tkin_kspace->size())
+            throw ( EParamProblem("VcoupI differs in size") );
+      
       /* Init storage for exponentials */
       if (_expT == NULL) {
 	 _expT = new cVec(_Tkin_kspace->size());
@@ -156,6 +149,10 @@ namespace QDLIB {
 	 *_Vcoup1 = 1;
       }
 	 
+      if (_expVcoupI == NULL && _coupdiag){
+         _expVcoupI = Psi->NewInstance();
+      }
+      
       _InitT();
       _InitV();
 
@@ -257,6 +254,8 @@ namespace QDLIB {
 	 WFGridSystem *psi = dynamic_cast<WFGridSystem*>(Psi);
 	 /* exp(-i/2 V dt) */
 	 MultElements( (cVec*) psi, (cVec*) _expV );
+         if (_coupdiag)
+            MultElements( (cVec*) psi, (cVec*) _expVcoupI );
 	 
 	 /* exp(-i T dt) */
 	 psi->ToKspace();
@@ -265,6 +264,8 @@ namespace QDLIB {
 	 
 	 /* exp(-i/2 V dt) */
 	 MultElements( (cVec*) psi,  (cVec*) _expV );
+         if (_coupdiag)
+            MultElements( (cVec*) psi, (cVec*) _expVcoupI );
 	 return psi;
       }
    }
@@ -315,6 +316,7 @@ namespace QDLIB {
       _needs->SetValue( "Tkin", "");
       _needs->SetValue( "Vpot", "");
       _needs->SetValue( "Vcoup", "opt");
+      _needs->SetValue( "VcoupI", "opt");
       
       return *_needs;
    }
@@ -322,7 +324,7 @@ namespace QDLIB {
    
    void OSPO::AddNeeds( string &Key, Operator *O )
    {
-      if (Key != "Tkin" && Key != "Vpot"  && Key != "Vcoup")
+      if (Key != "Tkin" && Key != "Vpot"  && Key != "Vcoup" && Key != "VcoupI")
 	 throw ( EParamProblem("SPO only knows Tkin, Vpot or Vcoup") );
       
       if (Key == "Tkin") {
@@ -338,12 +340,12 @@ namespace QDLIB {
       /* Check for Potentials: 1 or 2 */
       if (Key == "Vpot") {
 	 OMultistate *mpot = dynamic_cast<OMultistate*>(O);
-	 if (mpot == NULL) {
+	 if (mpot == NULL) { /* Single state */
 	    _Vpot[0] = dynamic_cast<OGridSystem*>(O);
 	    if (_Vpot[0] == NULL)
 	       throw ( EParamProblem("Vpot is invalid", O->Name()) );
 	    if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
-	 } else {
+	 } else { /* Multistate */
 	    if (mpot->States() > 2)
 	       throw ( EParamProblem("SPO only supports two states") );
 	
@@ -376,6 +378,14 @@ namespace QDLIB {
 	 _coupling = true;
       }
       
+      /* IR coupling */
+      if (Key == "VcoupI") {
+         _VcoupI = dynamic_cast<OGridSystem*>(O);
+         if (_VcoupI == NULL)
+            throw ( EParamProblem("VcoupI is invalid", O->Name()) );
+         if (_VcoupI->isTimeDep()) _isTimedependent=true;
+         _coupdiag = true;
+      }
    }
 
   

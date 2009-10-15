@@ -1,10 +1,11 @@
-AC_INIT(configure.in)
+AC_INIT
+AC_CONFIG_SRCDIR([configure.in])
 
 AM_CONFIG_HEADER(src/config.h)
-AM_INIT_AUTOMAKE(QDng, 0.1)
+AM_INIT_AUTOMAKE([QDng], [alpha-0.2])
 
 
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 AC_PROG_CXX
 AC_PROG_F77
 
@@ -60,4 +61,5 @@ dnl	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation
 dnl	    [],with_mpi-prefix=no)
 
 
-AC_OUTPUT(Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile)
+AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile])
+AC_OUTPUT

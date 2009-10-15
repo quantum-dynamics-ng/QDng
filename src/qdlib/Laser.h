@@ -51,10 +51,21 @@ namespace QDLIB {
 	 QDClock* Clock();
 	 
 	 double Get();
+         
+         void Set(double value);
 	 
 	 Laser& operator=(const Laser &laser);
 	 
 	 double PulseEnergy();
+         
+         double Dt() {return _dt;}
+         
+         void Dt(double dt);
+         
+         int Nt() {return dVec::size();}
+         
+         void Nt(int size);
+         
    };
 
 } /* namespace QDLIB */

@@ -40,13 +40,16 @@ namespace QDLIB {
 	 dVec    *_Tkin_kspace;
 	 OGridSystem* _Vpot[2];
 	 OGridSystem* _Vcoup;
+         OGridSystem* _VcoupI;
 	 cVec* _expT;
 	 WaveFunction *_expV, *_V1;     /* Dirty hack to get time dependence */
 	 WaveFunction *_expVcoup, *_Vcoup1; /* Dirty hack to get time dependence */
-	 
+         WaveFunction *_expVcoupI;
+         
 	 WaveFunction *_buf;
 	 
-         bool _coupling;                   /* Indicates two state coupling */
+         bool _coupling;        /* coupling */
+         bool _coupdiag;        /* Coupling on diagonal in Vpot*/
 	 
 	 dcomplex _cV, _cT;
 	 int _last_time;
@@ -58,12 +61,7 @@ namespace QDLIB {
 	 OSPO();
       
 	 ~OSPO();
-		  
-	 
-	 void AddTkin( ODSpace *T );
-	 void AddVpot( OGridSystem *V );
-	 
-	 
+
 	 /* Interface implementation, Operator */
 	 virtual Operator* NewInstance();
 	       

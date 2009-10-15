@@ -21,7 +21,6 @@ namespace QDLIB {
     * Note that you have use the Align method of the vector class.
     * fftw relies on aligned memory for accelleration.
     * 
-    * \todo Improve the FFTW planing (FFTW_MEASURE is fine! wisdoms etc.)
     */
    class FFT {
       private:

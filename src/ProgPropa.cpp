@@ -89,33 +89,31 @@ namespace QDLIB {
       
       /* Check the reporter values */
       bool onoff;
-      if ( attr.isPresent("norm") ) {
-	 attr.GetValue("norm", onoff);
-	 _reporter.Norm( onoff );
+      
+      attr.GetValue("norm", onoff, true);
+      _reporter.Norm( onoff );
+
+      attr.GetValue("energy", onoff, true);
+      _reporter.Energy(onoff);
+
+      attr.GetValue("proj0", onoff);
+      _reporter.Proj0(onoff);
+
+      attr.GetValue("proj0Abs", onoff);
+      _reporter.Proj0Square(onoff);
 	 
-      }
-      if ( attr.isPresent("energy") ) {
-	 attr.GetValue("energy", s);
-	 _reporter.Energy(onoff);
-      }
-      if ( attr.isPresent("proj0") ) {
-	 attr.GetValue("proj0", onoff);
-	 _reporter.Proj0(onoff);
-      }
-      if ( attr.isPresent("proj0Abs") ) {
-	 attr.GetValue("proj0Abs", onoff);
-	 _reporter.Proj0Square(onoff);
-	 
-      }
+
       if ( attr.isPresent("spectrum") ) {
 	 attr.GetValue("spectrum", s);
 	 _reporter.Spectrum( _dir+s );
       }
 
       if (attr.isPresent("nfile")){
-	 _writenorm = true;
 	 attr.GetValue("nfile",s);
-	 if (! s.empty() ) _nfile = _dir+s;
+	 if (! s.empty() ){
+            _nfile = _dir+s;
+            _writenorm = true;
+         }
       }
       
    }
@@ -236,7 +234,12 @@ namespace QDLIB {
       /* The propagation loop */
       log.Header( "Free propagation", Logger::Section);
       log.flush();
-      if( _writenorm ) log.FileOutput( _nfile );
+      /* redirect to to normfile */
+      if( _writenorm ) {
+         log.cout() << "Propagation table is redirected to Norm file: " << _nfile << endl;
+         log.flush();
+         log.FileOutput( _nfile );
+      }
       for (lint i=1; i <= clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
@@ -248,12 +251,17 @@ namespace QDLIB {
       if( _writenorm )  log.FileClose();
       _reporter.Finalize();
 
+      /* Write propagation meta file*/
       ParamContainer p;
       p.SetValue("CLASS", "Propagation" );
-      p.SetValue("WFCLASS", wfm->Name() );
+      if (wfm != NULL){
+         p.SetValue("WFCLASS", wfm->Name() );
+         p.SetValue("States", wfm->States() );
+      } else {
+         p.SetValue("WFCLASS", Psi->Name() );
+      }
       p.SetValue("Nt", clock->Steps() );
       p.SetValue("dt", clock->Dt() );
-      p.SetValue("States", wfm->States() );
       p.SetValue("WFBaseName", _fname );
       p.SetValue("Wcycle", _wcycle );
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);

@@ -90,8 +90,13 @@ namespace QDLIB
 	 
    void OGridPotential::Init( WaveFunction *Psi)
    {
-      if( dynamic_cast<WFGridSystem*>(Psi) == NULL)
+      WFGridSystem* psi;
+      
+      psi=dynamic_cast<WFGridSystem*>(Psi);
+      if( psi == NULL)
 	 throw ( EIncompatible ("GridPotential can't operate on ", Psi->Name()));
+      if ( *((GridSystem*) this) != *((GridSystem*) psi) )
+         throw ( EIncompatible ("GridPotential parameters are not compatible with wave function") );
    }
    
    const string& OGridPotential::Name()

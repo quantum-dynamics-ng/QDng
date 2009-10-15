@@ -9,7 +9,7 @@
 
 #define DEFAULT_BASENAME_LASER "laser"
 #define DEFAULT_ITERATIONS 50
-#define DEFAULT_CONVERGENCE 1e-6
+#define DEFAULT_CONVERGENCE 1e-5
 #define MAX_TARGETS 16
 #define MAX_LASERS 4
 
@@ -25,7 +25,7 @@ namespace QDLIB {
    * \li dt       time step
    * \li steps    number of time steps
    * \li dir      Output directory
-   * \li method   OCT method to use (krotov, rabiz)
+   * \li method   OCT method to use (krotov, rabiz, rabitzfb)
    * \li coup     The type of coupling to optimize (dipole)
    * \li ttype    target type (operator,overlap)
    * \li phase    phase sensitive objective (true|false, default false)
@@ -35,12 +35,16 @@ namespace QDLIB {
    * \li conv     Target convergence. Stop iterating if below convergence
    * \li shape    Name of shapefile
    * \li writel   Write laser in every iteration
+   * \li writey   Write Norm and Yild to seperate file
+   * \li yfile    Name of the Yield file
+   * \li membuf   Buffer back propagated targets in memory (default true)
    * 
+   * rabitzfb = Rabitz feedback iterative scheme (W. Zhu and H. Rabitz, J. Chem. Phys 109, 385 (1998))
    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
    */
    class ProgOCT{
       private:
-	 typedef enum {krotov, rabitz} _method_t;
+	 typedef enum {krotov, rabitz, rabitzfb, freq} _method_t;
 	 typedef enum {dipole} _coupling_t;
 	 typedef enum {op, ov} _ttype_t;
 	 
@@ -49,36 +53,59 @@ namespace QDLIB {
 	 	 
 	 string _fname;
 	 string _dir;
+         string _yfile;
+         bool _writeyield;
 	 
-	 int _iterations;
-	 double _convergence;
-	 bool _writel;
+	 int _iterations;      /* Maximum number of iterations */
+	 double _convergence;  /* Convergence ctriteria */
+	 bool _writel;         /* Write laser in every iteration */
+         bool _membuf;         /* Use mebuffer, don't do the same propagation twice */
 	 
 	 _method_t _method;
 	 _coupling_t _coupling;
 	 _ttype_t _ttype;
-	 bool _phase;
-	 
+	 bool _phase;       /* Phase sensitive OCT */
+         
 	 int _ntargets;
 	 double _alpha;
 	 
-	 OPropagator *_Uf;
-	 OPropagator *_Ub;
-	 Operator *_H;
-	 Operator *_Coup;
+	 OPropagator *_Uf;  /* Forward Propagation */
+         OPropagator *_Ub;  /* Backward Propagation */
+	 Operator *_H;      /* Hamiltonian */
+	 Operator *_Coup;   /* The coupling to optimize */
 	 
 	 Laser* _laserf[MAX_LASERS];
 	 Laser* _laserb[MAX_LASERS];
-	 Laser _shape[MAX_LASERS];
+	 Laser _shape[MAX_LASERS];     /* temporal shape function */
+         Laser _frqmask[MAX_LASERS];   /* freq. mask for freq. OCT*/
+         Laser _gamma[MAX_LASERS];     /* Correction field for freq. OCT*/
 	 
+         Operator* _Otarget[MAX_TARGETS];     /* Target operator for OPOC */
+         
 	 WaveFunction* PsiI[MAX_TARGETS];
 	 WaveFunction* PsiT[MAX_TARGETS];
-	 
+         WaveFunction* _opwf;             /* Buffer for mu*psi */
+         WaveFunction*** _memwfbuf;       /* memory buffer for backpropagation */
+	 bool _membuf_init;               /* indicate initailized membuf */
+         
 	 void _InitParams();
 	 
+         inline void _CopyWFs(WaveFunction **wfa, WaveFunction **wfb)
+         {
+            for (int t=0; t < _ntargets; t++)
+               *(wfa[t]) = wfb[t];
+         }
       protected:
+         double CalcCorr(WaveFunction** wfi, WaveFunction** wft);
 	 double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
-	 double Report(WaveFunction **wfi, int iteration);
+         double Report(WaveFunction **wfi, WaveFunction** wft, int iteration);
+         void PropagateForward(WaveFunction **wf, bool membuf);
+         void PropagateBackward(WaveFunction **wf, bool membuf);
+         void SyncTargetOverlap(WaveFunction** phii, WaveFunction** phit, int step);
+         void SyncTargetOperator(WaveFunction** phii, WaveFunction** phit, int step);
+         void Iterate(WaveFunction** phii, WaveFunction** phit, int step);
+         void IterateRabitzFB(WaveFunction** phii, WaveFunction** phit, int step);
+         void IterateFreq(WaveFunction** phii, WaveFunction** phit, int step);
       public:
 	 ProgOCT(XmlNode &OCTNode);
 	 ~ProgOCT();

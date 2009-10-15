@@ -245,8 +245,13 @@ namespace QDLIB {
   /** Phase angle of complex number.*/
   inline double phase(dcomplex z)
   {
-      return atan2(z._imag, z._real);
-  
+     double r;
+     r = cabs(z);
+     if (r == 0) return NAN;
+     if (z._imag >= 0)
+        return acos(z._real / r);
+     else 
+        return -acos(z._real / r);
   }
   
   
