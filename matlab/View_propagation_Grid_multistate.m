@@ -1,7 +1,10 @@
+% Script to view the propagtion of a grid multistate propagation
 QDng_prop_meta=input('QDng Propagation meta file?  ','s');
 meta_file=fopen(QDng_prop_meta,'r');
+dir=str(1:max(findstr(QDng_prop_meta, '/')))
 while 1    
     l_meta_data = fgetl(meta_file);
+    disp(l_meta_data);
     if ~ischar(l_meta_data),   break,   end
     [name value]= strread(l_meta_data,'%s%s', 'delimiter', '=');
     if strmatch('#', name), continue , end
@@ -24,13 +27,14 @@ if view_ts=='Y'
    each=input('Show every?  ');
    for t=0:each:Ts/wcycle
       for s=0:1:states-1
-         WF=read_QDng_WF(base_name,s,t);
+         disp([dir base_name]);
+         WF=read_QDng_WF([dir base_name],s,t);
          dx=(WF.grid(1,3)-WF.grid(1,2))/(WF.grid(1,1)-1);
          x=WF.grid(1,2):dx:WF.grid(1,3);
          subplot(states,1,states-s);
          plot(x,abs(WF.data),'-b',x,real(WF.data),'-g',x,imag(WF.data),'-r');
          title(['WF-' int2str(s) '\_' int2str(t) ' Time = ' num2str(t*wcycle*dt/41.34) ' fs' ])
       end
-      pause();
+      pause(0.1);
    end
 end
