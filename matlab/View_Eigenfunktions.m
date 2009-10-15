@@ -1,3 +1,4 @@
+% Script to view the calculated eigenfunktion of a potential
 QDng_ef_dir=input('QDng Eigenfunktion Directory?  ','s');
 Nef=0;
 WF=read_QDng_WF([QDng_ef_dir '/ef'],Nef);

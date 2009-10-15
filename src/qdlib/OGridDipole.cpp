@@ -73,13 +73,13 @@ namespace QDLIB {
    
    WaveFunction * OGridDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, _laser.Get());
+      MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, (-1) * _laser.Get());
       return destPsi;
    }
    
    WaveFunction * OGridDipole::Apply(WaveFunction *Psi)
    {
-      MultElements((cVec*) Psi, (dVec*) this, _laser.Get());
+      MultElements((cVec*) Psi, (dVec*) this, (-1) * _laser.Get());
       return Psi;
    }
    
