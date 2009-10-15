@@ -210,6 +210,9 @@ namespace QDLIB {
 	    throw(EParamProblem("Unknown OCT target type", s));
       }
       
+      /* Moving target */
+      attr.GetValue("mv", _mv);
+      
       /* Check for phase sensitive oct*/
       attr.GetValue("phase", _phase);
        
@@ -266,6 +269,9 @@ namespace QDLIB {
 	    log.cout() << " - Excpectation values";
 	    break;
       }
+      
+      if (_mv)
+         log.cout() << " - Moving Target";
       
       if (_phase)
 	 log.cout() << " - phase sensitive" << endl;
@@ -334,18 +340,21 @@ namespace QDLIB {
 	 case krotov: /* Add New Laser to previous field */
 		  res = _laserb[0]->Get() -
 			_shape[0].Get() / (_alpha * double(_ntargets)) * res;
+//                   _laserobj[0] += _alpha / _shape[0].Get() * abs(res - _laserb[0]->Get());
 	    break;
          case freq:  /* like krotov - but subtract gamma */
             res = _laserb[0]->Get() +
                   _shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get());
             /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
+//             _laserobj[0] += _alpha / _shape[0].Get() * abs(_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()));
             break;
 	 case rabitz:
          case rabitzfb:
 		  res = -1* _shape[0].Get() / (_alpha * double(_ntargets)) * res;
+//                   _laserobj[0] += _alpha / _shape[0].Get() *res*res;
 	    break;
       }
-      
+      //_laserobj[0] *= QDGlobalClock::Instance()->Dt();
       return res;
    }
    
@@ -375,6 +384,7 @@ namespace QDLIB {
             if (_phase && _ttype == ov)
                log.cout() << "Phase_" << t << "\t\t";
          }
+//          log.cout() << "Objective\t\t";
          log.cout() << "Pulse Energy" << endl;
       }
       
@@ -405,6 +415,7 @@ namespace QDLIB {
          }
          
       }
+//       log.cout() << ov_sum.real() - _laserobj[0] << "\t\t";
       log.cout() << _laserf[0]->PulseEnergy() << endl;
       log.flush();
       return cabs(ov_sum);
@@ -464,18 +475,21 @@ namespace QDLIB {
    /**
     *Synchronize overlap targets.
     * 
+    * Writes to membuf.
     */
    void QDLIB::ProgOCT::SyncTargetOverlap(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
       
       /* Backpropagation of targets */
-      PropagateBackward(phit, _membuf);
+      if (!_mv)
+         PropagateBackward(phit, _membuf);
       
    }
 
    /**
     * Synchronize operator targets.
     *
+    * Writes to membuf.
     */   
    void ProgOCT::SyncTargetOperator(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
@@ -530,6 +544,9 @@ namespace QDLIB {
             _Uf->Apply(phii[t]);
          }
          ++(*clock);
+      }
+      if (_mv) {
+         _CopyWFs(phit, _memwfbuf[clock->Steps()-1] );
       }
    }
    
@@ -737,6 +754,16 @@ namespace QDLIB {
       log.cout() << endl;
       log.IndentDec();
       
+      /* Initialize Buffer for backpropagation */
+      if (_membuf){
+         _memwfbuf = new WaveFunction**[clock->Steps()+1];
+         for (int s=0; s < clock->Steps()+1; s++){
+            _memwfbuf[s] = new WaveFunction*[_ntargets];
+            for (int t=0; t < _ntargets; t++)
+               _memwfbuf[s][t] = PsiI[t]->NewInstance();
+         }
+      }
+      
       if(_ttype == ov){
          /* Load Target Wavefunctions */
          log.Header( "Target wave functions", Logger::SubSection);
@@ -746,7 +773,22 @@ namespace QDLIB {
             section = _ContentNodes->FindNode( "wft"+string(num) );
             if (section == NULL)
                throw ( EParamProblem ("Missing target wavefunction", t) );
-            PsiT[t] = ChainLoader::LoadWaveFunctionChain( section );
+            if (_mv == true) { /* Prepare series for moving targets */
+               PsiT[t] = ChainLoader::LoadWaveFunctionChain( section, 0 );
+               *(_memwfbuf[0][t]) = PsiT[t];
+               if (_membuf){
+                  log.flush();
+                  log.Supress(true);
+                  for (int s=1; s < clock->Steps()+1; s++){ /* Read time steps */
+                     *(_memwfbuf[s][t]) = ChainLoader::LoadWaveFunctionChain( section, s );
+                  }
+                  log.flush();
+                  log.Supress(false); 
+               } else 
+                  throw ( EParamProblem("Moving overlapp target needs membuf") );
+                  
+            } else /* Load simple target */
+               PsiT[t] = ChainLoader::LoadWaveFunctionChain( section );
             delete section;
          }
          log.cout() << endl;
@@ -887,17 +929,6 @@ namespace QDLIB {
       wfile.Name(_dir+string("wfb"));
       wfile.ActivateSequence();
       
-
-
-      /* Initialize Buffer for backpropagation */
-      if (_membuf){
-         _memwfbuf = new WaveFunction**[clock->Steps()+1];
-         for (int s=0; s < clock->Steps()+1; s++){
-            _memwfbuf[s] = new WaveFunction*[_ntargets];
-            for (int t=0; t < _ntargets; t++)
-               _memwfbuf[s][t] = PsiI[t]->NewInstance();
-         }
-      }
       
       /* Initialize gamma for freq. shape */
       if (_method == freq){
@@ -931,7 +962,9 @@ namespace QDLIB {
             else
                _CopyWFs(phit, PsiI);
          }
-
+         
+         _laserobj[0]=0;
+         
          /* The iteration step itself depends on the method */
 	 if (_method == rabitzfb)
             IterateRabitzFB(phii, phit, i);
@@ -940,17 +973,17 @@ namespace QDLIB {
          else {
             Iterate(phii, phit,i);
          }
-         
+         _laserobj[0] *= clock->Dt();
          /* Check for convergency  & Write Report */
          for (int it=0; it < 3-1; it++)
             deltaTarget[0] = deltaTarget[it+1];
          
-         deltaTarget[2] = Report(phii,phit, i);
+         deltaTarget[2] = abs(deltaTarget[2]-Report(phii,phit, i));
          delta = 0;
          
          for (int it=0; it < 3; it++)
             delta += abs(deltaTarget[it]);
-         
+//          cout << delta << endl;
 	 /* Write laserfields */
 	 if(_writel){
 	    file << _laserf[0];
