@@ -186,7 +186,7 @@ namespace QDLIB
                
             } else if (pm_child.isPresent("coeff2")){
                pm_child.GetValue("coeff2", coeff);
-               coeff *= coeff;
+               coeff = sqrt(coeff);
             }
             if(coeff > 0){
                log.cout().precision(8);
