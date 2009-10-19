@@ -317,8 +317,8 @@ namespace QDLIB {
          /* Phase sensitive */
          if (_phase)
             im = 1* (*wft[t] * _opwf);
-         else /** \todo clarify why it only works this way! should be wfi * wft !!! */
-            im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
+         else
+            im = (*(wft[t]) * wfi[t] ) * (*(wft[t]) * _opwf );
 
          res += im.imag();
       }
@@ -340,18 +340,21 @@ namespace QDLIB {
 	 case krotov: /* Add New Laser to previous field */
 		  res = _laserb[0]->Get() -
 			_shape[0].Get() / (_alpha * double(_ntargets)) * res;
-//                   _laserobj[0] += _alpha / _shape[0].Get() * abs(res - _laserb[0]->Get());
+                  _laserobj[0] += _alpha / _shape[0].Get() * (_shape[0].Get() / (_alpha * double(_ntargets)) * res) *
+                        (_shape[0].Get() / (_alpha * double(_ntargets)) * res);
 	    break;
          case freq:  /* like krotov - but subtract gamma */
             res = _laserb[0]->Get() +
                   _shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get());
+            _laserobj[0] += _alpha / _shape[0].Get() * (_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()))  *
+                  (_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()));
             /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
 //             _laserobj[0] += _alpha / _shape[0].Get() * abs(_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()));
             break;
 	 case rabitz:
          case rabitzfb:
 		  res = -1* _shape[0].Get() / (_alpha * double(_ntargets)) * res;
-//                   _laserobj[0] += _alpha / _shape[0].Get() *res*res;
+                   _laserobj[0] += _alpha / _shape[0].Get() *res*res;
 	    break;
       }
       //_laserobj[0] *= QDGlobalClock::Instance()->Dt();
@@ -384,7 +387,7 @@ namespace QDLIB {
             if (_phase && _ttype == ov)
                log.cout() << "Phase_" << t << "\t\t";
          }
-//          log.cout() << "Objective\t\t";
+         log.cout() << "Objective\t\t";
          log.cout() << "Pulse Energy" << endl;
       }
       
@@ -399,8 +402,8 @@ namespace QDLIB {
 	 
          if (_ttype == ov) { /* Print overlapp */
             overlap = *wfi[t] * wft[t];
-            ov_sum += cabs(overlap);
-            log.cout() << cabs(overlap) << "\t";
+            //ov_sum += cabs(overlap)*cabs(overlap);
+            log.cout() << cabs(overlap)*cabs(overlap) << "\t";
             if (_phase){
                log.cout() << overlap << "\t";
                ov_sum += overlap;
@@ -415,7 +418,7 @@ namespace QDLIB {
          }
          
       }
-//       log.cout() << ov_sum.real() - _laserobj[0] << "\t\t";
+      log.cout() << ov_sum.real() -_laserobj[0]  << "\t\t";
       log.cout() << _laserf[0]->PulseEnergy() << endl;
       log.flush();
       return cabs(ov_sum);
@@ -436,11 +439,11 @@ namespace QDLIB {
       _CopyWFs(_memwfbuf[0], wf); /* Save t=0 */
       
       clock->Begin();
-      for (int s=1; s < clock->Steps(); s++){ /* Save t=1..T */
+      for (int s=0; s < clock->Steps(); s++){ /* Save t=1..T */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(wf[t]);
             if (membuf)
-               *(_memwfbuf[s][t]) = wf[t];
+               *(_memwfbuf[s+1][t]) = wf[t];
          }
          ++(*clock);
       }
@@ -458,16 +461,15 @@ namespace QDLIB {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
       clock->End();
-      _CopyWFs(_memwfbuf[clock->TimeStep()], wf); /* Save t=T */
+      _CopyWFs(_memwfbuf[clock->TimeStep()+1], wf); /* Save t=T */
       
-      for (int s=clock->TimeStep()-1; s >= 0; s--){
-         --(*clock);
+      for (int s=clock->TimeStep(); s >= 0; s--){
          for (int t=0; t < _ntargets; t++){
             _Ub->Apply(wf[t]);
             if (membuf)
                *(_memwfbuf[s][t]) = wf[t];
          }
-         
+         --(*clock);
       }
    }
    
@@ -562,6 +564,8 @@ namespace QDLIB {
          PropagateForward(phii, _membuf);
       }
       
+      _CopyWFs(phii, _memwfbuf[0]);
+      
       /* Create target */
       if (_ttype == op)
          for (int t=0; t < _ntargets; t++)
@@ -569,10 +573,10 @@ namespace QDLIB {
       
       /* Propagate Target Backward with new field (1) */
       clock->End();
-      for (int s=0; s < clock->Steps()-1; s++){
+      for (int s=0; s < clock->Steps(); s++){
          /* Calc new laser field */
          if (_membuf)
-            _laserb[0]->Set(CalcLaserField(_memwfbuf[clock->TimeStep()], phit));
+            _laserb[0]->Set(CalcLaserField(_memwfbuf[clock->TimeStep()+1], phit));
          else {
             for (int t=0; t < _ntargets; t++)
                _Ub->Apply(phii[t]);
@@ -581,7 +585,7 @@ namespace QDLIB {
          
          /* Save back steps */
          if (_membuf)
-            _CopyWFs(_memwfbuf[clock->TimeStep()], phit);
+            _CopyWFs(_memwfbuf[clock->TimeStep()+1], phit);
 
          
          /* Do one step back */
@@ -591,13 +595,15 @@ namespace QDLIB {
          
          --(*clock);
       }
-      /* Save back steps */
+      /* Save last  back steps */
       if (_membuf)
-         _CopyWFs(_memwfbuf[clock->TimeStep()+1], phit);
+         _CopyWFs(_memwfbuf[0], phit);
+      
+      _CopyWFs(phit, _memwfbuf[clock->Steps()]);
       
       /* Propagate forward initial with new field (2) */
       clock->Begin();
-      for (int s=0; s < clock->Steps()-1; s++){
+      for (int s=0; s < clock->Steps(); s++){
          /* Calc new laser field */
          if (_membuf)
             _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[clock->TimeStep()]));
@@ -619,9 +625,9 @@ namespace QDLIB {
          
          ++(*clock);
       }
-      /* Save forward steps */
+      /* Save last forward steps */
       if (_membuf)
-         _CopyWFs(_memwfbuf[clock->TimeStep()], phii);
+         _CopyWFs(_memwfbuf[clock->Steps()], phii);
       
 
       
@@ -635,24 +641,28 @@ namespace QDLIB {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
       cVec *freqbuf;
+      cVec *freqbufb;
+     
       
+      /* Shape old Laser in the frequency domain & write result to new laser */
+      _laserf[0]->FastCopy(*(_laserb[0]));
+      freqbuf = _laserf[0]->Spectrum();
+      freqbufb = _laserb[0]->Spectrum(); /** \todo dirty hack to correct the time steps */
+      
+      for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
+         (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
+         (*freqbufb)[s] *= (_frqmask[0])[s] / clock->Steps();
+      }
+      
+      _laserf[0]->ToTimeDomain();
+      _laserb[0]->ToTimeDomain();
+
       /* Sync targets */
       if (_ttype == ov)
          SyncTargetOverlap(phii, phit, step);
       else
          SyncTargetOperator(phii, phit, step);
       
-      /* Shape old Laser in the frequency domain & write result to new laser */
-      _laserf[0]->FastCopy(*(_laserb[0]));
-      freqbuf = _laserf[0]->Spectrum();
-      _laserb[0]->Spectrum(); /** \todo dirty hack to correct the time steps */
-      
-      for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
-         (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
-      }
-      
-      _laserf[0]->ToTimeDomain();
-
       /* Determine correction field gamma (propagation with shaped lasers)*/
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
