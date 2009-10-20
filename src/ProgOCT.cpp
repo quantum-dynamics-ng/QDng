@@ -54,6 +54,8 @@ namespace QDLIB {
       int steps;
       string s;
       
+      double cutoffl, cutoffh; /* Cut off frequencies for freq-shape method */
+      
       /* Init the clock */
       attr.GetValue("dt", dt);
       attr.GetValue("steps", steps);
@@ -120,6 +122,7 @@ namespace QDLIB {
       
       /* Look for freq. shape params */
       if (_method == freq){
+         double cutoff;
          if ( attr.isPresent("freq") ){ /* Load mask from file */
             string frqmask;
             attr.GetValue("freq", frqmask);
@@ -136,14 +139,12 @@ namespace QDLIB {
             _frqmask[0].Dt(dt);
             ((dVec&) (_frqmask[0])) = 1.0; /* initialize with ones */
             
-            double cutoff;
+            
             dVec mask(steps/2+1);
             /* Lower cuttoff => Highpass */
             if  (attr.isPresent("freql")) {
-               attr.GetValue("freql", cutoff);
-               cout << "Lower " << cutoff << endl;
-               cutoff = abs(cutoff) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
-               cout << cutoff << endl;
+               attr.GetValue("freql", cutoffl);
+               cutoff = abs(cutoffl) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
                if (cutoff > steps/2+1)
                   throw ( EParamProblem("Lower frequency bound larger than Nyquist frequency") );
                Butterworth<dVec>::Highpass(mask, cutoff, 100);
@@ -153,10 +154,8 @@ namespace QDLIB {
             }
             /* Higher cuttoff => Lowpass */
             if  (attr.isPresent("freqh")) {
-               attr.GetValue("freqh", cutoff);
-               cout << "Higher " << cutoff << endl;
-               cutoff = abs(cutoff) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
-               cout << cutoff << endl;
+               attr.GetValue("freqh", cutoffh);
+               cutoff = abs(cutoffh) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
                if (cutoff > steps/2+1)
                   throw ( EParamProblem("Upper frequency bound larger than Nyquist frequency") );
                Butterworth<dVec>::Lowpass(mask, cutoff, 100);
@@ -278,6 +277,11 @@ namespace QDLIB {
       else 
 	 log.cout() << endl;
       
+      if (_method == freq){
+         log.cout() << endl << "Frequency mask parameters: ";
+         log.cout() << "low = " << cutoffl << "  high = " << cutoffh << endl;
+      }
+      
       log.cout().precision(3);
       log.cout() << "alpha : " << _alpha << endl;
       log.cout() << "Number of targets: " << _ntargets << endl;
@@ -345,9 +349,9 @@ namespace QDLIB {
 	    break;
          case freq:  /* like krotov - but subtract gamma */
             res = _laserb[0]->Get() +
-                  _shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get());
-            _laserobj[0] += _alpha / _shape[0].Get() * (_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()))  *
-                  (_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()));
+                  _shape[0].Get() / (_alpha * double(_ntargets)) * (-res+_gamma[0].Get());
+            _laserobj[0] += (1 / ( double(_ntargets)) * (-res-_gamma[0].Get()))  *
+                  (_shape[0].Get() / (_alpha * double(_ntargets)) * (-res+_gamma[0].Get()));
             /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
 //             _laserobj[0] += _alpha / _shape[0].Get() * abs(_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()));
             break;
@@ -984,16 +988,20 @@ namespace QDLIB {
             Iterate(phii, phit,i);
          }
          _laserobj[0] *= clock->Dt();
+         
          /* Check for convergency  & Write Report */
          for (int it=0; it < 3-1; it++)
-            deltaTarget[0] = deltaTarget[it+1];
+            deltaTarget[it] = deltaTarget[it+1];
          
-         deltaTarget[2] = abs(deltaTarget[2]-Report(phii,phit, i));
+         deltaTarget[2] = abs(Report(phii,phit, i));
          delta = 0;
+      
+         for (int it=0; it < 3-1; it++)
+            delta += abs(deltaTarget[it]-deltaTarget[it+1]);
          
-         for (int it=0; it < 3; it++)
-            delta += abs(deltaTarget[it]);
-//          cout << delta << endl;
+         delta = abs(delta);
+         
+         
 	 /* Write laserfields */
 	 if(_writel){
 	    file << _laserf[0];
@@ -1004,9 +1012,12 @@ namespace QDLIB {
 	 
 	 log.flush();
 	 i++;
-      } /* while (i < _iterations && deltaTarget > _convergence) */
+      } /* while (i < _iterations && delta > _convergence) */
       if( _writeyield )
          log.FileClose();
+      
+      if (delta <= _convergence)
+         log.cout() << endl << "Convergence reached" << endl;
       
       /* Write the final laser */
       file.StopSequence();
