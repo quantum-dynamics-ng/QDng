@@ -335,21 +335,22 @@ namespace QDLIB {
     */
    double ProgOCT::CalcLaserField( WaveFunction** wfi, WaveFunction** wft )
    {
-      double res;
+      double res=0;
+      double im;
       
-      res = CalcCorr(wfi, wft);
+      im = CalcCorr(wfi, wft);
 
       /* Method */
       switch(_method){
 	 case krotov: /* Add New Laser to previous field */
 		  res = _laserb[0]->Get() -
-			_shape[0].Get() / (_alpha * double(_ntargets)) * res;
+			_shape[0].Get() / (_alpha * double(_ntargets)) * im;
                   _laserobj[0] += _alpha / _shape[0].Get() * (_shape[0].Get() / (_alpha * double(_ntargets)) * res) *
                         (_shape[0].Get() / (_alpha * double(_ntargets)) * res);
 	    break;
          case freq:  /* like krotov - but subtract gamma */
             res = _laserb[0]->Get() +
-                  _shape[0].Get() / (_alpha * double(_ntargets)) * (-res+_gamma[0].Get());
+                  _shape[0].Get() / (_alpha * double(_ntargets)) * (-im+_gamma[0].Get());
             _laserobj[0] += (1 / ( double(_ntargets)) * (-res-_gamma[0].Get()))  *
                   (_shape[0].Get() / (_alpha * double(_ntargets)) * (-res+_gamma[0].Get()));
             /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
@@ -357,8 +358,8 @@ namespace QDLIB {
             break;
 	 case rabitz:
          case rabitzfb:
-		  res = -1* _shape[0].Get() / (_alpha * double(_ntargets)) * res;
-                   _laserobj[0] += _alpha / _shape[0].Get() *res*res;
+		  res = -1* _shape[0].Get() / (_alpha * double(_ntargets)) * im;
+                  _laserobj[0] +=  -1  / (double(_ntargets)) * im  *res;
 	    break;
       }
       //_laserobj[0] *= QDGlobalClock::Instance()->Dt();
@@ -440,7 +441,8 @@ namespace QDLIB {
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
-      _CopyWFs(_memwfbuf[0], wf); /* Save t=0 */
+      if (_membuf)
+         _CopyWFs(_memwfbuf[0], wf); /* Save t=0 */
       
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){ /* Save t=1..T */
@@ -465,7 +467,9 @@ namespace QDLIB {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
       clock->End();
-      _CopyWFs(_memwfbuf[clock->TimeStep()+1], wf); /* Save t=T */
+      
+      if (_membuf)
+         _CopyWFs(_memwfbuf[clock->TimeStep()+1], wf); /* Save t=T */
       
       for (int s=clock->TimeStep(); s >= 0; s--){
          for (int t=0; t < _ntargets; t++){
@@ -568,7 +572,8 @@ namespace QDLIB {
          PropagateForward(phii, _membuf);
       }
       
-      _CopyWFs(phii, _memwfbuf[0]);
+      if (_membuf)
+         _CopyWFs(phii, _memwfbuf[0]);
       
       /* Create target */
       if (_ttype == op)
