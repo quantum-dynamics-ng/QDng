@@ -150,8 +150,9 @@ namespace QDLIB
 
    void WFMultistate::Normalize( )
    {
+      double norm=Norm();
       for(lint i=0; i < _nstates; i++){
-	 MultElements( (cVec*) _states[i] , 1/sqrt(Norm()) );
+	 MultElements( (cVec*) _states[i] , 1/sqrt(norm) );
       }
    }
 

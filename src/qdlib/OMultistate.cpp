@@ -214,10 +214,11 @@ namespace QDLIB
 	 
    double OMultistate::Emin()
    {
-      double d;
+      double d=0;
       double min;
       
-      d = _matrix[0][0]->Emin();
+      if (_matrix[0][0] != NULL)
+         d = _matrix[0][0]->Emin();
       
       for (lint i=1; i < _nstates; i++){
 	 if (_matrix[i][i] != NULL){
