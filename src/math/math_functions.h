@@ -16,13 +16,40 @@ namespace QDLIB {
     * \param m1 Matrix element 11
     * \param m2 Matrix element 22
     * \param m1 Matrix element 12 = 21
-    * \param ev1 Eigenvalue 1
-    * \param ev2 Eigenvalue 2
+    * \param eval Eigenvalues
     */
-   inline void diag22symm(double m1, double m2, double m12, double &ev1, double &ev2)
+   inline void diag22symm(double m1, double m2, double m12, double *eval)
    {
-      ev1 = 0.5 * ( m1 + m2 + sqrt(m1*m1 + m2*m2 - 2*m1*m2 + 4*m12*m12) );
-      ev2 = 0.5 * ( m1 + m2 - sqrt(m1*m1 + m2*m2 - 2*m1*m2 + 4*m12*m12) );
+      /* Eigenvalues */
+      eval[0] = 0.5 * ( m1 + m2 + sqrt(m1*m1 + m2*m2 - 2*m1*m2 + 4*m12*m12) );
+      eval[1] = 0.5 * ( m1 + m2 - sqrt(m1*m1 + m2*m2 - 2*m1*m2 + 4*m12*m12) );
    }
    
+   /**
+    * Diagonalize a symmetric 2x2 matrix
+    * 
+    * \param m1 Matrix element 11
+    * \param m2 Matrix element 22
+    * \param m1 Matrix element 12 = 21
+    * \param eval Eigenvalues
+    * \param evec Eigenvectors
+    */
+   inline void diag22symm(double m1, double m2, double m12, double *eval, double **evec)
+   {
+      diag22symm(m1, m2, m12, eval);
+
+      /* Eigenvectors */
+      evec[0][0] = m12 / 0.5 / ( m2 - m1 + sqrt(m1*m1 + m2*m2 - 2*m1*m2 + 4*m12*m12) );
+      evec[1][0] = m12 / 0.5 / ( m2 - m1 - sqrt(m1*m1 + m2*m2 - 2*m1*m2 + 4*m12*m12) );
+      
+      /* Normalize eigenvectors */
+      double norm;
+      norm=evec[0][0]*evec[0][0] + 1;
+      evec[0][0] /= sqrt(norm);
+      evec[0][1] = 1/ sqrt(norm);
+      
+      norm=evec[1][0]*evec[1][0] + 1;
+      evec[1][0] /= sqrt(norm);
+      evec[1][1] = 1/ sqrt(norm);
+   }
 }
