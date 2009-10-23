@@ -2,7 +2,7 @@
 #include "tools/Exception.h"
 #include "WFGridSystem.h"
 #include "OMultistate.h"
-
+#include "math/math_functions.h"
 
 namespace QDLIB {
 
@@ -55,16 +55,18 @@ namespace QDLIB {
 	 /* Gen: V(t) * 1  =  V_t */
 	 ((Operator*) (_Vpot[1]))->UpdateTime();
 	 _Vpot[0]->Apply(expV->State(0), V1->State(0));
-	 ExpElements((cVec*) expV->State (0), (cVec*) expV->State(0), _cV);
 	 _Vpot[1]->Apply(expV->State(1), V1->State(1));
-	 ExpElements((cVec*) expV->State(1), (cVec*) expV->State(1), _cV);	 
+         if (_Vcoup == NULL){ /* Exponents for coupling are build directly */
+            ExpElements((cVec*) expV->State(0), (cVec*) expV->State(0), _cV);
+            ExpElements((cVec*) expV->State(1), (cVec*) expV->State(1), _cV);
+         }
 	 /* Coupling - only held once */
 	 if (_Vcoup != NULL){
 	    ((Operator*) (_Vcoup))->UpdateTime();
 	    _Vcoup->Apply(expVcoup->State(0), V1->State(0));
 	    _Vcoup->Apply(expVcoup->State(1), V1->State(1));
-	    ExpElements((cVec*) expVcoup->State(0), (cVec*) expVcoup->State(0), -1*_cV);
-	    ExpElements((cVec*) expVcoup->State(1), (cVec*) expVcoup->State(1), _cV);
+	    //ExpElements((cVec*) expVcoup->State(0), (cVec*) expVcoup->State(0), -1*_cV);
+	    //ExpElements((cVec*) expVcoup->State(1), (cVec*) expVcoup->State(1), _cV);
 	 }
       } else { /* Single state */
 	 ((Operator*) (_Vpot[0]))->UpdateTime();
@@ -152,10 +154,8 @@ namespace QDLIB {
       if (_expVcoupI == NULL && _coupdiag){
          _expVcoupI = Psi->NewInstance();
       }
-      
       _InitT();
       _InitV();
-
    }
    
    void QDLIB::OSPO::Init( ParamContainer & params )
@@ -213,36 +213,48 @@ namespace QDLIB {
       
       if (_coupling){ /* With coupling */
 	 WFMultistate *psi = dynamic_cast<WFMultistate*>(Psi);
-	 WFMultistate *buf = dynamic_cast<WFMultistate*>(_buf);
+//	 WFMultistate *buf = dynamic_cast<WFMultistate*>(_buf);
 	 WFMultistate *expVcoup = dynamic_cast<WFMultistate*>(_expVcoup);
+         WFMultistate *expV = dynamic_cast<WFMultistate*>(_expV);
 	 
 	 /* exp(-i/2 T dt) */
 	 for (int i=0; i < 2; i++){
 	    dynamic_cast<WFGridSystem*>(psi->State(i))->ToKspace(); 
-	    MultElements( (cVec*) psi->State(i),  (cVec*) _expT, 1/ double(psi->size()) );
+            MultElements( (cVec*) psi->State(i),  (cVec*) _expT, 1/ double(psi->State(i)->size()) );
 	    dynamic_cast<WFGridSystem*>(psi->State(i))->ToXspace();
 	 }
-	 
-	 /* exp(-i V dt) */
-	 MultElements( (cVec*) psi,  (cVec*) _expV);
-	 
+	 	 
 	 /* exp(-i Vcoup dt) */
 	 if (expVcoup != NULL){
-	    /* transform psi to Vcoup diag basis */
-	    *(buf->State(0)) = psi->State(1); 
-	    *(buf->State(0)) -= psi->State(0);
-	    *(buf->State(1)) = psi->State(1);
-	    *(buf->State(1)) += psi->State(0);
-	 
-	    MultElements( (cVec*) buf,  (cVec*) expVcoup);
-	 
-	    /* transform psi back from  Vcoup diag basis */
-	    *(psi->State(0)) = buf->State(1); 
-	    *(psi->State(0)) -= buf->State(0);
-	    *(psi->State(1)) = buf->State(1);
-	    *(psi->State(1)) += buf->State(0);
-	 }
-	 
+            double eval[2];
+            double evec1[2];
+            double evec2[2];
+            double* evec[2] ={evec1,evec2};
+            cVec *V = (cVec*) expV;
+            cVec *Vcoup  = (cVec*) expVcoup;
+            int size= V->size()/2;
+            cVec *wf= (cVec*) psi;
+            dcomplex wfb0;
+            dcomplex wfb1;
+            
+            /* Diagonalize V and exponentiate */
+            for (int i=0; i < size; i++){
+               diag22symm((*V)[i].real(), (*V)[i+size].real(), (*Vcoup)[i].real(), eval, evec);
+               wfb0 = cexp(eval[0] * _cV) * (evec[0][0] * (*wf)[i] + evec[0][1] * (*wf)[i+size]);
+               wfb1 = cexp(eval[1] * _cV) * (evec[1][0] * (*wf)[i] + evec[1][1] * (*wf)[i+size]);
+               (*wf)[i] = evec[0][0] * wfb0 + evec[1][0] * wfb1;
+               (*wf)[i+size] = evec[0][1] * wfb0 + evec[1][1] * wfb1;
+               //cout << clock->TimeStep() << " " << (*V)[i].real() << " " << (*V)[i+size].real() << endl;
+//                cout << evec[1][0]*evec[0][0] + evec[1][1]*evec[0][1] << endl;
+//                cout << evec[1][0]*evec[1][0] + evec[1][1]*evec[1][1] << " " <<   evec[0][0]*evec[0][0] + evec[0][1]*evec[0][1] << endl;
+/*               cout << evec[0][0] * evec[0][0] + evec[0][1] * evec[1][0] << "\t" << evec[0][0] * evec[1][0] +  evec[0][1] *  evec[1][1]<<endl;
+               cout << evec[1][0] * evec[0][0] + evec[1][1] * evec[1][0] << "\t" << evec[1][0] * evec[1][0] +  evec[1][1] *  evec[1][1]<<endl;*/
+            }
+         } else  
+            MultElements( (cVec*) psi,  (cVec*) _expV); /* exp(-i V dt) */
+         
+            //cout << endl;
+            
 	 /* exp(-i/2 T dt) */
 	 for (int i=0; i < 2; i++){
 	    dynamic_cast<WFGridSystem*>(psi->State(i))->ToKspace(); 
