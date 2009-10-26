@@ -24,7 +24,6 @@ namespace QDLIB {
 #ifdef _OPENMP
  #include <omp.h>
 #endif
-
 	       
 namespace QDLIB {
    /**

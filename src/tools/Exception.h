@@ -91,7 +91,7 @@ namespace QDLIB {
    };
    
    /**
-    * Indicate an overflow/Nummercal problem.
+    * Indicate an overflow/Nummerical problem.
     */
    class EOverflow : public Exception {
       public:

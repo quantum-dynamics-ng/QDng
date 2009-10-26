@@ -240,15 +240,15 @@ namespace QDLIB {
             /* Diagonalize V and exponentiate */
             for (int i=0; i < size; i++){
                diag22symm((*V)[i].real(), (*V)[i+size].real(), (*Vcoup)[i].real(), eval, evec);
-               wfb0 = cexp(eval[0] * _cV) * (evec[0][0] * (*wf)[i] + evec[0][1] * (*wf)[i+size]);
-               wfb1 = cexp(eval[1] * _cV) * (evec[1][0] * (*wf)[i] + evec[1][1] * (*wf)[i+size]);
-               (*wf)[i] = evec[0][0] * wfb0 + evec[1][0] * wfb1;
-               (*wf)[i+size] = evec[0][1] * wfb0 + evec[1][1] * wfb1;
-               //cout << clock->TimeStep() << " " << (*V)[i].real() << " " << (*V)[i+size].real() << endl;
-//                cout << evec[1][0]*evec[0][0] + evec[1][1]*evec[0][1] << endl;
-//                cout << evec[1][0]*evec[1][0] + evec[1][1]*evec[1][1] << " " <<   evec[0][0]*evec[0][0] + evec[0][1]*evec[0][1] << endl;
-/*               cout << evec[0][0] * evec[0][0] + evec[0][1] * evec[1][0] << "\t" << evec[0][0] * evec[1][0] +  evec[0][1] *  evec[1][1]<<endl;
-               cout << evec[1][0] * evec[0][0] + evec[1][1] * evec[1][0] << "\t" << evec[1][0] * evec[1][0] +  evec[1][1] *  evec[1][1]<<endl;*/
+               wfb0 = cexp(eval[0] * _cV) * (evec[0][0] * (*wf)[i] + evec[1][0] * (*wf)[i+size]);
+               wfb1 = cexp(eval[1] * _cV) * (evec[0][1] * (*wf)[i] + evec[1][1] * (*wf)[i+size]);
+               (*wf)[i] = evec[0][0] * wfb0 + evec[0][1] * wfb1;
+//                if ( fpclassify((*wf)[i].real()) == FP_NAN)
+//                   cout << i << " " << eval[0] << " " << eval[1] << " " << evec[1][0] << " " <<  (*Vcoup)[i].real() << endl;
+               (*wf)[i+size] = evec[1][0] * wfb0 + evec[1][1] * wfb1;
+//                if ( fpclassify((*wf)[i+size].real()) == FP_NAN)
+//                 //  cout << i+size << " " << eval[0] << " " << eval[1] << " " << evec[1][0] << endl;
+
             }
          } else  
             MultElements( (cVec*) psi,  (cVec*) _expV); /* exp(-i V dt) */
