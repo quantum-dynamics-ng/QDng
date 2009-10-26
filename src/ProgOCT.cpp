@@ -279,6 +279,7 @@ namespace QDLIB {
       
       if (_method == freq){
          log.cout() << endl << "Frequency mask parameters: ";
+         log.cout().precision(8);
          log.cout() << "low = " << cutoffl << "  high = " << cutoffh << endl;
       }
       
@@ -320,7 +321,7 @@ namespace QDLIB {
 	 
          /* Phase sensitive */
          if (_phase)
-            im = 1* (*wft[t] * _opwf);
+            im = (*wft[t] * _opwf);
          else
             im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
 
@@ -343,9 +344,9 @@ namespace QDLIB {
       /* Method */
       switch(_method){
 	 case krotov: /* Add New Laser to previous field */
-		  res = _laserb[0]->Get() -
-			_shape[0].Get() / (_alpha * double(_ntargets)) * im;
-                  _laserobj[0] += (res-_laserb[0]->Get()) * (res-_laserb[0]->Get());
+            res = _laserb[0]->Get();
+            res -= _shape[0].Get() / (_alpha * double(_ntargets)) * im;
+                  _laserobj[0] += (_shape[0].Get() / _alpha *  im) * (_shape[0].Get() / _alpha  * im);
 	    break;
          case freq:  /* like krotov - but subtract gamma */
             res = _laserb[0]->Get();
@@ -386,6 +387,7 @@ namespace QDLIB {
          log.cout() << "iteration\t";
          for (int t=0; t < _ntargets; t++){
             log.cout() << "Norm_" << t << "\t\t";
+            log.cout() << "Norm_t" << t << "\t\t";
             if (_ttype == ov) log.cout() << "Overlapp_" << t << "\t";
             else log.cout() << "Operator_" << t << "\t";
             if (_phase && _ttype == ov)
@@ -550,6 +552,11 @@ namespace QDLIB {
       else
          SyncTargetOperator(phii, phit, step);
       
+      /* Refresh intial */
+      for (int t=0; t < _ntargets; t++){
+         *(phii[t]) = PsiI[t];
+      }
+      
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
          /* Get new field */
@@ -677,11 +684,11 @@ namespace QDLIB {
       
       for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
          (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
-//          (*freqbufb)[s] *= (_frqmask[0])[s] / clock->Steps();
+         (*freqbufb)[s] *= (_frqmask[0])[s] / clock->Steps();
       }
       
       _laserf[0]->ToTimeDomain();
-      //_laserb[0]->ToTimeDomain();
+      _laserb[0]->ToTimeDomain();
 
       /* Sync targets */
       if (_ttype == ov)
