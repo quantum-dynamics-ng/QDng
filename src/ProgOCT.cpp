@@ -322,7 +322,7 @@ namespace QDLIB {
          if (_phase)
             im = 1* (*wft[t] * _opwf);
          else
-            im = (*(wft[t]) * wfi[t] ) * (*(wft[t]) * _opwf );
+            im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
 
          res += im.imag();
       }
@@ -337,7 +337,7 @@ namespace QDLIB {
    {
       double res=0;
       double im;
-      
+
       im = CalcCorr(wfi, wft);
 
       /* Method */
@@ -345,16 +345,12 @@ namespace QDLIB {
 	 case krotov: /* Add New Laser to previous field */
 		  res = _laserb[0]->Get() -
 			_shape[0].Get() / (_alpha * double(_ntargets)) * im;
-                  _laserobj[0] += _alpha / _shape[0].Get() * (_shape[0].Get() / (_alpha * double(_ntargets)) * res) *
-                        (_shape[0].Get() / (_alpha * double(_ntargets)) * res);
+                  _laserobj[0] += (res-_laserb[0]->Get()) * (res-_laserb[0]->Get());
 	    break;
          case freq:  /* like krotov - but subtract gamma */
-            res = _laserb[0]->Get() +
-                  _shape[0].Get() / (_alpha * double(_ntargets)) * (-im+_gamma[0].Get());
-            _laserobj[0] += (1 / ( double(_ntargets)) * (-res-_gamma[0].Get()))  *
-                  (_shape[0].Get() / (_alpha * double(_ntargets)) * (-res+_gamma[0].Get()));
-            /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
-//             _laserobj[0] += _alpha / _shape[0].Get() * abs(_shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get()));
+            res = _laserb[0]->Get();
+            res -= _shape[0].Get() / (_alpha * double(_ntargets)) * (im + _gamma[0].Get());
+            _laserobj[0] += (_shape[0].Get() / _alpha *  im) * (_shape[0].Get() / _alpha  * im);
             break;
 	 case rabitz:
          case rabitzfb:
@@ -362,7 +358,10 @@ namespace QDLIB {
                   _laserobj[0] +=  -1  / (double(_ntargets)) * im  *res;
 	    break;
       }
-      //_laserobj[0] *= QDGlobalClock::Instance()->Dt();
+      
+      if ( fpclassify(res) == FP_NAN)
+         throw ( EOverflow("Laserfield is non a number") );
+      
       return res;
    }
    
@@ -387,7 +386,7 @@ namespace QDLIB {
          log.cout() << "iteration\t";
          for (int t=0; t < _ntargets; t++){
             log.cout() << "Norm_" << t << "\t\t";
-            if (_ttype == ov) log.cout() << "Overlapp_" << t << "\t\t";
+            if (_ttype == ov) log.cout() << "Overlapp_" << t << "\t";
             else log.cout() << "Operator_" << t << "\t";
             if (_phase && _ttype == ov)
                log.cout() << "Phase_" << t << "\t\t";
@@ -401,11 +400,24 @@ namespace QDLIB {
       
       log.cout() << iteration << "\t\t";
       for (int t=0; t < _ntargets; t++){
+         double d;
          log.cout() << fixed;
 	 log.cout().precision(8);
-	 log.cout() << wfi[t]->Norm() << "\t";
+         d = wfi[t]->Norm();
+         if ( fpclassify(d) == FP_NAN)
+            throw ( EOverflow("Forward norm is non a number") );
+         
+	 log.cout() << d << "\t";
+         
 	 
          if (_ttype == ov) { /* Print overlapp */
+            d = wft[t]->Norm();
+            if ( fpclassify(d) == FP_NAN)
+               throw ( EOverflow("Backward norm is non a number") );
+               
+            log.cout() << d << "\t";
+
+            
             overlap = *wfi[t] * wft[t];
             //ov_sum += cabs(overlap)*cabs(overlap);
             log.cout() << cabs(overlap)*cabs(overlap) << "\t";
@@ -423,9 +435,14 @@ namespace QDLIB {
          }
          
       }
-      log.cout() << ov_sum.real() -_laserobj[0]  << "\t\t";
+      if (iteration == 0)
+         log.cout() << "-\t" << "\t\t";
+      else 
+         log.cout() << ov_sum.real() -_laserobj[0]  << "\t\t";
+      
       log.cout() << _laserf[0]->PulseEnergy() << endl;
       log.flush();
+      
       return cabs(ov_sum);
    }
    
@@ -535,7 +552,13 @@ namespace QDLIB {
       
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
+         /* Get new field */
+         if (_membuf)
+            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
+         else
+            _laserf[0]->Set(CalcLaserField(phii,phit));
             
+         
          /* Target with old field */
          if (! _membuf){
             for (int t=0; t < _ntargets; t++){
@@ -543,12 +566,6 @@ namespace QDLIB {
             }
          }
          
-         /* Get new field */
-         if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
-         else
-            _laserf[0]->Set(CalcLaserField(phii,phit));
-            
          /* Propagate initial with new field */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phii[t]);
@@ -660,11 +677,11 @@ namespace QDLIB {
       
       for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
          (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
-         (*freqbufb)[s] *= (_frqmask[0])[s] / clock->Steps();
+//          (*freqbufb)[s] *= (_frqmask[0])[s] / clock->Steps();
       }
       
       _laserf[0]->ToTimeDomain();
-      _laserb[0]->ToTimeDomain();
+      //_laserb[0]->ToTimeDomain();
 
       /* Sync targets */
       if (_ttype == ov)
@@ -675,18 +692,18 @@ namespace QDLIB {
       /* Determine correction field gamma (propagation with shaped lasers)*/
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
+         _gamma[0].Set( CalcCorr(phii,phit) );
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phit[t]);
             _Uf->Apply(phii[t]);
          }
-         _gamma[0].Set( CalcCorr(phii,phit) );
          ++(*clock);
       }
 
       /* Apply Bandstop filter */
       freqbuf = _gamma[0].Spectrum();
       for (int s=0; s < clock->Steps()/2+1; s++) /* apply mask */ 
-         (*freqbuf)[s] *= (1-(_frqmask[0])[s])/ clock->Steps();
+         (*freqbuf)[s] *= (1-(_frqmask[0])[s]) / double(clock->Steps());
       
       _gamma[0].ToTimeDomain();
       
@@ -704,6 +721,11 @@ namespace QDLIB {
       
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
+         /* Get new field */
+         if (_membuf)
+            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
+         else
+            _laserf[0]->Set(CalcLaserField(phii,phit));
             
          /* Target with old field */
          if (! _membuf){
@@ -714,12 +736,6 @@ namespace QDLIB {
             _laserb[0]->swap(*(_laserf[0]));
          }
          
-         /* Get new field */
-         if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
-         else
-            _laserf[0]->Set(CalcLaserField(phii,phit));
-            
          /* Propagate initial with new field */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phii[t]);
@@ -837,7 +853,7 @@ namespace QDLIB {
       log.cout() << "Initial engergy: " << _hf->Expec(PsiI[0]) << endl;
       if (_ttype == ov){
          log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
-         log.cout() << "Initial Overlapp: " << *(PsiT[0]) * (PsiI[0])<< endl;
+         log.cout() << "Initial Overlapp: " << *(PsiI[0]) * (PsiT[0])<< endl;
       }
       log.flush();
       /* Copy, since the propagator will propably scale it/modify etc. */
@@ -915,9 +931,10 @@ namespace QDLIB {
       ParamContainer Upm;
     
       Upm = _Uf->Params();
-      log.coutdbg() << "Forward Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << "Forward Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << _Uf->Exponent() << " " << _Ub->Exponent() << endl;
       Upm = _Ub->Params();
-      log.coutdbg() << "Backward Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << "Backward Propagators init parameters:\n\n" << Upm << endl;
 
       
       /* Objects for propagation */
@@ -956,8 +973,9 @@ namespace QDLIB {
          _gamma[0].Clock(clock);
       }
       
-      /* Write Report & Calculate change */
+      /* Write Report for guess */
       _CopyWFs(phii, PsiI);
+      _laserobj[0] = 0;
       PropagateForward(phii,false);
       Report(phii,PsiT, 0);
       
