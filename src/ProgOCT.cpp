@@ -387,8 +387,10 @@ namespace QDLIB {
          log.cout() << "iteration\t";
          for (int t=0; t < _ntargets; t++){
             log.cout() << "Norm_" << t << "\t\t";
-            log.cout() << "Norm_t" << t << "\t\t";
-            if (_ttype == ov) log.cout() << "Overlapp_" << t << "\t";
+            if (_ttype == ov){
+               log.cout() << "Norm_t" << t << "\t\t";
+               log.cout() << "Overlapp_" << t << "\t";
+            }
             else log.cout() << "Operator_" << t << "\t";
             if (_phase && _ttype == ov)
                log.cout() << "Phase_" << t << "\t\t";
@@ -407,7 +409,7 @@ namespace QDLIB {
 	 log.cout().precision(8);
          d = wfi[t]->Norm();
          if ( fpclassify(d) == FP_NAN)
-            throw ( EOverflow("Forward norm is non a number") );
+            throw ( EOverflow("Forward norm is not a number") );
          
 	 log.cout() << d << "\t";
          
@@ -415,7 +417,7 @@ namespace QDLIB {
          if (_ttype == ov) { /* Print overlapp */
             d = wft[t]->Norm();
             if ( fpclassify(d) == FP_NAN)
-               throw ( EOverflow("Backward norm is non a number") );
+               throw ( EOverflow("Backward norm is not a number") );
                
             log.cout() << d << "\t";
 
@@ -424,7 +426,7 @@ namespace QDLIB {
             //ov_sum += cabs(overlap)*cabs(overlap);
             log.cout() << cabs(overlap)*cabs(overlap) << "\t";
             if (_phase){
-               log.cout() << overlap << "\t";
+               log.cout() << phase(overlap)/M_PI << "\t";
                ov_sum += overlap;
             } else
                ov_sum._real += cabs(overlap)*cabs(overlap);

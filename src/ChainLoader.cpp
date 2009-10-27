@@ -191,6 +191,7 @@ namespace QDLIB
             if(coeff > 0){
                log.cout().precision(8);
                log.cout() << fixed << "Coefficient = " << coeff << endl;
+               log.cout() << fixed << "Coefficient^2 = " << coeff*coeff << endl;
             }
                     
             wfadd = LoadWaveFunctionChain( child, seqnum );
