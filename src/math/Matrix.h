@@ -26,6 +26,7 @@ namespace QDLIB {
 	 T* _v;     /* pointer to storage */
 	 T** _col;  /* Coloumn pointers */
 	 
+         bool _aligned;  /* Memaligned */
 	 void _init(lint m, lint n);
 	 void _destroy();
       public:
@@ -77,7 +78,8 @@ namespace QDLIB {
       _n = n;
       
 #ifdef HAVE_STDLIB_H
-      posix_memalign((void**) (&_v), QDLIB_DATA_ALIGNMENT, sizeof(T) * _mn );
+      if (posix_memalign((void**) (&_v), QDLIB_DATA_ALIGNMENT, sizeof(T) * _mn ) !=0)
+         _aligned = false;
 #else
       _v = new T[_nm]; 
 #endif

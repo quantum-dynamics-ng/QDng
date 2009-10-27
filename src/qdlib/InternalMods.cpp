@@ -4,7 +4,6 @@
 /* Operator list */
 #include "OCheby.h"
 #include "OSPO.h"
-#include "OSOD.h"
 
 #include "OGridNablaSq.h"
 #include "OGridGMat.h"
@@ -43,12 +42,6 @@ namespace QDLIB
       return p;
    }
    
-/*   Operator* INT_OSOD()
-   {
-      OSOD *p;
-      p = new OSOD ();
-      return p;
-   }*/
    
    Operator* INT_OGridNablaSq()
    {
@@ -160,7 +153,6 @@ namespace QDLIB
    {
       if (name == "INT_OCheby") return &INT_OCheby;
       if (name == "INT_OSPO") return &INT_OSPO;
-//       if (name == "INT_OSOD") return &INT_OSOD;
       
       if (name == "INT_OGridNablaSq") return &INT_OGridNablaSq;
       if (name == "INT_OGridGmat") return &INT_OGridGMat;

@@ -9,7 +9,7 @@ libqd_la_SOURCES = GridSystem.cpp InternalMods.cpp Kspace.cpp Laser.cpp \
 	WFMultistate.cpp FileWF.cpp TransformFFT.cpp TransformMat.cpp
 noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h OGridDipole.h \
 	OGridNablaSq.h OGridPotential.h OGridSum.h OGridsystem.h OHerMat.h OMultistate.h \
-	OPropagator.h OSOD.h OSPO.h OScalar.h OSum.h Operator.h WFGridCartesian.h \
+	OPropagator.h OSPO.h OSum.h Operator.h TransformFFT.h WFGridCartesian.h \
 	WFGridSystem.h WFLevel.h WFMultistate.h WaveFunction.h FileWF.h
 
 
