@@ -376,7 +376,7 @@ namespace QDLIB {
    {
       Logger& log = Logger::InstanceRef();
       dcomplex overlap;
-      dcomplex opval;
+      dcomplex opval(0,0);
       dcomplex ov_sum(0,0);
       
       /* Write Header for iteration table */
@@ -431,8 +431,6 @@ namespace QDLIB {
             } else
                ov_sum._real += cabs(overlap)*cabs(overlap);
         } else { /* Print operator */
-//             _Otarget[t]->Apply(_opwf,wft[t]);
-//             opval = *wft[t] * _opwf;
             opval._real = _Otarget[t]->Expec(wfi[t]);
             ov_sum += cabs(opval);
             log.cout() << opval.real() << "\t";
@@ -441,8 +439,8 @@ namespace QDLIB {
       }
       if (iteration == 0)
          log.cout() << "-\t" << "\t\t";
-      else 
-         log.cout() << ov_sum.real() -_laserobj[0]  << "\t\t";
+      else
+         log.cout() << ov_sum.real() - _laserobj[0] << "\t\t";
       
       log.cout() << _laserf[0]->PulseEnergy() << endl;
       log.flush();
