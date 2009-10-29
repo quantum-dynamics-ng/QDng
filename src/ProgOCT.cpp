@@ -361,7 +361,7 @@ namespace QDLIB {
       }
       
       if ( fpclassify(res) == FP_NAN)
-         throw ( EOverflow("Laserfield is non a number") );
+         throw ( EOverflow("Laserfield is not a number") );
       
       return res;
    }
@@ -524,13 +524,15 @@ namespace QDLIB {
    {
       
       /* Exchange laserfields */
-      _laserb[0]->swap(*(_laserf[0]));
+      for (int l=0; l < _nlaser; l++)
+         _laserb[l]->swap(*(_laserf[l]));
       /* Propagate forward */
       PropagateForward(phit, false);
       /* Write Report & Calculate change */
       
       /* Exchange laserfields */
-      _laserb[0]->swap(*(_laserf[0]));
+      for (int l=0; l < _nlaser; l++)
+         _laserb[l]->swap(*(_laserf[l]));
       
       /* Apply */
       for (int t=0; t < _ntargets; t++)
@@ -546,6 +548,7 @@ namespace QDLIB {
    void ProgOCT::Iterate(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
+      double laser;
       
       if (_ttype == ov)
          SyncTargetOverlap(phii, phit, step);
@@ -561,10 +564,12 @@ namespace QDLIB {
       for (int s=0; s < clock->Steps(); s++){
          /* Get new field */
          if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
+            laser = CalcLaserField(phii,_memwfbuf[s]);
          else
-            _laserf[0]->Set(CalcLaserField(phii,phit));
+            laser = CalcLaserField(phii,phit);
             
+         for (int l=0; l < _nlaser; l++)
+            _laserf[l]->Set(laser);
          
          /* Target with old field */
          if (! _membuf){
@@ -590,7 +595,7 @@ namespace QDLIB {
    void QDLIB::ProgOCT::IterateRabitzFB(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
-      
+      double laser;
       
       if (step==1){
          PropagateForward(phii, _membuf);
@@ -609,12 +614,15 @@ namespace QDLIB {
       for (int s=0; s < clock->Steps(); s++){
          /* Calc new laser field */
          if (_membuf)
-            _laserb[0]->Set(CalcLaserField(_memwfbuf[clock->TimeStep()+1], phit));
+            laser = CalcLaserField(_memwfbuf[clock->TimeStep()+1], phit);
          else {
             for (int t=0; t < _ntargets; t++)
                _Ub->Apply(phii[t]);
-            _laserb[0]->Set(CalcLaserField(phii,phit));
+            laser = CalcLaserField(phii,phit);
          }
+         
+         for (int l=0; l < _nlaser; l++)
+            _laserb[l]->Set(laser);
          
          /* Save back steps */
          if (_membuf)
@@ -639,12 +647,15 @@ namespace QDLIB {
       for (int s=0; s < clock->Steps(); s++){
          /* Calc new laser field */
          if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[clock->TimeStep()]));
+            laser = CalcLaserField(phii,_memwfbuf[clock->TimeStep()]);
          else {
             for (int t=0; t < _ntargets; t++)
                _Uf->Apply(phit[t]);
-            _laserf[0]->Set(CalcLaserField(phii,phit));
+            laser = CalcLaserField(phii,phit);
          }
+         
+         for (int l=0; l < _nlaser; l++)
+            _laserf[l]->Set(laser);
          
          /* Save forward steps */
          if (_membuf)
@@ -673,6 +684,7 @@ namespace QDLIB {
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
+      double laser;
       cVec *freqbuf;
       cVec *freqbufb;
      
@@ -690,6 +702,11 @@ namespace QDLIB {
       _laserf[0]->ToTimeDomain();
       _laserb[0]->ToTimeDomain();
 
+      for (int l=1; l < _nlaser; l++){
+         _laserf[l]-> FastCopy(*(_laserf[0]));
+         _laserb[l]-> FastCopy(*(_laserb[0]));
+      }
+      
       /* Sync targets */
       if (_ttype == ov)
          SyncTargetOverlap(phii, phit, step);
@@ -730,10 +747,13 @@ namespace QDLIB {
       for (int s=0; s < clock->Steps(); s++){
          /* Get new field */
          if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
+            laser = CalcLaserField(phii,_memwfbuf[s]);
          else
-            _laserf[0]->Set(CalcLaserField(phii,phit));
+            laser = CalcLaserField(phii,phit);
             
+         for (int l=0; l < _nlaser; l++)
+            _laserf[l]->Set(laser);
+         
          /* Target with old field */
          if (! _membuf){
             _laserb[0]->swap(*(_laserf[0]));
@@ -871,15 +891,21 @@ namespace QDLIB {
 
       /* Check & reference the coupling operator */
       bool coupling_ok = false;
+      int nlasers = MAX_LASERS;
       switch(_coupling){
 	 case dipole:
-	    OGridDipole *CoupOGridDipole;
-	    _Coup = FindOperatorType<OGridDipole>(_hf, &CoupOGridDipole);
+	    OGridDipole *CoupOGridDipole[MAX_LASERS];
+	    _Coup = FindOperatorType<OGridDipole>(_hf, CoupOGridDipole, nlasers);
+            cout << nlasers <<" --\n";
+            _nlaser = nlasers;
 	    if (CoupOGridDipole != NULL){
-	       _laserf[0] = CoupOGridDipole->GetLaser();
+               for (int l=0; l < _nlaser; l++)
+                  _laserf[l] = CoupOGridDipole[l]->GetLaser();
 	       /* Get the backward laser */
-	       FindOperatorType<OGridDipole>(_hb, &CoupOGridDipole);
-	       _laserb[0] = CoupOGridDipole->GetLaser();
+               nlasers = MAX_LASERS;
+               FindOperatorType<OGridDipole>(_hb, CoupOGridDipole, nlasers);
+               for (int l=0; l < _nlaser; l++)
+                  _laserb[l] = CoupOGridDipole[l]->GetLaser();
 	       coupling_ok=true;
 	    }
 	    break;
@@ -905,10 +931,13 @@ namespace QDLIB {
       
       switch(_coupling){
          case dipole:
-            OGridPotential* test;
-            FindOperatorType<OGridPotential>(_Coup, &test);
-            if (test == NULL)
-               throw( EParamProblem ("Invalid coupling operator") );
+            OGridPotential* test[MAX_LASERS];
+            nlasers=MAX_LASERS;
+            FindOperatorType<OGridPotential>(_Coup, test, nlasers);
+            for (int l=0; l < nlasers; l++){
+               if (test[l] == NULL)
+                  throw( EParamProblem ("Invalid coupling operator") );
+            }
             break;
       }
       
@@ -1038,7 +1067,8 @@ namespace QDLIB {
 	 }
 	 
 	 /* Exchange laserfields (New<->Old) */
-	 _laserb[0]->swap(*(_laserf[0]));
+         for (int l=0; l < _nlaser; l++)
+	     _laserb[l]->swap(*(_laserf[l]));
 	 
 	 log.flush();
 	 i++;

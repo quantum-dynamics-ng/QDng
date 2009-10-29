@@ -11,7 +11,7 @@
 #define DEFAULT_ITERATIONS 50
 #define DEFAULT_CONVERGENCE 1e-5
 #define MAX_TARGETS 16
-#define MAX_LASERS 4
+#define MAX_LASERS 16
 
 namespace QDLIB {
 
@@ -77,8 +77,9 @@ namespace QDLIB {
 	 Operator *_Coup;   /* The coupling to optimize */
 	 
          double _laserobj[MAX_LASERS]; /* Buffer for the Laser fluence contraints */
-	 Laser* _laserf[MAX_LASERS];
-	 Laser* _laserb[MAX_LASERS];
+	 Laser* _laserf[MAX_LASERS];   /* Forward propagation lasers */
+         Laser* _laserb[MAX_LASERS];    /* Backward propagation lasers */
+         int _nlaser;                 /* Number of lasers */
 	 Laser _shape[MAX_LASERS];     /* temporal shape function */
          Laser _frqmask[MAX_LASERS];   /* freq. mask for freq. OCT*/
          Laser _gamma[MAX_LASERS];     /* Correction field for freq. OCT*/
