@@ -277,6 +277,9 @@ namespace QDLIB {
       else 
 	 log.cout() << endl;
       
+      if (!_phase && (_ttype == op))
+         log.cout() << "WARNING : OPOC + phase insensitive is not meaningfull" << endl;
+      
       if (_method == freq){
          log.cout() << endl << "Frequency mask parameters: ";
          log.cout().precision(8);
