@@ -5,7 +5,7 @@ namespace QDLIB
 {
 
    OMultistate::OMultistate() : Operator(), _name("OMultistate"), _hermitian(true),
-                            _nstates(0), _unity(0), _buf1(NULL), _buf2(NULL)
+                            _nstates(0), _unity(false), _buf1(NULL), _buf2(NULL)
    {
       for(int i=0; i< QD_MAX_STATES; i++){
 	 for(int j=0; j< QD_MAX_STATES; j++){

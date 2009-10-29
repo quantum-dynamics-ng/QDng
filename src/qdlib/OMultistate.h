@@ -15,6 +15,7 @@ namespace QDLIB
     * 
     * parameters:
     * \li nonhermitian   Explicitly define a non-hermitian operator 
+    * \li unity          Treat empty diagonals as 1 (default: false)
     * 
     *	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
