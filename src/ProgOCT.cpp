@@ -896,7 +896,6 @@ namespace QDLIB {
 	 case dipole:
 	    OGridDipole *CoupOGridDipole[MAX_LASERS];
 	    _Coup = FindOperatorType<OGridDipole>(_hf, CoupOGridDipole, nlasers);
-            cout << nlasers <<" --\n";
             _nlaser = nlasers;
 	    if (CoupOGridDipole != NULL){
                for (int l=0; l < _nlaser; l++)

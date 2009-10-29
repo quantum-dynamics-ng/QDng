@@ -33,7 +33,7 @@ namespace QDLIB
     * \return The whole Operator with packaging (single state or multistate)
     */
    template <class C>
-   Operator* FindOperatorType(Operator *O, C **found, int &n, const int index=0)
+   Operator* FindOperatorType(Operator *O, C **found, int &n, string *label = NULL, const int index=0)
    {
       C* t;
       Operator* res = NULL;
@@ -45,7 +45,6 @@ namespace QDLIB
       if (t != NULL){
          n=1;
 	 found[index] = t;
-         cout << n <<" " << index << ": " << t->Name() << endl;
 	 return t;
       }
       
@@ -56,14 +55,12 @@ namespace QDLIB
          sop = new C*[n];
 	 for(int i=0; i < sum->Size(); i++){
              max=n;
-             cout << "Checking SUM: ("<< n <<") "<< i  <<" " << index +nops<< " " << endl;
-	     res = FindOperatorType<C>((*sum)[i], sop, max, index+nops);
+	     res = FindOperatorType<C>((*sum)[i], sop, max, label, index+nops);
 	     if (res != NULL){
                 for (int k=0; k < max; k++){
                   found[index+nops+k] = sop[k];
                   /* Abort if limit is reached prematurely */
                   if (nops+k >= n){
-                     cout << "n: " << n << endl;
                      delete[] sop;
                      return res;
                   }
@@ -72,7 +69,6 @@ namespace QDLIB
 	     }
 	 }
          n = nops;
-         cout << "n: " << n << " nops: " << nops << endl;
          delete[] sop;
          return res;
       }
@@ -88,14 +84,12 @@ namespace QDLIB
             for(int j=0; j < i; j++){ /** \bug Only works correctly with hermitian ms */
 	       if (ms->State(i,j) != NULL){
                   max=n;
-                  cout << "Checking MS: (" << n <<") "<< i << ","<< j <<" " << index +nops<< " " << endl;
-                  res = FindOperatorType<C>(ms->State(i,j), sop, max,index+nops);
+                  res = FindOperatorType<C>(ms->State(i,j), sop, max, label, index+nops);
 		  if (res != NULL){
 		     package->Add(res, i, j);
                      for (int k=0; k < max; k++){
                         found[index+nops+k] = sop[k];
                         if (nops+k >= n){
-                           cout << "n: " << n << endl;
                            delete[] sop;
                            return res;
                         }
@@ -105,7 +99,6 @@ namespace QDLIB
                   /* Abort if limit is reached prematurely */
                   if (nops > n){
                      n = nops;
-                     cout << "n: " << n << endl;
                      delete[] sop;
                      return package;
                   }
@@ -113,7 +106,6 @@ namespace QDLIB
 	    }
 	 }
          n = nops;
-         cout << "n: " << n << " nops: " << nops << endl;
          delete[] sop;
          return package;
       }
