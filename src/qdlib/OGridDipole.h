@@ -28,7 +28,9 @@ namespace QDLIB {
 	 
 	 ~OGridDipole() {}
 	 
-	       virtual void Clock ( QDClock *cl);
+         virtual string& Name() {return _name;}
+         
+	 virtual void Clock ( QDClock *cl);
 	 
 	 virtual Operator* NewInstance();
 	 

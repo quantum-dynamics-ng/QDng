@@ -46,7 +46,7 @@ namespace QDLIB {
 	 WaveFunction *_expVcoup, *_Vcoup1; /* Dirty hack to get time dependence */
          WaveFunction *_expVcoupI;
          
-	 WaveFunction *_buf;
+	 WaveFunction *_buf, *_buf2;
 	 
          bool _coupling;        /* coupling */
          bool _coupdiag;        /* Coupling on diagonal in Vpot*/

@@ -168,16 +168,16 @@ namespace QDLIB {
       if (_laststream == 1){
 	 s = _sout->str();
 	 _IndentString(s);
-	 *_global_out << s;
+	 *_global_out << s; 
 	 
 // 	 std::cout << _sout->str();
 	 _sout->str("");
       }
       if (_laststream == 2){
-	 if (_debug) *_global_out << _soutdbg->str();
+         if (_debug) *_global_out << _soutdbg->str();
 	 _soutdbg->str("");
       }
-      
+      _global_out->flush();
       _laststream = 0;
    }
    

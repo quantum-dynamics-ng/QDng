@@ -172,15 +172,16 @@ namespace QDLIB {
       if (_size == 1 ){ // Simple case
 	 T = VecMin(*(_Gmat[0][0])) / (GridSystem::Dx(0) * GridSystem::Dx(0));
       } else  if (_size == 2 ){ // Quick diag
-	 double g0, g1, g10, t0, t1;
+	 double g0, g1, g10;
+         double t[2];
 	 g0 =  VecMin(*(_Gmat[0][0]));
 	 g1 = VecMin(*(_Gmat[1][1]));
 	 g10 = VecMin(*(_Gmat[1][0]));
 	
-	 diag22symm(g0, g1, g10, t0, t1);
+	 diag22symm(g0, g1, g10, t);
 	 
-	 T = t0/ (GridSystem::Dx(0) * GridSystem::Dx(0));
-	 T += t1/ (GridSystem::Dx(1) * GridSystem::Dx(1));
+	 T = t[0]/ (GridSystem::Dx(0) * GridSystem::Dx(0));
+	 T += t[1]/ (GridSystem::Dx(1) * GridSystem::Dx(1));
       } else {
 	 for (int i=0; i < GridSystem::Dim(); i++)
 	    T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));

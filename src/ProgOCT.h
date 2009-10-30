@@ -11,7 +11,7 @@
 #define DEFAULT_ITERATIONS 50
 #define DEFAULT_CONVERGENCE 1e-5
 #define MAX_TARGETS 16
-#define MAX_LASERS 4
+#define MAX_LASERS 16
 
 namespace QDLIB {
 
@@ -30,6 +30,7 @@ namespace QDLIB {
    * \li ttype    target type (operator,overlap)
    * \li phase    phase sensitive objective (true|false, default false)
    * \li ntargets Number of targets
+   * \li mv       Moving target (true|false, default false)
    * \li alpha    The Field restriction value
    * \li iterations Maximum number of iterations
    * \li conv     Target convergence. Stop iterating if below convergence
@@ -67,6 +68,7 @@ namespace QDLIB {
 	 bool _phase;       /* Phase sensitive OCT */
          
 	 int _ntargets;
+         bool _mv;         /* Moving target */
 	 double _alpha;
 	 
 	 OPropagator *_Uf;  /* Forward Propagation */
@@ -74,8 +76,10 @@ namespace QDLIB {
 	 Operator *_H;      /* Hamiltonian */
 	 Operator *_Coup;   /* The coupling to optimize */
 	 
-	 Laser* _laserf[MAX_LASERS];
-	 Laser* _laserb[MAX_LASERS];
+         double _laserobj[MAX_LASERS]; /* Buffer for the Laser fluence contraints */
+	 Laser* _laserf[MAX_LASERS];   /* Forward propagation lasers */
+         Laser* _laserb[MAX_LASERS];    /* Backward propagation lasers */
+         int _nlaser;                 /* Number of lasers */
 	 Laser _shape[MAX_LASERS];     /* temporal shape function */
          Laser _frqmask[MAX_LASERS];   /* freq. mask for freq. OCT*/
          Laser _gamma[MAX_LASERS];     /* Correction field for freq. OCT*/

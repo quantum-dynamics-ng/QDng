@@ -54,6 +54,8 @@ namespace QDLIB {
       int steps;
       string s;
       
+      double cutoffl, cutoffh; /* Cut off frequencies for freq-shape method */
+      
       /* Init the clock */
       attr.GetValue("dt", dt);
       attr.GetValue("steps", steps);
@@ -120,6 +122,7 @@ namespace QDLIB {
       
       /* Look for freq. shape params */
       if (_method == freq){
+         double cutoff;
          if ( attr.isPresent("freq") ){ /* Load mask from file */
             string frqmask;
             attr.GetValue("freq", frqmask);
@@ -136,14 +139,12 @@ namespace QDLIB {
             _frqmask[0].Dt(dt);
             ((dVec&) (_frqmask[0])) = 1.0; /* initialize with ones */
             
-            double cutoff;
+            
             dVec mask(steps/2+1);
             /* Lower cuttoff => Highpass */
             if  (attr.isPresent("freql")) {
-               attr.GetValue("freql", cutoff);
-               cout << "Lower " << cutoff << endl;
-               cutoff = abs(cutoff) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
-               cout << cutoff << endl;
+               attr.GetValue("freql", cutoffl);
+               cutoff = abs(cutoffl) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
                if (cutoff > steps/2+1)
                   throw ( EParamProblem("Lower frequency bound larger than Nyquist frequency") );
                Butterworth<dVec>::Highpass(mask, cutoff, 100);
@@ -153,10 +154,8 @@ namespace QDLIB {
             }
             /* Higher cuttoff => Lowpass */
             if  (attr.isPresent("freqh")) {
-               attr.GetValue("freqh", cutoff);
-               cout << "Higher " << cutoff << endl;
-               cutoff = abs(cutoff) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
-               cout << cutoff << endl;
+               attr.GetValue("freqh", cutoffh);
+               cutoff = abs(cutoffh) * (steps-1)*dt/(2*M_PI); /* convert freq. => grid point */
                if (cutoff > steps/2+1)
                   throw ( EParamProblem("Upper frequency bound larger than Nyquist frequency") );
                Butterworth<dVec>::Lowpass(mask, cutoff, 100);
@@ -209,6 +208,9 @@ namespace QDLIB {
 	 else
 	    throw(EParamProblem("Unknown OCT target type", s));
       }
+      
+      /* Moving target */
+      attr.GetValue("mv", _mv);
       
       /* Check for phase sensitive oct*/
       attr.GetValue("phase", _phase);
@@ -267,10 +269,22 @@ namespace QDLIB {
 	    break;
       }
       
+      if (_mv)
+         log.cout() << " - Moving Target";
+      
       if (_phase)
 	 log.cout() << " - phase sensitive" << endl;
       else 
 	 log.cout() << endl;
+      
+      if (!_phase && (_ttype == op))
+         log.cout() << "WARNING : OPOC + phase insensitive is not meaningfull" << endl;
+      
+      if (_method == freq){
+         log.cout() << endl << "Frequency mask parameters: ";
+         log.cout().precision(8);
+         log.cout() << "low = " << cutoffl << "  high = " << cutoffh << endl;
+      }
       
       log.cout().precision(3);
       log.cout() << "alpha : " << _alpha << endl;
@@ -310,8 +324,8 @@ namespace QDLIB {
 	 
          /* Phase sensitive */
          if (_phase)
-            im = 1* (*wft[t] * _opwf);
-         else /** \todo clarify why it only works this way! should be wfi * wft !!! */
+            im = (*wft[t] * _opwf);
+         else
             im = (*(wfi[t]) * wft[t] ) * (*(wft[t]) * _opwf );
 
          res += im.imag();
@@ -325,26 +339,32 @@ namespace QDLIB {
     */
    double ProgOCT::CalcLaserField( WaveFunction** wfi, WaveFunction** wft )
    {
-      double res;
-      
-      res = CalcCorr(wfi, wft);
+      double res=0;
+      double im;
+
+      im = CalcCorr(wfi, wft);
 
       /* Method */
       switch(_method){
 	 case krotov: /* Add New Laser to previous field */
-		  res = _laserb[0]->Get() -
-			_shape[0].Get() / (_alpha * double(_ntargets)) * res;
+            res = _laserb[0]->Get();
+            res -= _shape[0].Get() / (_alpha * double(_ntargets)) * im;
+                  _laserobj[0] += (_shape[0].Get() / _alpha *  im) * (_shape[0].Get() / _alpha  * im);
 	    break;
          case freq:  /* like krotov - but subtract gamma */
-            res = _laserb[0]->Get() +
-                  _shape[0].Get() / (_alpha * double(_ntargets)) * (-res-_gamma[0].Get());
-            /*res = -_shape[0].Get() / (_alpha * double(_ntargets)) * (res+_gamma[0].Get());*/
+            res = _laserb[0]->Get();
+            res -= _shape[0].Get() / (_alpha * double(_ntargets)) * (im + _gamma[0].Get());
+            _laserobj[0] += (_shape[0].Get() / _alpha *  im) * (_shape[0].Get() / _alpha  * im);
             break;
 	 case rabitz:
          case rabitzfb:
-		  res = -1* _shape[0].Get() / (_alpha * double(_ntargets)) * res;
+		  res = -1* _shape[0].Get() / (_alpha * double(_ntargets)) * im;
+                  _laserobj[0] +=  -1  / (double(_ntargets)) * im  *res;
 	    break;
       }
+      
+      if ( fpclassify(res) == FP_NAN)
+         throw ( EOverflow("Laserfield is not a number") );
       
       return res;
    }
@@ -359,7 +379,7 @@ namespace QDLIB {
    {
       Logger& log = Logger::InstanceRef();
       dcomplex overlap;
-      dcomplex opval;
+      dcomplex opval(0,0);
       dcomplex ov_sum(0,0);
       
       /* Write Header for iteration table */
@@ -370,11 +390,15 @@ namespace QDLIB {
          log.cout() << "iteration\t";
          for (int t=0; t < _ntargets; t++){
             log.cout() << "Norm_" << t << "\t\t";
-            if (_ttype == ov) log.cout() << "Overlapp_" << t << "\t\t";
+            if (_ttype == ov){
+               log.cout() << "Norm_t" << t << "\t\t";
+               log.cout() << "Overlapp_" << t << "\t";
+            }
             else log.cout() << "Operator_" << t << "\t";
             if (_phase && _ttype == ov)
                log.cout() << "Phase_" << t << "\t\t";
          }
+         log.cout() << "Objective\t\t";
          log.cout() << "Pulse Energy" << endl;
       }
       
@@ -383,30 +407,47 @@ namespace QDLIB {
       
       log.cout() << iteration << "\t\t";
       for (int t=0; t < _ntargets; t++){
+         double d;
          log.cout() << fixed;
 	 log.cout().precision(8);
-	 log.cout() << wfi[t]->Norm() << "\t";
+         d = wfi[t]->Norm();
+         if ( fpclassify(d) == FP_NAN)
+            throw ( EOverflow("Forward norm is not a number") );
+         
+	 log.cout() << d << "\t";
+         
 	 
          if (_ttype == ov) { /* Print overlapp */
+            d = wft[t]->Norm();
+            if ( fpclassify(d) == FP_NAN)
+               throw ( EOverflow("Backward norm is not a number") );
+               
+            log.cout() << d << "\t";
+
+            
             overlap = *wfi[t] * wft[t];
-            ov_sum += cabs(overlap);
-            log.cout() << cabs(overlap) << "\t";
+            //ov_sum += cabs(overlap)*cabs(overlap);
+            log.cout() << cabs(overlap)*cabs(overlap) << "\t";
             if (_phase){
-               log.cout() << overlap << "\t";
+               log.cout() << phase(overlap)/M_PI << "\t";
                ov_sum += overlap;
             } else
                ov_sum._real += cabs(overlap)*cabs(overlap);
         } else { /* Print operator */
-//             _Otarget[t]->Apply(_opwf,wft[t]);
-//             opval = *wft[t] * _opwf;
             opval._real = _Otarget[t]->Expec(wfi[t]);
             ov_sum += cabs(opval);
             log.cout() << opval.real() << "\t";
          }
          
       }
+      if (iteration == 0)
+         log.cout() << "-\t" << "\t\t";
+      else
+         log.cout() << ov_sum.real() - _laserobj[0] << "\t\t";
+      
       log.cout() << _laserf[0]->PulseEnergy() << endl;
       log.flush();
+      
       return cabs(ov_sum);
    }
    
@@ -422,14 +463,15 @@ namespace QDLIB {
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
-      _CopyWFs(_memwfbuf[0], wf); /* Save t=0 */
+      if (_membuf)
+         _CopyWFs(_memwfbuf[0], wf); /* Save t=0 */
       
       clock->Begin();
-      for (int s=1; s < clock->Steps(); s++){ /* Save t=1..T */
+      for (int s=0; s < clock->Steps(); s++){ /* Save t=1..T */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(wf[t]);
             if (membuf)
-               *(_memwfbuf[s][t]) = wf[t];
+               *(_memwfbuf[s+1][t]) = wf[t];
          }
          ++(*clock);
       }
@@ -447,16 +489,17 @@ namespace QDLIB {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
       clock->End();
-      _CopyWFs(_memwfbuf[clock->TimeStep()], wf); /* Save t=T */
       
-      for (int s=clock->TimeStep()-1; s >= 0; s--){
-         --(*clock);
+      if (_membuf)
+         _CopyWFs(_memwfbuf[clock->TimeStep()+1], wf); /* Save t=T */
+      
+      for (int s=clock->TimeStep(); s >= 0; s--){
          for (int t=0; t < _ntargets; t++){
             _Ub->Apply(wf[t]);
             if (membuf)
                *(_memwfbuf[s][t]) = wf[t];
          }
-         
+         --(*clock);
       }
    }
    
@@ -464,30 +507,35 @@ namespace QDLIB {
    /**
     *Synchronize overlap targets.
     * 
+    * Writes to membuf.
     */
    void QDLIB::ProgOCT::SyncTargetOverlap(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
       
       /* Backpropagation of targets */
-      PropagateBackward(phit, _membuf);
+      if (!_mv)
+         PropagateBackward(phit, _membuf);
       
    }
 
    /**
     * Synchronize operator targets.
     *
+    * Writes to membuf.
     */   
    void ProgOCT::SyncTargetOperator(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
       
       /* Exchange laserfields */
-      _laserb[0]->swap(*(_laserf[0]));
+      for (int l=0; l < _nlaser; l++)
+         _laserb[l]->swap(*(_laserf[l]));
       /* Propagate forward */
       PropagateForward(phit, false);
       /* Write Report & Calculate change */
       
       /* Exchange laserfields */
-      _laserb[0]->swap(*(_laserf[0]));
+      for (int l=0; l < _nlaser; l++)
+         _laserb[l]->swap(*(_laserf[l]));
       
       /* Apply */
       for (int t=0; t < _ntargets; t++)
@@ -503,15 +551,29 @@ namespace QDLIB {
    void ProgOCT::Iterate(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
+      double laser;
       
       if (_ttype == ov)
          SyncTargetOverlap(phii, phit, step);
       else
          SyncTargetOperator(phii, phit, step);
       
+      /* Refresh intial */
+      for (int t=0; t < _ntargets; t++){
+         *(phii[t]) = PsiI[t];
+      }
+      
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
+         /* Get new field */
+         if (_membuf)
+            laser = CalcLaserField(phii,_memwfbuf[s]);
+         else
+            laser = CalcLaserField(phii,phit);
             
+         for (int l=0; l < _nlaser; l++)
+            _laserf[l]->Set(laser);
+         
          /* Target with old field */
          if (! _membuf){
             for (int t=0; t < _ntargets; t++){
@@ -519,17 +581,14 @@ namespace QDLIB {
             }
          }
          
-         /* Get new field */
-         if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
-         else
-            _laserf[0]->Set(CalcLaserField(phii,phit));
-            
          /* Propagate initial with new field */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phii[t]);
          }
          ++(*clock);
+      }
+      if (_mv) {
+         _CopyWFs(phit, _memwfbuf[clock->Steps()-1] );
       }
    }
    
@@ -539,11 +598,14 @@ namespace QDLIB {
    void QDLIB::ProgOCT::IterateRabitzFB(WaveFunction ** phii, WaveFunction ** phit, int step)
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
-      
+      double laser;
       
       if (step==1){
          PropagateForward(phii, _membuf);
       }
+      
+      if (_membuf)
+         _CopyWFs(phii, _memwfbuf[0]);
       
       /* Create target */
       if (_ttype == op)
@@ -552,19 +614,22 @@ namespace QDLIB {
       
       /* Propagate Target Backward with new field (1) */
       clock->End();
-      for (int s=0; s < clock->Steps()-1; s++){
+      for (int s=0; s < clock->Steps(); s++){
          /* Calc new laser field */
          if (_membuf)
-            _laserb[0]->Set(CalcLaserField(_memwfbuf[clock->TimeStep()], phit));
+            laser = CalcLaserField(_memwfbuf[clock->TimeStep()+1], phit);
          else {
             for (int t=0; t < _ntargets; t++)
                _Ub->Apply(phii[t]);
-            _laserb[0]->Set(CalcLaserField(phii,phit));
+            laser = CalcLaserField(phii,phit);
          }
+         
+         for (int l=0; l < _nlaser; l++)
+            _laserb[l]->Set(laser);
          
          /* Save back steps */
          if (_membuf)
-            _CopyWFs(_memwfbuf[clock->TimeStep()], phit);
+            _CopyWFs(_memwfbuf[clock->TimeStep()+1], phit);
 
          
          /* Do one step back */
@@ -574,21 +639,26 @@ namespace QDLIB {
          
          --(*clock);
       }
-      /* Save back steps */
+      /* Save last  back steps */
       if (_membuf)
-         _CopyWFs(_memwfbuf[clock->TimeStep()+1], phit);
+         _CopyWFs(_memwfbuf[0], phit);
+      
+      _CopyWFs(phit, _memwfbuf[clock->Steps()]);
       
       /* Propagate forward initial with new field (2) */
       clock->Begin();
-      for (int s=0; s < clock->Steps()-1; s++){
+      for (int s=0; s < clock->Steps(); s++){
          /* Calc new laser field */
          if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[clock->TimeStep()]));
+            laser = CalcLaserField(phii,_memwfbuf[clock->TimeStep()]);
          else {
             for (int t=0; t < _ntargets; t++)
                _Uf->Apply(phit[t]);
-            _laserf[0]->Set(CalcLaserField(phii,phit));
+            laser = CalcLaserField(phii,phit);
          }
+         
+         for (int l=0; l < _nlaser; l++)
+            _laserf[l]->Set(laser);
          
          /* Save forward steps */
          if (_membuf)
@@ -602,9 +672,9 @@ namespace QDLIB {
          
          ++(*clock);
       }
-      /* Save forward steps */
+      /* Save last forward steps */
       if (_membuf)
-         _CopyWFs(_memwfbuf[clock->TimeStep()], phii);
+         _CopyWFs(_memwfbuf[clock->Steps()], phii);
       
 
       
@@ -617,7 +687,28 @@ namespace QDLIB {
    {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
       
+      double laser;
       cVec *freqbuf;
+      cVec *freqbufb;
+     
+      
+      /* Shape old Laser in the frequency domain & write result to new laser */
+      _laserf[0]->FastCopy(*(_laserb[0]));
+      freqbuf = _laserf[0]->Spectrum();
+      freqbufb = _laserb[0]->Spectrum(); /** \todo dirty hack to correct the time steps */
+      
+      for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
+         (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
+         (*freqbufb)[s] *= (_frqmask[0])[s] / clock->Steps();
+      }
+      
+      _laserf[0]->ToTimeDomain();
+      _laserb[0]->ToTimeDomain();
+
+      for (int l=1; l < _nlaser; l++){
+         _laserf[l]-> FastCopy(*(_laserf[0]));
+         _laserb[l]-> FastCopy(*(_laserb[0]));
+      }
       
       /* Sync targets */
       if (_ttype == ov)
@@ -625,32 +716,21 @@ namespace QDLIB {
       else
          SyncTargetOperator(phii, phit, step);
       
-      /* Shape old Laser in the frequency domain & write result to new laser */
-      _laserf[0]->FastCopy(*(_laserb[0]));
-      freqbuf = _laserf[0]->Spectrum();
-      _laserb[0]->Spectrum(); /** \todo dirty hack to correct the time steps */
-      
-      for (int s=0; s < clock->Steps()/2+1; s++){ /* apply mask */ 
-         (*freqbuf)[s] *= (_frqmask[0])[s] / clock->Steps(); /** \todo Replace with low level method */
-      }
-      
-      _laserf[0]->ToTimeDomain();
-
       /* Determine correction field gamma (propagation with shaped lasers)*/
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
+         _gamma[0].Set( CalcCorr(phii,phit) );
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phit[t]);
             _Uf->Apply(phii[t]);
          }
-         _gamma[0].Set( CalcCorr(phii,phit) );
          ++(*clock);
       }
 
       /* Apply Bandstop filter */
       freqbuf = _gamma[0].Spectrum();
       for (int s=0; s < clock->Steps()/2+1; s++) /* apply mask */ 
-         (*freqbuf)[s] *= (1-(_frqmask[0])[s])/ clock->Steps();
+         (*freqbuf)[s] *= (1-(_frqmask[0])[s]) / double(clock->Steps());
       
       _gamma[0].ToTimeDomain();
       
@@ -668,7 +748,15 @@ namespace QDLIB {
       
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
+         /* Get new field */
+         if (_membuf)
+            laser = CalcLaserField(phii,_memwfbuf[s]);
+         else
+            laser = CalcLaserField(phii,phit);
             
+         for (int l=0; l < _nlaser; l++)
+            _laserf[l]->Set(laser);
+         
          /* Target with old field */
          if (! _membuf){
             _laserb[0]->swap(*(_laserf[0]));
@@ -678,12 +766,6 @@ namespace QDLIB {
             _laserb[0]->swap(*(_laserf[0]));
          }
          
-         /* Get new field */
-         if (_membuf)
-            _laserf[0]->Set(CalcLaserField(phii,_memwfbuf[s]));
-         else
-            _laserf[0]->Set(CalcLaserField(phii,phit));
-            
          /* Propagate initial with new field */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phii[t]);
@@ -737,6 +819,16 @@ namespace QDLIB {
       log.cout() << endl;
       log.IndentDec();
       
+      /* Initialize Buffer for backpropagation */
+      if (_membuf){
+         _memwfbuf = new WaveFunction**[clock->Steps()+1];
+         for (int s=0; s < clock->Steps()+1; s++){
+            _memwfbuf[s] = new WaveFunction*[_ntargets];
+            for (int t=0; t < _ntargets; t++)
+               _memwfbuf[s][t] = PsiI[t]->NewInstance();
+         }
+      }
+      
       if(_ttype == ov){
          /* Load Target Wavefunctions */
          log.Header( "Target wave functions", Logger::SubSection);
@@ -746,7 +838,22 @@ namespace QDLIB {
             section = _ContentNodes->FindNode( "wft"+string(num) );
             if (section == NULL)
                throw ( EParamProblem ("Missing target wavefunction", t) );
-            PsiT[t] = ChainLoader::LoadWaveFunctionChain( section );
+            if (_mv == true) { /* Prepare series for moving targets */
+               PsiT[t] = ChainLoader::LoadWaveFunctionChain( section, 0 );
+               *(_memwfbuf[0][t]) = PsiT[t];
+               if (_membuf){
+                  log.flush();
+                  log.Supress(true);
+                  for (int s=1; s < clock->Steps()+1; s++){ /* Read time steps */
+                     *(_memwfbuf[s][t]) = ChainLoader::LoadWaveFunctionChain( section, s );
+                  }
+                  log.flush();
+                  log.Supress(false); 
+               } else 
+                  throw ( EParamProblem("Moving overlapp target needs membuf") );
+                  
+            } else /* Load simple target */
+               PsiT[t] = ChainLoader::LoadWaveFunctionChain( section );
             delete section;
          }
          log.cout() << endl;
@@ -776,7 +883,7 @@ namespace QDLIB {
       log.cout() << "Initial engergy: " << _hf->Expec(PsiI[0]) << endl;
       if (_ttype == ov){
          log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
-         log.cout() << "Initial Overlapp: " << *(PsiT[0]) * (PsiI[0])<< endl;
+         log.cout() << "Initial Overlapp: " << *(PsiI[0]) * (PsiT[0])<< endl;
       }
       log.flush();
       /* Copy, since the propagator will propably scale it/modify etc. */
@@ -787,15 +894,20 @@ namespace QDLIB {
 
       /* Check & reference the coupling operator */
       bool coupling_ok = false;
+      int nlasers = MAX_LASERS;
       switch(_coupling){
 	 case dipole:
-	    OGridDipole *CoupOGridDipole;
-	    _Coup = FindOperatorType<OGridDipole>(_hf, &CoupOGridDipole);
+	    OGridDipole *CoupOGridDipole[MAX_LASERS];
+	    _Coup = FindOperatorType<OGridDipole>(_hf, CoupOGridDipole, nlasers);
+            _nlaser = nlasers;
 	    if (CoupOGridDipole != NULL){
-	       _laserf[0] = CoupOGridDipole->GetLaser();
+               for (int l=0; l < _nlaser; l++)
+                  _laserf[l] = CoupOGridDipole[l]->GetLaser();
 	       /* Get the backward laser */
-	       FindOperatorType<OGridDipole>(_hb, &CoupOGridDipole);
-	       _laserb[0] = CoupOGridDipole->GetLaser();
+               nlasers = MAX_LASERS;
+               FindOperatorType<OGridDipole>(_hb, CoupOGridDipole, nlasers);
+               for (int l=0; l < _nlaser; l++)
+                  _laserb[l] = CoupOGridDipole[l]->GetLaser();
 	       coupling_ok=true;
 	    }
 	    break;
@@ -821,10 +933,13 @@ namespace QDLIB {
       
       switch(_coupling){
          case dipole:
-            OGridPotential* test;
-            FindOperatorType<OGridPotential>(_Coup, &test);
-            if (test == NULL)
-               throw( EParamProblem ("Invalid coupling operator") );
+            OGridPotential* test[MAX_LASERS];
+            nlasers=MAX_LASERS;
+            FindOperatorType<OGridPotential>(_Coup, test, nlasers);
+            for (int l=0; l < nlasers; l++){
+               if (test[l] == NULL)
+                  throw( EParamProblem ("Invalid coupling operator") );
+            }
             break;
       }
       
@@ -854,9 +969,10 @@ namespace QDLIB {
       ParamContainer Upm;
     
       Upm = _Uf->Params();
-      log.coutdbg() << "Forward Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << "Forward Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << _Uf->Exponent() << " " << _Ub->Exponent() << endl;
       Upm = _Ub->Params();
-      log.coutdbg() << "Backward Propagators init parameters:\n\n" << Upm << endl;
+      log.cout() << "Backward Propagators init parameters:\n\n" << Upm << endl;
 
       
       /* Objects for propagation */
@@ -887,17 +1003,6 @@ namespace QDLIB {
       wfile.Name(_dir+string("wfb"));
       wfile.ActivateSequence();
       
-
-
-      /* Initialize Buffer for backpropagation */
-      if (_membuf){
-         _memwfbuf = new WaveFunction**[clock->Steps()+1];
-         for (int s=0; s < clock->Steps()+1; s++){
-            _memwfbuf[s] = new WaveFunction*[_ntargets];
-            for (int t=0; t < _ntargets; t++)
-               _memwfbuf[s][t] = PsiI[t]->NewInstance();
-         }
-      }
       
       /* Initialize gamma for freq. shape */
       if (_method == freq){
@@ -906,8 +1011,9 @@ namespace QDLIB {
          _gamma[0].Clock(clock);
       }
       
-      /* Write Report & Calculate change */
+      /* Write Report for guess */
       _CopyWFs(phii, PsiI);
+      _laserobj[0] = 0;
       PropagateForward(phii,false);
       Report(phii,PsiT, 0);
       
@@ -931,7 +1037,9 @@ namespace QDLIB {
             else
                _CopyWFs(phit, PsiI);
          }
-
+         
+         _laserobj[0]=0;
+         
          /* The iteration step itself depends on the method */
 	 if (_method == rabitzfb)
             IterateRabitzFB(phii, phit, i);
@@ -940,16 +1048,20 @@ namespace QDLIB {
          else {
             Iterate(phii, phit,i);
          }
+         _laserobj[0] *= clock->Dt();
          
          /* Check for convergency  & Write Report */
          for (int it=0; it < 3-1; it++)
-            deltaTarget[0] = deltaTarget[it+1];
+            deltaTarget[it] = deltaTarget[it+1];
          
-         deltaTarget[2] = Report(phii,phit, i);
+         deltaTarget[2] = abs(Report(phii,phit, i));
          delta = 0;
+      
+         for (int it=0; it < 3-1; it++)
+            delta += abs(deltaTarget[it]-deltaTarget[it+1]);
          
-         for (int it=0; it < 3; it++)
-            delta += abs(deltaTarget[it]);
+         delta = abs(delta);
+         
          
 	 /* Write laserfields */
 	 if(_writel){
@@ -957,13 +1069,17 @@ namespace QDLIB {
 	 }
 	 
 	 /* Exchange laserfields (New<->Old) */
-	 _laserb[0]->swap(*(_laserf[0]));
+         for (int l=0; l < _nlaser; l++)
+	     _laserb[l]->swap(*(_laserf[l]));
 	 
 	 log.flush();
 	 i++;
-      } /* while (i < _iterations && deltaTarget > _convergence) */
+      } /* while (i < _iterations && delta > _convergence) */
       if( _writeyield )
          log.FileClose();
+      
+      if (delta <= _convergence)
+         log.cout() << endl << "Convergence reached" << endl;
       
       /* Write the final laser */
       file.StopSequence();
