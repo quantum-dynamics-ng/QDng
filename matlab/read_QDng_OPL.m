@@ -11,8 +11,16 @@
 
 function OPL=read_QDng_OPL(OPL_in_filename)
 
-meta_in=[OPL_in_filename '.meta'];
+index=strfind(OPL_in_filename, '/');
+index=max(index);
+path=OPL_in_filename(1:index);
+
+meta_in=[OPL_in_filename 'laser.meta'];
 meta_file=fopen(meta_in,'r');
+if meta_file == -1
+    meta_in=[path 'laser.meta'];
+    meta_file=fopen(meta_in,'r');
+end
 data_in=[OPL_in_filename '.op'];
 op_file=fopen(data_in,'rb');
 class = '';    
