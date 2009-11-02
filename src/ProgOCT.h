@@ -75,6 +75,9 @@ namespace QDLIB {
          OPropagator *_Ub;  /* Backward Propagation */
 	 Operator *_H;      /* Hamiltonian */
 	 Operator *_Coup;   /* The coupling to optimize */
+         
+         Operator *_Gobbler;   /* Gobbler operator */
+         
 	 
          double _laserobj[MAX_LASERS]; /* Buffer for the Laser fluence contraints */
 	 Laser* _laserf[MAX_LASERS];   /* Forward propagation lasers */

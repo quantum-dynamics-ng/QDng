@@ -10,7 +10,7 @@ namespace QDLIB {
    ProgOCT::ProgOCT(XmlNode &OCTNode) : _octNode(OCTNode), _ContentNodes(NULL),
    _fname(DEFAULT_BASENAME_LASER), _dir(""), _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE),
           _writel(false),_membuf(true), _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),
-                  _ntargets(1), _alpha(1),  _opwf(NULL), _membuf_init(false)
+                  _ntargets(1), _alpha(1), _Gobbler(NULL),  _opwf(NULL), _membuf_init(false)
    {
       for(int i=0; i < MAX_TARGETS; i++){
 	 PsiI[i] = NULL;
@@ -470,6 +470,10 @@ namespace QDLIB {
       for (int s=0; s < clock->Steps(); s++){ /* Save t=1..T */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(wf[t]);
+            if (_Gobbler){
+               _Gobbler->Apply(wf[t]);
+               wf[t]->Normalize();
+            }
             if (membuf)
                *(_memwfbuf[s+1][t]) = wf[t];
          }
@@ -496,6 +500,10 @@ namespace QDLIB {
       for (int s=clock->TimeStep(); s >= 0; s--){
          for (int t=0; t < _ntargets; t++){
             _Ub->Apply(wf[t]);
+            if (_Gobbler){
+               _Gobbler->Apply(wf[t]);
+               wf[t]->Normalize();
+            }
             if (membuf)
                *(_memwfbuf[s][t]) = wf[t];
          }
@@ -584,6 +592,10 @@ namespace QDLIB {
          /* Propagate initial with new field */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phii[t]);
+            if (_Gobbler){
+               _Gobbler->Apply(phii[t]);
+               phii[t]->Normalize();
+            }
          }
          ++(*clock);
       }
@@ -633,8 +645,13 @@ namespace QDLIB {
 
          
          /* Do one step back */
-         for (int t=0; t < _ntargets; t++)
+         for (int t=0; t < _ntargets; t++){
             _Ub->Apply(phit[t]);
+            if (_Gobbler){
+               _Gobbler->Apply(phit[t]);
+               phit[t]->Normalize();
+            }
+         }
          
          
          --(*clock);
@@ -666,8 +683,13 @@ namespace QDLIB {
 
          
          /* Do one step forward */
-         for (int t=0; t < _ntargets; t++)
+         for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phii[t]);
+            if (_Gobbler){
+               _Gobbler->Apply(phii[t]);
+               phii[t]->Normalize();
+            }
+         }
          
          
          ++(*clock);
@@ -723,6 +745,12 @@ namespace QDLIB {
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phit[t]);
             _Uf->Apply(phii[t]);
+            if (_Gobbler){
+               _Gobbler->Apply(phit[t]);
+               _Gobbler->Apply(phii[t]);
+               phii[t]->Normalize();
+               phit[t]->Normalize();
+            }
          }
          ++(*clock);
       }
@@ -762,6 +790,10 @@ namespace QDLIB {
             _laserb[0]->swap(*(_laserf[0]));
             for (int t=0; t < _ntargets; t++){
                _Uf->Apply(phit[t]);
+               if (_Gobbler){
+                  _Gobbler->Apply(phit[t]);
+                  phit[t]->Normalize();
+               }
             }
             _laserb[0]->swap(*(_laserf[0]));
          }
@@ -769,6 +801,10 @@ namespace QDLIB {
          /* Propagate initial with new field */
          for (int t=0; t < _ntargets; t++){
             _Uf->Apply(phii[t]);
+            if (_Gobbler){
+               _Gobbler->Apply(phii[t]);
+               phii[t]->Normalize();
+            }
          }
          ++(*clock);
       }
@@ -956,6 +992,18 @@ namespace QDLIB {
 
        _Coup->Init( PsiI[0] );
       
+       /* Load the Gobbler */
+       section = _ContentNodes->FindNode( "gobbler" );
+       if (section != NULL){
+          log.cout() << endl;
+          log.Header( "Loading gobbler", Logger::SubSection);
+          log.IndentInc();
+          _Gobbler = ChainLoader::LoadOperatorChain(section);
+          log.IndentDec();
+          _Gobbler->Init(PsiI[0] );
+          delete section;
+       }
+       
       /* Let the Propagator do it's initalisation */
       _Uf->Clock( clock );
       _Ub->Clock( clock );
