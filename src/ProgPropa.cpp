@@ -245,7 +245,17 @@ namespace QDLIB {
 	 _reporter.Analyze( Psi );      /* propagation report. */
 	_U->Apply(Psi);                 /* Propagate */
 	if (_usepost) _postfilter.Apply( Psi );/* Apply post-filters*/
-	if (i % _wcycle == 0) wfile << Psi;  /* Write wavefunction */
+	if (i % _wcycle == 0){
+           /* Dirty hack to get meta data right for multistate WFs */
+           /** \todo Remove this hack => make clean File Class */
+           WFMultistate *wfmm;
+           wfmm = dynamic_cast<WFMultistate*>(Psi);
+           if (wfmm != NULL){
+              ParamContainer& pfm = wfm->Params();
+              pfm = wfm->State(0)->Params();
+           }
+           wfile << Psi;  /* Write wavefunction */
+        }
 	++(*clock);                     /* Step the clock */
       }
       if( _writenorm )  log.FileClose();
