@@ -224,7 +224,7 @@ namespace QDLIB
       
       _Energies_raw.newsize(_Nef);
       
-      log.cout() << "Eigenfunction\tEnergy\n";
+      log.cout() << "EF\tNt\tEnergy\n";
      
    
       Psi_initial->Normalize();
