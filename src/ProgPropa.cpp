@@ -190,7 +190,7 @@ namespace QDLIB {
       /* Make sure our hamiltonian is initalized */
       _h->Clock( clock );
       _h->Init(Psi);
-      log.cout() << "Initial engergy: " << _h->Expec(Psi) << endl;
+      log.cout() << "Initial energy: " << _h->Expec(Psi) << endl;
       
       /* Copy, since the propagator will propably scale it/modify etc. */
       _H = _h->NewInstance();
