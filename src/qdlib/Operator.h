@@ -125,11 +125,15 @@ namespace QDLIB {
 
 	 /**
 	  * Complex Bra.Op.Ket value of two Wavefunctions.
+          * 
+          * \todo This is general function. Move to Base class?
 	  */
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet) = 0;
 	 
 	 /**
 	  * Expectation value.
+          * 
+          * \todo This is general function. Move to Base class?
 	  */
 	 virtual double Expec(WaveFunction *Psi) = 0;
 	 

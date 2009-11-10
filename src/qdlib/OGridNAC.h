@@ -1,0 +1,58 @@
+#ifndef QDLIBOGRIDNAC_H
+#define QDLIBOGRIDNAC_H
+
+#include <OGridNabla.h>
+#include "OGridPotential.h"
+
+namespace QDLIB {
+
+   /**
+    * Coupling operator for Non-Adiabatic coupling.
+    * 
+    * params:
+    * \li dims  Number of grid dimensions
+    * \li file  Numeric representation of the NAMCE
+    * \li sign  pre-factor (chose 1 or -1)
+    * 
+    *  @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
+    */
+   class OGridNAC : public OGridNabla
+   {
+      private:
+         string _name;
+         OGridPotential _NACME; /* Holds the NAC Matrix elements*/
+         dVec* _pNAMCE;          /* Content pointer to _NACME */
+         double _sign;
+         WaveFunction *_buf;
+      public:
+         OGridNAC();
+      
+         ~OGridNAC();
+         
+         /* Interface implementation, Operator */
+         virtual Operator* NewInstance();
+	 	 
+         virtual void Init(ParamContainer &params);
+	 
+         virtual void Init(WaveFunction *Psi);
+	 
+         virtual const string& Name();
+	 
+         virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
+	 
+         virtual double Expec(WaveFunction *Psi);
+	
+         virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
+	 
+         virtual WaveFunction* Apply(WaveFunction *Psi);
+
+         virtual Operator* operator=(Operator* O);
+	 
+         virtual Operator* Copy(Operator* O);
+	 
+         virtual Operator* operator*(Operator* O);
+   };
+
+}
+
+#endif

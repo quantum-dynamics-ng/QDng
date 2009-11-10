@@ -10,7 +10,6 @@ namespace QDLIB {
     * 
     * Provides a storage for the diagonal representation of the operator (real numbers).
     * 
-    * \todo add support for complex k-space operators.
     */
    template<typename T>
    class ODSpaceT: public Operator
