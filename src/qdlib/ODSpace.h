@@ -48,7 +48,8 @@ namespace QDLIB {
 	 virtual Operator* Scale(const double d)
 	 {
 	    if (_dspace == NULL)
-	       throw ( EParamProblem("k-space not initialized", Name()) );
+               InitDspace();
+            
 	    MultElements(_dspace, d);
 	    scaling=d;
 	    return this;

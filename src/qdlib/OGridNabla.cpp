@@ -47,6 +47,8 @@ namespace QDLIB {
       
       *((GridSystem*) this) = *((GridSystem*) psi);
       
+      _kspace = new dVec(GridSystem::Size(), true);
+      
       _InitDspaceReal(); /* Setup internal kspace */
    }
 
@@ -97,7 +99,7 @@ namespace QDLIB {
       
       ket = dynamic_cast<WFGridSystem*>(sourcePsi);
       opPsi = dynamic_cast<WFGridSystem*>(destPsi);
-         
+
       ket->ToKspace();
       opPsi->isKspace(true);
       MultElementsComplex((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
@@ -137,6 +139,11 @@ namespace QDLIB {
       _params = o->_params;
       _fac = o->_fac;
       
+      *((GridSystem*) this) = *((GridSystem*) o);
+      
+      if (_kspace == NULL)
+         _kspace = new dVec(GridSystem::Size(), true);
+         
       *_kspace = *(o->_kspace);
       
       return this;
@@ -152,7 +159,7 @@ namespace QDLIB {
    Operator * OGridNabla::Scale(const double d)
    {
       if (_kspace == NULL)
-         throw ( EParamProblem("k-space not initialized", Name()) );
+         throw ( EParamProblem("k-space not initialized: ", Name()) );
       
       MultElements(_kspace, d);
      
@@ -169,7 +176,7 @@ namespace QDLIB {
       if (_dspace == NULL ) _dspace = new cVec(GridSystem::Size(), true);
       
       /** \todo make mpi-save */
-      /* Copy to "official" dspace represantion of mother class */
+      /* Copy to "official" dspace represention of mother class */
       for (int i=0; i < GridSystem::Size(); i++){
          (*_dspace)[i]._imag = -(*_kspace)[i];
       }

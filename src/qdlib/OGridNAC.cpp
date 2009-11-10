@@ -43,10 +43,11 @@ namespace QDLIB {
    
    void OGridNAC::Init(WaveFunction * Psi)
    {
-      OGridNAC::Init(Psi);
+      OGridNabla::Init(Psi);
       _NACME.Init(Psi);
       
       _buf = Psi->NewInstance();
+      *_buf = Psi;
    }
 
    const string & OGridNAC::Name()
