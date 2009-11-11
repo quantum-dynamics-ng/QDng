@@ -98,6 +98,7 @@ namespace QDLIB {
 //       ket = Psi->NewInstance();
 //       *ket = Psi;
    
+      /** \todo make mpi-save */
       int s;
       dcomplex *a, *b;
       for (s=0; s < strides(); s++){

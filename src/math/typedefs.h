@@ -231,6 +231,41 @@ namespace QDLIB {
    
    /**
     * Multiply vectors by elements.
+    * \f$ c_i = a_i i b_i d \f$
+    * 
+    * \param C    Complex Vector, result
+    * \param A    Complex vector
+    * \param B    Vector is interpreted as imaginary part.
+    * \param d    Scale the whole vector by d
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void MultElementsComplexEq(cVec *C ,cVec *A, dVec *B, double d)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+      
+      dcomplex *c=NULL;
+      dcomplex *a=NULL;
+      double *b=NULL;
+      
+      dcomplex comp(0,0);
+      
+      lint s;
+      for (s=0; s < strides; s++){
+         a = A->begin(s);
+         b = B->begin(s);
+         c = C->begin(s);
+         for (lint i=0; i < size; i++){
+            c[i] = a[i] * (I * b[i]) * d;
+         }
+      }
+   }
+   
+   /**
+    * Multiply vectors by elements.
+    * \f$ c_i = c_i a_i i b_i d \f$
     * 
     * \param C    Complex Vector, result
     * \param A    Complex vector

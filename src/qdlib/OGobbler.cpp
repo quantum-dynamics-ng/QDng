@@ -194,7 +194,7 @@ namespace QDLIB {
 	 throw ( EIncompatible("Psi is not of type WFGridSystem", destPsi->Name()) );
       
       if (_nip) 
-         MultElementsComplex((cVec*) opPsi, (cVec*) ket, (dVec*) this, -1);
+         MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, (dVec*) this, -1);
       else 
 	 MultElements((cVec*) opPsi, (cVec*) ket, (dVec*) this);
       
