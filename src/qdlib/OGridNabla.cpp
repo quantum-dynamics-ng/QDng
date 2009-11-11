@@ -1,11 +1,11 @@
 #include "OGridNabla.h"
 #include "WFGridSystem.h"
 #include "Kspace.h"
-
+#include "Butterworth.h"
 
 namespace QDLIB {
 
-   OGridNabla::OGridNabla() : _name("OGridNabla"), _kspace(NULL)
+   OGridNabla::OGridNabla() : _name("OGridNabla"), _fac(1), _kspace(NULL)
    {
    }
    
@@ -30,6 +30,9 @@ namespace QDLIB {
       
        int n;
       _params.GetValue( "dims", n);
+      
+      if(_params.isPresent("factor"))
+         _params.GetValue( "factor", _fac);
    
       if (n < 1)
          throw ( EParamProblem ("Nabla operator needs at least one dimension") );
@@ -99,10 +102,10 @@ namespace QDLIB {
       
       ket = dynamic_cast<WFGridSystem*>(sourcePsi);
       opPsi = dynamic_cast<WFGridSystem*>(destPsi);
-
+      
       ket->ToKspace();
       opPsi->isKspace(true);
-      MultElementsComplex((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
+      MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
       ket->isKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
       opPsi->ToXspace();
          
@@ -199,7 +202,7 @@ namespace QDLIB {
       /* Init k-space for every dimension */
       for (int i=0; i < GridSystem::Dim(); i++){ 
          kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i));;
-
+         
          view.ActiveDim(i);
          view += *kspace1;
          delete kspace1;

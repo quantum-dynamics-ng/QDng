@@ -22,8 +22,10 @@ namespace QDLIB {
          string _name;
          OGridPotential _NACME; /* Holds the NAC Matrix elements*/
          dVec* _pNAMCE;          /* Content pointer to _NACME */
-         double _sign;
+         double _sign;           /* Sign of the coupling */
          WaveFunction *_buf;
+//          WaveFunction *_buf2;
+//          FFT _fft;
       public:
          OGridNAC();
       

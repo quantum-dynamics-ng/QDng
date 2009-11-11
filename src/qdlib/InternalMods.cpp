@@ -75,6 +75,13 @@ namespace QDLIB
       return p;
    }
    
+   Operator* INT_OGridNabla()
+   {
+      OGridNabla *p;
+      p = new OGridNabla();
+      return p;
+   }
+   
    Operator* INT_OGridNAC()
    {
       OGridNAC *p;
@@ -136,6 +143,7 @@ namespace QDLIB
       if (name == "INT_OGridGmat") return &INT_OGridGMat;
       if (name == "INT_OGridPotential") return &INT_OGridPotential;
       if (name == "INT_OGridDipole") return &INT_OGridDipole;
+      if (name == "INT_OGridNabla") return &INT_OGridNabla;
       if (name == "INT_OGridNAC") return &INT_OGridNAC;
       
       if (name == "INT_OGobbler") return &INT_OGobbler;

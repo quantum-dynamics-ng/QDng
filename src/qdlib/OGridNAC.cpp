@@ -11,6 +11,7 @@ namespace QDLIB {
    OGridNAC::~OGridNAC()
    {
       if (_buf != NULL) delete _buf;
+//       if (_fft != NULL) delete _fft;
    }
    
    
@@ -32,6 +33,7 @@ namespace QDLIB {
       ParamContainer pNAC;
       string s;
       _params.GetValue("file",s);
+      pNAC.SetValue("name", "OGridPotential");
       pNAC.SetValue("file", s);
       
       _NACME.Init(pNAC);
@@ -46,7 +48,10 @@ namespace QDLIB {
       OGridNabla::Init(Psi);
       _NACME.Init(Psi);
       
+//       _fft = new FFT( (*(GridSystem*)) this, buf, buf2, true);
+      
       _buf = Psi->NewInstance();
+//       _buf2 = Psi->NewInstance();
       *_buf = Psi;
    }
 
@@ -57,14 +62,26 @@ namespace QDLIB {
 
    dcomplex OGridNAC::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
-      dcomplex c;
+      dcomplex c(0,0);
+      
+      WaveFunction *opPsi;
+      
+      opPsi = PsiKet->NewInstance();
+      Apply(opPsi, PsiKet);
+      
+      c = *PsiBra * opPsi;
+      
+      delete opPsi;
       return c;
    }
 
    double OGridNAC::Expec(WaveFunction * Psi)
    {
-      double d=0;
-      return d;
+      dcomplex c;
+      
+      c = MatrixElement(Psi, Psi);
+     
+      return c.real();
    }
 
    WaveFunction * OGridNAC::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
@@ -73,14 +90,15 @@ namespace QDLIB {
       PreFactor(_sign);
       OGridNabla::Apply(_buf, sourcePsi);
       _NACME.Apply(_buf);
+//       *destPsi *= scaling;
       
       /* 1/2 del f psi*/
-      PreFactor(0.5 * _sign);
+      PreFactor(0.5*_sign);
       _NACME.Apply(destPsi, sourcePsi);
       OGridNabla::Apply(destPsi);
 
       *destPsi += _buf;
-      
+//        *destPsi = _buf;
       return destPsi;
    }
 
@@ -89,10 +107,10 @@ namespace QDLIB {
       /* f del psi*/
       PreFactor(_sign);
       OGridNabla::Apply(_buf, Psi);
-      _NACME.Apply(_buf);
+     _NACME.Apply(_buf);
       
       /* 1/2 del f psi*/
-      PreFactor(0.5 * _sign);
+      PreFactor(.5*_sign);
       _NACME.Apply(Psi);
       OGridNabla::Apply(Psi);
 
