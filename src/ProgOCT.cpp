@@ -2,6 +2,7 @@
 
 #include "tools/FileSingleDefs.h"
 #include "tools/Logger.h"
+#include "tools/fstools.h"
 #include "ChainLoader.h"
 #include "qdlib/Butterworth.h"
 
@@ -74,6 +75,7 @@ namespace QDLIB {
 	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
 	    _dir += "/";
       }
+      CreateDir(_dir);
       
       /* Init propagation file basename */
       if ( attr.isPresent("fname") ) {
@@ -875,6 +877,7 @@ namespace QDLIB {
             if (section == NULL)
                throw ( EParamProblem ("Missing target wavefunction", t) );
             if (_mv == true) { /* Prepare series for moving targets */
+               log.cout() << "\nLoading Propagation for moving target\n" << endl;
                PsiT[t] = ChainLoader::LoadWaveFunctionChain( section, 0 );
                *(_memwfbuf[0][t]) = PsiT[t];
                if (_membuf){
@@ -1062,6 +1065,8 @@ namespace QDLIB {
       /* Write Report for guess */
       _CopyWFs(phii, PsiI);
       _laserobj[0] = 0;
+      log.cout() << "Propagating forward to check initial guess\n\n";
+      log.flush();
       PropagateForward(phii,false);
       Report(phii,PsiT, 0);
       

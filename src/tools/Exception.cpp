@@ -1,6 +1,8 @@
 #include "Exception.h"
 
 #include <sstream>
+#include "sys/stat.h"
+#include "sys/errno.h"
 
 using namespace std;
 
@@ -28,11 +30,27 @@ namespace QDLIB{
    }
    
 
-   EIOError::EIOError( const char * message, string &name ) : Exception()
+   EIOError::EIOError( const char * message, const string &name ) : Exception()
    {
       SetMessage(string(message) + ": " + name);
    }
 
+   EIOError::EIOError(int cerrno, const string & name)
+   {
+      string s;
+      
+      switch(cerrno){
+         case EACCES:
+               s = "Access denied";
+            break;
+         case EIO:
+               s = "I/O read error";
+            break;
+         default:
+            s = "Error in accessing file";
+      }
+      SetMessage(s + ": " + name);
+   }
    
    EIncompatible::EIncompatible(const char * message, const string & name)
    {
@@ -49,6 +67,8 @@ namespace QDLIB{
 
    
 }
+
+
 
 
 

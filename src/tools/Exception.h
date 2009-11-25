@@ -42,7 +42,8 @@ namespace QDLIB {
    {
       public:
          EIOError(const char *message) : Exception(message) {}
-	 EIOError(const char *message, string &name);
+	 EIOError(const char *message, const string &name);
+         EIOError(int cerrno, const string &name);
    };
    
    /**

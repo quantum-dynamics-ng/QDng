@@ -5,6 +5,7 @@
 #include "tools/QDGlobalClock.h"
 #include "tools/FileSingleDefs.h"
 #include "tools/helpers.h"
+#include "tools/fstools.h"
 #include "ChainLoader.h"
 
 #include "tools/FileSingleDefs.h"
@@ -133,6 +134,7 @@ namespace QDLIB
 	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
 	    _dir += "/";
       }
+      CreateDir(_dir);
       
       /* Filter diagonalization */
       if ( attr.isPresent("diag"))

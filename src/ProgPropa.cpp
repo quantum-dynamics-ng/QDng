@@ -3,7 +3,7 @@
 #include "tools/FileSingleDefs.h"
 #include "ChainLoader.h"
 #include "tools/Logger.h"
-
+#include "tools/fstools.h"
 #include "qdlib/WFMultistate.h"
 
 namespace QDLIB {
@@ -67,6 +67,7 @@ namespace QDLIB {
 	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
 	    _dir += "/";
       }
+      CreateDir(_dir);
       
       /* Init propagation file basename */
       if ( attr.isPresent("fname") ) {
