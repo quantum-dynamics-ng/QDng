@@ -29,7 +29,7 @@
  * Generalize Cheby to complex plane energy range
 
 * Multistate System
- * efficient SPO Scheme (DONE)
+ * efficient SPO Scheme (DONE), SPO for N-States?
  * matrix system (DONE)
 
 * FFT
