@@ -161,7 +161,11 @@ namespace QDLIB {
     */
    void Logger::flush()
    {
-      if (_supress) return;
+      if (_supress){
+         _sout->str("");
+         _soutdbg->str("");
+         return;
+      }
       
       string s;
       

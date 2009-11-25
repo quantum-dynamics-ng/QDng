@@ -80,29 +80,6 @@ namespace QDLIB {
    
       stringstream& coutdbg ( );
 
-   
-      /**
-       * @param  Caller
-       */
-//       stringstream& cout (Operator* Caller );
-   
-   
-      /**
-       * @param  Caller
-       */
-//       stringstream& cout (WaveFunction* Caller );
-  
-      /**
-      * @param  Caller
-      */
-//       stringstream& coutdbg (Operator* Caller );
-   
-   
-      /**
-      * @param  Caller
-      */
-//       stringstream& coutdbg (WaveFunction* Caller );
-   
       void flush ();
    
       void Header(const string &title, SectionType type);
@@ -114,7 +91,7 @@ namespace QDLIB {
        * 
        * Everything will be send to void if flush is called.
        */
-      void Supress(bool supress) { _supress = supress;}
+      void Supress(bool supress) { flush(); _supress = supress;}
       
       /**
       * Ask for output supression
