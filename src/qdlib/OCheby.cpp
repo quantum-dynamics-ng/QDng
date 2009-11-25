@@ -220,6 +220,9 @@ namespace QDLIB
       /* Manual choice of recursion depth */
       if (_params.isPresent("order")) _params.GetValue("order", _order);
       
+      if (_order < 3)
+	 throw (EParamProblem("Chebychev recursion must be at least 3") );
+	 
       /* Check for Real/imag time */
       if (fabs(OPropagator::Exponent().imag()) != 0 && fabs(OPropagator::Exponent().real()) == 0){
 	 if ( BesselJ0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
