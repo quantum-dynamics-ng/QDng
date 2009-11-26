@@ -569,9 +569,7 @@ namespace QDLIB {
          SyncTargetOperator(phii, phit, step);
       
       /* Refresh intial */
-      for (int t=0; t < _ntargets; t++){
-         *(phii[t]) = PsiI[t];
-      }
+      _CopyWFs(phii, PsiI );
       
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
@@ -743,10 +741,14 @@ namespace QDLIB {
       /* Determine correction field gamma (propagation with shaped lasers)*/
       clock->Begin();
       for (int s=0; s < clock->Steps(); s++){
-         _gamma[0].Set( CalcCorr(phii,phit) );
+         if (!_mv)
+            _gamma[0].Set( CalcCorr(phii,phit) );
+         else
+            _gamma[0].Set( CalcCorr(phii,_memwfbuf[s]) );
          for (int t=0; t < _ntargets; t++){
-            _Uf->Apply(phit[t]);
             _Uf->Apply(phii[t]);
+            if (!_mv) _Uf->Apply(phit[t]);
+            
             if (_Gobbler){
                _Gobbler->Apply(phit[t]);
                _Gobbler->Apply(phii[t]);
@@ -877,7 +879,7 @@ namespace QDLIB {
             if (section == NULL)
                throw ( EParamProblem ("Missing target wavefunction", t) );
             if (_mv == true) { /* Prepare series for moving targets */
-               log.cout() << "\nLoading Propagation for moving target\n" << endl;
+               log.cout() << "\nLoading Propagation for moving target (" << t << ")\n" << endl;
                PsiT[t] = ChainLoader::LoadWaveFunctionChain( section, 0 );
                *(_memwfbuf[0][t]) = PsiT[t];
                if (_membuf){
@@ -895,6 +897,7 @@ namespace QDLIB {
                PsiT[t] = ChainLoader::LoadWaveFunctionChain( section );
             delete section;
          }
+         if (_mv) _CopyWFs(PsiT, _memwfbuf[clock->Steps()]); /* Use last step as "target" */
          log.cout() << endl;
       } else if (_ttype == op) {
          log.Header( "Target operators", Logger::SubSection);
