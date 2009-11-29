@@ -1,7 +1,6 @@
 #ifndef COMPLEXNUMBERS_H
 #define COMPLEXNUMBERS_H
 
-// #include "cppunit/portability/FloatingPoint.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "TestFixture.h"
 
@@ -21,9 +20,6 @@ class ComplexNumbers : public CppUnit::TestFixture
    public:
       ComplexNumbers();
       ~ComplexNumbers();
-      
-/*      virtual void setUp();
-      virtual void tearDown(); */
       
    protected:
       void API_Test();

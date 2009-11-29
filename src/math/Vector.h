@@ -415,7 +415,7 @@ class Vector
     }
 
     /**
-     * Gives the global end index of the actual stride.
+     * Gives the global end index+1 of the actual stride.
      * 
      * We need this later for vectors which are strided by over multiple processes (e.g. MPI);
      */
