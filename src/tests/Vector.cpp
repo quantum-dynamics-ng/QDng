@@ -1,9 +1,10 @@
 #include "Vector.h"
 #include "math/typedefs.h"
+#include "defs.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION(VectorTest);
 
-#define VEC_TEST_SIZE 3
+#define VEC_TEST_SIZE 12
 #define VEC_TEST_STRIDES 4
 
 using namespace QDLIB;
@@ -99,13 +100,119 @@ void VectorTest::API_Test_SingleStride()
 
 void VectorTest::API_Test_MultiStride()
 {
-   dVec d1;
+   dVec d1,d2;
    
-   /* resizing & stride handling */
+   /* resizing & stride handling - continous strides */
    d1.newsize(VEC_TEST_SIZE, VEC_TEST_STRIDES);
    CPPUNIT_ASSERT(d1.size() == VEC_TEST_SIZE);
+   CPPUNIT_ASSERT(d1.lsize() == VEC_TEST_SIZE/VEC_TEST_STRIDES);
    CPPUNIT_ASSERT(d1.strides() == VEC_TEST_STRIDES);
    
+   /* Accessor test */
+   for (lint i=0; i < VEC_TEST_SIZE; i++){
+      d1[i] = double(i);
+      CPPUNIT_ASSERT(d1[i] == double(i));
+   }
+   
+   double *dp,**v;
+   lint k=0;
+   v = d1.begin();
+   for (lint s=0; s < VEC_TEST_STRIDES; s++){
+      dp = d1.begin(s);
+      for (lint j=0; j < d1.lsize(); j++){
+	 CPPUNIT_ASSERT(dp[j] == double(k));
+	 CPPUNIT_ASSERT(v[s][j] == double(k));
+	 k++;
+      }
+   }
+   
+   /* Copy methods & xchange */
+   d2 = d1;
+   for (lint i=0; i < VEC_TEST_SIZE; i++){
+      CPPUNIT_ASSERT(d2[i] == double(i));
+   }
+
+   d1 = 3;
+   for (lint i=0; i < VEC_TEST_SIZE; i++){
+      CPPUNIT_ASSERT(d1[i] == 3);
+   }
+
+   d2.FastCopy(d1);
+   for (lint i=0; i < VEC_TEST_SIZE; i++){
+      CPPUNIT_ASSERT(d2[i] == 3);
+   }
+   
+   d1=1;
+   d2=2;
+   d1.swap(d2);
+   for (lint i=0; i < VEC_TEST_SIZE; i++){
+      CPPUNIT_ASSERT(d1[i] == 2);
+      CPPUNIT_ASSERT(d2[i] == 1);
+   }
+   
+   /* Stride Copy */
+   dVec da[VEC_TEST_STRIDES];
+   
+   for (lint s=0; s < VEC_TEST_STRIDES; s++){
+      da[s].newsize(VEC_TEST_SIZE/VEC_TEST_STRIDES);
+      da[s] = double(s);
+      d1.StrideCopy(da[s], 0, s);
+   }
+   
+   v = d1.begin();
+   for (lint s=0; s < VEC_TEST_STRIDES; s++){
+      for (lint j=0; j < d1.lsize(); j++){
+	 CPPUNIT_ASSERT(v[s][j] == double(s));
+      }
+   }
+   
+   /* Stride Refs */
+   class dVecStrides : public dVec {
+      public:
+	 void SRef (dVec &vec, lint source, lint dest)
+	 {
+	    StrideRef(vec, source, dest);
+	 }
+   };
+   
+   dVecStrides ds;
+   
+   for (lint s=0; s < VEC_TEST_STRIDES; s++){
+      ds.SRef(da[s], 0, s);
+   }
+
+   v = ds.begin();
+   for (lint s=0; s < VEC_TEST_STRIDES; s++){
+      for (lint j=0; j < d1.lsize(); j++){
+	 CPPUNIT_ASSERT(v[s][j] == double(s));
+      }
+   }
+}
+
+void VectorTest::NUMERIC_Test_Strides()
+{
+   dVec A, B, C;
+   
+   A.newsize(24,8);
+   B.newsize(24,8);
+   
+   A = 7.0;
+   B = 3.0;
+   
+   C = A + B;
+   
+   CPPUNIT_ASSERT_DOUBLES_EQUAL( 10.0, C[0], LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL( 10.0, C[23], LOOSE_EPS);
+   
+   C = A * B; /* Scalar product */
+   
+   CPPUNIT_ASSERT_DOUBLES_EQUAL( 504.0, C[0], LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL( 504.0, C[23], LOOSE_EPS);
+   
+   C = elementwise_mult(A,B);
+   
+   CPPUNIT_ASSERT_DOUBLES_EQUAL( 21.0, C[0], LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL( 21.0, C[23], LOOSE_EPS);
    
 }
 

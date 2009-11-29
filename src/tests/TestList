@@ -1,0 +1,50 @@
+Test				Type		Level	Status
+
+* dcomplex			AN		1	done
+* MultElements Functions	ANFI		2
+* Vector Class			AF		1	done
+* Matrix Class			AF		1
+* Vector Views			AFNI		2	old ones
+* fft				AFNI		2
+
+- Linalg-
+* Bessel			AN		2
+* Diags				ANFI		2
+
+- Tools -
+* fstools			AF		1
+* FileSingle			AF		2
+* GetOpt			AF		1
+* ParamContainer		AF		1
+* QDClock			AF		1	done
+
+- QDLib -
+* WFGridcartesian		AFNT		3
+* WFLevel			AFNT		3
+* WFMultistate			AFNIT		4
+
+* OGridNabla			AFNT		3
+* OGridNablaSq			AFNT		3
+* OGridPotential		AFNT		3
+* OMultistate			AFNIT		4
+* OSum				AFNIT		4
+
+* Butterworth			AFN		2
+* GridSystem			AF		1	done	
+* Laser				AFN		2
+
+* OGobbler			AFNT		3
+* OProjection			AFNT		3
+* OGridDipole			AFNT		3				
+
+* OCheby			AFNIT		4
+* OSPO				AFNIT		4
+
+
+
+A = API
+F = Functional
+N = Numeric
+I = Integration
+T = Initialization behavior
+

@@ -1,8 +1,7 @@
 #include "dVecMinMax.h"
 
-#include "cppunit/portability/FloatingPoint.h"
-
 CPPUNIT_TEST_SUITE_REGISTRATION (TestMinMax);
+using namespace QDLIB;
 
 TestMinMax::TestMinMax() : vec(NULL)
 {
@@ -24,11 +23,11 @@ void TestMinMax::tearDown(){}
 
 void TestMinMax::MinCheck()
 {
-   CPPUNIT_ASSERT_DOUBLES_EQUAL(-3.50001 , QDLIB::VecMin(*vec) , .000001);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-3.50001 , VecMin(*vec) , .000001);
 }
 
 
 void TestMinMax::MaxCheck()
 {
-   CPPUNIT_ASSERT_DOUBLES_EQUAL(15.10000001 , QDLIB::VecMax(*vec) , .000000001);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(15.10000001 , VecMax(*vec) , .000000001);
 }

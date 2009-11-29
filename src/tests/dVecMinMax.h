@@ -2,7 +2,7 @@
 #define TESTDVECMINMAX_H
 
 #include "cppunit/TestFixture.h"
-#include "math/typedefs.h"
+#include "math/math_functions.h"
 #include "cppunit/extensions/HelperMacros.h"
 
 
