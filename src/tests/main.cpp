@@ -5,8 +5,9 @@
 #include "cppunit/TestResultCollector.h"
 #include "cppunit/TestRunner.h"
 
-#include "dVecMinMax.h"
+#include "ComplexNumbers.h"
 
+using namespace std;
 int
 main( int argc, char* argv[] )
 {

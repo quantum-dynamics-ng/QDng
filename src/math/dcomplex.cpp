@@ -14,4 +14,14 @@ namespace QDLIB {
      return s;
    }
 
+   
+   void dcomplex::operator =(Imaginary i)
+   {
+      _real = 0;
+      _imag = 1;
+   }
+
+   
 } /* namespace QDLIB */ 
+
+

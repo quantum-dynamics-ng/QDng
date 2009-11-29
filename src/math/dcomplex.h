@@ -6,7 +6,10 @@
 
 
 namespace QDLIB {
-
+   
+   struct Imaginary;
+   
+   
   /**
    * Simple class for complex numbers.
    * Implementet for double precission only.
@@ -74,15 +77,7 @@ namespace QDLIB {
   
     }
     
-//      inline double* operator*()
-//      {
-// 	return &_real;
-//      }
-  
-	
-  /*  std::istream& operator>>(std::istream &s, Matrix<T> &A)
-    {
-    }*/
+    void operator=(Imaginary i);
     
   }; /*struct dcomplex*/
   
@@ -143,6 +138,10 @@ namespace QDLIB {
     A = A + B;
   }
   
+  inline void operator-=(dcomplex &A, const dcomplex &B)
+  {
+     A = A - B;
+  }
   
   inline dcomplex operator*(const dcomplex &A, const dcomplex &B)
   {
@@ -185,7 +184,7 @@ namespace QDLIB {
     double d;
     
     d = B._real*B._real + B._imag*B._imag;
-    c._real = A._real * B._real + B._real * B._imag;
+    c._real = A._real * B._real + A._imag * B._imag;
     c._imag = A._imag * B._real - A._real * B._imag;
     c._real /= d;
     c._imag /= d;

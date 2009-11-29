@@ -4,7 +4,7 @@ INCLUDES = -I$(top_srcdir)/src $(LIBXML2_CFLAGS) $(all_includes)
 
 # the library search path.
 
-SUBDIRS = math tools fft qdlib modules slatec linalg
+SUBDIRS = fft linalg math modules qdlib slatec tests tools
 
 noinst_LTLIBRARIES = libqdng.la
 libqdng_la_SOURCES = libqdng.cpp 
