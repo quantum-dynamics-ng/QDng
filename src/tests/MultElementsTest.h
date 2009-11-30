@@ -5,15 +5,19 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include "math/typedefs.h"
 
+using namespace QDLIB;
+
 /**
 	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
 */
 class MultElementsTest : public CppUnit::TestFixture
 {
    CPPUNIT_TEST_SUITE( MultElementsTest );
-   CPPUNIT_TEST( NUMERIC_Real2Cplx );
    CPPUNIT_TEST( NUMERIC_Add );
    CPPUNIT_TEST( NUMERIC_Exp );
+   CPPUNIT_TEST( NUMERIC_Real2Cplx );
+   CPPUNIT_TEST( NUMERIC_Mult );
+   CPPUNIT_TEST( NUMERIC_Mult_Copy );
    CPPUNIT_TEST_SUITE_END();
    public:
       MultElementsTest();
@@ -26,10 +30,12 @@ class MultElementsTest : public CppUnit::TestFixture
       void NUMERIC_Add();
       void NUMERIC_Exp();
       void NUMERIC_Real2Cplx();
+      void NUMERIC_Mult();
+      void NUMERIC_Mult_Copy();
 
    private:
-      QDLIB::cVec cRes, cA, cB, cC;
-      QDLIB::dVec dRes, dA, dB, dC;
+      cVec cRes, cA, cB, cC;
+      dVec dRes, dA, dB, dC;
 };
 
 #endif
