@@ -264,8 +264,10 @@ namespace QDLIB {
     */
    Operator * OGobbler::operator *(Operator * O)
    {
-      OGridSystem *op;
       
+      throw ( EIncompatible("Gobbler can't be applied to other operators") );
+      
+/*      OGridSystem *op;
       op = dynamic_cast<OGridSystem*>(O);
       if (op == NULL)
 	 throw ( EIncompatible("O is not of type OGridSystem", O->Name()) );
@@ -273,9 +275,10 @@ namespace QDLIB {
       
       if ( *((GridSystem*) this) != *((GridSystem*) op) ) _Init();
       
-      MultElements( (dVec*) op, (dVec*) this);
+      MultElements( (dVec*) op, (dVec*) this);*/
       
-      return op;
+//       return op;
+      return NULL;
    }
 
 }

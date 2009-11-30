@@ -41,6 +41,15 @@ void MultElementsTest::setUp()
 
 void MultElementsTest::tearDown()
 {
+   cA.newsize(0);
+   cB.newsize(0);
+   cC.newsize(0);
+   dA.newsize(0);
+   dB.newsize(0);
+   dC.newsize(0);
+   
+   cRes.newsize(0);
+   dRes.newsize(0);
 }
 
 
@@ -134,8 +143,8 @@ void MultElementsTest::NUMERIC_Real2Cplx()
    MultElementsComplex(&cRes, &cB, &dC, d);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cA[i] * cB[i] * dcomplex(0,dC[i]) * d;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    } 
    
    
@@ -145,8 +154,8 @@ void MultElementsTest::NUMERIC_Real2Cplx()
    MultElementsComplex(&cRes, &dB, d);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cA[i] * dcomplex(0,dB[i]) * d;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    } 
 
 }
@@ -167,11 +176,18 @@ void MultElementsTest::NUMERIC_Mult()
    
 //    inline void MultElements(dVec *A, dVec *B)
 //    dRes = dA;
-//    MultElements(&dRes, &dB);
+//    tearDown();
+//    setUp();
+//    std::cout << std::endl << dRes.strides() << " "<< dRes.lsize() << endl;
+//    std::cout << std::endl << dC.begin(0) << endl;
+//    std::cout << dC.begin(1) << endl;
+//    std::cout << dC.begin(2) << endl;
+//    std::cout << dC.begin(3) << endl;
+//    MultElements(&dRes, &dC);
 //    for(lint i=dA.start(); i < dA.stop(); i++){
-//       d = dA[i] * dB[i];
-//       std::cout << std::endl << d << " " << dA[i] << " " << dB[i] << std::endl;
-//       CPPUNIT_ASSERT_DOUBLES_EQUAL(d, dRes[i], TIGHT_EPS);
+//       d = dA[i] * dC[i];
+//       std::cout << std::endl << dRes[i] <<" "<< d << " " << dA[i] << " " << dC[i] << std::endl;
+//       CPPUNIT_ASSERT_DOUBLES_EQUAL(d, dRes[i], LOOSE_EPS);
 //    }
    
 //    inline void MultElements(cVec *A, dVec *B)
@@ -190,8 +206,8 @@ void MultElementsTest::NUMERIC_Mult()
    MultElements(&cRes, &cB, d);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cA[i] * cB[i] *d;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    }
    
 //    inline void MultElements(cVec *A, dVec *B, double c)
@@ -200,29 +216,26 @@ void MultElementsTest::NUMERIC_Mult()
    MultElements(&cRes, &dB, d);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cA[i] * dB[i] *d;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    }
 
 //    inline void MultElements(cVec *C, cVec *A, dVec *B, double d)
    d = 8.8;
-   cRes = cA;
    MultElements(&cRes, &cB, &dC, d);
    for(lint i=cA.start(); i < cA.stop(); i++){
-      c = cA[i] * cB[i] * dC[i] *d;
-      std::cout << std::endl << cRes[i] << " " << c << " " << cA[i] << " " << cB[i] << std::endl;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      c = cB[i] * dC[i] * d;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    }
 
    //    inline void MultElements(cVec *C, cVec *A, dVec *B)
-//    cRes = cA;
-//    MultElements(&cRes, &cB, &dC);
-//    for(lint i=cA.start(); i < cA.stop(); i++){
-//       c = cA[i] * cB[i] * dC[i];
-//       CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-//       CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
-//    }
+   MultElements(&cRes, &cB, &dC);
+   for(lint i=cA.start(); i < cA.stop(); i++){
+      c = cB[i] * dC[i];
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+   }
 
 //    inline void MultElements(cVec *A, dVec *B, dcomplex c)
    c1 = dcomplex(1.1,2.2);
@@ -230,8 +243,8 @@ void MultElementsTest::NUMERIC_Mult()
    MultElements(&cRes, &dB, c1);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cA[i] * dB[i] * c1;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    }
    
 //    inline void MultElements(cVec *A, double c)
@@ -240,8 +253,8 @@ void MultElementsTest::NUMERIC_Mult()
    MultElements(&cRes, d);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cA[i] * d;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    }
 
 //    inline void MultElements(dVec *A, double c)
@@ -258,8 +271,8 @@ void MultElementsTest::NUMERIC_Mult()
    MultElements(&cRes, c1);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cA[i] * c1;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
 
    }
 
@@ -275,8 +288,8 @@ void MultElementsTest::NUMERIC_Mult_Copy()
    MultElementsCopy(&cRes, &cB, d);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = d*cB[i];
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    }
    
 //    inline void MultElementsCopy(cVec *C, cVec *A, dcomplex d)
@@ -284,8 +297,8 @@ void MultElementsTest::NUMERIC_Mult_Copy()
    MultElementsCopy(&cRes, &cB, c1);
    for(lint i=cA.start(); i < cA.stop(); i++){
       c = cB[i] * c1;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), 1e-10);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), 1e-10);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.real(), cRes[i].real(), LOOSE_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(c.imag(), cRes[i].imag(), LOOSE_EPS);
    }
    
 }

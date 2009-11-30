@@ -147,7 +147,7 @@ namespace QDLIB {
 	 /** Sum */
 	 WaveFunction* operator+=(WaveFunction* Psi)
 	 {
-	    if (cVec::size() != Psi->size()) throw ( EParamProblem("Grids differ in size") );
+	    if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
 	    
 	    AddElements((cVec*) this, (cVec*) Psi);
 	    return this;

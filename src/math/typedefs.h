@@ -360,7 +360,7 @@ namespace QDLIB {
     * You strongly encouraged to use this, since all optimizations and
     * parallelistation will be done here.
     */
-   inline void MultElements(dVec *A, dVec *B)
+/*   inline void MultElements(Vector<double> *A, Vector<double> *B)
    {
       lint size = A->lsize();
       lint strides = A->strides();
@@ -370,14 +370,14 @@ namespace QDLIB {
       
       lint s;
       for (s=0; s < strides; s++)
-	 a = A->begin(0);
-         b = B->begin(0);
+	 a = A->begin(s);
+         b = B->begin(s);
 	 for (lint i=0; i < size; i++){
 	 {
 	    a[i] *=  b[i];
 	 }
       }
-   }
+   }*/
    
    /**
     * Multiply vectors by elements.
