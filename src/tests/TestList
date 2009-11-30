@@ -1,7 +1,7 @@
 Test				Type		Level	Status
 
 * dcomplex			AN		1	done
-* MultElements Functions	ANFI		2
+* MultElements Functions	NFI		2
 * Vector Class			AF		1	done
 * Matrix Class			AF		1
 * Vector Views			AFNI		2	old ones
