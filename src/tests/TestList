@@ -19,7 +19,7 @@ Test				Type		Level	Status
 * QDClock			AF		1	done
 
 - QDLib -
-* WFGridcartesian		AFNT		3
+* WFGridcartesian		AFNT		3       done
 * WFLevel			AFNT		3
 * WFMultistate			AFNIT		4
 
@@ -35,7 +35,7 @@ Test				Type		Level	Status
 
 * OGobbler			AFNT		3
 * OProjection			AFNT		3
-* OGridDipole			AFNT		3				
+* OGridDipole			AFNT		3
 
 * OCheby			AFNIT		4
 * OSPO				AFNIT		4

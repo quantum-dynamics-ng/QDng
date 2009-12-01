@@ -1,5 +1,6 @@
 #include "WFGridSystemTest.h"
 #include "defs.h"
+#include "function_gens.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WFGridSystemTest);
 
@@ -15,15 +16,6 @@ WFGridSystemTest::WFGridSystemTest()
 
 WFGridSystemTest::~WFGridSystemTest()
 {
-}
-
-void fgen_sin(cVec &vec, double min, double max)
-{
-   double dx = (max - min)/(vec.size()-1);
-   
-   for (lint i=0; i < vec.size(); i++){
-      vec[i] = sin( (double(i) * dx + min)  * 2 / M_PI);
-   }
 }
 
 void WFGridSystemTest::setUp()
