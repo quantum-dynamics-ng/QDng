@@ -12,7 +12,10 @@ using namespace QDLIB;
 /* Define a dummy child class to obtain a real, instanciable class */
 class WFT : public QDLIB::WaveFunction
 {
+   private:
+      string _name;
    public:
+      WFT(): _name("Test") {}
       virtual WaveFunction* NewInstance()
       { 
 	 WFT* res;
@@ -21,11 +24,11 @@ class WFT : public QDLIB::WaveFunction
 	 return res;
       }
       virtual void Init(ParamContainer &params){}
-      virtual const string& Name() {}
-      virtual double Norm() {}
+      virtual const string& Name() {return _name;}
+      virtual double Norm() {return 0;}
       void Normalize() {}
-      virtual WaveFunction* operator=(WaveFunction* Psi){}
-      virtual dcomplex operator*(WaveFunction* Psi){}
+      virtual WaveFunction* operator=(WaveFunction* Psi){return NULL;}
+      virtual dcomplex operator*(WaveFunction* Psi){return dcomplex(0,9);}
 };
 
 
