@@ -3,3 +3,4 @@ autoheader
 automake --add-missing -c
 autoconf
 libtoolize --automake -c
+automake
