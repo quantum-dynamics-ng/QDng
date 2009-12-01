@@ -4,11 +4,11 @@ METASOURCES = AUTO
 AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 
 noinst_HEADERS = ComplexNumbers.h GridSystem.h MultElementsTest.h \
-	OGridHarmonic.h QDClock.h Test.h TestCheby.h TestGetopt.h TestLogger.h \
+	OGridHarmonic.h QDClock.h TestGetopt.h TestLogger.h \
 	TestMathFunctions.h TestStridedVector.h TestViews.h Vector.h WFGridCartesian.h \
 	WFGridHarmonic.h WaveFunctionTest.h defs.h
 
-noinst_PROGRAMS = Getopt runtest
+noinst_PROGRAMS = runtest
 runtest_SOURCES = ComplexNumbers.cpp GridSystem.cpp MultElementsTest.cpp \
 	QDClock.cpp TestViews.cpp TestViews.h Vector.cpp WFGridCartesian.cpp \
 	WaveFunctionTest.cpp dVecMinMax.cpp dVecMinMax.h main.cpp
