@@ -39,7 +39,11 @@ void WFGridCartesianTest::tearDown()
 void WFGridCartesianTest::API_Test()
 {
    ParamContainer p2;
-      
+   string s;
+   int n;
+   
+   CPPUNIT_ASSERT(wf->Name() == "WFGridCartesian");
+   
    CPPUNIT_ASSERT_THROW(wf->Init(p2), Exception);
    
    /* Init */
@@ -58,8 +62,6 @@ void WFGridCartesianTest::API_Test()
    
    p2 = wf2->Params();
    
-   string s;
-   int n;
    
    p2.GetValue("dims",s);
    CPPUNIT_ASSERT( s == "1");
@@ -87,10 +89,12 @@ void WFGridCartesianTest::NUMERIC_Test()
 {
    ParamContainer p2;
    double d;
+   dcomplex c;
    
    /* Init */
    CPPUNIT_ASSERT_NO_THROW(wf->Init(p));
    
+   /* Norm features */
    fgen_sin_norm(*wf, -5, 5);
    
    CPPUNIT_ASSERT_DOUBLES_EQUAL(1, wf->Norm(), LOOSE_EPS);
@@ -101,6 +105,10 @@ void WFGridCartesianTest::NUMERIC_Test()
    
    CPPUNIT_ASSERT_DOUBLES_EQUAL(1, wf->Norm(), LOOSE_EPS);
    
+   /* Scalar Product */
+   c = *wf * wf;
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(1, c.real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(0, c.imag(), LOOSE_EPS);
 }
 
 

@@ -7,5 +7,6 @@ using namespace QDLIB;
 
 extern void fgen_sin(cVec &vec, double min, double max);
 extern void fgen_sin_norm(cVec &vec, double min, double max);
+extern void fgen_cos_norm(cVec &vec, double min, double max);
 
 #endif
