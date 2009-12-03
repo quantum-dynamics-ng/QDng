@@ -65,7 +65,7 @@ void OGridNablaSqTest::API_Test()
 void OGridNablaSqTest::NUMERIC_Test()
 {
    double L = 10;
-   double dx = L/(WF_TEST_SIZE-1);
+//    double dx = L/(WF_TEST_SIZE-1);
    double pre = 2 * M_PI*M_PI / L / L;
 
    p.SetValue("dims", 1);

@@ -88,7 +88,7 @@ void WFGridCartesianTest::API_Test()
 void WFGridCartesianTest::NUMERIC_Test()
 {
    ParamContainer p2;
-   double d;
+//    double d;
    dcomplex c;
    
    /* Init */
