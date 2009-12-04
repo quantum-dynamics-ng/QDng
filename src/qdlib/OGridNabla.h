@@ -1,7 +1,7 @@
 #ifndef QDLIBOGRIDNABLA_H
 #define QDLIBOGRIDNABLA_H
 
-#include <ODSpace.h>
+#include "ODSpace.h"
 #include <GridSystem.h>
 
 namespace QDLIB {

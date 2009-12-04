@@ -4,13 +4,16 @@ METASOURCES = AUTO
 AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 
 noinst_HEADERS = ComplexNumbers.h GridSystem.h MultElementsTest.h \
-	OGridHarmonic.h QDClock.h TestGetopt.h TestLogger.h \
-	TestMathFunctions.h TestStridedVector.h TestViews.h Vector.h WFGridCartesian.h \
-	WFGridHarmonic.h WaveFunctionTest.h defs.h
+	OGridHarmonic.h OGridNablaSqTest.h OGridNablaTest.h QDClock.h Test.h TestCheby.h \
+	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
+	Vector.h WFGridCartesian.h WFGridHarmonic.h WFGridSystemTest.h \
+	WaveFunctionTest.h defs.h function_gens.h
 
 noinst_PROGRAMS = runtest
 runtest_SOURCES = ComplexNumbers.cpp GridSystem.cpp MultElementsTest.cpp \
-	QDClock.cpp TestViews.cpp TestViews.h Vector.cpp WFGridCartesian.cpp \
-	WaveFunctionTest.cpp dVecMinMax.cpp dVecMinMax.h main.cpp
-runtest_LDADD = $(top_builddir)/src/tools/libtools.la \
-	$(top_builddir)/src/math/libmath.la $(top_builddir)/src/qdlib/libqd.la -lcppunit
+	OGridNablaSqTest.cpp OGridNablaTest.cpp QDClock.cpp TestViews.cpp TestViews.h Vector.cpp \
+	WFGridCartesianTest.cpp WFGridSystemTest.cpp WaveFunctionTest.cpp dVecMinMax.cpp dVecMinMax.h \
+	function_gens.cpp main.cpp
+runtest_LDADD = $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/tools/libtools.la $(top_builddir)/src/fft/libfft.la \
+	-lfftw3 -lcppunit
