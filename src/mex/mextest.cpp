@@ -1,32 +1,55 @@
-#include "mex.h"
-//#include "ObjectHandle.h"
-
 #include <iostream>
 #include <math.h>
 
 
-void loadWF(mxArray **out1, const mxArray *in1 , const mxArray *in2) {
-  //std::cout << "Hallo4" << std::endl;
-  char *string_name1;
-  char *string_name2;
-  string_name1 = mxArrayToString(in1);
-  string_name2 = mxArrayToString(in2);
-  std::string name1 = string_name1;
-  std::string name2 = string_name2;
-  std::cout << name1 << std::endl;
-  std::cout << name2 << std::endl;
+#include "mex.h"
 
-  *out1= mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+/*
+ * timestwo.c - example found in API guide
+ *
+ * Computational function that takes a scalar and double it.
+ *
+ * This is a MEX-file for MATLAB.
+ * Copyright 1984-2000 The MathWorks, Inc.
+ */
+
+/* $Revision: 1.8 $ */
+
+void timestwo(double y[], double x[])
+{
+  y[0] = 2.0*x[0];
 }
 
-void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )     
+void mexFunction( int nlhs, mxArray *plhs[],
+                  int nrhs, const mxArray *prhs[] )
 {
-  //std::cout << "Hallo1" << std::endl;
-  if (nlhs == 1 && nrhs == 2) {
-	  //std::cout << "Hallo2" << std::endl;
-	  if (mxIsChar(prhs[0]) && mxIsChar(prhs[1])) {
-	    //std::cout << "Hallo3" << std::endl;
-	    loadWF(&plhs[0],prhs[0],prhs[1]);
-	  }
-	}else mexErrMsgTxt("Bad input.");
+  
+  std::cout << "Hallo Du Sack23457" << std::endl;
+  double *x,*y;
+  int     mrows,ncols;
+
+  /* Check for proper number of arguments. */
+  if(nrhs!=1) {
+    mexErrMsgTxt("One input required.");
+  } else if(nlhs>1) {
+    mexErrMsgTxt("Too many output arguments");
+  }
+
+  /* The input must be a noncomplex scalar double.*/
+  mrows = mxGetM(prhs[0]);
+  ncols = mxGetN(prhs[0]);
+  if( !mxIsDouble(prhs[0]) || mxIsComplex(prhs[0]) ||
+      !(mrows==1 && ncols==1) ) {
+    mexErrMsgTxt("Input must be a noncomplex scalar double.");
+  }
+
+  /* Create matrix for the return argument. */
+  plhs[0] = mxCreateDoubleMatrix(mrows,ncols, mxREAL);
+
+  /* Assign pointers to each input and output. */
+  x = mxGetPr(prhs[0]);
+  y = mxGetPr(plhs[0]);
+
+  /* Call the timestwo subroutine. */
+  timestwo(y,x);
 }
