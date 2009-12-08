@@ -36,6 +36,8 @@ void loadWF(mxArray **out1, const mxArray *in1 , const mxArray *in2) {
    	WaveFunction *WF=NULL;
    	ModuleLoader* mods = ModuleLoader::Instance();
    	WF = mods->LoadWF( name2 );
+	if (WF == NULL)
+	    throw ( EParamProblem("WaveFunction module loading failed") );
    	//file >> WF;
 	*out1= mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
    } catch (Exception e) {
