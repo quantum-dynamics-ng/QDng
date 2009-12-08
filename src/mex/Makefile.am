@@ -18,8 +18,17 @@ CXXFLAGS  = -g
 #mextest_LDFLAGS = $(MATLAB_LINK)
 #mextest_LDADD = $(MATLAB_LIB)
 
-lib_LTLIBRARIES = libmextest2.la readwf.la
+pkglib_LTLIBRARIES = libmextest2.la readwf.la
 libmextest2_la_CXXFLAGS  = $(MATLAB_FLAGS)
-libmextest2_la_LDFLAGS = -module $(MATLAB_LINK) -o mextest2.mexa64
+libmextest2_la_LDFLAGS = -module -avoid-version -shrext=.mexa64 $(MATLAB_LINK)
 libmextest2_la_LIBADD = $(MATLAB_LIB)
 libmextest2_la_SOURCES = mextest.cpp
+
+readwf_la_CXXFLAGS  = $(MATLAB_FLAGS)
+readwf_la_LDFLAGS = -module -avoid-version -shrext=.mexa64 $(MATLAB_LINK)
+readwf_la_SOURCES = readwf.cpp
+readwf_la_LIBADD = $(top_builddir)/src/fft/libfft.la \
+	$(top_builddir)/src/linalg/liblinalg.a $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/modules/libModuleLoader.a $(top_builddir)/src/qdlib/libqd.la \
+	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/tools/libtools.la $(FFTW_LIBS) $(FLIBS) \
+	$(LAPACK_LIBS) $(LIBXML2_LIBS) $(MATLAB_LIB)
