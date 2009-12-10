@@ -35,7 +35,12 @@ readwf_la_LIBADD = $(top_builddir)/src/fft/libfft.la \
 
 
 bin_PROGRAMS = debugmex
-debugmex_SOURCES = debugreadwf.cpp
+debugmex_SOURCES = debugreadwf.cpp readwf.cpp
 debugmex_CXXFLAGS = -I${MATLAB_DIR}/extern/include -I${MATLAB_DIR}/simulink/include
 debugmex_LDFLAGS = -Wl,-rpath-link,/opt/adm/matlab7.9/bin/glnxa64 -L/opt/adm/matlab7.9/bin/glnxa64 -lmx -lmex \
 	-lmat -lm
+debugmex_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
+	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/linalg/liblinalg.a \
+	$(top_builddir)/src/tools/libtools.la $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS) $(FLIBS) $(FFTW_LIBS) \
+	$(LIBXML2_LIBS)
