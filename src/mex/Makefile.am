@@ -18,7 +18,8 @@ CXXFLAGS  = -g
 #mextest_LDFLAGS = $(MATLAB_LINK)
 #mextest_LDADD = $(MATLAB_LIB)
 
-pkglib_LTLIBRARIES = libmextest2.la readwf.la
+pkglib_LTLIBRARIES = libmextest2.la libreadwfstatic.la readwf.la
+
 libmextest2_la_CXXFLAGS  = $(MATLAB_FLAGS)
 libmextest2_la_LDFLAGS = -module -avoid-version -shrext=.mexa64 $(MATLAB_LINK)
 libmextest2_la_LIBADD = $(MATLAB_LIB)
@@ -28,19 +29,21 @@ readwf_la_CXXFLAGS  = $(MATLAB_FLAGS)
 readwf_la_LDFLAGS = -module -avoid-version -shrext=.mexa64 $(MATLAB_LINK)
 readwf_la_SOURCES = readwf.cpp
 readwf_la_LIBADD = $(top_builddir)/src/fft/libfft.la \
-	$(top_builddir)/src/linalg/liblinalg.a $(top_builddir)/src/math/libmath.la \
-	$(top_builddir)/src/modules/libModuleLoader.a $(top_builddir)/src/qdlib/libqd.la \
-	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/tools/libtools.la $(FFTW_LIBS) $(FLIBS) \
+	$(top_builddir)/src/linalg/liblinalg.la $(top_builddir)/src/math/libmath.la \
+	$(top_builddir)/src/modules/libModuleLoader.la $(top_builddir)/src/qdlib/libqd.la \
+	$(top_builddir)/src/slatec/libslatecmin.la $(top_builddir)/src/tools/libtools.la $(FFTW_LIBS) $(FLIBS) \
 	$(LAPACK_LIBS) $(LIBXML2_LIBS) $(MATLAB_LIB)
 
 
-bin_PROGRAMS = debugmex
-debugmex_SOURCES = debugreadwf.cpp readwf.cpp
-debugmex_CXXFLAGS = -I${MATLAB_DIR}/extern/include -I${MATLAB_DIR}/simulink/include
-debugmex_LDFLAGS = -Wl,-rpath-link,/opt/adm/matlab7.9/bin/glnxa64 -L/opt/adm/matlab7.9/bin/glnxa64 -lmx -lmex \
-	-lmat -lm
-debugmex_LDADD = $(top_builddir)/src/modules/libModuleLoader.a \
-	$(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/linalg/liblinalg.a \
-	$(top_builddir)/src/tools/libtools.la $(top_builddir)/src/math/libmath.la \
-	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS) $(FLIBS) $(FFTW_LIBS) \
-	$(LIBXML2_LIBS)
+#bin_PROGRAMS = debugmex
+#ebugmex_SOURCES = debugreadwf.cpp readwf.cpp
+#debugmex_CXXFLAGS = -I${MATLAB_DIR}/extern/include -I${MATLAB_DIR}/simulink/include
+#debugmex_LDFLAGS = -L/opt/adm/matlab7.9/bin/glnxa64 \
+#	-Wl,-rpath-link,/opt/adm/matlab7.9/bin/glnxa64 -lm -lmat -lmex -lmx
+#debugmex_LDADD = $(top_builddir)/src/lib/libqdng.la $(FFTW_LIBS) $(FLIBS) \
+#	$(LAPACK_LIBS) $(LIBXML2_LIBS)
+
+libreadwfstatic_la_SOURCES = readwf.cpp
+libreadwfstatic_la_CXXFLAGS  = $(MATLAB_FLAGS)
+libreadwfstatic_la_LDFLAGS = -module -avoid-version -shrext=.mexa64 $(MATLAB_LINK) -static
+libreadwfstatic_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(MATLAB_LIB)
