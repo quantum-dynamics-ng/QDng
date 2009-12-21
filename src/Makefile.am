@@ -10,7 +10,7 @@ if CPPUNIT
   OPT_DIRS+=tests
 endif
 
-SUBDIRS = $(OPT_DIRS) fft linalg math modules qdlib slatec tools lib mex 
+SUBDIRS = $(OPT_DIRS) fft linalg math modules qdlib slatec tools fftw lib mex 
 
 
 bin_PROGRAMS = qdng

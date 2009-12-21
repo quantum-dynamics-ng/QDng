@@ -4,9 +4,9 @@
 #include <cstring>
 #include <string>
 #include <math.h>
-#include "mex/readwf.h"
+#include "mex/init_wf_file.h"
 
-
+#include "mex/convert_to_mxArray.h"
 #include "tools/Exception.h"
 #include "tools/FileSingleDefs.h"
 #include "modules/ModuleLoader.h"
@@ -22,20 +22,7 @@ using namespace QDLIB;
 int main()
 {
 std::cout << "Hallo Welt 3" << std::endl;
-//    FileWF file;
-//    WaveFunction *WF;
-//    ModuleLoader* mods = ModuleLoader::Instance();
-// 
-//    WF = mods->LoadWF("GridCartesian");
-// 
-//    file.Suffix(BINARY_WF_SUFFIX);
-//    file.Name("./ef0");
-// 
-//    file >> WF;
-// 
-//    cout << *WF<<endl;
-// 
-// std::cout << "Hallo Welt 4" << std::endl;
+
 int nlhs = 1;
 int nrhs = 2;
 mxArray *plhs[1];
@@ -48,18 +35,7 @@ char *cstr1[1], *cstr2[1];
 str1= "/home.asteria/pvh/K2/Propa_Pot_Baumert/WF0";
 str2= "GridCartesian";
 
-// FileWF file;
-// file.Suffix(BINARY_WF_SUFFIX);
-// std::cout << "Suffix: " << file.GetSuffix() << std::endl;
-// file.Name(str1);
-// std::cout << "Filename: " << file.Name() << std::endl;
-// WaveFunction *WF=NULL;
-// ModuleLoader* mods = ModuleLoader::Instance();
-// WF = mods->LoadWF( str2 );
-// if (WF == NULL)
-//     throw ( EParamProblem("WaveFunction module loading failed") );
-// //file >> WF;
-// std::cout << "Hallo Welt 4.5" << std::endl;
+
 cstr1[0] = new char [str1.size()+1];
 cstr2[0] = new char [str2.size()+1];
 

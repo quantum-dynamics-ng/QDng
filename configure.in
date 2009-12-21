@@ -68,6 +68,7 @@ dnl AC_ARG_WITH([mpi-prefix],
 dnl	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation])],
 dnl	    [],with_mpi-prefix=no)
 
+AC_CONFIG_SUBDIRS([src/fftw/])
 
 
 AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile src/lib/Makefile src/mex/Makefile])

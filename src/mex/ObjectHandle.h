@@ -17,7 +17,13 @@
 
 #include <mex.h>
 #include <typeinfo>
-#include <list>
+#include <map>
+
+#include <iostream>
+#include <string>
+#include <math.h>
+
+
 
 template<typename T> class Collector;
 
@@ -26,23 +32,14 @@ class ObjectHandle {
 public:
 	// Constructor for free-store allocated objects.
 	// Handle takes ownership, and will delete object when it is destroyed.
-	ObjectHandle(T*& ptr) : type(&typeid(T)), owns(true), t(ptr) { 
-		signature = this; 
-		Collector<T>::register_handle(this);
-		ptr = 0;
-	} 
+	ObjectHandle(T*& ptr);
 
 	// Constructor for non-owned objects.
 	// Object may be heap or statically allocated; the handle does NOT
 	// take ownership, and the client is responsible for deleting it.
-	ObjectHandle(T& obj) : type(&typeid(T)), owns(false), t(&obj) { 
-		signature= this; 
-	} 
+	ObjectHandle(T& obj);
 
-	~ObjectHandle() { 
-		if (owns) delete t; // destroy object
-		signature= 0; // destroy signature
-	} 
+	~ObjectHandle();
 
 	// Convert ObjectHandle<T> to a mxArray handle (to pass back from mex-function).
 	mxArray* to_mex_handle(); 
@@ -51,7 +48,8 @@ public:
 	static ObjectHandle* from_mex_handle( const mxArray* ma );
 
 	// Get the actual object contained by handle
-	T& get_object() const { return *t; }
+	T* get_object() const { return t; }
+	void destroy_object(const mxArray *mxh);
 
 private:
 	ObjectHandle* signature; // use 'this' as a unique object signature 
@@ -78,55 +76,57 @@ mxArray *create_handle(T* t)
 }
 
 template <typename T>
-T& get_object(const mxArray *mxh)
+T* get_object(const mxArray *mxh)
 // Obtain object represented by handle.
 {
 	ObjectHandle<T>* handle= ObjectHandle<T>::from_mex_handle(mxh);
 	return handle->get_object();
 }
 
+
 template <typename T>
-void destroy_object(const mxArray *mxh)
+void ObjectHandle<T>::destroy_object(const mxArray *mxh)
 // If deleting object, rather than leaving it to garbage collection,
 // must delete it via the handle; do not delete T* directly.
 {
-	ObjectHandle<T>* handle= ObjectHandle<T>::from_mex_handle(mxh);
-	delete handle;
+	//std::cout << "destroy_object" << std::endl;
+	Collector<T>* coll = Collector<T>::Instance ();
+	coll->delete_handle(mxh);
+	delete this;
 }
 
-// --------------------------------------------------------- 
-// ------------------ Garbage Collection -------------------
-// --------------------------------------------------------- 
 
-// Garbage collection singleton (one collector object for each type T).
-// Ensures that registered handles are deleted when the dll is released (they
-// may also be deleted previously without problem).
-//    The Collector provides protection against resource leaks in the case
-// where 'clear all' is called in MatLab. (This is because MatLab will call
-// the destructors of statically allocated objects but not free-store allocated
-// objects.)
 template <typename T>
-class Collector {
-	std::list<ObjectHandle<T>*> objlist;
-public:
-	~Collector() {
-		typename std::list<ObjectHandle<T>*>::iterator it;
-		typename std::list<ObjectHandle<T>*>::iterator end= objlist.end();
-		for (it= objlist.begin(); it!=end; ++it) {
-			if ((*it)->signature == *it) // check for valid signature
-				delete *it;
+ObjectHandle<T>::ObjectHandle(T*& ptr) : type(&typeid(T)), owns(true), t(ptr) { 
+		signature = this; 
+		Collector<T>* coll = Collector<T>::Instance ();
+		coll->register_handle(this);
+		ptr = 0;
+	} 
+
+template <typename T>
+ObjectHandle<T>::ObjectHandle(T& obj) : type(&typeid(T)), owns(false), t(&obj) { 
+		signature= this; 
+	}
+
+template <typename T>
+ObjectHandle<T>::~ObjectHandle() { 
+		std::cout << "Delete ObjectHandle" << std::endl;
+		if (owns) {
+			delete t; // destroy object
 		}
-	}
+		signature= 0; // destroy signature
+	} 
 
-	static void register_handle (ObjectHandle<T>* obj) {
-		static Collector singleton;
-		singleton.objlist.push_back(obj);
-	}
-
-private: // prevent construction
-	Collector() {}
-	Collector(const Collector&);
-};
+// Create a numeric array as handle for an ObjectHandle.
+// We ASSUME we can store object pointer in the mxUINT32 element of mxArray.
+template <typename T>
+mxArray* ObjectHandle<T>::to_mex_handle() 
+{
+	mxArray* handle  = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+	*reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle)) = this;
+	return handle;
+}
 
 // --------------------------------------------------------- 
 // ---------- Implementation of member functions ----------- 
@@ -142,32 +142,17 @@ ObjectHandle<T>* ObjectHandle<T>::from_mex_handle(const mxArray* handle)
 		mexErrMsgTxt("Parameter is not an ObjectHandle type.");
 
 	// We *assume* we can store ObjectHandle<T> pointer in the mxUINT32 of handle
-	ObjectHandle* obj = *reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle));
-
-	if (!obj) // gross check to see we don't have an invalid pointer
-		mexErrMsgTxt("Parameter is NULL. It does not represent an ObjectHandle object.");
-// TODO: change this for max-min check for pointer values
-
-	if (obj->signature != obj) // check memory has correct signature
-		mexErrMsgTxt("Parameter does not represent an ObjectHandle object.");
-
-	if (*(obj->type) != typeid(T)) { // check type 
-		mexPrintf("Given: <%s>, Required: <%s>.\n", obj->type->name(), typeid(T).name());
-		mexErrMsgTxt("Given ObjectHandle does not represent the correct type.");
+	Collector<T>* coll = Collector<T>::Instance ();
+	double test = coll->find_handle(handle);
+	ObjectHandle* obj = NULL;
+	//std::cout << obj->type->name() << " " <<   typeid(T).name() << std::endl;
+	if (test == *mxGetPr(handle)) {
+	      //std::cout << "Cast" << std::endl;
+	      obj = *reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle));
 	}
-
 	return obj;
 }
 
-// Create a numeric array as handle for an ObjectHandle.
-// We ASSUME we can store object pointer in the mxUINT32 element of mxArray.
-template <typename T>
-mxArray* ObjectHandle<T>::to_mex_handle() 
-{
-	mxArray* handle  = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
-	*reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle)) = this;
-	return handle;
-}
 
 
 

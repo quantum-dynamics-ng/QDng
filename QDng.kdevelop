@@ -23,14 +23,14 @@
         <mextest/>
         <readwf/>
         <debugmex/>
-        <qdng/>
+        <qdng></qdng>
       </runarguments>
       <debugarguments>
         <read_WF/>
         <mextest/>
         <readwf/>
         <debugmex/>
-        <qdng/>
+        <qdng></qdng>
       </debugarguments>
       <cwd>
         <read_WF>/home.asteria/pvh/Programme/Cpp/QDng.git/debug/./</read_WF>
