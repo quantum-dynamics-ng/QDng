@@ -1,4 +1,4 @@
-/* class ObjectHandle: a handle class for mex-functions
+/** class ObjectHandle: a handle class for mex-functions
  *
  * Notes:
  * 1. If passing an object to the first (pointer) constructor, be sure that
@@ -8,8 +8,6 @@
  * 2. The second (reference) constructor permits static objects to be passed via 
  * ObjectHandles by ensuring the ObjectHandle does not take ownership of
  * the object. 
- *
- * Tim Bailey 2004. Adapted from a design by Mike Stevens.
  */
 
 #ifndef OBJECT_HANDLE_T_H_
@@ -24,30 +22,35 @@
 #include <math.h>
 
 
-
 template<typename T> class Collector;
 
 template <typename T>
 class ObjectHandle {
 public:
-	// Constructor for free-store allocated objects.
-	// Handle takes ownership, and will delete object when it is destroyed.
+	/**
+	* Constructor for free-store allocated objects.
+	* Handle takes ownership, and will delete object when it is destroyed.
+	*/
 	ObjectHandle(T*& ptr);
-
-	// Constructor for non-owned objects.
-	// Object may be heap or statically allocated; the handle does NOT
-	// take ownership, and the client is responsible for deleting it.
+	/**
+	* Constructor for non-owned objects.
+	* Object may be heap or statically allocated; the handle does NOT
+	*take ownership, and the client is responsible for deleting it.
+	*/
 	ObjectHandle(T& obj);
 
 	~ObjectHandle();
-
-	// Convert ObjectHandle<T> to a mxArray handle (to pass back from mex-function).
+	/**
+	* Convert ObjectHandle<T> to a mxArray handle (to pass back from mex-function).
+	*/
 	mxArray* to_mex_handle(); 
-
-	// Convert mxArray (passed to mex-function) to an ObjectHandle<T>.
+	/**
+	* Convert mxArray (passed to mex-function) to an ObjectHandle<T>.
+	*/
 	static ObjectHandle* from_mex_handle( const mxArray* ma );
-
-	// Get the actual object contained by handle
+	/**
+	* Get the actual object contained by handle
+	*/
 	T* get_object() const { return t; }
 	void destroy_object(const mxArray *mxh);
 
@@ -59,35 +62,41 @@ private:
 
 	friend class Collector<T>; // allow Collector access to signature
 };
-
-// --------------------------------------------------------- 
-// ------------------ Helper functions ---------------------
-// --------------------------------------------------------- 
-// These functions remove the need to deal with ObjectHandle<T>
-// class directly for most common operations.
-
+/**
+* --------------------------------------------------------- 
+* ------------------ Helper functions ---------------------
+* --------------------------------------------------------- 
+* These functions remove the need to deal with ObjectHandle<T>
+* class directly for most common operations.
+*
+* Create mex handle to object t (where t is heap allocated). 
+* Client no longer owns t, and so must not delete it.
+*/
 template <typename T>
 mxArray *create_handle(T* t)
-// Create mex handle to object t (where t is heap allocated). 
-// Client no longer owns t, and so must not delete it.
+
 {
 	ObjectHandle<T>* handle= new ObjectHandle<T>(t);
 	return handle->to_mex_handle();
 }
 
+/**
+* Obtain object represented by handle.
+*/
+
 template <typename T>
 T* get_object(const mxArray *mxh)
-// Obtain object represented by handle.
 {
 	ObjectHandle<T>* handle= ObjectHandle<T>::from_mex_handle(mxh);
 	return handle->get_object();
 }
 
-
+/**
+* If deleting object, rather than leaving it to garbage collection,
+* must delete it via the handle; do not delete T* directly.
+*/
 template <typename T>
 void ObjectHandle<T>::destroy_object(const mxArray *mxh)
-// If deleting object, rather than leaving it to garbage collection,
-// must delete it via the handle; do not delete T* directly.
 {
 	//std::cout << "destroy_object" << std::endl;
 	Collector<T>* coll = Collector<T>::Instance ();
@@ -117,23 +126,27 @@ ObjectHandle<T>::~ObjectHandle() {
 		}
 		signature= 0; // destroy signature
 	} 
-
-// Create a numeric array as handle for an ObjectHandle.
-// We ASSUME we can store object pointer in the mxUINT32 element of mxArray.
+/**
+* Create a numeric array as handle for an ObjectHandle.
+* We ASSUME we can store object pointer in the mxUINT64 (64 Bit arichtecture) element of mxArray.
+*/
 template <typename T>
 mxArray* ObjectHandle<T>::to_mex_handle() 
 {
 	mxArray* handle  = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
-	*reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle)) = this;
+	Collector<T>* coll = Collector<T>::Instance ();
+	ObjectHandle<T> *Ohandle = coll->find_ptr(this);
+	*reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle)) = Ohandle;
 	return handle;
 }
-
-// --------------------------------------------------------- 
-// ---------- Implementation of member functions ----------- 
-// --------------------------------------------------------- 
-
-// Import a handle from MatLab as a mxArray of UINT32. Check that
-// it is actually a pointer to an ObjectHandle<T>.
+/**
+* --------------------------------------------------------- 
+* ---------- Implementation of member functions ----------- 
+* --------------------------------------------------------- 
+*
+* Import a handle from MatLab as a mxArray of UINT32. Check that
+* it is actually a pointer to an ObjectHandle<T>.
+*/
 template <typename T>
 ObjectHandle<T>* ObjectHandle<T>::from_mex_handle(const mxArray* handle) 
 {
