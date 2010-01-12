@@ -13,7 +13,9 @@ namespace QDLIB {
     * \li dims  Number of grid dimensions
     * \li file  Numeric representation of the NAMCE
     * \li sign  pre-factor (chose 1 or -1)
+    * \li mass  reduced mass
     * 
+    * \todo implement for N-dims
     *  @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
    class OGridNAC : public OGridNabla
@@ -23,6 +25,7 @@ namespace QDLIB {
          OGridPotential _NACME; /* Holds the NAC Matrix elements*/
          dVec* _pNAMCE;          /* Content pointer to _NACME */
          double _sign;           /* Sign of the coupling */
+         double _mass;            /* mass for 1D-NACs */
          WaveFunction *_buf;
 //          WaveFunction *_buf2;
 //          FFT _fft;

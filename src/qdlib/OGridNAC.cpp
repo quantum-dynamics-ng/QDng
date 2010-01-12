@@ -2,7 +2,7 @@
 
 namespace QDLIB {
 
-   OGridNAC::OGridNAC(): OGridNabla(), _name("GridNAC"), _sign(1), _buf(NULL)
+   OGridNAC::OGridNAC(): OGridNabla(), _name("GridNAC"), _sign(1), _mass(1), _buf(NULL)
    {
       _pNAMCE = (dVec*) &_NACME;
    }
@@ -40,6 +40,9 @@ namespace QDLIB {
       
       if (_params.isPresent("sign"))
          _params.GetValue("sign",_sign);
+      
+      if (_params.isPresent("mass"))
+         _params.GetValue("mass",_mass);
    }
 
    
@@ -87,13 +90,13 @@ namespace QDLIB {
    WaveFunction * OGridNAC::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       /* f del psi*/
-      PreFactor(_sign);
+      PreFactor(0.5 * _sign / _mass);
       OGridNabla::Apply(_buf, sourcePsi);
       _NACME.Apply(_buf);
 //       *destPsi *= scaling;
       
       /* 1/2 del f psi*/
-      PreFactor(0.5*_sign);
+      PreFactor(0.5 * _sign / _mass);
       _NACME.Apply(destPsi, sourcePsi);
       OGridNabla::Apply(destPsi);
 
@@ -105,12 +108,12 @@ namespace QDLIB {
    WaveFunction * OGridNAC::Apply(WaveFunction * Psi)
    {
       /* f del psi*/
-      PreFactor(_sign);
+      PreFactor(0.5 * _sign / _mass);
       OGridNabla::Apply(_buf, Psi);
      _NACME.Apply(_buf);
       
       /* 1/2 del f psi*/
-      PreFactor(.5*_sign);
+      PreFactor(.5 * _sign / _mass);
       _NACME.Apply(Psi);
       OGridNabla::Apply(Psi);
 
