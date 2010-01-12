@@ -487,6 +487,4 @@ int convert_wf_mxArray::write_WF(char *string_File_name , WaveFunction* WF, int 
 	mexErrMsgTxt(e.GetMessage().c_str());
    }
 }
-void convert_wf_mxArray::delete_wf_handle(const mxArray* handle) {
-    wf_ObjectHandle_interface::deleteWF( handle );
-}
+
