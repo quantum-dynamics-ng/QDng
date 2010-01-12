@@ -165,7 +165,22 @@ namespace QDLIB {
 	    
 	 }
 	 
+         /** Pointwise multiplication.
+          * In place method.
+          */
+         void DirectProduct(WaveFunction* Psi)
+         {
+            if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
+	    
+            MultElements((cVec*) this, (cVec*) Psi);
+	    
+         }
+         
    }; /* class WaveFunction */
+
+   /** Pointwise multiplication. */
+   WaveFunction* DirectProduct(WaveFunction* PsiA, WaveFunction* PsiB);
+
 
   
 } /* namespace QDLIB */
