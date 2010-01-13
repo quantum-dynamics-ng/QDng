@@ -92,8 +92,13 @@ namespace QDLIB
          
       /* Norm */
       if (_norm){
+         double norm = Psi->Norm();
 	 log.cout().precision(8);
-	 log.cout() << "\t" << fixed << Psi->Norm();
+	 log.cout() << "\t" << fixed << norm;
+         
+         if ( fpclassify(norm) == FP_NAN)
+            throw ( EOverflow("Norm is not a number") );
+         
 	 if (_multistate){ /* Norm of single states */
 	    for (int i=0; i< mspsi->States(); i++)
 	       log.cout() << "\t" << fixed << mspsi->State(i)->Norm();
