@@ -1,7 +1,8 @@
+
 #include "mex.h"
 
-#include "mex/convert_wf_mxArray.h"
-#include "mex/wf_ObjectHandle_interface.h"
+#include "mex/libs/convert_wf_mxArray.h"
+#include "mex/libs/wf_ObjectHandle_interface.h"
 
 #include <iostream>
 #include <string>

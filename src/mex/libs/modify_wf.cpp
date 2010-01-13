@@ -1,5 +1,8 @@
-#include "mex/modify_wf.h"
-#include "mex/wf_ObjectHandle_interface.h"
+
+#include "mex/libs/modify_wf.h"
+#include "mex/libs/wf_ObjectHandle_interface.h"
+#include "mex/libs/ObjectHandle.h"
+#include "mex/libs/Collector.h"
 
 #include "mex.h"
 
@@ -9,9 +12,6 @@
 
 #include "qdlib/WaveFunction.h"
 #include "qdlib/WFGridCartesian.h"
-
-#include "mex/ObjectHandle.h"
-#include "mex/Collector.h"
 
 #include "tools/Exception.h"
 #include "tools/FileSingleDefs.h"
@@ -30,6 +30,10 @@
 
 using namespace QDLIB;
 
+/**
+    * Adds two Wavefunctions pointwise
+    */
+
 void modify_wf::add_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
    WaveFunction *WF1=NULL;
    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
@@ -41,6 +45,10 @@ void modify_wf::add_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
    *WF_result += WF2;
    wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
 }
+
+/**
+    * Substacts two Wavefunctions pointwise
+    */
 
 void modify_wf::sub_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
    WaveFunction *WF1=NULL;
@@ -54,6 +62,9 @@ void modify_wf::sub_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
    wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
 }
 
+/**
+    * Multiplies a Wavefunctions pointwise with a double
+    */
 void modify_wf::mult_wf_double(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_double) {
    WaveFunction *WF1=NULL;
    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
@@ -71,6 +82,52 @@ void modify_wf::mult_wf_double(mxArray **handle_result, mxArray *handle_WF1, mxA
    WF_result = WF1->NewInstance ();
    *WF_result = *WF1;
    *WF_result *= dc;
+   wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
+}
+
+/**
+    * calculates the scalar product of two Wavefunctions
+    */
+void modify_wf::scalar_prod_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
+   WaveFunction *WF1=NULL;
+   WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+   WaveFunction *WF2=NULL;
+   WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+   handle_result[0] = mxCreateDoubleMatrix(1,1,mxCOMPLEX);
+   double *pdr,*pdi;
+   pdr=mxGetPr(handle_result[0]);
+   pdi=mxGetPi(handle_result[0]);
+   dcomplex result = *WF1 * WF2;
+   *pdr = result.real();
+   *pdi = result.imag();
+}
+
+/**
+    * calculates the complex product of two Wavefunctions pointwise 
+    * \f$ Psi = Psi_a^*  Psi_b \f$
+    */
+void modify_wf::mult_wf_complex(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
+   WaveFunction *WF1=NULL;
+   WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+   WaveFunction *WF2=NULL;
+   WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+   WaveFunction *WF_result=NULL;
+   WF_result = WF1->NewInstance ();
+   *WF_result = DirectProductComplex(WF1, WF2);
+   wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
+}
+
+/**
+    * Multiplies two Wavefunctions pointwise
+    */
+void modify_wf::mult_wf_pointwise(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
+   WaveFunction *WF1=NULL;
+   WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+   WaveFunction *WF2=NULL;
+   WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+   WaveFunction *WF_result=NULL;
+   WF_result = WF1->NewInstance ();
+   *WF_result = DirectProduct(WF1, WF2);
    wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
 }
 

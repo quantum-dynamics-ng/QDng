@@ -1,7 +1,7 @@
 #ifndef COLLECTOR_T_H_
 #define COLLECTOR_T_H_
 
-#include "mex/ObjectHandle.h"
+#include "mex/libs/ObjectHandle.h"
 #include <mex.h>
 #include <typeinfo>
 #include <map>
@@ -56,7 +56,7 @@ Collector<T>::~Collector() {
 			//if ((*it)->signature == *it) // check for valid signature
 				//std::cout << it->first << std::endl;
 				delete it->second;
-				std::cout << "Delete Collector" << std::endl;
+				//std::cout << "Delete Collector" << std::endl;
 		}
 }
 /**
@@ -65,7 +65,7 @@ Collector<T>::~Collector() {
 template <typename T>
 Collector<T>* Collector<T>::Instance () {
  			static Collector singleton;
-			std::cout << "Collector::Instance Coll: " << &singleton << std::endl;
+			//std::cout << "Collector::Instance Coll: " << &singleton << std::endl;
  			return &singleton;
 // 			std::cout << "New Collector: " << typeid(T).name() << std::endl;
 

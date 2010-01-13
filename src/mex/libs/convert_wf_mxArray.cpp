@@ -1,5 +1,8 @@
-#include "mex/convert_wf_mxArray.h"
-#include "mex/wf_ObjectHandle_interface.h"
+
+#include "mex/libs/convert_wf_mxArray.h"
+#include "mex/libs/wf_ObjectHandle_interface.h"
+#include "mex/libs/ObjectHandle.h"
+#include "mex/libs/Collector.h"
 
 #include "mex.h"
 
@@ -9,9 +12,6 @@
 
 #include "qdlib/WaveFunction.h"
 #include "qdlib/WFGridCartesian.h"
-
-#include "mex/ObjectHandle.h"
-#include "mex/Collector.h"
 
 #include "tools/Exception.h"
 #include "tools/FileSingleDefs.h"

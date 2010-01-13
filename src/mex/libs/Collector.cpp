@@ -1,5 +1,6 @@
-#include "mex/Collector.h"
-#include "mex/ObjectHandle.h"
+
+#include "mex/libs/Collector.h"
+#include "mex/libs/ObjectHandle.h"
 #include <mex.h>
 #include <typeinfo>
 #include <map>

@@ -71,7 +71,7 @@ dnl	    [],with_mpi-prefix=no)
 AC_CONFIG_SUBDIRS([src/fftw/])
 
 
-AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile src/lib/Makefile src/mex/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile])
 AC_ARG_WITH([cppunit], 
       [AS_HELP_STRING([--with-cppunit], [Enable CppUnit tests])],
       [with_cppunit=yes],

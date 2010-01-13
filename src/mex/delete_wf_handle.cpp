@@ -1,8 +1,9 @@
+
 #include "mex.h"
 
 
-#include "mex/convert_wf_mxArray.h"
-#include "mex/wf_ObjectHandle_interface.h"
+#include "mex/libs/convert_wf_mxArray.h"
+#include "mex/libs/wf_ObjectHandle_interface.h"
 
 #include <iostream>
 #include <string>
@@ -25,9 +26,9 @@
 
 using namespace QDLIB;
 /**
-    * mexFunction to get a structured mxArray of the wavefunction
+    * mexFunction to delete a wavefunction and it's handle
     * input (one argument): Objecthandle
-    * output (one argument): Struct containing the Wavefunction
+    * no output
     */
 void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )     
 {

@@ -3,9 +3,9 @@
 
 #include "mex.h"
 
-#include "mex/ObjectHandle.h"
-#include "mex/Collector.h"
-#include "mex/convert_to_mxArray.h"
+#include "mex/libs/ObjectHandle.h"
+#include "mex/libs/Collector.h"
+#include "mex/libs/convert_wf_mxArray.h"
 
 #include <iostream>
 #include <string>
