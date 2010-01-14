@@ -24,7 +24,6 @@ namespace QDLIB {
          dVec *_kspace; /* Imaginary part of the k-space */
       protected:
          void _InitDspaceReal();
-         //void _Apply(WaveFunction *Psi);
       public:
          OGridNabla();
       

@@ -11,7 +11,6 @@ namespace QDLIB {
    OGridNAC::~OGridNAC()
    {
       if (_buf != NULL) delete _buf;
-//       if (_fft != NULL) delete _fft;
    }
    
    
@@ -51,11 +50,7 @@ namespace QDLIB {
       OGridNabla::Init(Psi);
       _NACME.Init(Psi);
       
-//       _fft = new FFT( (*(GridSystem*)) this, buf, buf2, true);
-      
       _buf = Psi->NewInstance();
-//       _buf2 = Psi->NewInstance();
-      *_buf = Psi;
    }
 
    const string & OGridNAC::Name()
@@ -89,11 +84,10 @@ namespace QDLIB {
 
    WaveFunction * OGridNAC::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
-      /* f del psi*/
+      /* 1/2 f del psi*/
       PreFactor(0.5 * _sign / _mass);
       OGridNabla::Apply(_buf, sourcePsi);
       _NACME.Apply(_buf);
-//       *destPsi *= scaling;
       
       /* 1/2 del f psi*/
       PreFactor(0.5 * _sign / _mass);
@@ -101,13 +95,12 @@ namespace QDLIB {
       OGridNabla::Apply(destPsi);
 
       *destPsi += _buf;
-//        *destPsi = _buf;
       return destPsi;
    }
 
    WaveFunction * OGridNAC::Apply(WaveFunction * Psi)
    {
-      /* f del psi*/
+      /* 1/2 f del psi*/
       PreFactor(0.5 * _sign / _mass);
       OGridNabla::Apply(_buf, Psi);
      _NACME.Apply(_buf);

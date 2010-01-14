@@ -83,17 +83,11 @@ namespace QDLIB {
       return c.real();
    }
    
-   /** \todo Refine function (just stolen from GridNablaSq) */
+   /** \todo Refine function 
+    * \return 0
+    */
    double OGridNabla::Emax()
    {
-//       if (GridSystem::Dim() == 0) throw ( EParamProblem("Nabla operator not initalized") );
-//       /* Calc Tmax on the Grid */
-//       double T=0;
-//       for (int i=0; i < GridSystem::Dim(); i++)
-//          T += _fac/ (GridSystem::Dx(i) * GridSystem::Dx(i));
-//       
-//       T *= ( M_PI*M_PI / 2 );
-//       return T;
       return 0;
    }
    
