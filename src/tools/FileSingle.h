@@ -97,6 +97,7 @@ namespace QDLIB {
          string Name();
          
 	 void Suffix(const string &suffix);
+	 string GetSuffix();
 	 
          void DropMeta(bool drop);
          bool DropMeta();
@@ -173,7 +174,16 @@ namespace QDLIB {
    {
       _name = name;
    }
-   
+
+   /**
+    * Get the file name.
+    */
+   template <class C>
+   string FileSingle<C>::Name()
+   {
+      return _name;
+   }
+
    /**
     * Set the file name suffix.
     * 
@@ -184,7 +194,16 @@ namespace QDLIB {
    {
       _suffix = suffix;
    }
-   
+    /**
+    * Get the file name suffix.
+    * 
+    * Is appended to all file names.
+    */
+   template <class C>
+   string FileSingle<C>::GetSuffix()
+   {
+      return _suffix;
+   }
    /**
     * Ignore meta data information.
     * 
