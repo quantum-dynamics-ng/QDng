@@ -3,6 +3,7 @@ INCLUDES = $(LIBXML2_CFLAGS) $(all_includes) -I$(top_srcdir)/src -I$(MATLAB_DIR)
 METASOURCES = AUTO
 CLEANFILES = *.mexa64
 SUBDIRS = libs
+SUFFIXES = .mexa64
 #CXXFLAGS  = -g
 
 #libexec_PROGRAMS = readwf
