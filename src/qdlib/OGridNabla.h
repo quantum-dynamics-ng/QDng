@@ -9,10 +9,15 @@ namespace QDLIB {
    /**
     * Nabla Operator.
     * 
-    * \f$ a \sum_i \frac{\partial}{\partial x_i} \f$
+    * \f$ \sum_i \frac{\partial}{\partial x_i} \f$
+    * 
+    * Can also be used as momentum operator:
+    * 
+    * \f$ \hat p = -i \sum_i \frac{\partial}{\partial x_i} \f$
     * 
     * prarams:
     * \li fac Prefactor
+    * \li momentum Set operational to momentum 
     * 
     *  @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
@@ -20,19 +25,28 @@ namespace QDLIB {
    {
       private:
          string _name;
-         double _fac;  /* Prefactor */
-         dVec *_kspace; /* Imaginary part of the k-space */
+         double _fac;    /* Prefactor */
+         dVec *_kspace;  /* Imaginary part of the k-space */
+         bool _momentum; /* Work in momentum mode */
       protected:
          void _InitDspaceReal();
       public:
          OGridNabla();
-      
+         
+         /** Set to momentum mode */
+         OGridNabla(bool momentum);
+         
          ~OGridNabla();
          
          /** Set prefactor a */
          void PreFactor(double factor) { _fac = factor; }
          /** Get prefactor a */
          double PreFactor() { return _fac; }
+         
+         /** Set momentum mode */
+         void Momentum(bool on) { _momentum = on; }
+         /** Get momentum mode */
+         double Momentum() { return _momentum; }
          
          /* Interface implementation, Operator */
          virtual Operator* NewInstance();

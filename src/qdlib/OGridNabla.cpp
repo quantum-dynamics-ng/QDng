@@ -5,10 +5,14 @@
 
 namespace QDLIB {
 
-   OGridNabla::OGridNabla() : _name("OGridNabla"), _fac(1), _kspace(NULL)
+   OGridNabla::OGridNabla() : _name("OGridNabla"), _fac(1), _kspace(NULL),  _momentum(false)
    {
    }
    
+   OGridNabla::OGridNabla(bool momentum) : _name("OGridNabla"), _fac(1), _kspace(NULL), _momentum(momentum)
+   {
+   }
+
    
    OGridNabla::~OGridNabla()
    {
@@ -27,17 +31,9 @@ namespace QDLIB {
    void OGridNabla::Init(ParamContainer & params)
    {
       _params = params;
-      
-       int n;
-      _params.GetValue( "dims", n);
-      
+            
       if(_params.isPresent("factor"))
          _params.GetValue( "factor", _fac);
-   
-      if (n < 1)
-         throw ( EParamProblem ("Nabla operator needs at least one dimension") );
-      GridSystem::Dim(n);
-      
    }
    
    void OGridNabla::Init(WaveFunction * Psi)
@@ -100,7 +96,10 @@ namespace QDLIB {
       
       ket->ToKspace();
       opPsi->isKspace(true);
-      MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
+      if (_momentum)
+         MultElementsCopy((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
+      else
+         MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
       ket->isKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
       opPsi->ToXspace();
          
@@ -115,7 +114,10 @@ namespace QDLIB {
       opPsi = dynamic_cast<WFGridSystem*>(Psi);
 
       opPsi->ToKspace();
-      MultElementsComplex((cVec*) opPsi, _kspace, _fac/double(GridSystem::Size()));
+      if (_momentum)
+         MultElements((cVec*) opPsi, _kspace, _fac/double(GridSystem::Size()));
+      else 
+         MultElementsComplex((cVec*) opPsi, _kspace, _fac/double(GridSystem::Size()));
       opPsi->ToXspace();
       
       return opPsi;
@@ -136,6 +138,7 @@ namespace QDLIB {
       
       _params = o->_params;
       _fac = o->_fac;
+      _momentum = o->_momentum;
       
       *((GridSystem*) this) = *((GridSystem*) o);
       
