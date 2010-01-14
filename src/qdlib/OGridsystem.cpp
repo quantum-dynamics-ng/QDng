@@ -38,6 +38,9 @@ namespace QDLIB {
    {
       OGridSystem *o = dynamic_cast<OGridSystem*>(O);
       
+      if (o == NULL)
+         throw ( EIncompatible("Copy OGridSystem <- ", O->Name()) );
+      
       /* Copy vector */
       *((dVec*) this) = *((dVec*) o);
       

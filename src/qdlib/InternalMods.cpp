@@ -10,6 +10,7 @@
 #include "OGridGMat.h"
 #include "OGridPotential.h"
 #include "OGridDipole.h"
+#include "OGridPosition.h"
 #include "OGridNAC.h"
 
 #include "OGobbler.h"
@@ -72,6 +73,13 @@ namespace QDLIB
    {
       OGridDipole *p;
       p = new OGridDipole ();
+      return p;
+   }
+   
+   Operator* INT_OGridPosition()
+   {
+      OGridPosition *p;
+      p = new OGridPosition();
       return p;
    }
    
@@ -143,6 +151,7 @@ namespace QDLIB
       if (name == "INT_OGridGmat") return &INT_OGridGMat;
       if (name == "INT_OGridPotential") return &INT_OGridPotential;
       if (name == "INT_OGridDipole") return &INT_OGridDipole;
+      if (name == "INT_OGridPosition") return &INT_OGridPosition;
       if (name == "INT_OGridNabla") return &INT_OGridNabla;
       if (name == "INT_OGridNAC") return &INT_OGridNAC;
       
