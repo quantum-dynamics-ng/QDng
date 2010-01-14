@@ -21,14 +21,13 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_TYPE_SIZE_T
-sinclude([mex_init.m4])
-sinclude([matlab.m4])
-MEX_INIT([MEX],[1],[1],[2])
 
 dnl
 dnl Matlab Library
 dnl
-
+sinclude([mex_init.m4])
+sinclude([matlab.m4])
+MEX_INIT([MEX],[1],[1],[2])
 CHECK_MATLAB
 
 dnl libxml2

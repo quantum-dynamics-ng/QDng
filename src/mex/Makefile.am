@@ -4,6 +4,14 @@ METASOURCES = AUTO
 CLEANFILES = *.mexa64
 SUBDIRS = libs
 SUFFIXES = .mexa64
+
+
+
+all-local:
+	echo "cp"
+	cp $(top_srcdir)/src/mex/*.m .
+
+
 #CXXFLAGS  = -g
 
 #libexec_PROGRAMS = readwf

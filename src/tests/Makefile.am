@@ -4,7 +4,7 @@ METASOURCES = AUTO
 AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 
 noinst_HEADERS = ComplexNumbers.h GridSystem.h MultElementsTest.h \
-	OGridHarmonic.h OGridNablaSqTest.h OGridNablaTest.h QDClock.h Test.h TestCheby.h \
+	OGridHarmonic.h OGridNablaSqTest.h OGridNablaTest.h QDClock.h TestCheby.h \
 	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
 	Vector.h WFGridCartesian.h WFGridHarmonic.h WFGridSystemTest.h \
 	WaveFunctionTest.h defs.h function_gens.h

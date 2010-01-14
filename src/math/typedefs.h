@@ -356,7 +356,7 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          for (lint i=0; i < size; i++){
-            a[i] = a[i].conj() * b[i] * d;
+            a[i] = a[i] * I * b[i] * d;
          }
       }
    }
