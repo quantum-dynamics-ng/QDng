@@ -21,6 +21,15 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_TYPE_SIZE_T
+sinclude([mex_init.m4])
+sinclude([matlab.m4])
+MEX_INIT([MEX],[1],[1],[2])
+
+dnl
+dnl Matlab Library
+dnl
+
+CHECK_MATLAB
 
 dnl libxml2
 sinclude([acx_libxml2.m4])
@@ -59,14 +68,15 @@ dnl AC_ARG_WITH([mpi-prefix],
 dnl	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation])],
 dnl	    [],with_mpi-prefix=no)
 
+AC_CONFIG_SUBDIRS([src/fftw/])
 
+
+AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile])
 AC_ARG_WITH([cppunit], 
       [AS_HELP_STRING([--with-cppunit], [Enable CppUnit tests])],
       [with_cppunit=yes],
       [with_cppunit=no])
 
 AM_CONDITIONAL([CPPUNIT], [test "x$with_cppunit" != "xno"])
-
      
-AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile])
 AC_OUTPUT

@@ -4,5 +4,5 @@ noinst_LTLIBRARIES = libtools.la
 libtools_la_SOURCES = Exception.cpp Getopt.cpp KeyValFile.cpp Logger.cpp \
 	ParamContainer.cpp QDClock.cpp QDGlobalClock.cpp XmlNode.cpp XmlParser.cpp fstools.cpp \
 	helpers.cpp
-AM_CXXFLAGS = -pedantic -pedantic-errors -ansi
+AM_CXXFLAGS = -pedantic -fPIC -g -pedantic-errors -ansi
 noinst_HEADERS = fstools.h

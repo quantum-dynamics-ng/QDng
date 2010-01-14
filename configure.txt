@@ -1,0 +1,1 @@
+./configure --enable-debug=full --with-matlab=/opt/adm/matlab7.9/ CFLAGS=-fPIC && make -j8

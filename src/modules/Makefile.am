@@ -1,8 +1,6 @@
 INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 $(all_includes)
 METASOURCES = AUTO
-noinst_LIBRARIES = libModuleLoader.a
 
-libModuleLoader_a_SOURCES = ModuleLoader.cpp
 
 
 #pkglib_LTLIBRARIES = libqd-OSPO.la libqd-OSOD.la libqd-OGridNablaSq.la \
@@ -17,7 +15,9 @@ libModuleLoader_a_SOURCES = ModuleLoader.cpp
 #libqd_OSPO_la_SOURCES = mod-OSPO.cpp
 #libqd_OSOD_la_SOURCES = mod-OSOD.cpp
 #libqdWFGridCartesian_la_SOURCES = mod-WFGridCartesian.cpp
-AM_CXXFLAGS = -O3 -fPIC
+AM_CXXFLAGS = -O3 -g -fPIC
 #libqd_OGridNablaSq_la_LIBADD = $(top_builddir)/src/tools/libtools.la \
 #	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la \
 #	$(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS)
+noinst_LTLIBRARIES = libModuleLoader.la
+libModuleLoader_la_SOURCES = ModuleLoader.cpp
