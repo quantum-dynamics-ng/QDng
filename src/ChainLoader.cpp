@@ -1,6 +1,6 @@
 #include "ChainLoader.h"
 
-#include "tools/FileSingleDefs.h"
+
 #include "modules/ModuleLoader.h"
 #include "tools/QDGlobalClock.h"
 #include "tools/Logger.h"
@@ -10,6 +10,7 @@
 #include "qdlib/OGridsystem.h"
 #include "qdlib/OMultistate.h"
 #include "qdlib/WFMultistate.h"
+#include "qdlib/FileWF.h"
 
 namespace QDLIB
 {

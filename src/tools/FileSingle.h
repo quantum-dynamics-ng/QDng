@@ -83,6 +83,7 @@ namespace QDLIB {
 	bool _sequence;
 	int _counter;
 	int _increment;
+        void ReadMeta(ParamContainer &p);
       public:
 	 	 
 	 FileSingle();
@@ -412,21 +413,31 @@ namespace QDLIB {
    template <class C>
    void FileSingle<C>::_ReadMeta(C *data)
    {
+      /* Read meta file & Init */
+      if (!_drop_meta){
+	 ParamContainer p;
+         ReadMeta(p);
+	 data->Init(p);
+      }
+   }
+   
+   /**
+    * Read Metafile & save in ParamContainer.
+    */
+   template <class C>
+   void  FileSingle<C>::ReadMeta(ParamContainer &p)
+   {
       string name;
       
-      /* Read meta file */
-      if (!_drop_meta){
-	 name = _name + METAFILE_SUFFIX;
-	 KeyValFile file(name);
-	 ParamContainer p;
-	 if ( !file.Parse(p) ) {
-	    /* try again, but remove trailing underscore + further chars */
-	    name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
-	    file.SetName( name );
-	    if ( !file.Parse(p) ) 
-	       throw( EIOError("Can not read meta file", name) );
-	 }
-	 data->Init(p);
+      name = _name + METAFILE_SUFFIX;
+      KeyValFile file(name);
+
+      if ( !file.Parse(p) ) {
+         /* try again, but remove trailing underscore + further chars */
+         name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
+         file.SetName( name );
+         if ( !file.Parse(p) ) 
+            throw( EIOError("Can not read meta file", name) );
       }
    }
    

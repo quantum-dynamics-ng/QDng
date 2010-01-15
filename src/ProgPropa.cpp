@@ -1,10 +1,10 @@
 #include "ProgPropa.h"
 
-#include "tools/FileSingleDefs.h"
 #include "ChainLoader.h"
 #include "tools/Logger.h"
 #include "tools/fstools.h"
 #include "qdlib/WFMultistate.h"
+#include "qdlib/FileWF.h"
 
 namespace QDLIB {
 

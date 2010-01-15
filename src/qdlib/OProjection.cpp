@@ -1,6 +1,6 @@
 #include "OProjection.h"
 #include "WFMultistate.h"
-#include "tools/FileSingleDefs.h"
+#include "FileWF.h"
 
 namespace QDLIB {
 

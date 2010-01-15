@@ -14,7 +14,7 @@
 #include "qdlib/WFGridCartesian.h"
 
 #include "tools/Exception.h"
-#include "tools/FileSingleDefs.h"
+#include "qdlib/FileWF.h"
 #include "modules/ModuleLoader.h"
 #include "tools/QDGlobalClock.h"
 #include "tools/Logger.h"
