@@ -41,6 +41,23 @@ void wf_ObjectHandle_interface::WF_to_handle_mxArray( mxArray **mx_handle, WaveF
 	
 }
 
+/**
+    * Creates mxArray containing the all handle from a Wavefunction
+    */
+void wf_ObjectHandle_interface::all_WF_handle_mxArray( mxArray **mx_handle) {
+	ObjectHandle<WaveFunction> *handle = new ObjectHandle<WaveFunction>();
+	*mx_handle = handle->all_to_mex_handle();
+	
+}
+
+/**
+    * deletes all Wavefunction from the memory
+    */
+void wf_ObjectHandle_interface::delete_all_WF() { 
+  ObjectHandle<WaveFunction>* handle = new ObjectHandle<WaveFunction>();
+  handle->destroy_all_object();
+  delete handle;
+}
 
 /**
     * deletes Wavefunction from the memory

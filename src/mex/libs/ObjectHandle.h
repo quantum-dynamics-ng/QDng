@@ -38,12 +38,16 @@ public:
 	*take ownership, and the client is responsible for deleting it.
 	*/
 	ObjectHandle(T& obj);
-
+	ObjectHandle();
 	~ObjectHandle();
 	/**
 	* Convert ObjectHandle<T> to a mxArray handle (to pass back from mex-function).
 	*/
 	mxArray* to_mex_handle(); 
+	/**
+	* Convert all ObjectHandle<T> to a mxArray handle (to pass back from mex-function).
+	*/
+	mxArray* all_to_mex_handle(); 
 	/**
 	* Convert mxArray (passed to mex-function) to an ObjectHandle<T>.
 	*/
@@ -52,7 +56,14 @@ public:
 	* Get the actual object contained by handle
 	*/
 	T* get_object() const { return t; }
+	/**
+	* delete a single object handle
+	*/
 	void destroy_object(const mxArray *mxh);
+	/**
+	* delete all object handle
+	*/
+	void destroy_all_object();
 
 private:
 	ObjectHandle* signature; // use 'this' as a unique object signature 
@@ -104,6 +115,17 @@ void ObjectHandle<T>::destroy_object(const mxArray *mxh)
 	delete this;
 }
 
+/**
+* destroys all ObjectHandle<T>
+*/
+template <typename T>
+void ObjectHandle<T>::destroy_all_object()
+{
+	//std::cout << "destroy_all_object" << std::endl;
+	Collector<T>* coll = Collector<T>::Instance ();
+	coll->delete_all();
+//	delete this;
+}
 
 template <typename T>
 ObjectHandle<T>::ObjectHandle(T*& ptr) : type(&typeid(T)), owns(true), t(ptr) { 
@@ -116,6 +138,11 @@ ObjectHandle<T>::ObjectHandle(T*& ptr) : type(&typeid(T)), owns(true), t(ptr) {
 template <typename T>
 ObjectHandle<T>::ObjectHandle(T& obj) : type(&typeid(T)), owns(false), t(&obj) { 
 		signature= this; 
+	}
+	
+template <typename T>
+ObjectHandle<T>::ObjectHandle() : owns(false) { 
+		 Collector<T>* coll = Collector<T>::Instance ();
 	}
 
 template <typename T>
@@ -139,6 +166,33 @@ mxArray* ObjectHandle<T>::to_mex_handle()
 	*reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle)) = Ohandle;
 	return handle;
 }
+
+/**
+* Create a numeric array as handle for an ObjectHandle.
+* We ASSUME we can store object pointer in the mxUINT64 (64 Bit arichtecture) element of mxArray.
+*/
+template <typename T>
+mxArray* ObjectHandle<T>::all_to_mex_handle() 
+{
+	Collector<T>* coll = Collector<T>::Instance ();
+	int number= coll->get_number_objects ();
+	if (number == 0) {
+	  mxArray* handle  = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+	  *mxGetPr(handle) =0;
+	  return handle;
+	}
+	mxArray* handle  = mxCreateNumericMatrix(number, 1, mxUINT64_CLASS, mxREAL);
+	double *pdr = mxGetPr(handle);
+	for (int i=0;i<number;i++) {
+	  ObjectHandle<T> *Ohandle = coll->get_objects_by_number(i);
+	  if (Ohandle != NULL) {
+	    *reinterpret_cast<ObjectHandle<T>**>(pdr) = Ohandle;
+	  }
+	  pdr++;
+	}
+	return handle;
+}
+
 /**
 * --------------------------------------------------------- 
 * ---------- Implementation of member functions ----------- 

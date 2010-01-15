@@ -179,10 +179,10 @@ namespace QDLIB {
 	 /** Pointwise Complex multiplication. Psi* x Psi
           * In place method.
           */
-         void DirectProductComplex(WaveFunction* Psi)
+         void DirectProducConugatet(WaveFunction* Psi)
          {
             if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
-            MultElementsComplex((cVec*) this, (cVec*) Psi, (double) 1.0);
+            MultElementsConugate((cVec*) this, (cVec*) Psi, (double) 1.0);
 	    
          }
          
@@ -192,7 +192,7 @@ namespace QDLIB {
    WaveFunction* DirectProduct(WaveFunction* PsiA, WaveFunction* PsiB);
 
    /** Pointwise Complex multiplication.Psi* x Psi */
-   WaveFunction* DirectProductComplex(WaveFunction* PsiA, WaveFunction* PsiB);
+   WaveFunction* DirectProductConugate(WaveFunction* PsiA, WaveFunction* PsiB);
 
 
   

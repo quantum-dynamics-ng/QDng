@@ -127,21 +127,33 @@ void convert_wf_mxArray::init_wf_from_struct(mxArray **out_arg, const mxArray *S
 	  for (int k =0;k<elements;k++) {
 	    mxSetFieldByNumber(State,0,k,mxDuplicateArray(mxGetFieldByNumber(act_field,j,k)));
 	  }
+	  int handle_field = mxGetFieldNumber(State,"handle");
+	  if (handle_field != -1) {
+	    mxRemoveField(State, handle_field);
+	  }
 	  wfsub = convert_wf_mxArray::loadWF( State , string_WF_type );
 		  multi->Add( wfsub, j);
 	}
 	std::string name;
 	std::string value;
 	ParamContainer mparam = multi->Params ();
+	std::string str_handle = "handle";
 	for (int k = 0; k<nr_fields;k++) {
 	  if (k==i) continue;
-	  mparam.SetValue(mxGetFieldNameByNumber(Struct_mxArray,k),mxArrayToString(mxGetFieldByNumber(Struct_mxArray,0,k)));
+	    if (str_handle.compare(mxGetFieldNameByNumber(Struct_mxArray,k))) {
+	      mparam.SetValue(mxGetFieldNameByNumber(Struct_mxArray,k),mxArrayToString(mxGetFieldByNumber(Struct_mxArray,0,k)));
+	    }
 	}
 	wf_ObjectHandle_interface::WF_to_handle_mxArray(out_arg,multi);
       }
     }
     if (is_multi == false) {
-      WaveFunction* WF = convert_wf_mxArray::loadWF(Struct_mxArray,string_WF_type);
+      mxArray *State = mxDuplicateArray(Struct_mxArray);
+      int handle_field = mxGetFieldNumber(State,"handle");
+      if (handle_field != -1) {
+	mxRemoveField(State, handle_field);
+      }
+      WaveFunction* WF = convert_wf_mxArray::loadWF(State,string_WF_type);
       wf_ObjectHandle_interface::WF_to_handle_mxArray(out_arg,WF);
     }
     mxFree(string_WF_type); 
@@ -164,11 +176,12 @@ void convert_wf_mxArray::get_wf_from_handle(mxArray **out_arg,const mxArray *han
 	//std::cout << "WaveFunction: " << WF << std::endl;
 	if (WF == NULL)
 		 throw ( EParamProblem("WaveFunction loading failed") );
-	convert_wf_mxArray::WF_to_Struct_mxArray( out_arg, WF);
+	convert_wf_mxArray::WF_to_Struct_mxArray( out_arg, WF , handle);
   } catch (Exception e) {
 	mexErrMsgTxt(e.GetMessage().c_str());
   }
 }
+
 
 /**
     * Writes the Wavefunction handle to File
@@ -261,10 +274,12 @@ void convert_wf_mxArray::WF_to_mxArray( mxArray **mx_WF, WaveFunction* WF, lint 
 /**
     * Creates a structured mxArray from a single Wavefunction
     */
-void convert_wf_mxArray::WF_make_Struct( mxArray **mx_WF, WaveFunction* WF) {
+void convert_wf_mxArray::WF_make_Struct( mxArray **mx_WF, WaveFunction* WF,const mxArray *handle) {
 try {
 	mxArray* WF_data;
 	convert_wf_mxArray::WF_to_mxArray( &WF_data, WF);
+	mxArray* WF_handle;
+	WF_handle = mxDuplicateArray(handle);
 	ParamContainer param = WF->Params ();
 	param.ResetPosition ();
 	std::string name;
@@ -273,9 +288,10 @@ try {
 	while (param.GetNextValue (name, value)) {
 		i++;
 	}
-	int number_of_fields = i+1;
+	int number_of_fields = i+2;
 	std::string field_names[number_of_fields];
 	field_names[0] = "data";
+	field_names[number_of_fields-1] = "handle";
 	i=0;
 	param.ResetPosition ();
 	while (param.GetNextValue (name, value)) {
@@ -297,6 +313,8 @@ try {
 	}
 	field = mxGetFieldNumber(mx_WF[0],"data");
 	mxSetFieldByNumber(mx_WF[0],0,field,WF_data);
+	field = mxGetFieldNumber(mx_WF[0],"handle");
+	mxSetFieldByNumber(mx_WF[0],0,field,WF_handle);
 }catch (Exception e) {
 	std::cout << e.GetMessage() << std::endl;
 	mexErrMsgTxt(e.GetMessage().c_str());
@@ -306,23 +324,26 @@ try {
 /**
     * Creates a structured mxArray from a Wavefunction e.g Multistate
     */
-void convert_wf_mxArray::WF_to_Struct_mxArray( mxArray **mx_WF, WaveFunction* WF) {
+void convert_wf_mxArray::WF_to_Struct_mxArray( mxArray **mx_WF, WaveFunction* WF,const mxArray *handle) {
 	WFMultistate *wfm;
       	wfm = dynamic_cast<WFMultistate*>(WF);
       	if (wfm != NULL){
  		int States = wfm->States();
- 		std::string field_names[3];
+ 		std::string field_names[4];
  		field_names[0] = "CLASS";
- 		field_names[1] = "NStates";
- 		field_names[2] = "States";
+		field_names[1] = "handle";
+ 		field_names[2] = "NStates";
+ 		field_names[3] = "States";
  		mwSize dims[2] = {1, 1};
  		mwSize dims_all[2] = {1, States};
- 		mx_WF[0]=mxCreateStructArray(2, dims, 3, (const char **) field_names);
+ 		mx_WF[0]=mxCreateStructArray(2, dims, 4, (const char **) field_names);
  		int field =0;
  		field = mxGetFieldNumber(mx_WF[0],"CLASS");
  		const char *name[] = {"WFMultistate"};
  		mxArray* text = mxCreateCharMatrixFromStrings(1,name);
  		mxSetFieldByNumber(mx_WF[0],0,field,text);
+		field = mxGetFieldNumber(mx_WF[0],"handle");
+ 		mxSetFieldByNumber(mx_WF[0],0,field,mxDuplicateArray(handle));
  		field = mxGetFieldNumber(mx_WF[0],"NStates");
  		std::ostringstream ss;
  		ss << States;
@@ -336,7 +357,7 @@ void convert_wf_mxArray::WF_to_Struct_mxArray( mxArray **mx_WF, WaveFunction* WF
  			WaveFunction* WF;
  			WF=wfm->State(i);
  			mxArray *Struct_State;
- 			convert_wf_mxArray::WF_make_Struct(&Struct_State, WF);
+ 			convert_wf_mxArray::WF_make_Struct(&Struct_State, WF,handle);
  			int NoF = mxGetNumberOfFields((const mxArray *) Struct_State);
  			for (int j=0; j<NoF ;j++) {
  				const char * field_name =mxGetFieldNameByNumber(Struct_State,j);
@@ -357,11 +378,15 @@ void convert_wf_mxArray::WF_to_Struct_mxArray( mxArray **mx_WF, WaveFunction* WF
  					mxSetFieldByNumber(Struct_States,i,j,mx_null_text);
 				}
 			}
+			int act_field = mxGetFieldNumber(Struct_States,"handle");
+			if (act_field != -1) {
+			  mxRemoveField(Struct_States, act_field);
+			}
 		}
 		field = mxGetFieldNumber(mx_WF[0],"States");
  		mxSetFieldByNumber(mx_WF[0],0,field,Struct_States);
 	} else {
-		convert_wf_mxArray::WF_make_Struct(&mx_WF[0], WF);
+		convert_wf_mxArray::WF_make_Struct(&mx_WF[0], WF,handle);
 	}
 }
 
@@ -410,7 +435,7 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray , char *string
 	ParamContainer param;
 	for (int i=0;i<elements;i++) {
 	  std::string fname = mxGetFieldNameByNumber(s_mxArray,i);
-	  if (fname.compare("data")) {
+	  if (fname.compare("data") && fname.compare("handle") ) {
 	    param.SetValue((const std::string) fname,(const std::string) mxArrayToString(mxGetFieldByNumber(s_mxArray,0,i)));
 	  }
 	}
