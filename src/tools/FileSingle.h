@@ -84,6 +84,7 @@ namespace QDLIB {
 	int _counter;
 	int _increment;
         void ReadMeta(ParamContainer &p);
+        void WriteMeta(ParamContainer &p);
       public:
 	 	 
 	 FileSingle();
@@ -98,7 +99,7 @@ namespace QDLIB {
          string Name();
          
 	 void Suffix(const string &suffix);
-	 string GetSuffix();
+	 string Suffix();
 	 
          void DropMeta(bool drop);
          bool DropMeta();
@@ -201,7 +202,7 @@ namespace QDLIB {
     * Is appended to all file names.
     */
    template <class C>
-   string FileSingle<C>::GetSuffix()
+   string FileSingle<C>::Suffix()
    {
       return _suffix;
    }
@@ -303,17 +304,23 @@ namespace QDLIB {
    {
       ParamContainer p;
       
-      /* Write meta file. In a sequence only for the first file. */
-      if (!_drop_meta || _counter == 1){
-	 p = data->Params();
-	 p.SetValue("CLASS", data->Name() );
-	 
-	 KeyValFile meta_file(_name + METAFILE_SUFFIX);
-	 if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
-      }
+      p = data->Params();
+      p.SetValue("CLASS", data->Name() );
       
+      WriteMeta(p);
    }
    
+   /** Write named meta file from params */
+   template <class C>
+   void FileSingle<C>::WriteMeta(ParamContainer &p)
+   {
+      /* Write meta file. In a sequence only for the first file. */
+      if (!_drop_meta || _counter == 1){
+	 
+         KeyValFile meta_file(_name + METAFILE_SUFFIX);
+         if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
+      }
+   }
    
    template <class C>
    void FileSingle<C>::_WriteMetaStrided(C *data, int stride)

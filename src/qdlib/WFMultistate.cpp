@@ -42,8 +42,10 @@ namespace QDLIB
       if (index+1 >= QD_MAX_STATES )
 	 throw( EOverflow( "More states requested than possible (QD_MAX_STATES)") );
       
-      if (index+1 > _nstates)
+      if (index+1 > _nstates){
 	 _nstates = index+1;
+         _params.SetValue("states", _nstates);
+      }
       
        _states[index] = Psi;
       

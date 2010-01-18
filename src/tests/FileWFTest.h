@@ -6,6 +6,7 @@
 
 #include "qdlib/FileWF.h"
 
+
 using namespace QDLIB;
 
 /**
@@ -17,17 +18,20 @@ class FileWFTest : public CppUnit::TestFixture
 {
    CPPUNIT_TEST_SUITE( FileWFTest );
    CPPUNIT_TEST( API_Test );
-   CPPUNIT_TEST( IO_Test );
+   CPPUNIT_TEST( IO_Test_Single );
+   CPPUNIT_TEST( IO_Test_Multistate );
    CPPUNIT_TEST_SUITE_END();
    public:
       
       FileWFTest();
    
       ~FileWFTest();
-
+     
+      
    protected:
       void API_Test();
-      void IO_Test();
+      void IO_Test_Single();
+      void IO_Test_Multistate();
    private:
       FileWF file;
 };
