@@ -216,18 +216,8 @@ namespace QDLIB {
       
       /* Init file writer for wf output */
       FileWF wfile;
-      
-      /* Dirty hack to get meta data right for multistate WFs */
-      /** \todo Remove this hack => make clean File Class */
-      WFMultistate *wfm;
-      wfm = dynamic_cast<WFMultistate*>(Psi);
-      if (wfm != NULL){
-	 ParamContainer& pfm = wfm->Params();
-	 pfm = wfm->State(0)->Params();
-      }
-      
+  
       wfile.Name(_dir+_fname);
-     
       wfile.Suffix(BINARY_WF_SUFFIX);
       wfile.ActivateSequence();
       wfile << Psi;
@@ -247,14 +237,6 @@ namespace QDLIB {
 	_U->Apply(Psi);                 /* Propagate */
 	if (_usepost) _postfilter.Apply( Psi );/* Apply post-filters*/
 	if (i % _wcycle == 0){
-           /* Dirty hack to get meta data right for multistate WFs */
-           /** \todo Remove this hack => make clean File Class */
-           WFMultistate *wfmm;
-           wfmm = dynamic_cast<WFMultistate*>(Psi);
-           if (wfmm != NULL){
-              ParamContainer& pfm = wfm->Params();
-              pfm = wfm->State(0)->Params();
-           }
            wfile << Psi;  /* Write wavefunction */
         }
 	++(*clock);                     /* Step the clock */
@@ -265,12 +247,6 @@ namespace QDLIB {
       /* Write propagation meta file*/
       ParamContainer p;
       p.SetValue("CLASS", "Propagation" );
-      if (wfm != NULL){
-         p.SetValue("WFCLASS", wfm->Name() );
-         p.SetValue("States", wfm->States() );
-      } else {
-         p.SetValue("WFCLASS", Psi->Name() );
-      }
       p.SetValue("Nt", clock->Steps() );
       p.SetValue("dt", clock->Dt() );
       p.SetValue("WFBaseName", _fname );

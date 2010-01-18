@@ -62,7 +62,8 @@ namespace QDLIB {
 	 };
       private:
          bool _drop_meta;      // Ignore metadata
-	 
+	 int _counter_last;
+         
 	 void _ReadMeta(C *data);
 	 void _WriteMeta(C *data);
 	 void _WriteMetaStrided(C *data, int stride);
@@ -81,6 +82,7 @@ namespace QDLIB {
 	string _name;
 	string _suffix;
 	bool _sequence;
+        bool _sequence_init; /* indicates that this is the first step of the sequence */
 	int _counter;
 	int _increment;
         void ReadMeta(ParamContainer &p);
@@ -139,7 +141,8 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle() :
-	 _drop_meta(false), _type(binary),  _name("default"), _suffix(""), _sequence(false),  _counter(0), _increment(1) {}
+         _drop_meta(false), _counter_last(0), _type(binary),  _name("default"), _suffix(""), _sequence(false),
+                    _counter(0), _increment(1), _sequence_init(false) {}
    
    /**
     * Constructor with type initialisation.
@@ -147,14 +150,16 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, bool Sequence) :
-	 _type(type), _drop_meta(false), _name("default"), _suffix(""), _sequence(Sequence), _counter(0),_increment(1) {}
+         _type(type), _drop_meta(false), _counter_last(0), _name("default"), _suffix(""), _sequence(Sequence),
+               _counter(0),_increment(1), _sequence_init(false) {}
    
    /**
     * Constructor with type and name initialisation.
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence) :
-	 _type(type), _name(name), _suffix(suffix), _sequence(Sequence), _counter(0), _increment(1){}
+         _counter_last(0), _type(type), _name(name), _suffix(suffix), _sequence(Sequence),
+               _counter(0), _increment(1), _sequence_init(false) {}
    
    
    /**
@@ -243,6 +248,7 @@ namespace QDLIB {
    void FileSingle<C>::ActivateSequence()
    {
       _sequence = true;
+      _sequence_init = true;
    }
  
    /**
@@ -261,6 +267,7 @@ namespace QDLIB {
    {
       _sequence = true;
       _increment = increment;
+      _sequence_init = true;
    }
    
    /**
@@ -270,6 +277,7 @@ namespace QDLIB {
    void FileSingle<C>::StopSequence()
    {
       _sequence = false;
+      _sequence_init = false;
    }
    
    /**
@@ -279,6 +287,8 @@ namespace QDLIB {
    void FileSingle<C>::ResetCounter()
    {
       _counter = 0;
+      _counter_last = 0;
+      
    }
    
    /**
@@ -297,6 +307,8 @@ namespace QDLIB {
    void FileSingle<C>::Counter(int counter)
    {
       _counter = counter;
+      _counter_last = _counter;
+      
    }
    
    template <class C>
@@ -315,7 +327,7 @@ namespace QDLIB {
    void FileSingle<C>::WriteMeta(ParamContainer &p)
    {
       /* Write meta file. In a sequence only for the first file. */
-      if (!_drop_meta || _counter == 1){
+      if (!_drop_meta || _counter != _counter_last){
 	 
          KeyValFile meta_file(_name + METAFILE_SUFFIX);
          if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
@@ -328,7 +340,7 @@ namespace QDLIB {
       ParamContainer p;
       
       /* Write meta file. In a sequence only for the first file. */
-      if (!_drop_meta || _counter == 1){
+      if (!_drop_meta || _counter != _counter_last){
 	 p = data->Params();
 	 p.SetValue("CLASS", data->Name() );
 	 
@@ -360,6 +372,7 @@ namespace QDLIB {
 	 stringstream ss;
 	 ss << _counter;
 	 s = _name + "_" + ss.str() + _suffix;
+         _counter_last = _counter;
 	 _counter += _increment;
       } else {
 	 s = _name + _suffix;
@@ -373,7 +386,7 @@ namespace QDLIB {
       if( file.bad() ) throw( EIOError("Can not write binary file", s) );
       
       file.close();
-   
+      _sequence_init = false;
    }
    
    /**
@@ -476,6 +489,7 @@ namespace QDLIB {
 	       ss << "_" << _counter;
 
 	    s = _name +  ss.str() + _suffix;
+            _counter_last = _counter;
 	    _counter += _increment;
 	 } else {
 	    if (data->strides() > 1){

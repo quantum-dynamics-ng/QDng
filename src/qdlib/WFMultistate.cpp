@@ -77,7 +77,8 @@ namespace QDLIB
 	 r->StrideRef(*(r->_states[i]), 0, i);
       }
 
-     return r;
+      r->_params = _params;
+      return r;
    }
 
    
