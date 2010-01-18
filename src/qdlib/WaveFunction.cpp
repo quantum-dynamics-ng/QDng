@@ -14,7 +14,7 @@ namespace QDLIB {
       return wf;
    }
    
-   WaveFunction* DirectProductComplex(WaveFunction* PsiA, WaveFunction* PsiB)
+   WaveFunction* DirectProductConugate(WaveFunction* PsiA, WaveFunction* PsiB)
    {
       WaveFunction *wf;
          
@@ -22,7 +22,7 @@ namespace QDLIB {
                
       if (PsiB->size() != PsiA->size()) throw ( EParamProblem("WFs differ in size") );
                
-       MultElementsComplex((cVec*) wf, (cVec*) PsiA, (cVec*) PsiB, (double) 1.0);
+       MultElementsConugate((cVec*) wf, (cVec*) PsiA, (cVec*) PsiB, (double) 1.0);
       return wf;
    }
 

@@ -46,6 +46,10 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 		
 	  convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0],prhs[1],prhs[2]);
 	  
+	}else if (mxIsCell(prhs[0]) && mxIsChar(prhs[1]) && mxIsChar(prhs[2]) && !strcmp (mxArrayToString(prhs[1]),"Multistate")){
+
+	  convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0],prhs[1],prhs[2]);
+	  
 	} else mexErrMsgTxt("Bad input. Three  input argumets needed: array of filenames, Multistate, WF-module e.g. GridCartesian ");
   } else mexErrMsgTxt("Bad input. One output and 2 or 3 or 5 input argumets needed");
 }

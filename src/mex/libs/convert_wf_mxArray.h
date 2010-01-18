@@ -25,8 +25,8 @@ class convert_wf_mxArray
 	 static int write_WF(char *string_File_name , WaveFunction* WF, int number);
 	 static void WF_to_mxArray( mxArray **mx_WF, WaveFunction* WF);
 	 static void WF_to_mxArray( mxArray **mx_WF, WaveFunction* WF, lint stri);
-	 static void WF_make_Struct( mxArray **mx_WF, WaveFunction* WF);
-	 static void WF_to_Struct_mxArray( mxArray **mx_WF, WaveFunction* WF);
+	 static void WF_make_Struct( mxArray **mx_WF, WaveFunction* WF,const mxArray *handle);
+	 static void WF_to_Struct_mxArray( mxArray **mx_WF, WaveFunction* WF,const mxArray *handle);
    };
 
 #endif
