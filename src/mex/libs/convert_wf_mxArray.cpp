@@ -75,30 +75,48 @@ void convert_wf_mxArray::init_wf_from_file(mxArray **out_arg, const mxArray *mxA
     * inits single Wavefunction from File-Array
     */
 void convert_wf_mxArray::init_wf_from_file(mxArray **out_arg, const mxArray *mxArray_filename, const mxArray *mxArray_Multisiate, const mxArray *mxArray_filetype) {
-  int States = mxGetM(mxArray_filename);
-  int str_length = mxGetN(mxArray_filename);
-  if (States > 1) {
-	char *string_File_name_all = mxArrayToString(mxArray_filename);
-	char *files[States];
-	for (int i =0 ; i<States; i++) {
-		files[i] = new char [str_length+1];
-		for(int j =0; j<str_length;j++) {
-			files[i][j]=string_File_name_all[i+(States*j)];
-		}
-		files[i][str_length] = string_File_name_all[States*str_length];
-	}
-	char *string_WF_type = mxArrayToString(mxArray_filetype);
-	WaveFunction *wfsub;
-	WFMultistate *multi = new WFMultistate();
-	for (int i = 0; i < States; i++) {	
-		wfsub = convert_wf_mxArray::loadWF( files[i], string_WF_type );
-		multi->Add( wfsub, i);
-		mxFree(files[i]);
-	}
-	wf_ObjectHandle_interface::WF_to_handle_mxArray(out_arg,multi);
-	mxFree(string_File_name_all);
-	mxFree(string_WF_type);
-  } else mexErrMsgTxt("Bad input. No Multistate WF");
+  if (mxIsChar(mxArray_filename)) {
+    int States = mxGetM(mxArray_filename);
+    int str_length = mxGetN(mxArray_filename);
+    if (States > 1) {
+	  char *string_File_name_all = mxArrayToString(mxArray_filename);
+	  char *files[States];
+	  for (int i =0 ; i<States; i++) {
+		  files[i] = new char [str_length+1];
+		  for(int j =0; j<str_length;j++) {
+			  files[i][j]=string_File_name_all[i+(States*j)];
+		  }
+		  files[i][str_length] = string_File_name_all[States*str_length];
+	  }
+	  char *string_WF_type = mxArrayToString(mxArray_filetype);
+	  WaveFunction *wfsub;
+	  WFMultistate *multi = new WFMultistate();
+	  for (int i = 0; i < States; i++) {	
+		  wfsub = convert_wf_mxArray::loadWF( files[i], string_WF_type );
+		  multi->Add( wfsub, i);
+		  mxFree(files[i]);
+	  }
+	  wf_ObjectHandle_interface::WF_to_handle_mxArray(out_arg,multi);
+	  mxFree(string_File_name_all);
+	  mxFree(string_WF_type);
+    } else mexErrMsgTxt("Bad input. No Multistate WF");
+  } else if (mxIsCell(mxArray_filename) && (mxGetN(mxArray_filename) == 1 || mxGetM(mxArray_filename) == 1)) {
+    int States = mxGetN(mxArray_filename)*mxGetM(mxArray_filename);
+    char *string_WF_type = mxArrayToString(mxArray_filetype);
+    WaveFunction *wfsub;
+    WFMultistate *multi = new WFMultistate();
+    for (int i=0; i<States;i++) {
+      mxArray *field = mxGetCell(mxArray_filename,i);
+      if (mxIsChar(field)) {
+	char *file = mxArrayToString(field);
+	wfsub = convert_wf_mxArray::loadWF( file, string_WF_type );
+	multi->Add( wfsub, i);
+	mxFree(file);
+      }
+    }
+    wf_ObjectHandle_interface::WF_to_handle_mxArray(out_arg,multi);
+    mxFree(string_WF_type);
+  }
 }
 
 
