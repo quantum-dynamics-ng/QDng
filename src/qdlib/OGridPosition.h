@@ -9,18 +9,23 @@ namespace QDLIB {
     * Position Operator
     * 
     *  @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
+    * 
+    * prams:
+    * \li dim  Use only for dimension i
     */
    class OGridPosition : public OGridSystem
    {
       private:
          string _name;
+         int _dim;
+         void _InitDim(dVecView &view, const int dim);
       public:
          OGridPosition();
       
          ~OGridPosition();
    
 	 virtual Operator* NewInstance();
-         virtual void Init(ParamContainer &params){}
+         virtual void Init(ParamContainer &params);
 	 virtual void Init(WaveFunction *Psi);
 	 virtual const string& Name() {return _name;}
          virtual void UpdateTime(){}

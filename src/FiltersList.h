@@ -23,11 +23,12 @@ namespace QDLIB {
 	 lint _size;
 	 bool _initalized;
 	 
-	 Operator* _olist[MAX_FILTERS];
-	 _FilterAction _action[MAX_FILTERS];
+	 Operator* _olist[MAX_FILTERS];          /* Operator list */
+	 _FilterAction _action[MAX_FILTERS];     /* action for corresponding operator */
+         string _labels[MAX_FILTERS];            /* user defined labels for expec table  */
 	 
 	 string _fname;
-	 bool _writefile;
+	 bool _writefile;                        /* write to file or stdout */
 	 
 	 ofstream _ofile;
 	       

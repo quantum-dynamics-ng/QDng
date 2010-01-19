@@ -99,7 +99,12 @@ namespace QDLIB {
 	    throw EParamProblem (error.c_str());
 	 }
 	 if (faction != "normalize"){
-	     _olist[_size] = ChainLoader::LoadOperatorChain( filters );
+	     _olist[_size] = ChainLoader::LoadOperatorChain( filters );  /* Load operator */
+             ParamContainer attr = filters->Attributes();     /* Set label */
+             if (attr.isPresent("label"))
+                attr.GetValue("label", _labels[_size]);
+              else 
+                _labels[_size] = _olist[_size]->Name();
 	 }
 	 _size++;
 	 filters->NextNode();
@@ -121,16 +126,21 @@ namespace QDLIB {
       
       /* Check for initializations of the operators */
       if (! _initalized){
+         _ofile << "time \t";
 	 for(int i=0; i < _size; i++){
 	    _olist[i]->Clock(_clock);
 	    _olist[i]->Init(Psi);
 	    if (_writefile && (_action[i] == expec || _action[i] == expeconly))
-	       _ofile << _olist[i]->Name() << "\t";
+	       _ofile << _labels[i] << "\t";
 	 }
 	 if (_writefile)
 	    _ofile << endl;
       }
       	 
+      /* Write time */
+      if (_writefile)
+         _ofile << _clock->Time() << "\t";
+      
       /* Apply filters */
       for(int i=0; i < _size; i++){
 	 if (_action[i] == expec || _action[i] == expeconly){
