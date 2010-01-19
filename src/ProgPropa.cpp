@@ -155,9 +155,10 @@ namespace QDLIB {
 	 throw ( EParamProblem ("No inital wave function found") );
       
       log.Header( "Initial wave function", Logger::SubSection);
+      log.IndentInc();
       Psi = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
-      
+      log.IndentDec();
       
       /* Pre step filters */
       section = _ContentNodes->FindNode( "filterpre" );
@@ -182,6 +183,7 @@ namespace QDLIB {
 	 _postfilter.Init( section );
 	 _usepost = true;
 	 log.IndentDec();
+	 log.cout() << endl;
 	 delete section;
       }
       
