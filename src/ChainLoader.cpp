@@ -1,6 +1,6 @@
 #include "ChainLoader.h"
 
-#include "tools/FileSingleDefs.h"
+
 #include "modules/ModuleLoader.h"
 #include "tools/QDGlobalClock.h"
 #include "tools/Logger.h"
@@ -10,6 +10,7 @@
 #include "qdlib/OGridsystem.h"
 #include "qdlib/OMultistate.h"
 #include "qdlib/WFMultistate.h"
+#include "qdlib/FileWF.h"
 
 namespace QDLIB
 {
@@ -133,34 +134,57 @@ namespace QDLIB
       
       pm = WFNode->Attributes();
       pm.GetValue( "name", name );
+      if (name.length() == 1 && pm.isPresent("file")){ /* Lets try to load blind via file name & meta files */
+         pm.GetValue( "file", name );
+         FileWF file;
+         file.Suffix(BINARY_WF_SUFFIX);
+         file.Name(name);
+
+         log.cout() << "Loading wavefunction from file definition: " << name;
+         if (seqnum > -1 || pm.isPresent("num") ){ /* Read file from a sequence => only basename is given */
+            file.ActivateSequence();
+            int num = seqnum;
+            
+            if (pm.isPresent("num")){
+               pm.GetValue("num", num);
+            }
+            file.Counter(num);
+            log.cout() << " ("<< num << ")";
+         }
+         log.cout()  << endl;
+         log.flush();
+         
+         file >> &WF;
+         
+         return WF;
+      }
       
       if (name == "Multistate"){ /* Further recursion for multistate WF */
 	 log.cout() << "Multi state wave function:" << endl;
 	 log.IndentInc();
 	 child = WFNode->NextChild();
 	 child->AdjustElementNode();
-	 WaveFunction *wfsub;
-	 WFMultistate *multi = new WFMultistate();
-         if ( pm.isPresent("files") ){ /* Read from a Multistate set with basename <files> */
-            /** \todo implement multistate set file reading */
-            throw( EParamProblem("Multistate reading from file set not implemented") );
-         } else { /* Read single WF definitions into Multistate */
-            while (child->EndNode()){
-               string name;
-               stringstream ss;
-               int state;
-               
-               name = child->Name();
-               ss << name.substr(2);
-               ss >> state;
-               log.cout() << "-State " << state << endl;
-               
-               wfsub = LoadWaveFunctionChain( child, seqnum );
-               
-               multi->Add( wfsub, state);
-               child->NextNode();
-            }
+         
+         WaveFunction *wfsub;
+         
+         /* Read single WF definitions into Multistate */
+         WFMultistate *multi = new WFMultistate();
+         while (child->EndNode()){
+            string name;
+            stringstream ss;
+            int state;
+            
+            name = child->Name();
+            ss << name.substr(2);
+            ss >> state;
+            log.cout() << "-State " << state << endl;
+            
+            wfsub = LoadWaveFunctionChain( child, seqnum );
+            
+            multi->Add( wfsub, state);
+            child->NextNode();
          }
+         
 	 multi->Init(pm);
 	 pm.GetValue( "normalize", onoff);
 	 if ( onoff) {
@@ -188,7 +212,7 @@ namespace QDLIB
                pm_child.GetValue("coeff2", coeff);
                coeff = sqrt(coeff);
             }
-            if(coeff > 0){
+            if(coeff != 0){
                log.cout().precision(8);
                log.cout() << fixed << "Coefficient = " << coeff << endl;
                log.cout() << fixed << "Coefficient^2 = " << coeff*coeff << endl;
@@ -196,7 +220,7 @@ namespace QDLIB
                     
             wfadd = LoadWaveFunctionChain( child, seqnum );
             
-            if(coeff > 0)
+            if(coeff != 0)
                MultElements((cVec*) wfadd, coeff);
             
 	    if (WF == NULL){

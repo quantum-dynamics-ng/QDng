@@ -12,8 +12,6 @@
 
 
 namespace QDLIB {
-   typedef FileSingle<WaveFunction> FileWF;
-	 
    typedef FileSingle<OHerMat> FileOHerMat;
 }
 

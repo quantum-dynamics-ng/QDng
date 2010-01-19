@@ -1,10 +1,10 @@
 #include "ProgOCT.h"
 
-#include "tools/FileSingleDefs.h"
 #include "tools/Logger.h"
 #include "tools/fstools.h"
 #include "ChainLoader.h"
 #include "qdlib/Butterworth.h"
+#include "qdlib/FileWF.h"
 
 namespace QDLIB {
 

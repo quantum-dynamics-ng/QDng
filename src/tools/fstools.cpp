@@ -28,6 +28,14 @@ namespace QDLIB {
       cout << dir << endl;
    }
    
+   /** 
+    * Create a directory.
+    * 
+    * If the directory doesn't exist nothing happens.
+    * If dir is path with more than one non-existent directories, then
+    * the full path will be created.
+    * 
+    */
    void CreateDir(const string & dir)
    {
       struct stat statbuf;
@@ -75,7 +83,22 @@ namespace QDLIB {
          throw ( EIOError(errno, dir) );
    }
 
-   
+   /** Remove file or empty directory. */
+   void Remove(const string& name)
+   {
+      if ( remove(name.c_str()) != 0 ){
+         switch (errno) {
+            case EACCES:
+                  throw ( EIOError ("Can't remove file. Access denied: ", name) );
+               break;
+            case ENOENT:
+                  throw ( EIOError ("Can't remove file. File does not exist: ", name) );
+               break;
+            default:
+               throw ( EIOError ("Can't remove file. Error: ", name) );
+         }
+      }
+   }
 }
 
 

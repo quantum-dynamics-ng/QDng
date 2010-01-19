@@ -7,14 +7,9 @@
 
 namespace QDLIB {
    
-   /**
-    */
-//    extern void BuildPath(const string& dir, string& path );
-   
-   /**
-    * 
-    */
+
    extern void CreateDir(const string& dir);
+   extern void Remove(const string& name);
 }
 
 

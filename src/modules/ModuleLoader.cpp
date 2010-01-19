@@ -66,7 +66,11 @@ namespace QDLIB {
       void* handle=NULL;
       string s;
       
-      s = INTERNAL_BASENAME_WF + name;
+      if (name.substr(0,2)  == "WF") /* check for prefix WF & remove it */
+         s = INTERNAL_BASENAME_WF + name.substr(2);
+      else
+         s = INTERNAL_BASENAME_WF + name;
+      
       instWF* InstanceWF = InternalWF(s);
       
       if (InstanceWF != NULL){

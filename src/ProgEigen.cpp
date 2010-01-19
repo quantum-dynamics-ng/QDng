@@ -3,7 +3,6 @@
 #include "tools/Logger.h"
 
 #include "tools/QDGlobalClock.h"
-#include "tools/FileSingleDefs.h"
 #include "tools/helpers.h"
 #include "tools/fstools.h"
 #include "ChainLoader.h"
@@ -12,6 +11,7 @@
 #include "tools/QDGlobalClock.h"
 
 #include "ChainLoader.h"
+#include "qdlib/FileWF.h"
 #include "qdlib/Conversion.h"
 
 namespace QDLIB
