@@ -461,15 +461,23 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray , char *string
 	double *pdr,*pdi;
 	mxArray * data = mxGetField(s_mxArray,0,"data");
 	pdr = mxGetPr(data);
-	pdi = mxGetPi(data);
+	if (mxIsComplex(data)) {
+	  pdi = mxGetPi(data);
+	}
 	dcomplex* val_WF = WF->begin(0);
 	int elem = WF->lsize();
 	int length = mxGetM(data);
-	if (elem == length) {
+	if (elem == length && mxIsComplex(data)) {
 	  for (int p = 0; p<elem; p++) {
 		  dcomplex val(*pdr,*pdi);
 		  *val_WF = val;
 		  val_WF ++;pdr++;pdi++;
+	  }
+	} else if (elem == length && !mxIsComplex(data)) {
+	  for (int p = 0; p<elem; p++) {
+		  dcomplex val(*pdr,(double) 0.0);
+		  *val_WF = val;
+		  val_WF ++;pdr++;
 	  }
 	} else throw ( EParamProblem("WaveFunction inizialization failed") );
 	if (WF == NULL)

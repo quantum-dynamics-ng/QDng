@@ -191,10 +191,11 @@ namespace QDLIB
       section = _ContentNodes->FindNode( "wf" );
       if (section == NULL)
 	 throw ( EParamProblem ("No inital wave function found") );
-      
+      log.Header( "Wavefunction: ", Logger::SubSection);
+      log.IndentInc();
       Psi_initial = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
-      
+      log.IndentDec();
       
       /* Make sure our hamiltonian is initalized */
       h->Init(Psi_initial);

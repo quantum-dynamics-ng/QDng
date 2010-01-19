@@ -1,1 +1,0 @@
-src/qdng.cpp
