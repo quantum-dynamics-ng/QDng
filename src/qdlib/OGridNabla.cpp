@@ -5,11 +5,11 @@
 
 namespace QDLIB {
 
-   OGridNabla::OGridNabla() : _name("OGridNabla"), _fac(1), _kspace(NULL),  _momentum(false)
+   OGridNabla::OGridNabla() : _name("OGridNabla"), _fac(1), _kspace(NULL),  _momentum(false), _dim(-1)
    {
    }
    
-   OGridNabla::OGridNabla(bool momentum) : _name("OGridNabla"), _fac(1), _kspace(NULL), _momentum(momentum)
+   OGridNabla::OGridNabla(bool momentum) : _name("OGridNabla"), _fac(1), _kspace(NULL), _momentum(momentum), _dim(-1)
    {
    }
 
@@ -34,6 +34,13 @@ namespace QDLIB {
             
       if(_params.isPresent("factor"))
          _params.GetValue( "factor", _fac);
+      
+      if (_params.isPresent("dim")){
+         _params.GetValue("dim", _dim);
+         
+         if (_dim < 0)
+            throw ( EParamProblem("Invalid dimension chosen for position operator: ", _dim)  );
+      }
    }
    
    void OGridNabla::Init(WaveFunction * Psi)
@@ -45,6 +52,9 @@ namespace QDLIB {
          throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
       
       *((GridSystem*) this) = *((GridSystem*) psi);
+      
+      if (GridSystem::Dim() < _dim + 1)
+         throw (EParamProblem ("Dimension for momentum operator exceeds dimensions of Wavefunction", _dim) );
       
       _kspace = new dVec(GridSystem::Size(), true);
       
@@ -184,6 +194,21 @@ namespace QDLIB {
       
    }
    
+   /**
+    * Setup k-space for specified dimension.
+    */
+   void QDLIB::OGridNabla::_InitDim(dVecView & view, const int dim)
+   {
+      dVec *kspace1; /* Single dimension k-space */
+      
+      kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(dim) - GridSystem::Xmin(dim), GridSystem::DimSizes(dim));;
+         
+      view.ActiveDim(dim);
+      view += *kspace1;
+      delete kspace1;
+   }
+
+   
    /** Init internal k-space only.
     * 
     * This saves some effort of copying the real valued vector to the general
@@ -191,24 +216,22 @@ namespace QDLIB {
     */
    void OGridNabla::_InitDspaceReal()
    {
-      dVec *kspace1; /* Single dimension k-space */
-      
       *_kspace = 0; /* Init with zeros */
       
       dVecView view(*_kspace, GridSystem::Dim(), GridSystem::DimSizes());
       
-      /* Init k-space for every dimension */
-      for (int i=0; i < GridSystem::Dim(); i++){ 
-         kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i));;
-         
-         view.ActiveDim(i);
-         view += *kspace1;
-         delete kspace1;
-      }
+      if (_dim < 0 ) {
+         /* Init k-space for every dimension */
+         for (int i=0; i < GridSystem::Dim(); i++)
+            _InitDim(view, i);
+         } else {
+            _InitDim(view, _dim);
+         }
    }
    
    
 } /* namespace QDLIB */
+
 
 
 

@@ -17,7 +17,8 @@ namespace QDLIB {
     * 
     * prarams:
     * \li fac Prefactor
-    * \li momentum Set operational to momentum 
+    * \li momentum Set operational mode to momentum 
+    * \li dim Only setup the operator for specified dimension.
     * 
     *  @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
@@ -28,6 +29,8 @@ namespace QDLIB {
          double _fac;    /* Prefactor */
          dVec *_kspace;  /* Imaginary part of the k-space */
          bool _momentum; /* Work in momentum mode */
+         int _dim;       /* Only act on this dimension */
+         void _InitDim(dVecView &view, const int dim);
       protected:
          void _InitDspaceReal();
       public:
