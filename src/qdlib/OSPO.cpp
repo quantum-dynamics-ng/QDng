@@ -396,10 +396,22 @@ namespace QDLIB {
       }
    }
 
-  
+   bool OSPO::Valid(WaveFunction * Psi)
+   {
+      bool valid = true;
+      
+      if ( Psi == NULL ) return false;
+      
+      valid = valid & _Tkin->Valid(Psi);
+      valid = valid & _Vpot[0]->Valid(Psi);
+      
+      return valid;
+   }
    
    
 } /* namespace QDLIB */
+
+
 
 
 

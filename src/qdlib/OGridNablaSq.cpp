@@ -182,6 +182,16 @@ namespace QDLIB {
       return O;
    }
 
+   bool QDLIB::OGridNablaSq::Valid(WaveFunction * Psi)
+   {
+      if ( Psi == NULL) return false;
+      
+      if ( *((GridSystem*) this) != *((GridSystem*) Psi) ) return false;
+      
+      return true;
+   }
+
+   
    /**
     * \todo clean Vector view.
     * \bug dimensions are inverse => x (lowest number ) is the fastest!
@@ -215,5 +225,6 @@ namespace QDLIB {
    }
 
 } /* namespace QDLIB */
+
 
 

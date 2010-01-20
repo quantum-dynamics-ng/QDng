@@ -180,6 +180,15 @@ namespace QDLIB {
       return this;
    }
    
+   bool OGridNabla::Valid(WaveFunction * Psi)
+   {
+      if ( Psi == NULL) return false;
+      
+      if ( *((GridSystem*) this) != *((GridSystem*) Psi) ) return false;
+      
+      return true;
+   }
+   
    void OGridNabla::InitDspace()
    {
       if (_kspace == NULL) _InitDspaceReal();
@@ -231,6 +240,8 @@ namespace QDLIB {
    
    
 } /* namespace QDLIB */
+
+
 
 
 

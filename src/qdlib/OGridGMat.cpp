@@ -294,4 +294,15 @@ namespace QDLIB {
       return this;
    }
 
+   
+   bool OGridGMat::Valid(WaveFunction * Psi)
+   {
+      if ( Psi == NULL) return false;
+      
+      if ( *((GridSystem*) this) != *((GridSystem*) Psi) ) return false;
+      
+      return true;
+   }
 }
+
+

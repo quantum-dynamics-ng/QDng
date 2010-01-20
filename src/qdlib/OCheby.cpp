@@ -284,7 +284,15 @@ namespace QDLIB
 
    }
 
+   
+   bool OCheby::Valid(WaveFunction * Psi)
+   {
+      return _hamilton->Valid(Psi);
+   }
+   
 } /* namespace QDLIB */
+
+
 
 
 

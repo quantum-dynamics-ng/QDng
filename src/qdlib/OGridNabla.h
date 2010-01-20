@@ -82,8 +82,13 @@ namespace QDLIB {
          
          virtual Operator* Scale(const double d);
 
+         virtual bool Valid(WaveFunction *Psi);
+         
          /*Interface implementation, ODSpace  */ 
          virtual void InitDspace();
+         
+         
+         
    };
 
 }

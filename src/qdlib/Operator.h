@@ -206,6 +206,15 @@ namespace QDLIB {
 	  */
 	 double Scaling() {return scaling;}
          
+         /**
+          * Check if the provided Wavefunction is valid with respect to initialization.
+          * 
+          * \param Psi The wavefunction to check (may be NULL).
+          * 
+          * \return true if is compatible with initalized. If incompatible or NULL => false.
+          */
+         virtual bool Valid(WaveFunction *Psi) = 0;
+         
          typedef WaveFunction* (Operator::*METHODWF) (WaveFunction*);
 	 typedef WaveFunction* (Operator::*METHODWF2) (WaveFunction*, dcomplex);
 	 
