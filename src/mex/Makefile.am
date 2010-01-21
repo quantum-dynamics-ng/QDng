@@ -31,7 +31,9 @@ all-local:
 
 pkglib_LTLIBRARIES = libget_wf_handle.la \
 	libinit_wf_file.la libwrite_wf_file.la libdelete_wf_handle.la \
-	libinit_wf_struct.la libwf_mod.la libget_all_wf_handle.la
+	libinit_wf_struct.la libwf_mod.la libget_all_wf_handle.la \
+	libinit_op.la
+
 #	libmextest2.la libreadwfstatic.la readwf.la
 
 # libmextest2_la_CXXFLAGS  = $(MATLAB_FLAGS)
@@ -99,3 +101,8 @@ libget_all_wf_handle_la_SOURCES = get_all_wf_handle.cpp
 libget_all_wf_handle_la_CXXFLAGS  = $(MATLAB_FLAGS)
 libget_all_wf_handle_la_LDFLAGS = -Wl,-oget_all_wf_handle.mexa64 -module  $(MATLAB_LINK)
 libget_all_wf_handle_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+libinit_op_la_SOURCES =  init_op.cpp  
+libinit_op_la_CXXFLAGS  = $(MATLAB_FLAGS)
+libinit_op_la_LDFLAGS = -module -Wl,-oinit_op.mexa64 $(MATLAB_LINK)
+libinit_op_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)

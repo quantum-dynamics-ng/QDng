@@ -61,7 +61,7 @@ Collector<T>::~Collector() {
     */
 template <typename T>
 Collector<T>* Collector<T>::Instance () {
- 			static Collector singleton;
+ 			static Collector singleton; /* Reation of the Singleton*/
 			//std::cout << "Collector::Instance Coll: " << &singleton << std::endl;
  			return &singleton;
 // 			std::cout << "New Collector: " << typeid(T).name() << std::endl;
@@ -78,11 +78,11 @@ void Collector<T>::register_handle (ObjectHandle<T>* obj) {
 		mxArray* val = obj->to_mex_handle();
 		typename std::map<double,ObjectHandle<T>*>::iterator it;
 		typename std::map<double,ObjectHandle<T>*>::iterator end= objlist.end();
-		for (it= objlist.begin(); it!=end; ++it) {
+		for (it= objlist.begin(); it!=end; ++it) { /* search the whole map*/
 		  ObjectHandle<T>* obj_test = it->second;
-		  if ( obj_test->t == obj->t) {reg = false;} 
+		  if ( obj_test->t == obj->t) {reg = false;} /*compare the stored pointer*/
 		}
-		if (reg == true ) {
+		if (reg == true ) { /*register the handle */
 		  double map_val = *mxGetPr(val);
 		  objlist[*mxGetPr(val)] = obj;
 		}
@@ -97,11 +97,11 @@ ObjectHandle<T>* Collector<T>::find_ptr (ObjectHandle<T>* obj) {
 		typename std::map<double,ObjectHandle<T>*>::iterator end= objlist.end();
 		ObjectHandle<T>* obj_test;
 		ObjectHandle<T>* obj_return = obj;
-		for (it= objlist.begin(); it!=end; ++it) {
+		for (it= objlist.begin(); it!=end; ++it) {/* search the whole map*/
 		  obj_test = it->second;
-		  if ( obj_test->t == obj->t) obj_return = obj_test; 
+		  if ( obj_test->t == obj->t) obj_return = obj_test; /*compare the stored pointer*/
 		}
-		return obj_return;
+		return obj_return; /*return ObjectHandle*/
 }
 /**
     * Deletes an ObjectHandle and the pointer 
@@ -109,9 +109,9 @@ ObjectHandle<T>* Collector<T>::find_ptr (ObjectHandle<T>* obj) {
 template <typename T>
 void Collector<T>::delete_handle (const mxArray* val) {
 		//std::cout << "delete_handle" << std::endl;
-		typename std::map<double,ObjectHandle<T>*>::iterator it = objlist.find(*mxGetPr(val));
+		typename std::map<double,ObjectHandle<T>*>::iterator it = objlist.find(*mxGetPr(val)); /*search Handle*/
 		//delete it->second;
-		objlist.erase (it); 
+		objlist.erase (it); /*delete Handle and Object*/
 }
 
 /**
@@ -121,10 +121,10 @@ template <typename T>
 void Collector<T>::delete_all () {
 		typename std::map<double,ObjectHandle<T>*>::iterator it;
 		typename std::map<double,ObjectHandle<T>*>::iterator end= objlist.end();
-		for (it= objlist.begin(); it!=end; ++it) {
+		for (it= objlist.begin(); it!=end; ++it) {/* search the whole map*/
 			//if ((*it)->signature == *it) // check for valid signature
 			//std::cout << it->first << std::endl;
-			delete it->second;
+			delete it->second; /*delete Handle and Object*/
 			objlist.erase (it);
 			//std::cout << "Delete Collector" << std::endl;
 		} 
@@ -134,16 +134,16 @@ void Collector<T>::delete_all () {
     */
 template <typename T>
 double Collector<T>::find_handle (const mxArray* val) {
-		double obj = objlist.find(*mxGetPr(val))->first;
+		double obj = objlist.find(*mxGetPr(val))->first; /*search Handle*/
 		return obj;
 }
 
 /**
-    * searches the map for an existen Handle 
+    * get the size of the map
     */
 template <typename T>
 int Collector<T>::get_number_objects () {
-		int number = (int) objlist.size();
+		int number = (int) objlist.size(); /*get the size of the map*/
 		return number;
 }
 
@@ -154,8 +154,8 @@ template <typename T>
 ObjectHandle<T>* Collector<T>::get_objects_by_number(int number){
   if (number > this->get_number_objects()) return NULL;
   typename std::map<double,ObjectHandle<T>*>::iterator it= objlist.begin();
-  for (int i=0; i<number; i++) {
-    it++;
+  for (int i=0; i<number; i++) { /*iterate to number */
+    it++; 
   }
   return it->second;
 }

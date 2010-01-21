@@ -1,6 +1,7 @@
 #include "fstools.h"
 #include "sys/stat.h"
 #include "sys/errno.h"
+#include <stdio.h>
 
 
 namespace QDLIB {

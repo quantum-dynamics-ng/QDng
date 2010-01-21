@@ -25,31 +25,26 @@ using namespace QDLIB;
 /**
     * mexFunction to load a Wavefunction from file
     * output (one argument) is the ObjectHandle
-    * input: 1) two arguments -> Filename, WF-module e.g. GridCartesian
-    *	     2) three arguments -> array of filenames, Multistate, WF-module e.g. GridCartesian
-    *	     3) five arguments -> filename, Multistate, WF-module e.g. GridCartesian, #States, #WF
+    * input: 1) one arguments -> Filename or cell array of filenames
+    *	     2) two arguments -> array of filenames,int  #WF
     */
 void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )     
 {
-  if (nlhs == 1 && nrhs == 2) {
-	if (mxIsChar(prhs[0]) && mxIsChar(prhs[1])) {
-	    convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0],prhs[1]);
-	} else mexErrMsgTxt("Bad input. One output and two input argumets needed (filename, WF-module e.g. GridCartesian)");
-  } else if (nlhs == 1 && nrhs == 5){
-	if (mxIsChar(prhs[0]) && mxIsChar(prhs[1]) && mxIsChar(prhs[2]) && mxIsDouble(prhs[3]) && mxIsDouble(prhs[4]) && !strcmp (mxArrayToString(prhs[1]),"Multistate")) {
+  if (nlhs == 1 && nrhs == 1) {
+	if (mxIsChar(prhs[0])) {
+	  
+	    convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0]);
+	    
+	} else if (mxIsCell(prhs[0])) {
+	  
+	    convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0]);
+	  
+	}else mexErrMsgTxt("Bad input. One output and one input argumets needed (filename)");
+  } else if (nlhs == 1 && nrhs == 2){
+	if (mxIsChar(prhs[0]) &&  mxIsDouble(prhs[1])) {
 		
-	  convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0],prhs[2],prhs[3],prhs[4]);
+	  convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0],prhs[1]);
 	  
-	}else mexErrMsgTxt("Bad input. One output and 5 input argumets needed (filename, Multistate, WF-module e.g. GridCartesian, #States, #WF)");
-  } else if (nlhs == 1 && nrhs == 3){
-	if ( mxIsChar(prhs[0]) && mxIsChar(prhs[1]) && mxIsChar(prhs[2]) && !strcmp (mxArrayToString(prhs[1]),"Multistate")) {
-		
-	  convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0],prhs[1],prhs[2]);
-	  
-	}else if (mxIsCell(prhs[0]) && mxIsChar(prhs[1]) && mxIsChar(prhs[2]) && !strcmp (mxArrayToString(prhs[1]),"Multistate")){
-
-	  convert_wf_mxArray::init_wf_from_file(&plhs[0],prhs[0],prhs[1],prhs[2]);
-	  
-	} else mexErrMsgTxt("Bad input. Three  input argumets needed: array of filenames, Multistate, WF-module e.g. GridCartesian ");
-  } else mexErrMsgTxt("Bad input. One output and 2 or 3 or 5 input argumets needed");
+	} else mexErrMsgTxt("Bad input. One output and two input argumets needed (filename #WF)");
+  }  else mexErrMsgTxt("Bad input. One output and one or two input argumets needed");
 }
