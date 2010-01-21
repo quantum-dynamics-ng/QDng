@@ -1,0 +1,6 @@
+# Generated file
+CLASS = WFGridCartesian
+N0 = 1024
+dims = 1
+xmax0 = 30
+xmin0 = 5
