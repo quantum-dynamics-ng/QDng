@@ -364,6 +364,25 @@ namespace QDLIB
       return this;
    }
 
+   bool OMultistate::Valid(WaveFunction * Psi)
+   {
+      bool valid = true;
+      
+      if ( Psi == NULL ) return false;
+      
+      for(int i=0; i< _nstates; i++){
+         for(int j=0; j< _nstates; j++){
+            if (_matrix[i][j] != NULL)
+               valid = valid & _matrix[i][j]->Valid(Psi);
+            if ( !valid ) return false;
+         }
+      }
+      
+      return valid;
+   }
+   
 }
 /* namespace QDLIB */
+
+
 

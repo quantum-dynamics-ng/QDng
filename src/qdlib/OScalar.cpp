@@ -92,8 +92,19 @@ namespace QDLIB {
       throw ( EIncompatible("No operator application implementet", _name ) );
    }
    
+   bool OScalar::Valid(WaveFunction * Psi)
+   {
+      if ( Psi == NULL ) return false;
+      if ( Psi->size() != _buf->size() ) return false;
+      
+      return true;
+   }
    
 } /* namespace QDLIB */
+
+
+
+
 
 
 

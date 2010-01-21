@@ -91,6 +91,8 @@ namespace QDLIB {
 	 virtual ParamContainer& TellNeeds();
       
 	 virtual void AddNeeds(string &Key, Operator *O);
+         
+         virtual bool Valid(WaveFunction *Psi);
       };
 
 }

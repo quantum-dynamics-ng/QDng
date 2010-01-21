@@ -239,8 +239,22 @@ namespace QDLIB {
       return this;
    }
 
+   bool OSum::Valid(WaveFunction * Psi)
+   {
+      bool valid = true;
+      
+      if ( Psi == NULL ) return false;
+      
+      for (int i=0; i < _size; i++){
+         valid = valid & _O[i]->Valid(Psi);
+         if ( !valid ) return false;
+      }
+      return valid;
+   }
    
 }
  /* namespace QDLIB */
+
+
 
 

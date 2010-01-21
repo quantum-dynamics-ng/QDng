@@ -50,8 +50,18 @@ namespace QDLIB {
       return this;
    }
 
+   bool OGridSystem::Valid(WaveFunction * Psi)
+   {
+      if ( Psi == NULL ) return false;
+      
+      if ( *((GridSystem*) this) != *((GridSystem*) Psi) ) return false;
+      
+      return true;
+   }
    
 } /* namespace QDLIB */
+
+
 
 
 

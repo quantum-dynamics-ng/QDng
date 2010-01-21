@@ -72,8 +72,8 @@ namespace QDLIB {
 	 virtual Operator* Offset(const double d){return this;} /* No need to do this */
 	 
 	 virtual Operator* Scale(const double d);
-	 
-   
+         
+         virtual bool Valid(WaveFunction *Psi);
    };
 
 }

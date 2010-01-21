@@ -104,6 +104,8 @@ namespace QDLIB
 // 	 virtual Operator* operator-=(const double d);
 
 	 virtual Operator* Scale(const double d);
+         
+         virtual bool Valid(WaveFunction *Psi);
    };
 
 }

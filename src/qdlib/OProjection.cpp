@@ -219,4 +219,15 @@ namespace QDLIB {
    }
 
 
+   bool OProjection::Valid(WaveFunction * Psi)
+   {
+      if ( Psi == NULL ) return false;
+      
+      if (_buf->size() != Psi->size() ) return false;
+      
+      return true;
+   }
+   
 }
+
+

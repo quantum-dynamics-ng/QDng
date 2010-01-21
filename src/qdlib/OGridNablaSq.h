@@ -61,7 +61,7 @@ namespace QDLIB {
 	 
 	 virtual Operator* operator*(Operator* O);
 
-	 
+         virtual bool Valid(WaveFunction *Psi);
 	 
 	 /*Interface implementation, ODSpace  */ 
 	 virtual void InitDspace();

@@ -4,7 +4,7 @@
 namespace QDLIB {
 
    OGridPosition::OGridPosition()
-   : OGridSystem(), _name("OGridPosition")
+   : OGridSystem(), _name("OGridPosition"), _dim(-1)
    {
    }
    
@@ -23,7 +23,33 @@ namespace QDLIB {
       return r;
    }
 
+   void OGridPosition::Init(ParamContainer & params)
+   {
+      _params = params;
+      
+      if (_params.isPresent("dim")){
+         _params.GetValue("dim", _dim);
+         
+         if (_dim < 0)
+            throw ( EParamProblem("Invalid dimension chosen for position operator: ", _dim)  );
+      }
+   }
 
+   /** Init a single dimension */
+   void OGridPosition::_InitDim(dVecView &view, const int dim)
+   {
+      dVec xspace1;
+      
+      xspace1.newsize(GridSystem::DimSizes(dim));
+      
+      /* setup x */
+      for (int n=0; n < GridSystem::DimSizes(dim); n++){
+         xspace1[n] = GridSystem::Xmin(dim) + GridSystem::Dx(dim) * n;
+      }
+         
+      view.ActiveDim(dim);
+      view += xspace1;
+   }
 
    void OGridPosition::Init(WaveFunction * Psi)
    {
@@ -41,16 +67,16 @@ namespace QDLIB {
       
       *((dVec*) this) = 0; /* Init with zeros */
       
-      /* Init k-space for every dimension */
+      if (GridSystem::Dim() < _dim + 1)
+         throw (EParamProblem ("Dimension for position operator exceeds dimensions of Wavefunction", _dim) );
+      
       dVecView view(*this, GridSystem::Dim(), GridSystem::DimSizes());
-      for (int i=0; i < GridSystem::Dim(); i++){
-         xspace1.newsize(GridSystem::DimSizes(i));
-         for (int n=0; n < GridSystem::DimSizes(i); n++){
-              xspace1[n] = GridSystem::Xmin(i) + GridSystem::Dx(i) * n;
-         }
-         
-         view.ActiveDim(i);
-         view += xspace1;
+      
+      if (_dim < 0 ) { /* Init k-space for every dimension */
+         for (int i=0; i < GridSystem::Dim(); i++)
+            _InitDim(view, i);
+      } else {
+         _InitDim(view, _dim);
       }
    }
    
@@ -111,6 +137,7 @@ namespace QDLIB {
    }
 
 } /* namespace QDLIB */
+
 
 
 
