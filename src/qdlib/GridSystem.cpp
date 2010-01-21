@@ -161,9 +161,11 @@ namespace QDLIB {
       for (int i=0; i < MAX_DIMS; i++)
       {
 	 if (_dims[i] != G._dims[i]) equal = false;
+	 //std::cout << "Dims: " << _dims[i] << " GDims: " << G._dims[i] << std::endl;
 	 if (_xmin[i] != G._xmin[i]) equal = false;
+	 //std::cout << "xmin: " << _xmin[i] << " Gxmin: " << G._xmin[i] << std::endl;
 	 if (_xmax[i] != G._xmax[i]) equal = false;
-	 
+	 //std::cout << "xmax: " << _xmax[i] << " xmin: " << G._xmax[i] << std::endl;
       }
       return equal;
    }
@@ -173,7 +175,7 @@ namespace QDLIB {
     */
    bool GridSystem::operator !=( GridSystem & G )
    {
-      if ( *this == G ) return false;
+     if ( *this == G ) return false;
       else return true;
    }
    

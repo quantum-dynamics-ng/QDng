@@ -32,7 +32,8 @@ all-local:
 pkglib_LTLIBRARIES = libget_wf_handle.la \
 	libinit_wf_file.la libwrite_wf_file.la libdelete_wf_handle.la \
 	libinit_wf_struct.la libwf_mod.la libget_all_wf_handle.la \
-	libinit_op.la
+	libinit_op.la libdelete_op_handle.la libapply_op.la  \
+	libexpec_op.la
 
 #	libmextest2.la libreadwfstatic.la readwf.la
 
@@ -106,3 +107,18 @@ libinit_op_la_SOURCES =  init_op.cpp
 libinit_op_la_CXXFLAGS  = $(MATLAB_FLAGS)
 libinit_op_la_LDFLAGS = -module -Wl,-oinit_op.mexa64 $(MATLAB_LINK)
 libinit_op_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+libdelete_op_handle_la_SOURCES = delete_op_handle.cpp
+libdelete_op_handle_la_CXXFLAGS  = $(MATLAB_FLAGS)
+libdelete_op_handle_la_LDFLAGS = -module -Wl,-odelete_op_handle.mexa64 $(MATLAB_LINK)
+libdelete_op_handle_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+libapply_op_la_SOURCES = apply_op.cpp
+libapply_op_la_CXXFLAGS  = $(MATLAB_FLAGS)
+libapply_op_la_LDFLAGS = -module -Wl,-oapply_op.mexa64 $(MATLAB_LINK)
+libapply_op_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+libexpec_op_la_SOURCES = expec_op.cpp
+libexpec_op_la_CXXFLAGS  = $(MATLAB_FLAGS)
+libexpec_op_la_LDFLAGS = -module -Wl,-oexpec_op.mexa64 $(MATLAB_LINK)
+libexpec_op_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)

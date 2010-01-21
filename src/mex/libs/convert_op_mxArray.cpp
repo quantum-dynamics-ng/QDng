@@ -36,7 +36,7 @@
 using namespace QDLIB;
 
 /**
-    * inits Operator from File(s)
+    * inits Operator from Struct
     */
 void convert_op_mxArray::init_op(mxArray **out_arg, const mxArray *Struct_mxArray, const mxArray *WF_h_mxArray ) {
 try {  
@@ -81,6 +81,105 @@ try {
 }
 
 /**
+    * Calculates Expectation vale of an Operator
+    */
+void convert_op_mxArray::op_expec(mxArray **out_arg, const mxArray *OP_h_mxArray, const mxArray *WF_h_mxArray ) {
+try {  
+  /*Create WF pointer*/
+  WaveFunction *WF=NULL;
+  
+  /*Search for the right pointer and pass it to WF*/
+  WF = wf_ObjectHandle_interface::search_WF (WF_h_mxArray); 
+  //std::cout << "WaveFunction: " << WF << std::endl;
+  
+  /*if loading fails*/
+  if (WF == NULL)
+	    throw ( EParamProblem("WaveFunction loading failed") );
+  
+  /*Create OP pointer*/
+  Operator* OP=NULL;
+  
+  /*Search for the right pointer and pass it to OP*/
+  OP =  op_ObjectHandle_interface::search_OP (OP_h_mxArray);
+  
+  /*if loading fails*/
+  if (OP == NULL)
+      throw ( EParamProblem("Operator loading failed") );
+  
+  /*Check for the right Wavefunction*/
+  bool valid = OP->Valid(WF);
+  //std:: cout << "Valid Check: " << valid << std::endl;
+    
+  if (valid == false)
+    throw ( EParamProblem("Mismatching Operator and Wavefunction") );
+  
+  /*Apply Operator*/
+  double expect_val = OP->Expec(WF);
+  
+  //std::cout << "Value: " << expect_val << std::endl;
+  
+  /*init the result mxArray*/
+  out_arg[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+  double *pdr;
+  pdr=mxGetPr(out_arg[0]);
+  
+  *pdr = expect_val;
+  
+  
+  } catch (Exception e) {
+     
+    mexErrMsgTxt(e.GetMessage().c_str());
+	
+ }
+}
+
+/**
+    * Applies an Operator to a Wavefunction
+    */
+void convert_op_mxArray::apply_op(mxArray **out_arg, const mxArray *OP_h_mxArray, const mxArray *WF_h_mxArray ) {
+try {  
+  /*Create WF pointer*/
+  WaveFunction *WF=NULL;
+  
+  /*Search for the right pointer and pass it to WF*/
+  WF = wf_ObjectHandle_interface::search_WF (WF_h_mxArray); 
+  //std::cout << "WaveFunction: " << WF << std::endl;
+  
+  /*if loading fails*/
+  if (WF == NULL)
+	    throw ( EParamProblem("WaveFunction loading failed") );
+  
+  /*Create OP pointer*/
+  Operator* OP=NULL;
+  
+  /*Search for the right pointer and pass it to OP*/
+  OP =  op_ObjectHandle_interface::search_OP (OP_h_mxArray);
+  
+  /*if loading fails*/
+  if (OP == NULL)
+      throw ( EParamProblem("Operator loading failed") );
+  
+  /*Check for the right Wavefunction*/
+  bool valid = OP->Valid(WF);
+  //std:: cout << "Valid Check: " << valid << std::endl;
+    
+  if (valid == false)
+    throw ( EParamProblem("Mismatching Operator and Wavefunction") );
+  
+  /*Apply Operator*/
+  WF = OP->Apply(WF);
+  
+  /*return the ObjectHandle (Wavefunction)*/
+  wf_ObjectHandle_interface::WF_to_handle_mxArray(out_arg,WF);
+  
+  } catch (Exception e) {
+     
+    mexErrMsgTxt(e.GetMessage().c_str());
+	
+ }
+}
+
+/**
     * loads a Operator from structured mxArray
     */
 Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
@@ -102,7 +201,101 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
       
       /*If class is WFMultistate */ 
       if (!s_class.compare("OPMultistate") || !s_class.compare("Multistate") ) {
-	throw ( EParamProblem("Multistate not implemented jet") );
+	
+	/*Check the s_mxArray for validity */
+	if (mxGetFieldNumber(s_mxArray, "operators") == -1)
+	  throw ( EParamProblem("Struct contains no operators field") );
+    
+	if (mxGetFieldNumber(s_mxArray, "Operator") == -1)
+	  throw ( EParamProblem("Struct contains no Operator field") );
+	
+	char *s = mxArrayToString(mxGetField(s_mxArray, 0,"operators"));
+	std::string s_operators = s; 
+	mxFree((void*) s );
+	
+	int operators;
+	sscanf( s_operators.c_str(), "%d", &operators);
+	
+	/*Copy the  Field State in new mxArray all_States*/
+	mxArray *all_Operators = mxDuplicateArray(mxGetField(s_mxArray,0,"Operator"));
+	if (operators != mxGetNumberOfElements(all_Operators))
+	  throw ( EParamProblem("Struct contains more of less Operators than defined in the operators Field") );
+	
+	
+	/*Set the ParameterCotainer for the Multistate right (copy the struct-Fields)*/
+	std::string name;
+	std::string value;
+	ParamContainer mparam;
+	std::string str_handle = "handle";
+	std::string str_State = "Operator";
+	int nr_fields = mxGetNumberOfFields(s_mxArray);
+	for (int k = 0; k<nr_fields;k++) {
+	  if (str_handle.compare(mxGetFieldNameByNumber(s_mxArray,k)) && str_State.compare(mxGetFieldNameByNumber(s_mxArray,k))) {
+	    char *s = mxArrayToString(mxGetFieldByNumber(s_mxArray,0,k));
+	    mparam.SetValue(mxGetFieldNameByNumber(s_mxArray,k),s);
+	    mxFree((void*) s);
+	  }
+	}
+	
+	/*init MS OP*/
+	Operator *osub;
+	OMultistate *matrix = new OMultistate();
+	matrix->Init(mparam);
+	
+	/*Prepare the fieldnames
+	* for the Copy procedure */
+	int elements = mxGetNumberOfFields(all_Operators);
+	std::string fname[elements];
+	mwSize dims[2] = {1, 1};
+	for (int j=0;j<elements;j++) {
+	  fname[j] = mxGetFieldNameByNumber(all_Operators,j); 
+	}
+	
+	for (int s = 0;s<operators;s++) {
+	  
+	  
+	  /*Create StructArray*/
+	  mxArray *Operator = mxCreateStructArray(2, dims, elements , (const char **) fname);
+	  
+	  /*Copy each element importend: Duplicate the Array otherwise a Sec. Fault will occure by clear all*/
+	  for (int k =0;k<elements;k++) {
+	    mxSetFieldByNumber(Operator,0,k,mxDuplicateArray(mxGetFieldByNumber(all_Operators,s,k))); /*Copy*/
+	  }
+	  
+	  /*If the field "handle" exists remove it (not crucial and to avoid handle confusions)*/
+	  int handle_field = mxGetFieldNumber(Operator,"handle");
+	  if (handle_field != -1) {
+	    mxRemoveField(Operator, handle_field);
+	  }
+	  
+	  /*Check whether the struct contains row and coll Field and set the values*/
+	  if (mxGetFieldNumber(Operator, "row") == -1)
+	    throw ( EParamProblem("One Operator contains no row field") );
+	  if (mxGetFieldNumber(Operator, "col") == -1)
+	    throw ( EParamProblem("One Operator contains no col field") );
+	  
+	  char *str_r = mxArrayToString(mxGetField(Operator, 0,"row"));
+	  std::string s_row = str_r; 
+	  mxFree((void*) str_r );
+	  int row;
+	  sscanf( s_row.c_str(), "%d", &row);
+	  
+	  char *str_c = mxArrayToString(mxGetField(Operator, 0,"col"));
+	  std::string s_col = str_c; 
+	  mxFree((void*) str_c );
+	  int col;
+	  sscanf( s_col.c_str(), "%d", &col);
+	  
+	  /*load sub-OP from struct and add to Multistate*/
+	  osub = convert_op_mxArray::loadOP(Operator);
+	  matrix->Add( osub, row, col);
+	  mxDestroyArray(Operator);
+	  
+	  
+	}
+	
+	return matrix;
+	
       } else if (!s_class.compare("OPSum") || !s_class.compare("OPSum")) {
 	throw ( EParamProblem("Summ not implemented jet") );
       } else if (!s_class.compare("OPGridSum") || !s_class.compare("OPGridSum")) {
@@ -149,5 +342,15 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
 	
       }
   } {throw ( EParamProblem("Field CLASS contains no string"));}
+  
+}
+
+/**
+    * Deletes the OPerator and the corresponding handle
+    */
+void convert_op_mxArray::delete_op_handle(const mxArray *handle) {
+  
+  /*delete handle and WF*/
+  op_ObjectHandle_interface::deleteOP( handle );
   
 }

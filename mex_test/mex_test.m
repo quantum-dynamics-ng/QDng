@@ -96,9 +96,61 @@ disp('Done');
 
 disp('Testing get_all_handle routines');
 
-all_handles = get_all_wf_handle()
+all_handles = get_all_wf_handle();
 
 disp('Done');
 
+delete_wf_handle();
+handle1= init_wf_file('WF-0_100');
+handle2= init_wf_file('WF',100);
+
+disp('Testing init_op routines');
+
+op_struct = struct('CLASS', 'OGridPosition');
+
+op_handle1 = init_op(op_struct,handle1);
+op_handle3 = init_op(op_struct,handle1);
+op_handle4 = init_op(op_struct,handle1);
+
+disp('     Testing init_op routines (Multistate)');
+
+op_structMS = struct('CLASS', 'OPMultistate','operators','5','Operator',[]);
+
+for i=1:1:5
+    op_structMS.Operator(i).CLASS = 'OGridPosition';
+    op_structMS.Operator(i).row = int2str(i-1);
+    op_structMS.Operator(i).col = int2str(i-1);
+end
+disp(op_structMS);
+
+op_handle2 = init_op(op_structMS,handle2);
+
+disp('     Done');
+
+disp('Done');
+
+disp('Testing apply_op routines');
+
+handle3=wf_mod('*',handle1,1);
+handle4=wf_mod('*',handle2,1);
+
+handle5 = apply_op(op_handle1,handle3);
+handle6 = apply_op(op_handle2,handle4);
+
+disp('Done');
+
+disp('Testing expec_op routines');
+
+val1 = expec_op(op_handle1,handle1)
+val2 = expec_op(op_handle2,handle2)
+
+disp('Done');
+
+disp('Testing delete_op_handle routines');
+
+delete_op_handle(op_handle1);
+delete_op_handle();
+
+disp('Done');
 
 disp('Test succsessfully terminated');

@@ -370,10 +370,17 @@ namespace QDLIB
       
       if ( Psi == NULL ) return false;
       
+      WFMultistate *wfm;
+      wfm = dynamic_cast<WFMultistate*>(Psi);
+      
+      if ( wfm == NULL ) return false;
+      
+      if ( wfm->States() != _nstates) return false;
+      
       for(int i=0; i< _nstates; i++){
          for(int j=0; j< _nstates; j++){
             if (_matrix[i][j] != NULL)
-               valid = valid & _matrix[i][j]->Valid(Psi);
+               valid = valid & _matrix[i][j]->Valid(wfm->State(i));
             if ( !valid ) return false;
          }
       }

@@ -22,17 +22,17 @@
 using namespace QDLIB;
 
 /**
-    * mexFunction to load a Operator from struct
-    * output (one argument) is the ObjectHandle
-    * input: 1) two arguments -> structmxArray (ParamContainer) Wavefunction Handle
+    * mexFunction to delete a Operator and it's handle or all Operators and it's handles
+    * input (one argument): Objecthandle
+    * no output
     */
 void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )     
 {
-  if (nlhs == 1 && nrhs == 2) {
-	if (mxIsStruct(prhs[0]) && mxGetClassID(prhs[1]) == mxUINT64_CLASS) {
-   	    
-	  convert_op_mxArray::init_op(&plhs[0],prhs[0],prhs[1]);
-	    
-	} else mexErrMsgTxt("Bad input. One output and one input argumets needed (structmxArray)");
-   }else mexErrMsgTxt("Bad input. One output and one input argumets needed");
+  if (nlhs == 0 && nrhs == 1) {
+	if (mxGetClassID(prhs[0]) == mxUINT64_CLASS ) {
+		convert_op_mxArray::delete_op_handle(prhs[0]);
+	} else mexErrMsgTxt("Bad input. One output and one input argumets needed (ObjectHandle)");
+  } else if(nlhs == 0 && nrhs == 0) {
+	op_ObjectHandle_interface::delete_all_OP();
+  }else mexErrMsgTxt("Bad input. One output and no or one input argumets needed");
 }

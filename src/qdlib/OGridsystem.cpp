@@ -54,8 +54,12 @@ namespace QDLIB {
    {
       if ( Psi == NULL ) return false;
       
-      if ( *((GridSystem*) this) != *((GridSystem*) Psi) ) return false;
+      GridSystem* Psi_GS = dynamic_cast<GridSystem*>(Psi);
       
+      if ( Psi_GS == NULL ) return false;
+      
+      if ( *((GridSystem*) this) != *Psi_GS ) return false;
+
       return true;
    }
    
