@@ -1,5 +1,4 @@
 #include "OGridsystem.h"
-#include "WFGridSystem.h"
 
 namespace QDLIB {
    
@@ -55,11 +54,11 @@ namespace QDLIB {
    {
       if ( Psi == NULL ) return false;
       
-      WFGridSystem* Psi_GS = dynamic_cast<WFGridSystem*>(Psi);
+      GridSystem* Psi_GS = dynamic_cast<GridSystem*>(Psi);
       
       if ( Psi_GS == NULL ) return false;
       
-      if ( *((GridSystem*) this) != *((GridSystem*) Psi_GS) ) return false;
+      if ( *((GridSystem*) this) != *Psi_GS ) return false;
 
       return true;
    }

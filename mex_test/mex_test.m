@@ -126,6 +126,18 @@ for i=1:1:5
 end
 disp(op_structMS);
 
+op_structMS_Pot = struct('CLASS', 'OPMultistate','operators','5','Operator',[]);
+
+for i=1:1:5
+    op_structMS_Pot.Operator(i).CLASS = 'GridPotential';
+    op_structMS_Pot.Operator(i).file = 'Pot1';
+    op_structMS_Pot.Operator(i).row = int2str(i-1);
+    op_structMS_Pot.Operator(i).col = int2str(i-1);
+end
+disp(op_structMS_Pot);
+
+op_handleMS_Pot = init_op(op_structMS_Pot,handle2);
+
 op_handle4 = init_op(op_structMS,handle2);
 
 op_structPot_Sum = struct('CLASS', 'OPSum','operators','2','Operator',[]);
@@ -135,6 +147,23 @@ op_structPot_Sum.Operator(1).file = 'Pot1';
 op_structPot_Sum.Operator(2).file = 'Pot1';
 
 op_handlePot_Sum = init_op(op_structPot_Sum,handle1);
+
+op_structMS_Summ = struct('CLASS', 'OPMultistate','operators','5','Operator',[]);
+
+for i=1:1:5
+    op_structMS_Summ.Operator(i).CLASS = 'Sum';
+    op_structMS_Summ.Operator(i).operators='2';
+    op_structMS_Summ.Operator(i).Operator=[];
+    for k=1:1:2
+        op_structMS_Summ.Operator(i).Operator(k).CLASS = 'GridPotential';
+        op_structMS_Summ.Operator(i).Operator(k).file = 'Pot1';
+    end
+    op_structMS_Summ.Operator(i).row = int2str(i-1);
+    op_structMS_Summ.Operator(i).col = int2str(i-1);
+end
+disp(op_structMS_Summ);
+
+op_handleMS_Sum = init_op(op_structMS_Summ,handle2);
 
 disp('     Done');
 
@@ -146,7 +175,8 @@ handle1_copy = wf_mod('*',handle1,1);
 
 handle23 = apply_op(op_handle1,handle1);
 handle24 = apply_op(op_handle4,handle2);
-%handle25 = apply_op(op_handleKin,handle1);
+handle25 = apply_op(op_handleKin,handle1);
+handle26 = apply_op(op_handleMS_Sum,handle2);
 
 apply_op(op_handle1,handle1_copy);
 
@@ -167,7 +197,18 @@ disp('Expected: 1.0236e-04');
 val5 = expec_op(op_handlePot_Sum,handle1)
 disp('Expected: 2.0472e-04');
 
-%val6 = expec_op(op_handleKin,handle1);
+val6 = expec_op(op_handleKin,handle1)
+
+val7 = expec_op(op_handleMS_Pot,handle2)
+
+val8 = expec_op(op_handleMS_Sum,handle2)
+
+disp('Done');
+
+disp('Testing get_all_op_handle routines');
+
+all_op_handles = get_all_op_handle();
+disp(all_op_handles);
 
 disp('Done');
 

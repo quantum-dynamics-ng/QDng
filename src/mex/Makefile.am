@@ -33,7 +33,7 @@ pkglib_LTLIBRARIES = libget_wf_handle.la \
 	libinit_wf_file.la libwrite_wf_file.la libdelete_wf_handle.la \
 	libinit_wf_struct.la libwf_mod.la libget_all_wf_handle.la \
 	libinit_op.la libdelete_op_handle.la libapply_op.la  \
-	libexpec_op.la
+	libexpec_op.la libget_all_op_handle.la
 
 #	libmextest2.la libreadwfstatic.la readwf.la
 
@@ -122,3 +122,8 @@ libexpec_op_la_SOURCES = expec_op.cpp
 libexpec_op_la_CXXFLAGS  = $(MATLAB_FLAGS)
 libexpec_op_la_LDFLAGS = -module -Wl,-oexpec_op.mexa64 $(MATLAB_LINK)
 libexpec_op_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+libget_all_op_handle_la_SOURCES = get_all_op_handle.cpp
+libget_all_op_handle_la_CXXFLAGS  = $(MATLAB_FLAGS)
+libget_all_op_handle_la_LDFLAGS = -Wl,-oget_all_op_handle.mexa64 -module  $(MATLAB_LINK)
+libget_all_op_handle_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
