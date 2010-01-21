@@ -100,17 +100,20 @@ all_handles = get_all_wf_handle();
 
 disp('Done');
 
-delete_wf_handle();
-handle1= init_wf_file('WF-0_100');
-handle2= init_wf_file('WF',100);
 
 disp('Testing init_op routines');
 
 op_struct = struct('CLASS', 'OGridPosition');
 
 op_handle1 = init_op(op_struct,handle1);
+op_handle2 = init_op(op_struct,handle1);
 op_handle3 = init_op(op_struct,handle1);
-op_handle4 = init_op(op_struct,handle1);
+
+op_structPot = struct('CLASS', 'GridPotential','file','Pot1');
+op_handlePot = init_op(op_structPot,handle1);
+
+op_structKin = struct('CLASS', 'GridNablaSq','dims','1','mass0','35636');
+op_handleKin = init_op(op_structKin,handle1);
 
 disp('     Testing init_op routines (Multistate)');
 
@@ -123,7 +126,15 @@ for i=1:1:5
 end
 disp(op_structMS);
 
-op_handle2 = init_op(op_structMS,handle2);
+op_handle4 = init_op(op_structMS,handle2);
+
+op_structPot_Sum = struct('CLASS', 'OPSum','operators','2','Operator',[]);
+op_structPot_Sum.Operator(1).CLASS = 'GridPotential';
+op_structPot_Sum.Operator(2).CLASS = 'GridPotential';
+op_structPot_Sum.Operator(1).file = 'Pot1';
+op_structPot_Sum.Operator(2).file = 'Pot1';
+
+op_handlePot_Sum = init_op(op_structPot_Sum,handle1);
 
 disp('     Done');
 
@@ -131,22 +142,36 @@ disp('Done');
 
 disp('Testing apply_op routines');
 
-handle3=wf_mod('*',handle1,1);
-handle4=wf_mod('*',handle2,1);
+handle1_copy = wf_mod('*',handle1,1);
 
-handle5 = apply_op(op_handle1,handle3);
-handle6 = apply_op(op_handle2,handle4);
+handle23 = apply_op(op_handle1,handle1);
+handle24 = apply_op(op_handle4,handle2);
+%handle25 = apply_op(op_handleKin,handle1);
+
+apply_op(op_handle1,handle1_copy);
 
 disp('Done');
 
 disp('Testing expec_op routines');
 
 val1 = expec_op(op_handle1,handle1)
-val2 = expec_op(op_handle2,handle2)
+disp('Expected: 7.4002');
+val2 = expec_op(op_handle4,handle2)
+disp('Expected: 7.4002');
+val3 = expec_op(op_handle1,handle1_copy)
+disp('Expected: 406.0050');
+
+val4 = expec_op(op_handlePot,handle1)
+disp('Expected: 1.0236e-04');
+
+val5 = expec_op(op_handlePot_Sum,handle1)
+disp('Expected: 2.0472e-04');
+
+%val6 = expec_op(op_handleKin,handle1);
 
 disp('Done');
 
-disp('Testing delete_op_handle routines');
+disp('Testing delete_op_handle routine');
 
 delete_op_handle(op_handle1);
 delete_op_handle();

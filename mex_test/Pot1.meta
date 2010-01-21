@@ -1,0 +1,6 @@
+# Generated file
+CLASS = GridPotential 
+dims = 1 
+N0 = 1024 
+xmax0 = 30 
+xmin0 = 5 
