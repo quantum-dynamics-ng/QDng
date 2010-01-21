@@ -297,9 +297,13 @@ namespace QDLIB {
    
    bool OGridGMat::Valid(WaveFunction * Psi)
    {
-      if ( Psi == NULL) return false;
+      WFGridSystem *PsiGS;
       
-      if ( *((GridSystem*) this) != *((GridSystem*) Psi) ) return false;
+      PsiGS = dynamic_cast<WFGridSystem*>(Psi);
+      
+      if ( PsiGS == NULL) return false;
+      
+      if ( *((GridSystem*) this) != *((GridSystem*) PsiGS) ) return false;
       
       return true;
    }

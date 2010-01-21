@@ -11,6 +11,8 @@ namespace QDLIB {
     * options 
     * \li val  The value
     *   @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
+    * 
+    * \todo remove buffer, this not needed for scalar operator!?
     */
    class OScalar : public Operator
    {
