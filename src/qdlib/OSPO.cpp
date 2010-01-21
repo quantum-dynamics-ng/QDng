@@ -402,8 +402,18 @@ namespace QDLIB {
       
       if ( Psi == NULL ) return false;
       
-      valid = valid & _Tkin->Valid(Psi);
-      valid = valid & _Vpot[0]->Valid(Psi);
+      if (_coupling) {
+         WFMultistate *wfm = dynamic_cast<WFMultistate*>(Psi);
+         
+         if (wfm == NULL) return false;
+         if (wfm->States() != 2) return false;
+         
+         valid = valid & _Tkin->Valid(wfm->State(0));
+         valid = valid & _Vpot[0]->Valid(wfm->State(0));
+      } else {
+         valid = valid & _Tkin->Valid(Psi);
+         valid = valid & _Vpot[0]->Valid(Psi);
+      }
       
       return valid;
    }
