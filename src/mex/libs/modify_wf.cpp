@@ -31,7 +31,7 @@
 using namespace QDLIB;
 
 /**
-    * Adds two Wavefunctions pointwise
+    * Adds two Wavefunctions pointwise (returns result as an new Wavefunction)
     */
 
 void modify_wf::add_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
@@ -57,7 +57,7 @@ void modify_wf::add_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
 }
 
 /**
-    * Substacts two Wavefunctions pointwise
+    * Substacts two Wavefunctions pointwise (returns result as an new Wavefunction)
     */
 
 void modify_wf::sub_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
@@ -83,7 +83,7 @@ void modify_wf::sub_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
 }
 
 /**
-    * Multiplies a Wavefunctions pointwise with a double
+    * Multiplies a Wavefunctions pointwise with a double (returns result as an new Wavefunction)
     */
 void modify_wf::mult_wf_double(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_double) {
   
@@ -116,7 +116,7 @@ void modify_wf::mult_wf_double(mxArray **handle_result, mxArray *handle_WF1, mxA
 }
 
 /**
-    * calculates the scalar product of two Wavefunctions
+    * calculates the scalar product of two Wavefunctions (returns result as an new Wavefunction)
     */
 void modify_wf::scalar_prod_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
   
@@ -141,7 +141,7 @@ void modify_wf::scalar_prod_wf(mxArray **handle_result, mxArray *handle_WF1, mxA
 }
 
 /**
-    * calculates the complex product of two Wavefunctions pointwise
+    * calculates the complex product of two Wavefunctions pointwise (returns result as an new Wavefunction)
     * \f$ Psi = Psi_a^*  Psi_b \f$
     */
 void modify_wf::mult_wf_complex(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
@@ -166,7 +166,7 @@ void modify_wf::mult_wf_complex(mxArray **handle_result, mxArray *handle_WF1, mx
 }
 
 /**
-    * Multiplies two Wavefunctions pointwise
+    * Multiplies two Wavefunctions pointwise (returns result as an new Wavefunction)
     */
 void modify_wf::mult_wf_pointwise(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_WF2) {
   
@@ -203,4 +203,163 @@ void modify_wf::test_wf(mxArray **handle_result, mxArray *handle_WF1) {
     
     /*return ObectHandle*/
     wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
+}
+
+/**
+    * Norm Wavefunction (returns result as an new Wavefunction)
+    */
+void modify_wf::norm_wf(mxArray **handle_result, mxArray *handle_WF1) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /* Init WF_result*/
+    WaveFunction *WF_result=NULL;
+    WF_result = WF1->NewInstance ();
+    
+    /*Norm WF*/
+    *WF_result = *WF1; 
+    dcomplex c_norm = *WF1 * WF1;
+    
+    if (c_norm.imag() != (double) 0) 
+      mexErrMsgTxt("Scalarproduct failed");
+    
+    double norm = c_norm.real();
+    norm = 1/sqrt(norm);
+    
+    *WF_result *= (const double) norm;
+    
+    
+    /*return ObectHandle*/
+    wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
+}
+
+
+/**
+    * Adds two Wavefunctions pointwise 
+    */
+
+void modify_wf::add_wf(mxArray *handle_WF1, mxArray *handle_WF2) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /* Init second WF*/
+    WaveFunction *WF2=NULL;
+    WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+    
+    /*add WF1 and WF2*/
+    *WF1 += WF2;
+    
+}
+
+/**
+    * Substacts two Wavefunctions pointwise 
+    */
+
+void modify_wf::sub_wf(mxArray *handle_WF1, mxArray *handle_WF2) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /* Init second WF*/
+    WaveFunction *WF2=NULL;
+    WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+    
+    
+    /*sub WF1 and WF2*/
+    *WF1 -= WF2;
+
+}
+
+/**
+    * Multiplies a Wavefunctions pointwise with a double 
+    */
+void modify_wf::mult_wf_double(mxArray *handle_WF1, mxArray *handle_double) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /*get the double and check whether complex or not*/
+    double *pdr,*pdi;
+    dcomplex dc;
+    pdr = mxGetPr(handle_double);
+    dc._real=*pdr;
+    if (mxIsComplex(handle_double)) {
+        pdi = mxGetPi(handle_double);
+        dc._imag=*pdi;
+    } else  {
+        dc._imag=0;
+    }
+    
+    
+    /*nult WF1 with the double*/
+    *WF1 *= dc;
+
+}
+
+
+/**
+    * calculates the complex product of two Wavefunctions pointwise 
+    * \f$ Psi = Psi_a^*  Psi_b \f$
+    */
+void modify_wf::mult_wf_complex(mxArray *handle_WF1, mxArray *handle_WF2) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /* Init second WF*/
+    WaveFunction *WF2=NULL;
+    WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+    
+    /*calc the direct conjugate Product*/
+    *WF1 = DirectProductConugate(WF1, WF2);
+    
+}
+
+/**
+    * Multiplies two Wavefunctions pointwise 
+    */
+void modify_wf::mult_wf_pointwise(mxArray *handle_WF1, mxArray *handle_WF2) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /* Init second WF*/
+    WaveFunction *WF2=NULL;
+    WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+    
+    
+    /*calc the direct Product*/
+    *WF1 = DirectProduct(WF1, WF2);
+    
+}
+
+
+
+/*
+    * Norm Wavefunction (returns result as an new Wavefunction)
+    */
+void modify_wf::norm_wf(mxArray *handle_WF1) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    dcomplex c_norm = *WF1 * WF1;
+    
+    if (c_norm.imag() != (double) 0) 
+      mexErrMsgTxt("Scalarproduct failed");
+    
+    double norm = c_norm.real();
+    norm = 1/sqrt(norm);
+    
+    *WF1 *= (const double) norm;
+    
 }
