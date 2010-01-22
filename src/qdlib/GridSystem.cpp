@@ -2,6 +2,10 @@
 #include <iostream>
 #include "GridSystem.h"
 
+#define GRID_EPS 1e-10
+
+#include <math.h>
+
 namespace QDLIB {
 
    GridSystem::GridSystem() :  _ndims(0)
@@ -160,9 +164,9 @@ namespace QDLIB {
       
       for (int i=0; i < MAX_DIMS; i++)
       {
-	 if (_dims[i] != G._dims[i]) equal = false;
-	 if (_xmin[i] != G._xmin[i]) equal = false;
-	 if (_xmax[i] != G._xmax[i]) equal = false;
+         if ( fabs(_dims[i] - G._dims[i]) > GRID_EPS) equal = false;
+         if ( fabs(_xmin[i] - G._xmin[i]) > GRID_EPS) equal = false;
+         if ( fabs(_xmax[i] - G._xmax[i]) > GRID_EPS) equal = false;
       }
       return equal;
    }

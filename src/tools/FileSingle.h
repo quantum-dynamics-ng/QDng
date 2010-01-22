@@ -142,7 +142,7 @@ namespace QDLIB {
    template <class C>
    FileSingle<C>::FileSingle() :
          _drop_meta(false), _counter_last(0), _type(binary),  _name("default"), _suffix(""), _sequence(false),
-                    _counter(0), _increment(1), _sequence_init(false) {}
+                    _sequence_init(false), _counter(0), _increment(1) {}
    
    /**
     * Constructor with type initialisation.
@@ -151,7 +151,7 @@ namespace QDLIB {
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, bool Sequence) :
          _type(type), _drop_meta(false), _counter_last(0), _name("default"), _suffix(""), _sequence(Sequence),
-               _counter(0),_increment(1), _sequence_init(false) {}
+               _sequence_init(false), _counter(0),_increment(1) {}
    
    /**
     * Constructor with type and name initialisation.
@@ -159,7 +159,7 @@ namespace QDLIB {
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence) :
          _counter_last(0), _type(type), _name(name), _suffix(suffix), _sequence(Sequence),
-               _counter(0), _increment(1), _sequence_init(false) {}
+                       _sequence_init(false), _counter(0), _increment(1) {}
    
    
    /**
