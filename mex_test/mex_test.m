@@ -72,25 +72,55 @@ handle11 = wf_mod('+',handle1,handle1);
 handle12 = wf_mod('+',handle1,handle1,handle1,handle1);
 handle13 = wf_mod('+',handle2,handle2);
 
+wf_mod('+',handle11,handle11);
+wf_mod('+',handle11,handle11,handle11,handle11);
+wf_mod('+',handle12,handle12);
+
 disp('sub');
 
 handle14 = wf_mod('-',handle1,handle1);
 handle15 = wf_mod('-',handle1,handle1,handle1,handle1);
 handle16 = wf_mod('-',handle2,handle2);
 
+wf_mod('-',handle11,handle11);
+wf_mod('-',handle11,handle11,handle11,handle11);
+wf_mod('-',handle12,handle12);
+
 disp('mult')
 
 handle17 = wf_mod('*',handle1,2);
 handle18 = wf_mod('*',handle2,2);
 
+wf_mod('*',handle11,2);
+wf_mod('*',handle11,2);
+
 norm  = wf_mod('*',handle1,handle1)
 norm  = wf_mod('*',handle2,handle2)
+
+norm  = wf_mod('*',handle17,handle17)
+norm  = wf_mod('*',handle18,handle18)
+
+handle_norm17 = wf_mod('norm',handle17);
+handle_norm18 = wf_mod('norm',handle18);
+
+wf_mod('norm',handle17);
+
+norm  = wf_mod('*',handle17,handle17)
+
+norm  = wf_mod('*',handle_norm17,handle_norm17)
+norm  = wf_mod('*',handle_norm18,handle_norm18)
 
 handle19 = wf_mod('p*',handle1,handle1);
 handle20 = wf_mod('p*',handle2,handle2);
 
+wf_mod('p*',handle11,handle11);
+wf_mod('p*',handle12,handle12);
+
 handle21 = wf_mod('c*',handle1,handle1);
 handle22 = wf_mod('c*',handle2,handle2);
+
+wf_mod('c*',handle11,handle11);
+wf_mod('c*',handle12,handle12);
 
 disp('Done');
 
