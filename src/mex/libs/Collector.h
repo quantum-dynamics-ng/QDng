@@ -61,7 +61,7 @@ Collector<T>::~Collector() {
     */
 template <typename T>
 Collector<T>* Collector<T>::Instance () {
- 			static Collector singleton; /* Reation of the Singleton*/
+ 			static Collector<T> singleton; /* Creation of the Singleton*/
 			//std::cout << "Collector::Instance Coll: " << &singleton << std::endl;
  			return &singleton;
 // 			std::cout << "New Collector: " << typeid(T).name() << std::endl;
@@ -83,7 +83,6 @@ void Collector<T>::register_handle (ObjectHandle<T>* obj) {
 		  if ( obj_test->t == obj->t) {reg = false;} /*compare the stored pointer*/
 		}
 		if (reg == true ) { /*register the handle */
-		  double map_val = *mxGetPr(val);
 		  objlist[*mxGetPr(val)] = obj;
 		}
 }
@@ -92,7 +91,6 @@ void Collector<T>::register_handle (ObjectHandle<T>* obj) {
     */
 template <typename T>
 ObjectHandle<T>* Collector<T>::find_ptr (ObjectHandle<T>* obj) {
-		bool exists = false;
 		typename std::map<double,ObjectHandle<T>*>::iterator it;
 		typename std::map<double,ObjectHandle<T>*>::iterator end= objlist.end();
 		ObjectHandle<T>* obj_test;

@@ -295,7 +295,8 @@ namespace QDLIB {
 	 throw ( EIncompatible("Incompatible Assignment", this->Name(), O->Name()) );
       
       *((Operator*) _Tkin) = (Operator*) org->_Tkin;
-      *((Operator*) _Vpot) = (Operator*) org->_Vpot;
+      *((Operator*) _Vpot[0]) = (Operator*) org->_Vpot[0];
+      *((Operator*) _Vpot[1]) = (Operator*) org->_Vpot[1];
 
       *_expT = *(org->_expT);
       *_expV = *(org->_expV);

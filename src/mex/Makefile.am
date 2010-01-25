@@ -12,7 +12,7 @@ all-local:
 	cp $(top_srcdir)/src/mex/*.m .
 
 
-#CXXFLAGS  = -g
+#CXXFLAGS  = -O1
 
 #libexec_PROGRAMS = readwf
 #readwf_SOURCES = test_read_wf.cpp

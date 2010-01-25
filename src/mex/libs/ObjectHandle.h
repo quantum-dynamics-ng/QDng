@@ -142,7 +142,7 @@ ObjectHandle<T>::ObjectHandle(T& obj) : type(&typeid(T)), owns(false), t(&obj) {
 	
 template <typename T>
 ObjectHandle<T>::ObjectHandle() : owns(false) { 
-		 Collector<T>* coll = Collector<T>::Instance ();
+		 Collector<T>::Instance ();
 	}
 
 template <typename T>
@@ -201,6 +201,7 @@ mxArray* ObjectHandle<T>::all_to_mex_handle()
 * Import a handle from MatLab as a mxArray of UINT32. Check that
 * it is actually a pointer to an ObjectHandle<T>.
 */
+
 template <typename T>
 ObjectHandle<T>* ObjectHandle<T>::from_mex_handle(const mxArray* handle) 
 {
@@ -211,11 +212,11 @@ ObjectHandle<T>* ObjectHandle<T>::from_mex_handle(const mxArray* handle)
 	// We *assume* we can store ObjectHandle<T> pointer in the mxUINT32 of handle
 	Collector<T>* coll = Collector<T>::Instance ();
 	double test = coll->find_handle(handle);
-	ObjectHandle* obj = NULL;
-	//std::cout << obj->type->name() << " " <<   typeid(T).name() << std::endl;
+	ObjectHandle<T>* obj = NULL;
 	if (test == *mxGetPr(handle)) {
-	      //std::cout << "Cast" << std::endl;
-	      obj = *reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle));
+//	      std::cout << "Cast" << std::endl;
+ 	      obj = *reinterpret_cast<ObjectHandle<T>**>(mxGetPr(handle));
+// 	      return obj;
 	}
 	return obj;
 }

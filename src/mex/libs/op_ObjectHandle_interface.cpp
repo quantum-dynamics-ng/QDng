@@ -83,11 +83,11 @@ try {
 	if (handle !=NULL) {;
 		OP = handle->get_object();
 		return OP;
-	}
-	throw ( EParamProblem("Operator not found in Collector") );
+	} else {throw ( EParamProblem("Operator not found in Collector") );}
 }catch (Exception e) {
 	std::cout << e.GetMessage() << std::endl;
 	mexErrMsgTxt(e.GetMessage().c_str());
 }
+ return NULL;
 }
 

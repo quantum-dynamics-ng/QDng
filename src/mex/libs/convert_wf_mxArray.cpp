@@ -53,7 +53,7 @@ void convert_wf_mxArray::init_wf_from_file(mxArray **out_arg, const mxArray *mxA
     int States = mxGetM(mxArray_filename);
     int str_length = mxGetN(mxArray_filename);
     char *string_File_name_all = mxArrayToString(mxArray_filename);
-    char *files[States];
+    char **files = new char*[States];
       for (int i =0 ; i<States; i++) {
 	files[i] = new char [str_length+1];
 	for(int j =0; j<str_length;j++) {
@@ -68,7 +68,8 @@ void convert_wf_mxArray::init_wf_from_file(mxArray **out_arg, const mxArray *mxA
       for (int i = 0; i < States; i++) {	
 	wfsub = convert_wf_mxArray::loadWF( files[i] ); /*load the sub WF*/
 	multi->Add( wfsub, i);
-	mxFree(files[i]);
+	//mxFree(files[i]);
+	delete[] files[i];
       }
       
       /*return the ObjectHandle*/
@@ -156,8 +157,8 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray) {
 	    std::string s_States = s; 
 	    mxFree((void*) s );
 	    
-	    int States;
-	    sscanf( s_States.c_str(), "%d", &States);
+	    unsigned int States;
+	    sscanf( s_States.c_str(), "%d",(int*) &States);
 	    
 	    /*Copy the  Field State in new mxArray all_States*/
 	    mxArray *all_States = mxDuplicateArray(mxGetField(s_mxArray,0,"State"));
@@ -168,7 +169,8 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray) {
 	    /*Prepare the fieldnames
 	    * for the Copy procedure */
 	    int elements = mxGetNumberOfFields(all_States);
-	    std::string fname[elements];
+	    std::string *fname = new std::string[elements];
+	    //std::string fname[elements];
 	    mwSize dims[2] = {1, 1};
 	    for (int j=0;j<elements;j++) {
 	      fname[j] = mxGetFieldNameByNumber(all_States,j); 
@@ -178,7 +180,7 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray) {
 	    WaveFunction *wfsub;
 	    WFMultistate *multi = new WFMultistate();
 	    
-	    for (int s = 0;s<States;s++) {
+	    for (int s = 0;s<(int)States;s++) {
 	      
 	      
 	      /*Create StructArray*/
@@ -199,6 +201,7 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray) {
 	      wfsub = convert_wf_mxArray::loadWF( State );
 	      multi->Add( wfsub, s);
 	      mxDestroyArray(State);
+	      //delete[] fname;
 	      
 	    }
 	   
@@ -217,6 +220,7 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray) {
 		mxFree((void*) s);
 	      }
 	    }
+	    delete[] fname;
 	    
 	    /*Clean up*/
 	    mxDestroyArray(all_States);
@@ -264,6 +268,7 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray) {
 	      
 	      /*Copy the data*/
 	      double *pdr,*pdi;
+	      pdi = NULL;
 	      mxArray * data = mxGetField(s_mxArray,0,"data");
 	      pdr = mxGetPr(data);
 	      
@@ -307,6 +312,7 @@ WaveFunction* convert_wf_mxArray::loadWF(const mxArray *s_mxArray) {
 	mexErrMsgTxt(e.GetMessage().c_str());
 	
    }
+   return NULL;
 }
         
 
@@ -553,7 +559,7 @@ try {
 	int number_of_fields = i+2;
 	
 	/*Set the fiednames form ParameterContainer and the one added (handle and data) */
-	std::string field_names[number_of_fields];
+	std::string *field_names = new std::string[number_of_fields];
 	field_names[0] = "data";
 	field_names[number_of_fields-1] = "handle";
 	i=0;
@@ -588,6 +594,8 @@ try {
 	/*Set the field "handle*/
 	field = mxGetFieldNumber(mx_WF[0],"handle");
 	mxSetFieldByNumber(mx_WF[0],0,field,WF_handle);
+	
+	delete[] field_names;
 	
 }catch (Exception e) {
 	mexErrMsgTxt(e.GetMessage().c_str());
@@ -778,6 +786,7 @@ WaveFunction* convert_wf_mxArray::loadWF(char *string_File_name) {
    } catch (Exception e) {
 	mexErrMsgTxt(e.GetMessage().c_str());
    }
+   return NULL;
 }
 
 /**
@@ -812,6 +821,7 @@ WaveFunction* convert_wf_mxArray::loadWF(char *string_File_name, int Number) {
    } catch (Exception e) {
 	mexErrMsgTxt(e.GetMessage().c_str());
    }
+   return NULL;
 }
 
 
@@ -841,6 +851,7 @@ int convert_wf_mxArray::write_WF(char *string_File_name , WaveFunction* WF){
 	mexErrMsgTxt(e.GetMessage().c_str());
 	
    }
+   return 0;
 }
 
 /**
@@ -871,5 +882,6 @@ int convert_wf_mxArray::write_WF(char *string_File_name , WaveFunction* WF, int 
 	mexErrMsgTxt(e.GetMessage().c_str());
 	
    }
+   return 0;
 }
 

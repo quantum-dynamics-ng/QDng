@@ -63,31 +63,33 @@ void wf_ObjectHandle_interface::delete_all_WF() {
     * deletes Wavefunction from the memory
     */
 void wf_ObjectHandle_interface::deleteWF( const mxArray *mxh) {
-try {
-	ObjectHandle<WaveFunction>* handle = ObjectHandle<WaveFunction>::from_mex_handle( mxh );
-	if (handle==NULL) throw ( EParamProblem("WaveFunction not found in Collector") );
-        handle->destroy_object(mxh);
-}catch (Exception e) {
-	std::cout << e.GetMessage() << std::endl;
-	mexErrMsgTxt(e.GetMessage().c_str());
-}
+  try {
+	  ObjectHandle<WaveFunction>* handle = ObjectHandle<WaveFunction>::from_mex_handle( mxh );
+	  if (handle==NULL) throw ( EParamProblem("WaveFunction not found in Collector") );
+	  handle->destroy_object(mxh);
+  }catch (Exception e) {
+	  std::cout << e.GetMessage() << std::endl;
+	  mexErrMsgTxt(e.GetMessage().c_str());
+  }
 }
 
 /**
     * searches a Wavefunction in the Collector
     */
 WaveFunction* wf_ObjectHandle_interface::search_WF ( const mxArray* mxh) {
-try {
-	WaveFunction* WF;
-	ObjectHandle<WaveFunction> *handle = ObjectHandle<WaveFunction>::from_mex_handle( mxh );
-	if (handle !=NULL) {;
-		WF = handle->get_object();
-		return WF;
-	}
-	throw ( EParamProblem("WaveFunction not found in Collector") );
-}catch (Exception e) {
-	std::cout << e.GetMessage() << std::endl;
-	mexErrMsgTxt(e.GetMessage().c_str());
-}
+  try {
+	  WaveFunction* WF;
+	  ObjectHandle<WaveFunction> *handle = ObjectHandle<WaveFunction>::from_mex_handle( mxh );
+	  if (handle !=NULL) {;
+		  WF = handle->get_object();
+		  return WF;
+	  }else {
+	    throw ( EParamProblem("WaveFunction not found in Collector") );
+	  }
+  }catch (Exception e) {
+	  std::cout << e.GetMessage() << std::endl;
+	  mexErrMsgTxt(e.GetMessage().c_str());
+  }
+  return NULL;
 }
 

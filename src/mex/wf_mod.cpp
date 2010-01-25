@@ -260,7 +260,6 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 		    /*if is double */
 		    if (mxGetClassID(prhs[i]) == mxDOUBLE_CLASS) { 
 		      
-		      mxArray *temp = plhs[0];
 		      modify_wf::mult_wf_double((mxArray*) prhs[1] ,(mxArray*) prhs[i]);
 		      
 		    } else mexErrMsgTxt("Bad input. No double");

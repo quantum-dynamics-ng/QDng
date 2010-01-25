@@ -268,8 +268,8 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
 	std::string s_operators = s; 
 	mxFree((void*) s );
 	
-	int operators;
-	sscanf( s_operators.c_str(), "%d", &operators);
+	unsigned int operators;
+	sscanf( s_operators.c_str(), "%d", (int*) &operators);
 	
 	/*Copy the  Field State in new mxArray all_States*/
 	mxArray *all_Operators = mxDuplicateArray(mxGetField(s_mxArray,0,"Operator"));
@@ -300,13 +300,13 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
 	/*Prepare the fieldnames
 	* for the Copy procedure */
 	int elements = mxGetNumberOfFields(all_Operators);
-	std::string fname[elements];
+	std::string *fname = new std::string[elements];
 	mwSize dims[2] = {1, 1};
 	for (int j=0;j<elements;j++) {
 	  fname[j] = mxGetFieldNameByNumber(all_Operators,j); 
 	}
 	
-	for (int s = 0;s<operators;s++) {
+	for (int s = 0;s<(int) operators;s++) {
 	  
 	  
 	  /*Create StructArray*/
@@ -349,6 +349,7 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
 	  
 	}
 	
+	delete[] fname;
 	return matrix;
 	
       } else if (!s_class.compare("OPSum") || !s_class.compare("Sum")) {
@@ -363,8 +364,8 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
 	std::string s_operators = s; 
 	mxFree((void*) s );
 	
-	int operators;
-	sscanf( s_operators.c_str(), "%d", &operators);
+	unsigned int operators;
+	sscanf( s_operators.c_str(), "%d",(int*) &operators);
 	
 	/*Copy the  Field State in new mxArray all_States*/
 	mxArray *all_Operators = mxDuplicateArray(mxGetField(s_mxArray,0,"Operator"));
@@ -395,13 +396,13 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
 	/*Prepare the fieldnames
 	* for the Copy procedure */
 	int elements = mxGetNumberOfFields(all_Operators);
-	std::string fname[elements];
+	std::string *fname = new std::string[elements];
 	mwSize dims[2] = {1, 1};
 	for (int j=0;j<elements;j++) {
 	  fname[j] = mxGetFieldNameByNumber(all_Operators,j); 
 	}
 	
-	for (int s = 0;s<operators;s++) {
+	for (int s = 0;s<(int) operators;s++) {
 	  
 	  
 	  /*Create StructArray*/
@@ -426,7 +427,7 @@ Operator* convert_op_mxArray::loadOP(mxArray *s_mxArray) {
 	  
 	  
 	}
-	
+	delete[] fname;
 	return sum;
       } else if (!s_class.compare("OPGridSum") || !s_class.compare("GridSum")) {
 	throw ( EParamProblem("GridSumm not implemented jet") );
