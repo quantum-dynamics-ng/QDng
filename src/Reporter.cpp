@@ -7,7 +7,7 @@ namespace QDLIB
 {
 
    Reporter::Reporter() :
-	 _wcycle(10), _norm(true), _energy(false), _proj0(false), _proj0Sq(false),
+	 _wcycle(10), _norm(true), _scinorm(false), _energy(false), _proj0(false), _proj0Sq(false),
 		 _spectrum(false), _multistate(false),
 	         _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
    {}
@@ -93,15 +93,25 @@ namespace QDLIB
       /* Norm */
       if (_norm){
          double norm = Psi->Norm();
-	 log.cout().precision(8);
-	 log.cout() << "\t" << fixed << norm;
+         
+         if (_scinorm) { /* Printformat */
+            log.cout().precision(8);
+            log.cout() << "\t" << scientific << norm;
+         } else {
+	     log.cout().precision(6);
+	     log.cout() << "\t" << fixed << norm;
+         } 
          
          if ( fpclassify(norm) == FP_NAN)
             throw ( EOverflow("Norm is not a number") );
          
 	 if (_multistate){ /* Norm of single states */
-	    for (int i=0; i< mspsi->States(); i++)
-	       log.cout() << "\t" << fixed << mspsi->State(i)->Norm();
+	    for (int i=0; i< mspsi->States(); i++) {
+               if (_scinorm)
+                  log.cout() << "\t" << scientific << mspsi->State(i)->Norm();
+               else
+	          log.cout() << "\t" << fixed << mspsi->State(i)->Norm();
+            }
 	 }
 	 
       } 

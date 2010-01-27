@@ -11,7 +11,7 @@ namespace QDLIB {
    ProgPropa::ProgPropa(XmlNode & PropaNode) :
 	 _propaNode(PropaNode), _ContentNodes(NULL),
 	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _dir(""), _nfile(DEFAULT_NORMFILE), _writenorm(false),
-         _U(NULL), _H(NULL), _usepost(false), _usepre(false)
+         _scinorm(false), _U(NULL), _H(NULL), _usepost(false), _usepre(false)
    {
    }
    
@@ -117,6 +117,8 @@ namespace QDLIB {
          }
       }
       
+      attr.GetValue("scinorm", _scinorm, false);
+      _reporter.SciNorm(_scinorm);
    }
 
 

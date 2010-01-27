@@ -36,6 +36,7 @@ namespace QDLIB {
     * \li spectrum   filename  if given a the projection against the inital wavefunction is turned on.
     *                          The power spectrum of the propagagation will be written.
     * \li nfile   Write Norm to extra file.
+    * \li scinorm   Print norm in scientific format instead of fixed point values
     * 
     * @author Markus Kowalewski
     */
@@ -51,6 +52,8 @@ namespace QDLIB {
 	 
 	 string _nfile;
 	 bool _writenorm;
+         
+         bool _scinorm;
 	 
 	 OPropagator *_U;
 	 Operator *_H;

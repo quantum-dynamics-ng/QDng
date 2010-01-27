@@ -17,6 +17,7 @@ namespace QDLIB
       private:
 	 lint _wcycle;
 	 bool _norm;
+         bool _scinorm;    /* print norm in scientific format */
 	 bool _energy;
 	 bool _proj0;
 	 bool _proj0Sq;
@@ -49,9 +50,16 @@ namespace QDLIB
 	 
 	 /** Report norm */
 	 bool Norm() const { return _norm; }
+         
 	 /** Report norm */
 	 void Norm(bool on) { _norm = on; }
 	 
+         /** Norm in Scientific format */
+         void SciNorm (bool on) { _scinorm = on; }
+         
+         /** Norm in Scientific format */
+         bool SciNorm () { return _scinorm; }
+         
 	 /** Report energy */
 	 bool Energy() const { return _energy; }
 	 /** Report energy */

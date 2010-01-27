@@ -164,7 +164,7 @@ namespace QDLIB {
       
       for (int i=0; i < MAX_DIMS; i++)
       {
-         if ( fabs(_dims[i] - G._dims[i]) > GRID_EPS) equal = false;
+         if ( _dims[i] != G._dims[i] ) equal = false;
          if ( fabs(_xmin[i] - G._xmin[i]) > GRID_EPS) equal = false;
          if ( fabs(_xmax[i] - G._xmax[i]) > GRID_EPS) equal = false;
       }
