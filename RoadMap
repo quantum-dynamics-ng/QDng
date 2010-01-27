@@ -1,3 +1,11 @@
+* Coding issues
+ * Collector (non-singleton) to handle Operators and wavefunction buffers more easy
+
+* QDng input
+ * xsl scheme for input definition
+ * Loops (see Program types)
+ * "macros" for shorter defs., eg. Tkin on a multistate operator
+
 * MPI
  * Vector Classes
  * Matrix Classes
@@ -10,11 +18,13 @@
  * Mem-chached file buffer (in FileSingle)
  * Compressed storage => k-space, set zero, gzip/bzip2 compression
  * Seperate FileSingle class into specialized parts (WaveFunction->Multistate, other types of data)
+   => Special fileWF class (DONE)
 
 * Propgramm types
  * Eigen (=> SPO,Cheby with real exponents) (DONE)
  * OCT (Krotov, freq-shape) (DONE)
  * Pump Probe Spectroscopy simulation
+ * Loops in input with formatable loop variable in xml input
 
 * Matrix Class
  * Efficient Storage Scheme for Symmetric
@@ -29,7 +39,8 @@
  * Generalize Cheby to complex plane energy range
 
 * Multistate System
- * efficient SPO Scheme (DONE), SPO for N-States?
+ * efficient SPO Scheme (DONE)
+ * SPO for N-States
  * matrix system (DONE)
 
 * FFT

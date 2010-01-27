@@ -119,7 +119,6 @@ namespace QDLIB {
       
       /* Behavior of Expec() */
       _params.GetValue("residue", _residue);
-      if (_residue) cout << "residue is on" << endl;
    }
    
    void OGobbler::Init(WaveFunction *Psi)
