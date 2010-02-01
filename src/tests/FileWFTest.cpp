@@ -299,7 +299,7 @@ void FileWFTest::IO_Test_Multistate()
    char name[256];
    FILE *fh;
    
-   for (int i=1; i < 4; i++){
+   for (int i=0; i < 3; i++){
       CPPUNIT_ASSERT_NO_THROW(file << wfm);
       if (i==0){ /* Check for meta files */
          sprintf(name, "TESTMS.meta");
@@ -323,7 +323,7 @@ void FileWFTest::IO_Test_Multistate()
    
    /* Check for re-reading the sequence */
    file.ResetCounter();
-   for (int i=1; i < 4; i++){
+   for (int i=0; i < 3; i++){
       CPPUNIT_ASSERT_NO_THROW(file >> wfm);
    }
    

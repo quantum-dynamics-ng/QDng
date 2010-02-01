@@ -10,9 +10,10 @@ noinst_HEADERS = ComplexNumbers.h GridSystem.h FileWFTest.h MultElementsTest.h \
 	WaveFunctionTest.h defs.h function_gens.h
 
 noinst_PROGRAMS = runtest
-runtest_SOURCES = ComplexNumbers.cpp GridSystem.cpp FileWFTest.cpp MultElementsTest.cpp \
-	OGridNablaSqTest.cpp OGridNablaTest.cpp QDClock.cpp TestViews.cpp TestViews.h Vector.cpp \
-	WFGridCartesianTest.cpp WFGridSystemTest.cpp WaveFunctionTest.cpp dVecMinMax.cpp dVecMinMax.h \
+runtest_SOURCES = ComplexNumbers.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
+	dVecMinMax.cpp dVecMinMax.h GridSystem.cpp FileWFTest.cpp QDClock.cpp \
+	OGridNablaSqTest.cpp OGridNablaTest.cpp \
+	WaveFunctionTest.cpp WFGridCartesianTest.cpp WFGridSystemTest.cpp \
 	function_gens.cpp main.cpp
 runtest_LDADD = $(top_builddir)/src/lib/libqdng.la \
 	 -lcppunit

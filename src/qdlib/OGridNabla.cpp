@@ -105,7 +105,7 @@ namespace QDLIB {
       opPsi = dynamic_cast<WFGridSystem*>(destPsi);
       
       
-      _FFT.Forward(opPsi);
+      _FFT.Forward(ket);
       opPsi->IsKspace(true);
       if (_momentum)
          MultElementsCopy((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
