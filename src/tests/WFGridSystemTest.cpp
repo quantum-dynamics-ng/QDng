@@ -1,6 +1,7 @@
 #include "WFGridSystemTest.h"
 #include "defs.h"
 #include "function_gens.h"
+#include "qdlib/TransformFFT.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WFGridSystemTest);
 
@@ -33,6 +34,7 @@ void WFGridSystemTest::tearDown()
 void WFGridSystemTest::API_Test()
 {
    ParamContainer p;
+   TransformFFT FFT;
    WFG *wf2;
    
    /* Empty Init */
@@ -47,11 +49,11 @@ void WFGridSystemTest::API_Test()
    CPPUNIT_ASSERT_NO_THROW( wf->Init(p));
    
    /* Check if Transformation is running */
-   CPPUNIT_ASSERT(! wf->isKspace() );
-   wf->ToKspace();
-   CPPUNIT_ASSERT( wf->isKspace() );
-   wf->ToXspace();
-   CPPUNIT_ASSERT(! wf->isKspace() );
+   CPPUNIT_ASSERT(! wf->IsKspace() );
+   FFT.Forward(wf);
+   CPPUNIT_ASSERT( wf->IsKspace() );
+   FFT.Backward(wf);
+   CPPUNIT_ASSERT(! wf->IsKspace() );
    
    /* Check copy */
    wf2 = dynamic_cast<WFG*>(wf->NewInstance());
@@ -67,11 +69,11 @@ void WFGridSystemTest::API_Test()
    }
    
    /* Check if Transformation is running */
-   CPPUNIT_ASSERT(! wf2->isKspace() );
-   wf2->ToKspace();
-   CPPUNIT_ASSERT( wf2->isKspace() );
-   wf2->ToXspace();
-   CPPUNIT_ASSERT(! wf2->isKspace() );
+   CPPUNIT_ASSERT(! wf2->IsKspace() );
+   FFT.Forward(wf2);
+   CPPUNIT_ASSERT( wf2->IsKspace() );
+   FFT.Backward(wf2);
+   CPPUNIT_ASSERT(! wf2->IsKspace() );
    
    delete wf2;
 }
@@ -79,6 +81,7 @@ void WFGridSystemTest::API_Test()
 void WFGridSystemTest::NUMERIC_Test()
 {
    ParamContainer p;
+   TransformFFT FFT;
    
    /* Init with correst params */
    wf->Dim(1);
@@ -87,9 +90,9 @@ void WFGridSystemTest::NUMERIC_Test()
    wf->Xmax(0,5);
    
    CPPUNIT_ASSERT_NO_THROW( wf->Init(p));
-   wf->ToKspace();
    
    /* for proper fft */
+   FFT.Forward(wf);
    CPPUNIT_ASSERT_DOUBLES_EQUAL( -(*wf)[1].imag(),  (*wf)[WF_TEST_SIZE-1].imag(), LOOSE_EPS);
    CPPUNIT_ASSERT_DOUBLES_EQUAL( (*wf)[1].real(),  (*wf)[WF_TEST_SIZE-1].real(), LOOSE_EPS);
    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, (*wf)[0].imag(), LOOSE_EPS);
