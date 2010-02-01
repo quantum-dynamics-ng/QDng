@@ -291,6 +291,18 @@ namespace QDLIB {
       return this;
    }
 
+   bool QDLIB::OHermitianMatrix::Valid(WaveFunction * Psi)
+   {
+      WFLevel *PsiLv;
+
+      PsiLv = dynamic_cast<WFLevel*>(Psi);
+      if ( PsiLv == NULL) return false;
+      
+      if ( Psi->size() != rows() ) return false;
+      
+      return true;   
+   }
+   
    void OHermitianMatrix::InitDspace()
    {
       if (_dspace == NULL) {
@@ -299,6 +311,8 @@ namespace QDLIB {
    }
 
 } /* namespace QDLIB */
+
+
 
 
 

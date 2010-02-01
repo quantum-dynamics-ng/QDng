@@ -56,7 +56,8 @@ namespace QDLIB {
 	 virtual Operator* operator*(Operator* O);
          virtual Operator* Offset(const double d);
 	 virtual Operator* Scale(const double d);
-
+         bool Valid(WaveFunction *Psi);
+         
          /* Interface implementation, ODSpace */
          virtual void InitDspace();
          virtual Transform* Transformation() { return &_XT;}

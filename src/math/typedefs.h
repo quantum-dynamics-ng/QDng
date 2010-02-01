@@ -598,27 +598,18 @@ namespace QDLIB {
       dcomplex *a;
       dcomplex *c;
       double *b;
-      
-      
+            
       lint s;
-//#pragma omp parallel private(a,b,c)
-  //    {
+
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
 	 c = C->begin(s);
-<<<<<<< HEAD:src/math/typedefs.h
-#ifdef _OPENMP
-         #pragma omp parallel for
-#endif
-=======
->>>>>>> Lately resolved merge conflicts:src/math/typedefs.h
 	 for (lint i=0; i < size; i++)
 	 {
 	    c[i] = a[i] * b[i] * d;
 	 }
       }
-     // } /* parallel */
    }
    
    /**
@@ -671,12 +662,6 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-<<<<<<< HEAD:src/math/typedefs.h
-#ifdef _OPENMP
-         #pragma omp parallel for
-#endif
-=======
->>>>>>> Lately resolved merge conflicts:src/math/typedefs.h
 	 for (lint i=0; i < size; i++)
 	 {
 	    a[i] *= b[i] * c;
@@ -745,12 +730,6 @@ namespace QDLIB {
       lint s;
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
-<<<<<<< HEAD:src/math/typedefs.h
-#ifdef _OPENMP
-         #pragma omp parallel for
-#endif
-=======
->>>>>>> Lately resolved merge conflicts:src/math/typedefs.h
 	 for (lint i=0; i < size; i++)
 	 {
 	    a[i] *= c;

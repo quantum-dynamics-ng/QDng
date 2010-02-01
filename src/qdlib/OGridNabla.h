@@ -2,7 +2,8 @@
 #define QDLIBOGRIDNABLA_H
 
 #include "ODSpace.h"
-#include <GridSystem.h>
+#include "GridSystem.h"
+#include "TransformFFT.h"
 
 namespace QDLIB {
 
@@ -30,6 +31,7 @@ namespace QDLIB {
          dVec *_kspace;  /* Imaginary part of the k-space */
          bool _momentum; /* Work in momentum mode */
          int _dim;       /* Only act on this dimension */
+         TransformFFT _FFT;
          void _InitDim(dVecView &view, const int dim);
       protected:
          void _InitDspaceReal();
@@ -85,6 +87,7 @@ namespace QDLIB {
          virtual bool Valid(WaveFunction *Psi);
          
          /*Interface implementation, ODSpace  */ 
+         virtual Transform* Transformation() { return &_FFT; }
          virtual void InitDspace();
          
          

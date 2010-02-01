@@ -6,10 +6,10 @@
 
 #include "qdlib/WaveFunction.h"
 #include "qdlib/OGridsystem.h"
-
+#include "qdlib/OHermitianMatrix.h"
 
 namespace QDLIB {
-   typedef FileSingle<OHerMat> FileOHerMat;
+   typedef FileSingle<OHermitianMatrix> FileOHerMat;
 }
 
 
