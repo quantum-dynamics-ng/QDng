@@ -25,7 +25,7 @@ namespace QDLIB {
       
          void SetMatrix(dMat *X, bool adjoint = true);
          
-         /** Get the transformation matrix.*/
+         /** Get the transformation matrix. */
          dMat* GetMatrix() {return _X;}
       
    };

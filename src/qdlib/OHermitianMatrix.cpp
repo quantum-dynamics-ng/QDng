@@ -33,16 +33,17 @@ namespace QDLIB {
    void OHermitianMatrix::Init(ParamContainer &params)
    {
       int size;
-      string name;
       
       Operator::_params = params;
-      
-      _params.GetValue("file", name);
+     
       _params.GetValue("size", size);
-      cout << size << endl;
       /* Init from file - Set recursion indicator _init */
-      if (size <= 0 && name.size() != 0 && !_init){
+      if (_params.isPresent("file") && !_init){
+         
+         string name;
+         _params.GetValue("file", name);
          _init = true;
+         
          File()->Suffix(BINARY_O_SUFFIX);
          File()->Name(name);
 	 
@@ -57,8 +58,8 @@ namespace QDLIB {
                (*this)(i,i) -= min;
             }
          }
-         cout << *((dMat*) this) << endl;
          _init = false;
+         _valid = false;
          return;
       }
       
@@ -72,6 +73,7 @@ namespace QDLIB {
       }
       
       dMat::newsize(size,size);
+      _valid = false;
       
       /* Check if we diagonalize imidiately */
       bool initDiag;
@@ -79,8 +81,6 @@ namespace QDLIB {
       if (initDiag){
          if (_X == NULL) _X = new dMat(rows(),rows());
          InitDspace();
-         LAPACK::FullDiagHermitian(_X, _dspace);
-         _XT.SetMatrix(_X);
       }
       
       
@@ -109,6 +109,7 @@ namespace QDLIB {
       if (s != size) {
          _params.SetValue("size", size);
          dMat::newsize(size,size);
+         _valid = false;
       }
       
    }
@@ -153,24 +154,18 @@ namespace QDLIB {
       return MatrixElement(Psi, Psi).real();
    }
    
+   /** Return the largest eigenvalue */
    double OHermitianMatrix::Emax()
-   {      
-      double d = (*this)(0,0);
-      
-      for (int i=1; i < rows() ; i++)
-         if ((*this)(i,i) > d) d = (*this)(i,i);
-	 
-      return d;
+   {
+      if (!_valid) InitDspace();
+      return (*_dspace)[_dspace->size()-1];
    }
 	 
+   /** Return the smallest eigenvalue */
    double OHermitianMatrix::Emin()
-   {      
-      double d = (*this)(0,0);
-      
-      for (int i=1; i < rows() ; i++)
-         if ((*this)(0,0) < d) d = (*this)(0,0);
-      
-      return d;
+   {
+      if (!_valid) InitDspace();
+      return (*_dspace)[0];
    }
    
    /**
@@ -180,7 +175,6 @@ namespace QDLIB {
     */
    WaveFunction* OHermitianMatrix::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      cout << rows() << " " << cols() << endl;
       MatVecMult((cVec*) destPsi, (dMat*) this, (cVec*) sourcePsi);
       return destPsi;
    }
@@ -213,17 +207,25 @@ namespace QDLIB {
       cout << "Copy!" << endl;
       if (op==NULL)
          throw ( EIncompatible ("Copy, not of type OHermitianMatrix", O->Name() ) );
+      
       *((dMat*) this) = *((dMat*) op);
-//       *_X = *(op->_X);
+      
+      if (_X != NULL)
+         *_X = *(op->_X);
+      
+      if (_dspace != NULL)
+         *_dspace = *(op->_dspace);
+
       op->_XT.SetMatrix(op->_X);
       _params =  op->Params();
       
+      _valid = op->_valid;
       return this;
    }
    
-      /**
+   /**
     * Copy operator.
-       */
+    */
    Operator* OHermitianMatrix::operator=(Operator *O)
    {
      Copy(O);
@@ -275,17 +277,23 @@ namespace QDLIB {
    
    Operator * OHermitianMatrix::Offset(const double d)
    {
-      for (int i=0; i < rows() ; i++)
+      for (int i=0; i < rows() ; i++){
 	 (*this)(i,i) += d;
+         if(_valid)
+            (*_dspace)[i] += d;
+      }
+      
+      
       return this;
    }
 
 
    Operator * OHermitianMatrix::Scale(const double d)
    {
-      for (int i=0; i < rows() ; i++)
-	 for (int j=0; j < cols() ; j++)
-	  (*this)(i,j) *= d;
+      *((dMat*) this) *= d;
+      
+      if (_valid)
+         (*_dspace) *= d;
       
       scaling=d;
       return this;
@@ -300,14 +308,25 @@ namespace QDLIB {
       
       if ( Psi->size() != rows() ) return false;
       
-      return true;   
+      return true;
    }
    
    void OHermitianMatrix::InitDspace()
    {
-      if (_dspace == NULL) {
+      if (_dspace == NULL)
          _dspace = new dVec(rows());
+     
+      if (_X == NULL){
+         _X = new dMat(rows(),rows());
+         _XT.SetMatrix(_X);
       }
+      
+      *_X = *((dMat*) this);
+      _dspace->newsize(rows());
+      
+      LAPACK::FullDiagHermitian(_X, _dspace);
+
+      _valid = true;
    }
 
 } /* namespace QDLIB */

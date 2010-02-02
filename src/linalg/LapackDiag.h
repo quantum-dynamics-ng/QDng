@@ -14,9 +14,9 @@ using namespace QDLIB;
 namespace LAPACK {
       
 
-   extern void FullDiagHermitian(dMat *mat, dVec *evals);
+   extern int FullDiagHermitian(dMat *mat, dVec *evals);
    
-   extern void FullDiagHermitian(cMat *mat, dVec *evals);
+   extern int FullDiagHermitian(cMat *mat, dVec *evals);
    
    /* Lapack routines */
    extern "C" {

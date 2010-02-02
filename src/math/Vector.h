@@ -338,6 +338,15 @@ class Vector
     }
     
 
+    void operator *=(const T &scalar)
+    {
+       for (lint s=0; s < nstrides_; s++){
+          for (lint i=0; i< stride_size_; i++){
+             v_[s][i] *= scalar;
+          }
+       }
+    }
+    
     // assignments
     //
     Vector<T>& operator=(const Vector<T> &A)

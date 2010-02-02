@@ -54,6 +54,7 @@ namespace LAPACK {
 		  min_idx = i;
 		  min = sized[i];
 	       }
+               i++;
 	    }
 	    if (sized[min_idx] > 0) delete dbuf[min_idx];
 	    i=posix_memalign((void**) &dbuf[min_idx], 2*sizeof(double), size*sizeof(double));
@@ -77,6 +78,7 @@ namespace LAPACK {
 		  min_idx = i;
 		  min = sizec[i];
 	       }
+               i++;
 	    }
 	    if (sizec[min_idx] > 0) delete cbuf[min_idx];
 	    i=posix_memalign((void**) &cbuf[min_idx], 2*sizeof(dcomplex), size*sizeof(dcomplex));
@@ -96,15 +98,15 @@ namespace LAPACK {
     * \param mat     The matrix to diagonalize. On exit it contains the eigenvectors.
     * \param evals   Contains the eigenvalues 
     */
-   void FullDiagHermitian(dMat *mat, dVec *evals)
+   int FullDiagHermitian(dMat *mat, dVec *evals)
    {
       int ws_size;
       int size;
       int info;
       WsList *ws = WsList::Instance();
       
-      if (mat->rows() != mat->cols()) return;
-      if (evals->strides()) return;
+      if (mat->rows() != mat->cols()) return -1;
+      if (evals->strides() != 1) return -2;
       
       size = mat->rows();
       ws_size = size * 3;
@@ -116,17 +118,19 @@ namespace LAPACK {
       
       DSYEV_F77(&jobz, &uplo, &size, mat->begin(),  &size,
 		 evals->begin(0) , ws->Getdbuf(ws_size), &ws_size, &info);
+      
+      return info;
    }
    
-   void FullDiagHermitian(cMat *mat, dVec *evals)
+   int FullDiagHermitian(cMat *mat, dVec *evals)
    {
       int ws_size;
       int size;
       int info;
       WsList *ws = WsList::Instance();
       
-      if (mat->rows() != mat->cols()) return;
-      if (evals->strides()) return;
+      if (mat->rows() != mat->cols()) return -1;
+      if (evals->strides() != 1) return -2;
       
       size = mat->rows();
       ws_size = size * 3;
@@ -138,6 +142,8 @@ namespace LAPACK {
       
       ZHEEV_F77(&jobz, &uplo, &size, mat->begin(),  &size,
 	     evals->begin(0) , ws->Getcbuf(ws_size), &ws_size, ws->Getdbuf(ws_size), &info);
+      
+      return info;
    }
    
    

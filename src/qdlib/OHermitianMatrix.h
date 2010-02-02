@@ -14,9 +14,9 @@ namespace QDLIB {
     * 
     * Parameters:
     * \li size
-    * \li diag
-    * \li setzero
-    * \li file
+    * \li qdiag      Diagonalize immidately.s
+    * \li setzero    Shift diagonal to zero
+    * \li file       Input from file.
     * 
     * \todo modify matrix classes to provide real, efficient hermitian matrices.
     */
