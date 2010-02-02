@@ -14,6 +14,7 @@ Test				Type		Level	Status
 - Tools -
 * fstools			AF		1
 * FileSingle			AF		2
+* FileWF                        AFI             3       done
 * GetOpt			AF		1
 * ParamContainer		AF		1
 * QDClock			AF		1	done
