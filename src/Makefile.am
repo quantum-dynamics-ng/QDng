@@ -1,6 +1,6 @@
 
 # set the include path found by configure
-INCLUDES = -I$(top_srcdir)/src $(LIBXML2_CFLAGS) $(all_includes)
+INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/fftw/api $(LIBXML2_CFLAGS) $(all_includes)
 
 # the library search path.
 
