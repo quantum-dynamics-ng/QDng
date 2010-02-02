@@ -48,6 +48,8 @@ namespace QDLIB {
          
 	 Vector<T>* coloumn(lint c) const;
 	 Vector<T>* diag() const;
+         void diag(Vector<T>* diagonal);
+         
 	 void transpose();
          
 	 T& operator() (int i, int j);
@@ -201,19 +203,35 @@ namespace QDLIB {
    }
    
    /**
-    * Returns a copy of the diagonal.
+    * Set the diagonal from vector.
+    */
+   template <class T>
+   void Matrix<T>::diag(Vector<T>* diagvec)
+   {
+      if (_m != _n || _m < diagvec->size() ) return;
+      
+      for(int i=0; i < _m; i++)
+      {
+         _col[i][i] = (*diagvec)[i];
+      }
+   }
+   
+   /**
+    * Transpose the Matrix.
     * 
     * Only works if number of rows and cols are equal.
     */
    template <class T>
    void Matrix<T>::transpose()
    {
+      if (_m != _n) return;
+      
       T swap;
       for (int i=0; i < _m; i++) {
-         for (int j=1; j < _n; j++) {
-            swap=_v[i][j];
-            _v[i][j] = _v[j][i];
-            _v[j][i] = swap;
+         for (int j=0; j < i; j++) {
+            swap=_col[i][j];
+            _col[i][j] = _col[j][i];
+            _col[j][i] = swap;
          }
       }
    }
@@ -292,6 +310,12 @@ namespace QDLIB {
       int cols = M->cols();
       int rows = M->rows();
       
+      if (cols != A->size() && !transpose) return;
+      if (rows != A->size() && transpose) return;
+      
+      if (B->size() != A->size())
+         B->newsize(A->size());
+      
       T *b = B->begin(0);
       T *a = A->begin(0);
       
@@ -299,14 +323,14 @@ namespace QDLIB {
 	 for(int i=0; i < rows; i++){
             b[i] = T(0);
 	    for(int j=0; j < cols; j++){
-	       b[i] += (*M)(i,j) * a[j];
+	       b[i] += (*M)(j,i) * a[j];
 	    }
 	 }
       } else if (transpose && adjoint){
          for(int i=0; i < rows; i++){
             b[i] = T(0);
             for(int j=0; j < cols; j++){
-               b[i] += conj((*M)(i,j)) * a[j];
+               b[i] += conj((*M)(j,i)) * a[j];
             }
          }         
       }
@@ -314,7 +338,7 @@ namespace QDLIB {
 	 for(int i=0; i < rows; i++){
 	    b[i] = T(0);
 	    for(int j=0; j < cols; j++){
-               b[i] += (*M)(j,i) * a[j];
+               b[i] += (*M)(i,j) * a[j];
 	    }
 	 }
       }
