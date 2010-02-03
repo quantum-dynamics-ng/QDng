@@ -90,7 +90,20 @@ namespace QDLIB {
    {
       
       if (size() != Psi->size()) throw(EIncompatible("WFs differ in size"));
-      return (cVec) *Psi * (cVec) *Psi;
+      
+      /** \todo make mpi-save */
+      int s;
+      dcomplex *a, *b;
+      dcomplex c(0,0);
+      for (s=0; s < strides(); s++){
+         a = begin(s);
+         b = Psi->begin(s);
+         for(int i=0; i < lsize(); i++){
+            c += a[i].conj() * b[i];
+         }
+      }
+      
+      return c;
    }
    
    /**

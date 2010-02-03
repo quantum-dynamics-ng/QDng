@@ -79,13 +79,55 @@ void OHermitianMatrixTest::API_Test()
    
    /* Try Init with WF */
    WFLevel *wf = new WFLevel();
+   pm.clear();
    
+   pm.SetValue("size", "2");
+   wf->Init(pm);
    
+   CPPUNIT_ASSERT_NO_THROW(M->Init(wf));
 }
 
 void OHermitianMatrixTest::NUMERIC_Test()
 {
    OHermitianMatrix *M = new OHermitianMatrix();
+   WFLevel *wf = new WFLevel();
+   WaveFunction *wfo;
+   ParamContainer pm;
+   
+   /* Setup the test */
+   pm.SetValue("size", "2");
+   
+   CPPUNIT_ASSERT_NO_THROW ( wf->Init(pm) );
+   CPPUNIT_ASSERT_NO_THROW ( M->Init(pm) );
+   CPPUNIT_ASSERT_NO_THROW ( M->Init(wf)  );
+   
+   /* Init wf */
+   (*((cVec*) wf))[0] = 1;
+   (*((cVec*) wf))[1] = 1;
+   
+   wfo = wf->NewInstance();
+   
+   /* Init Matrix */
+   (*M)(0,0)=1;
+   (*M)(1,1)=3;
+   (*M)(1,0) = (*M)(0,1) = 2;
+   
+   /* Apply 1 */
+   M->Apply(wfo, wf);
+   
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply", 3,  (*wfo)[0].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply", 5,  (*wfo)[1].real(), TIGHT_EPS );
+   
+   /* Apply */
+   *wfo  = wf;
+   M->Apply(wfo);
+   
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply", 3,  (*wfo)[0].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply", 5,  (*wfo)[1].real(), TIGHT_EPS );
+
+   /* Expec */
+   wf->Normalize();
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Expec", 4,  M->Expec(wf), LOOSE_EPS );
 }
 
 

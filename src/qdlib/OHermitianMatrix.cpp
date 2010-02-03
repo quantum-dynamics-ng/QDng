@@ -48,7 +48,7 @@ namespace QDLIB {
          File()->Name(name);
 	 
          *File() >> (OHermitianMatrix*) this; /* Read Matrix */
-
+         
          /* Adjust min. diag value to zero */
          bool set_zero;
          _params.GetValue("setzero", set_zero);
@@ -86,7 +86,7 @@ namespace QDLIB {
       
    }
    
-   void QDLIB::OHermitianMatrix::Init(WaveFunction * Psi)
+   void OHermitianMatrix::Init(WaveFunction * Psi)
    {
       WFLevel *psi=dynamic_cast<WFLevel*>(Psi);
       
@@ -158,6 +158,7 @@ namespace QDLIB {
    double OHermitianMatrix::Emax()
    {
       if (!_valid) InitDspace();
+      cout << (*_dspace)[_dspace->size()-1] << endl;
       return (*_dspace)[_dspace->size()-1];
    }
 	 
@@ -165,6 +166,7 @@ namespace QDLIB {
    double OHermitianMatrix::Emin()
    {
       if (!_valid) InitDspace();
+      cout << (*_dspace)[0] << endl;
       return (*_dspace)[0];
    }
    

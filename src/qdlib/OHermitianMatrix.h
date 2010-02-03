@@ -67,8 +67,6 @@ namespace QDLIB {
 	 int Size();
 	 
 	 void Diag();
-	 dVec* Eval();
-	 dVec* Evec();
 	 
          FileMatrix* File() {if (_file == NULL) _file = new FileMatrix(); return _file;}
          
