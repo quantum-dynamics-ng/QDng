@@ -20,6 +20,7 @@ namespace QDLIB {
       private:
 	 string _name;
          int _size;
+         double _offset;
          Operator* _O[MAX_OPS];
 	 Operator::METHODWF2 _apply2;
 	 WaveFunction* _WFbuf[MAX_OPS];    /* Use a buffer for wfs, to get rid of much mallocs */

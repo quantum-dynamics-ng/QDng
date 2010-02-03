@@ -15,7 +15,7 @@ namespace QDLIB {
    /**
     * Default constructor
     */
-   OSum::OSum() : _name("OSum"), _size(0)
+   OSum::OSum() : _name("OSum"), _size(0), _offset(0)
    {
       for(int i=0; i < MAX_OPS; i++){
 	 _O[i] = NULL;
@@ -190,7 +190,7 @@ namespace QDLIB {
 	 _O[i]->Apply(_WFbuf[1], _WFbuf[0]);
 	 AddElements(Psi, _WFbuf[1]);
       }
-      
+
       return Psi;
    }
       
@@ -209,11 +209,15 @@ namespace QDLIB {
       if (r == NULL)
 	 throw( EIncompatible ("Incompatible in Assginment", this->Name(), O->Name() ) );
       
+      scaling = r->scaling;
+      _offset = r->_offset;
       _size = r->_size;
+      
       for (int i=0; i < _size; i++){
 	 _O[i] = r->_O[i]->NewInstance();
 	 *(_O[i]) = r->_O[i];
       }
+
       return r;
    }
    
@@ -225,8 +229,13 @@ namespace QDLIB {
    
    Operator* QDLIB::OSum::Offset(const double d)
    {
-      for (int i=0; i < _size; i++)
-	 _O[i]->Offset(d);
+      for (int i=0; i < _size; i++){
+         if ( abs (_O[i]->Emin()) > 0){
+            _O[i]->Offset(d);
+            break;
+         }
+      }
+      _offset = d;
       return this;
    }
 
