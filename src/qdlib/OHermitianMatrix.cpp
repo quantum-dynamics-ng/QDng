@@ -158,7 +158,6 @@ namespace QDLIB {
    double OHermitianMatrix::Emax()
    {
       if (!_valid) InitDspace();
-      cout << (*_dspace)[_dspace->size()-1] << endl;
       return (*_dspace)[_dspace->size()-1];
    }
 	 
@@ -166,7 +165,6 @@ namespace QDLIB {
    double OHermitianMatrix::Emin()
    {
       if (!_valid) InitDspace();
-      cout << (*_dspace)[0] << endl;
       return (*_dspace)[0];
    }
    
