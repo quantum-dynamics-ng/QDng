@@ -52,17 +52,17 @@ void OHermitianMatrixTest::API_Test()
    M->InitDspace(); /* Need to do this here because of Manual filing */
    
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emin", -2, M->Emin(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emax", 2, M->Emax(), LOOSE_EPS);
+   CPPUNIT_ASSERT_MESSAGE("Emax", 2 < M->Emax());
    
    /* Try scaling + offset */
    M->Scale(2);
    M->Offset(-1);
    
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emin -> scaled+shift", -5, M->Emin(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emax -> scaled+shift", 3, M->Emax(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emax -> scaled+shift", 9, M->Emax(), LOOSE_EPS);
    
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("M(0,0) -> scaled+shift", -5, M->Emin(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("M(1,1) -> scaled+shift", 3, M->Emax(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("M(1,1) -> scaled+shift", 9, M->Emax(), LOOSE_EPS);
    
   
    /* Check the FileWriter */

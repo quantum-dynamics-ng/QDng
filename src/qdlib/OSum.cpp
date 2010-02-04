@@ -172,7 +172,7 @@ namespace QDLIB {
 	 _O[i]->Apply(_WFbuf[0], sourcePsi);
 	 AddElements(destPsi, _WFbuf[0]);
       }
-
+      AddElements(destPsi, sourcePsi, _offset*scaling);
       return destPsi;
    }
    
@@ -190,7 +190,7 @@ namespace QDLIB {
 	 _O[i]->Apply(_WFbuf[1], _WFbuf[0]);
 	 AddElements(Psi, _WFbuf[1]);
       }
-
+      AddElements(Psi, _WFbuf[0], _offset*scaling);
       return Psi;
    }
       
@@ -229,12 +229,12 @@ namespace QDLIB {
    
    Operator* QDLIB::OSum::Offset(const double d)
    {
-      for (int i=0; i < _size; i++){
-         if ( abs (_O[i]->Emin()) > 0){
-            _O[i]->Offset(d);
-            break;
-         }
-      }
+//       for (int i=0; i < _size; i++){
+//          if ( abs (_O[i]->Emin()) > 0){
+//             _O[i]->Offset(d);
+//             break;
+//          }
+//       }
       _offset = d;
       return this;
    }

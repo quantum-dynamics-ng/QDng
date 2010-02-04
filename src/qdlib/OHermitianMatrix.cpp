@@ -158,10 +158,11 @@ namespace QDLIB {
    double OHermitianMatrix::Emax()
    {
       if (!_valid) InitDspace();
-      return (*_dspace)[_dspace->size()-1];
+      /* Overestimate Emax to avoid conflicts due to incorrect diagonalization in sums */
+      return 3 * (*_dspace)[_dspace->size()-1]; 
    }
 	 
-   /** Return the smallest eigenvalue */
+   /** Return the smallest diagonal */
    double OHermitianMatrix::Emin()
    {
       if (!_valid) InitDspace();
