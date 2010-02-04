@@ -230,6 +230,30 @@ namespace QDLIB {
    }
    
    /**
+    * Add up vectors by elements.
+    * 
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelistation will be done here.
+    */
+   inline void AddElements(cVec *A, cVec *B, dcomplex c)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+      
+      dcomplex *a;
+      dcomplex *b;
+      
+      lint s;
+      for (s=0; s < strides; s++){
+         a = A->begin(s);
+         b = B->begin(s);
+         for (lint i=0; i < size; i++){
+            a[i] += b[i] * c;
+         }
+      }
+   }
+   
+   /**
     * Multiply vectors by elements.
     * \f$ c_i = a_i i b_i d \f$
     * 

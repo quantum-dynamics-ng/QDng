@@ -104,6 +104,14 @@ class Vector
       
     }
    
+    /** copy only part out of the strides. */
+    void copy(T* const *v, lint begin, lint n)
+    {
+       for (lint s=0; s < nstrides_; s++)
+          for (lint i=0; i< n; i++)
+             v_[s][i] = v[s][begin+i];
+    }
+       
     void copy(T* const *v)
     {
 	for (lint s=0; s < nstrides_; s++)
@@ -388,6 +396,28 @@ class Vector
          v_[dest][i] = vec.v_[source][i];
        
        return true;
+    }
+    
+    /**
+     */
+    Vector<T>& CopySub(Vector<T> &A, lint begin, lint end)
+    {
+       if (v_ == A.v_)
+          return *this;
+
+       lint rsize = abs(end-begin)+1;
+       
+       if ( abs(rsize) > A.n_) return *this;
+	
+       if (n_ >= rsize  && nstrides_ == A.nstrides_){
+          /* no need to re-alloc */
+          copy(A.v_, begin, rsize);
+       } else {
+          if (!isRef_) destroy();
+          initialize(rsize, A.nstrides_);
+          copy(A.v_, begin, rsize);
+       }
+       return *this;
     }
     
     inline lint size() const

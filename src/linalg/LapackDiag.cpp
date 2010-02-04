@@ -146,7 +146,24 @@ namespace LAPACK {
       return info;
    }
    
-   
+   int TriDiagHermitian(dVec *diag, dVec *subdiag, dMat *evec, const int length)
+   {
+      char jobz = 'V'; /* compute including eigenvectors */
+      int n = length;
+      int ws_size;
+      int info;
+      
+      WsList *ws = WsList::Instance();
+      ws_size = 2*n-2;
+      
+      evec->newsize(n,n);
+      
+      DSTEV_F77(&jobz, &n ,diag->begin(0), subdiag->begin(0), evec->begin(),  &n, ws->Getdbuf(ws_size), &info);
+      
+      return info;
+   }
    
 }
+
+
 

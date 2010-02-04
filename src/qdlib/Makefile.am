@@ -5,12 +5,12 @@ libqd_la_SOURCES = GridSystem.cpp InternalMods.cpp Kspace.cpp Laser.cpp \
 	OCheby.cpp OGobbler.cpp OGridDipole.cpp OGridGMat.cpp OGridNAC.cpp OGridNablaSq.cpp \
 	OGridPosition.cpp OGridPotential.cpp OGridSum.cpp OGridsystem.cpp OHermitianMatrix.cpp \
 	OMultistate.cpp OProjection.cpp OSPO.cpp OGridNabla.cpp\
-	OScalar.cpp OSum.cpp WFGridCartesian.cpp WFGridSystem.cpp WFLevel.cpp \
+	OScalar.cpp OSum.cpp WFGridCartesian.cpp WFGridSystem.cpp WFLevel.cpp OSIL.cpp\
 	WFMultistate.cpp FileWF.cpp TransformFFT.cpp TransformMat.cpp
 noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h OGridDipole.h \
 	OGridNablaSq.h OGridPotential.h OGridSum.h OGridsystem.h OMultistate.h \
 	OPropagator.h OSPO.h OSum.h Operator.h TransformFFT.h WFGridCartesian.h \
-	WFGridSystem.h WFLevel.h WFMultistate.h WaveFunction.h FileWF.h
+	WFGridSystem.h WFLevel.h WFMultistate.h WaveFunction.h FileWF.h OSIL.h
 
 
 
