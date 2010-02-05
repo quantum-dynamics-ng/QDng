@@ -88,7 +88,7 @@ void WFGridCartesianTest::API_Test()
 void WFGridCartesianTest::NUMERIC_Test()
 {
    ParamContainer p2;
-//    double d;
+   double dx;
    dcomplex c;
    
    /* Init */
@@ -97,9 +97,11 @@ void WFGridCartesianTest::NUMERIC_Test()
    /* Norm features */
    fgen_sin_norm(*wf, -5, 5);
    
-   CPPUNIT_ASSERT_DOUBLES_EQUAL(1, wf->Norm(), LOOSE_EPS);
+   *wf *= 2;
+
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(2, wf->Norm(), LOOSE_EPS);
    
-   fgen_sin(*wf, -5, 5);
+   fgen_sin_one(*wf, -5, 5);
    
    wf->Normalize();
    
