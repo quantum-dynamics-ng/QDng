@@ -73,10 +73,10 @@ namespace QDLIB
       if (_step == 0){
  	 _specbuf.newsize(clock->Steps()+1);
 	 log.cout() << "Step\tTime[au]";
-	 if (_norm) log.cout() << "\tNorm";
+	 if (_norm) log.cout() << "\tPopulation";
 	 if (_multistate && _norm){
 	    for (int i=0; i < mspsi->States(); i++)
-	       if (_norm) log.cout() << "\t\tNorm_" << i;
+	       if (_norm) log.cout() << "\t\tPop_" << i;
 	 }
 	 if (_energy) log.cout() << "\t\tEnergy[au]";
 	 if (_proj0 && !_proj0Sq) log.cout() << "\t<Psi0|PsiT>";
@@ -93,6 +93,7 @@ namespace QDLIB
       /* Norm */
       if (_norm){
          double norm = Psi->Norm();
+	 norm *= norm;	/* norm -> Population */
          
          if (_scinorm) { /* Printformat */
             log.cout().precision(8);
@@ -107,10 +108,12 @@ namespace QDLIB
          
 	 if (_multistate){ /* Norm of single states */
 	    for (int i=0; i< mspsi->States(); i++) {
+	       norm = mspsi->State(i)->Norm();
+	       norm *= norm;
                if (_scinorm)
-                  log.cout() << "\t" << scientific << mspsi->State(i)->Norm();
+                  log.cout() << "\t" << scientific << norm;
                else
-	          log.cout() << "\t" << fixed << mspsi->State(i)->Norm();
+	          log.cout() << "\t" << fixed << norm;
             }
 	 }
 	 
