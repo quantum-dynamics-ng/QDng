@@ -19,7 +19,7 @@ MatrixTest::~MatrixTest()
 void MatrixTest::API_Test()
 {
    Matrix<int> M, R;
-   Vector<int> *V;
+   Vector<int> *V = NULL;
    
    /* Check init & Access */
    M.newsize(3,4);

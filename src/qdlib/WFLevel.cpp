@@ -51,7 +51,7 @@ namespace QDLIB {
       dcomplex d;
       
       d = *this * *this;
-      return d.real();
+      return sqrt(d.real());
    }
    
    /**
@@ -59,7 +59,7 @@ namespace QDLIB {
     */
    void WFLevel::Normalize()
    {
-      double  d = 1/sqrt(Norm());
+      double  d = 1/Norm();
       for (int i=0; i < size(); i++){
 	 (*this)[i] = (*this)[i] * d;
       }
