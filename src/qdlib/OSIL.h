@@ -3,16 +3,14 @@
 
 #include "OPropagator.h"
 
-#define SIL_MAX_ORDER 32
-#define SIL_CUTOFF_BETA 1e4
-#define SIL_CUTOFF_ALPHA 1e-8
+#define SIL_DEF_ORDER 20
 
 namespace QDLIB {
 
     /**
      * Short iterative Lanczos Propagator.
      *
-     * \param order   Recursion depth/Lanczos basis size. Values <= 0 mean autodetect.
+     * \param order   Recursion depth/Lanczos basis size. the default is 20.
      *
      *     @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
      */
@@ -24,17 +22,18 @@ namespace QDLIB {
             ParamContainer _needs;
             int _order;       /* Recursion depth, size of basis */
             Operator* _hamilton;      /* The hamiltonian */
-            WaveFunction* _Lzb[SIL_MAX_ORDER];  /* Buffer for Lanczos basis */
+            WaveFunction** _Lzb;  /* Buffer for Lanczos basis */
             WaveFunction *buf0, *buf1, *buf2;   /* Buffers */ 
             dVec _alpha;      /* Store alpha coeffs */
             dVec _beta;       /* Store beta coeffs */
             cVec _vect;       /* time vector in Lanczos basis */
             cVec _vec0;       /* time vector in Lanczos basis */
-            dVec _HD;         /* diagonal Hamiltonian */
             cVec _expHD;       /* Exponential vector */
             dMat _Z;          /* Lanczos eigenvectors */
             
-            void PropaLCB(WaveFunction* Psi, int basisLength);
+            void InitBuffers();
+            void BuildLZB(WaveFunction* Psi);
+            void DiagLZB(WaveFunction* Psi);
         public:
             OSIL();
 
