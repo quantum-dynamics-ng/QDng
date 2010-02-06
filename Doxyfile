@@ -78,7 +78,8 @@ EXCLUDE                = src/tnt-3.0.8-mod1/ \
                          /home/markus/src/QDng/devel-main/src/cppunit-1.12.1 \
                          /home/markus/src/QDng/devel-main/src/tests \
                          src/tnt \
-                         src/cppunit
+                         src/cppunit \
+			 src/fftw
 EXCLUDE_SYMLINKS       = YES
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = 
