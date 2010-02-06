@@ -2,16 +2,16 @@
 #include "WFGridSystem.h"
 
 namespace QDLIB {
-   
+
    OGridSystem::OGridSystem() : _file(NULL) {}
-   
+
    OGridSystem::~OGridSystem()
    {
       if (_file != NULL) delete _file;
    }
-	 
+
    /**
-    * Provides Acces to the associated Filewriter.
+    * Provides access to the associated File-writer.
     */
    OGridSystem::FileOGrid* OGridSystem::File()
    {
@@ -22,7 +22,7 @@ namespace QDLIB {
    Operator* OGridSystem::Offset(const double d)
    {
       for(lint i=0; i < lsize(); i++){
-	 (*this)[i] += d;
+         (*this)[i] += d;
       }
       return this;
    }
@@ -34,36 +34,41 @@ namespace QDLIB {
       scaling = d;
       return this;
    }
-   
+
    Operator* OGridSystem::Copy(Operator * O)
    {
       OGridSystem *o = dynamic_cast<OGridSystem*>(O);
-      
+
       if (o == NULL)
          throw ( EIncompatible("Copy OGridSystem <- ", O->Name()) );
-      
+
       /* Copy vector */
       *((dVec*) this) = *((dVec*) o);
-      
+
       /* Copy Grid description */
       *((GridSystem*) this) = *((GridSystem*) o);
-      
+
       return this;
    }
 
    bool OGridSystem::Valid(WaveFunction * Psi)
    {
       if ( Psi == NULL ) return false;
-      
+
       WFGridSystem* Psi_GS = dynamic_cast<WFGridSystem*>(Psi);
-      
+
       if ( Psi_GS == NULL ) return false;
-      
+
       if ( *((GridSystem*) this) != *((GridSystem*) Psi_GS) ) return false;
 
       return true;
    }
-   
+
+   void OGridSystem::InitDspace()
+   {
+      _dspace = (dVec*) this;
+   }
+
 } /* namespace QDLIB */
 
 

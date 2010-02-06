@@ -1,42 +1,46 @@
 #ifndef OGRIDSYSTEM_H
 #define OGRIDSYSTEM_H
 
-#include "Operator.h"
+#include "ODSpace.h"
 #include "GridSystem.h"
 #include "tools/FileSingle.h"
 
+namespace QDLIB
+{
 
-
-namespace QDLIB {
-  
-   
    /**
     * Abstract class to represent real number operators on a grid.
     */
-   class OGridSystem : public Operator, public dVec, public GridSystem
+   class OGridSystem: public ODSpace, public dVec, public GridSystem
    {
       public:
-	 typedef FileSingle<OGridSystem> FileOGrid;
+         typedef FileSingle<OGridSystem> FileOGrid;
       private:
-	 FileOGrid *_file;
+         FileOGrid *_file;
       public:
-	 
-	 OGridSystem();
-	 ~OGridSystem();
-	 
-	 FileOGrid* File();
-	 
-	 virtual Operator* Offset(const double d);
 
-	 virtual Operator* Scale(const double d);
-	 
-	 virtual Operator* Copy(Operator* O);
-         
+         OGridSystem();
+         ~OGridSystem();
+
+         FileOGrid* File();
+
+         virtual Operator* Offset(const double d);
+
+         virtual Operator* Scale(const double d);
+
+         virtual Operator* Copy(Operator* O);
+
          virtual bool Valid(WaveFunction *Psi);
+
+         /* DSpace interface */
+         virtual void InitDspace();
+         virtual Transform* Transformation()
+         {
+            return NULL;
+         }
+
    };
 
-   
-   
 } /* namespace QDLIB */
-      
+
 #endif /* #ifndef OGRIDSYSTEM_H */
