@@ -35,7 +35,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 	
 	/* If modifier is registerd */
 	if (mxIsChar(prhs[0]) && (!strcmp (mxArrayToString(prhs[0]),"+") || !strcmp (mxArrayToString(prhs[0]),"-") 
-	  || !strcmp (mxArrayToString(prhs[0]),"*") || !strcmp (mxArrayToString(prhs[0]),"test") 
+	  || !strcmp (mxArrayToString(prhs[0]),"*") || !strcmp (mxArrayToString(prhs[0]),"test") || !strcmp (mxArrayToString(prhs[0]),"=") 
 	  || !strcmp (mxArrayToString(prhs[0]),"c*") || !strcmp (mxArrayToString(prhs[0]),"p*") )) {
 	  
 	    /* Addidtion*/
@@ -95,6 +95,42 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 		      
 		      mxArray *temp = plhs[0];
 		      modify_wf::mult_wf_double(&plhs[0],(mxArray*) plhs[0] ,(mxArray*) prhs[i]);
+		      convert_wf_mxArray::delete_wf_handle((const mxArray *) temp);
+		      mxDestroyArray(temp);
+		      
+		    } else mexErrMsgTxt("Bad input. No double");
+		  }  
+		} /*end for loop*/
+		
+	    /* assigne with double */
+	    } else if (!strcmp (mxArrayToString(prhs[0]),"=") && (mxGetClassID(prhs[1]) == mxDOUBLE_CLASS || mxGetClassID(prhs[2]) == mxDOUBLE_CLASS) ) {
+	      
+	      /*over all input arguments*/
+	      for (int i = 2;i<nrhs;i++) {
+		
+		  /*for the first modification*/ 
+		  if (i == 2) {
+		    
+		    /*first is double second the Handle*/
+		    if (mxGetClassID(prhs[i-1]) == mxUINT64_CLASS && mxGetClassID(prhs[i]) == mxDOUBLE_CLASS ) {
+		      
+		      modify_wf::wf_assigne(&plhs[0],(mxArray*) prhs[i-1] ,(mxArray*) prhs[i]);
+		    
+		    /*first is handle second the double*/ 
+		    } else if (mxGetClassID(prhs[i]) == mxUINT64_CLASS && mxGetClassID(prhs[i-1]) == mxDOUBLE_CLASS) {
+		      
+		      modify_wf::wf_assigne(&plhs[0],(mxArray*) prhs[i] ,(mxArray*) prhs[i-1]);
+		      
+		    } else mexErrMsgTxt("Bad input. No Wavefunction Handle or no double");
+		  
+		  /*for the following modifications*/
+		  } else {
+		    
+		    /*if is double */
+		    if (mxGetClassID(prhs[i]) == mxDOUBLE_CLASS) { 
+		      
+		      mxArray *temp = plhs[0];
+		      modify_wf::wf_assigne(&plhs[0],(mxArray*) plhs[0] ,(mxArray*) prhs[i]);
 		      convert_wf_mxArray::delete_wf_handle((const mxArray *) temp);
 		      mxDestroyArray(temp);
 		      
@@ -261,6 +297,35 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 		    if (mxGetClassID(prhs[i]) == mxDOUBLE_CLASS) { 
 		      
 		      modify_wf::mult_wf_double((mxArray*) prhs[1] ,(mxArray*) prhs[i]);
+		      
+		    } else mexErrMsgTxt("Bad input. No double");
+		  }  
+		} /*end for loop*/
+		
+	    /* assigne double */
+	    } else if (!strcmp (mxArrayToString(prhs[0]),"=") && (mxGetClassID(prhs[1]) == mxDOUBLE_CLASS || mxGetClassID(prhs[2]) == mxDOUBLE_CLASS) ) {
+	      
+	      /*over all input arguments*/
+	      for (int i = 2;i<nrhs;i++) {
+		
+		  /*for the first modification*/ 
+		  if (i == 2) {
+		    
+		    /*first is double second the Handle*/
+		    if (mxGetClassID(prhs[1]) == mxUINT64_CLASS && mxGetClassID(prhs[2]) == mxDOUBLE_CLASS ) {
+		      
+		      modify_wf::wf_assigne((mxArray*) prhs[1] ,(mxArray*) prhs[2]);
+		    
+		    /*first is handle second the double*/ 
+		    }  else mexErrMsgTxt("Bad input. No Wavefunction Handle or no double");
+		  
+		  /*for the following modifications*/
+		  } else {
+		    
+		    /*if is double */
+		    if (mxGetClassID(prhs[i]) == mxDOUBLE_CLASS) { 
+		      
+		      modify_wf::wf_assigne((mxArray*) prhs[1] ,(mxArray*) prhs[i]);
 		      
 		    } else mexErrMsgTxt("Bad input. No double");
 		  }  
