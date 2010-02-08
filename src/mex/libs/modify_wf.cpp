@@ -44,6 +44,10 @@ void modify_wf::add_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
     
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
+    
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
     WF_result = WF1->NewInstance ();
@@ -70,6 +74,10 @@ void modify_wf::sub_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
     
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
+    
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
     WF_result = WF1->NewInstance ();
@@ -81,6 +89,40 @@ void modify_wf::sub_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
     /*return ObectHandle*/
     wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
 }
+
+/**
+    * assignes a value to each element of a Wavefunction (returns result as an new Wavefunction)
+    */
+void modify_wf::wf_assigne(mxArray **handle_result, mxArray *handle_WF1, mxArray *handle_double) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /*get the double and check whether complex or not*/
+    double *pdr,*pdi;
+    dcomplex dc;
+    pdr = mxGetPr(handle_double);
+    dc._real=*pdr;
+    if (mxIsComplex(handle_double)) {
+        pdi = mxGetPi(handle_double);
+        dc._imag=*pdi;
+    } else  {
+        dc._imag=0;
+    }
+    
+    /* Init WF_result*/
+    WaveFunction *WF_result=NULL;
+    WF_result = WF1->NewInstance ();
+    *WF_result = *WF1;
+    
+    /*nult WF1 with the double*/
+    *WF_result = dc;
+    
+    /*return ObectHandle*/
+    wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
+}
+
 
 /**
     * Multiplies a Wavefunctions pointwise with a double (returns result as an new Wavefunction)
@@ -128,6 +170,10 @@ void modify_wf::scalar_prod_wf(mxArray **handle_result, mxArray *handle_WF1, mxA
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
     
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
+    
     /*init the result mxArray*/
     handle_result[0] = mxCreateDoubleMatrix(1,1,mxCOMPLEX);
     double *pdr,*pdi;
@@ -154,6 +200,10 @@ void modify_wf::mult_wf_complex(mxArray **handle_result, mxArray *handle_WF1, mx
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
     
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
+    
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
     WF_result = WF1->NewInstance ();
@@ -177,6 +227,10 @@ void modify_wf::mult_wf_pointwise(mxArray **handle_result, mxArray *handle_WF1, 
     /* Init second WF*/
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+    
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
     
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
@@ -250,6 +304,10 @@ void modify_wf::add_wf(mxArray *handle_WF1, mxArray *handle_WF2) {
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
     
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
+    
     /*add WF1 and WF2*/
     *WF1 += WF2;
     
@@ -269,9 +327,40 @@ void modify_wf::sub_wf(mxArray *handle_WF1, mxArray *handle_WF2) {
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
     
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
+    
     
     /*sub WF1 and WF2*/
     *WF1 -= WF2;
+
+}
+
+/**
+    * Multiplies a Wavefunctions pointwise with a double 
+    */
+void modify_wf::wf_assigne(mxArray *handle_WF1, mxArray *handle_double) {
+  
+    /* Init first WF*/
+    WaveFunction *WF1=NULL;
+    WF1 = wf_ObjectHandle_interface::search_WF ( handle_WF1);
+    
+    /*get the double and check whether complex or not*/
+    double *pdr,*pdi;
+    dcomplex dc;
+    pdr = mxGetPr(handle_double);
+    dc._real=*pdr;
+    if (mxIsComplex(handle_double)) {
+        pdi = mxGetPi(handle_double);
+        dc._imag=*pdi;
+    } else  {
+        dc._imag=0;
+    }
+    
+    
+    /*nult WF1 with the double*/
+    *WF1 = dc;
 
 }
 
@@ -317,6 +406,10 @@ void modify_wf::mult_wf_complex(mxArray *handle_WF1, mxArray *handle_WF2) {
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
     
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
+    
     /*calc the direct conjugate Product*/
     *WF1 = DirectProductConugate(WF1, WF2);
     
@@ -334,6 +427,10 @@ void modify_wf::mult_wf_pointwise(mxArray *handle_WF1, mxArray *handle_WF2) {
     /* Init second WF*/
     WaveFunction *WF2=NULL;
     WF2 = wf_ObjectHandle_interface::search_WF ( handle_WF2);
+    
+    /*Check ifmodification is possible*/
+    if (WF1->strides () != WF2->strides () || WF1->lsize () != WF2->lsize () )
+      mexErrMsgTxt("Bad input. Wavefunction do not match!");
     
     
     /*calc the direct Product*/
