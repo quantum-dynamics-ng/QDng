@@ -1,10 +1,3 @@
-/*
- * OGSPO.cpp
- *
- *  Created on: 06.02.2010
- *      Author: markus
- */
-
 #include "OGSPO.h"
 
 namespace QDLIB
@@ -26,8 +19,9 @@ namespace QDLIB
    OGSPO::~OGSPO()
    {
       for (int i = 0; i < GSPO_MAX_LEN; i++) {
-         if (_ops[i] != NULL)
+         if (_ops[i] != NULL) {
             delete _ops[i];
+         }
       }
    }
 

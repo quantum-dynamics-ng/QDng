@@ -16,8 +16,6 @@ class OMatDipoleTest : public CppUnit::TestFixture
       OMatDipoleTest();
       virtual ~OMatDipoleTest();
    protected:
-//      void setUp();
-//      void tearDown();
       void API_Test();
       void NUMERIC_Test();
 };

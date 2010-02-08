@@ -252,12 +252,7 @@ namespace QDLIB {
     */
    void OHermitianMatrix::Diag()
    {
-//       if (_X == NULL || _dspace == NULL)
-//       {
-//          LAPACK::FullDiagHermitian(_X, _dspace);
-//       }
-//       FullDiagHermitian();
-//       _valid = true;
+      InitDspace();
    }
 
    /**

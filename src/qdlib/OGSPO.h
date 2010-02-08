@@ -18,6 +18,13 @@ namespace QDLIB
 
    /**
     * General SPO Propagator.
+    *
+    * The Operators must be d-space operators and are specified in a sequence:
+    * A, B, C,... corresponding to
+    * \f$ e^{A+B+C} = e^{\frac{1}{2}C} e^{\frac{1}{2}B} e^{A} e^{\frac{1}{2}B} e^{\frac{1}{2}C}\f$
+    * If a transformation is needed for exponentiation, this step is inserted e.g.:
+    * \f$ X_B~e^{\frac{1}{2}B}~X_B^\dagger~X_A~e^{A}~X_A\dagger~
+    * X_B~e^{\frac{1}{2}B}~X_B^\dagger\f$
     */
    class OGSPO: public QDLIB::OPropagator
    {
@@ -25,7 +32,7 @@ namespace QDLIB
          string _name;
          ParamContainer _needs;
          int _spoLen;                  /* Number of split elements */
-         ODSpace *_ops[GSPO_MAX_LEN];  /* operator list */
+         ODSpace* _ops[GSPO_MAX_LEN];  /* operator list */
          cVec _exp[GSPO_MAX_LEN];     /* storage for exponentials */
          int _laststep;                 /* Remember last time step for update */
 
