@@ -1,10 +1,3 @@
-/*
- * OMatDipole.h
- *
- *  Created on: 07.02.2010
- *      Author: markus
- */
-
 #ifndef OMATDIPOLE_H_
 #define OMATDIPOLE_H_
 
@@ -14,6 +7,12 @@
 namespace QDLIB
 {
 
+   /**
+    * Dipole interaction operator in matrix representation.
+    *
+    * params:
+    * \li laser file name of laser
+    */
    class OMatDipole: public QDLIB::OHermitianMatrix
    {
       private:
@@ -33,8 +32,6 @@ namespace QDLIB
          virtual Operator* NewInstance();
 
          virtual void Init(ParamContainer &params);
-
-         virtual void UpdateTime(){}
 
          virtual double Emax();
 

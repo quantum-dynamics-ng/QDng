@@ -41,8 +41,12 @@ namespace QDLIB
 
    void OMatDipole::Init(ParamContainer &params)
    {
+      bool leave_empty;
+
+      params.GetValue("empty", leave_empty, false);
+
       /* Protect from double initalization */
-      if (!_init) {
+      if (!_init && !leave_empty) {
          /* Read the laser field */
          string name;
          Laser::FileLaser file = _laser.File();
@@ -68,7 +72,7 @@ namespace QDLIB
 
    double OMatDipole::Emin()
    {
-      return OHermitianMatrix::Emin() * VecMax((dVec&) _laser);
+      return OHermitianMatrix::Emin() * VecMin((dVec&) _laser);
    }
 
    WaveFunction * OMatDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)

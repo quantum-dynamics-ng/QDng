@@ -4,18 +4,18 @@
 #include "linalg/LapackDiag.h"
 
 namespace QDLIB {
-   
+
    OHermitianMatrix::~OHermitianMatrix()
    {
       if (_X != NULL) delete _X;
       if (_file != NULL) delete _file;
    }
-   
-   
+
+
    OHermitianMatrix::OHermitianMatrix() : dMat(), ODSpaceT<double>(), _X(NULL),  _valid(false),
                                       _file(NULL) ,_init(false), _name("OHermitianMatrix") {}
-   
-   
+
+
    /**
     * Return a fresh instance.
     */
@@ -25,7 +25,7 @@ namespace QDLIB {
       r->newsize(rows(), rows());
       return r;
    }
-   
+
    /**
     * Initializer.
     *
@@ -33,22 +33,22 @@ namespace QDLIB {
    void OHermitianMatrix::Init(ParamContainer &params)
    {
       int size;
-      
+
       Operator::_params = params;
-     
+
       _params.GetValue("size", size);
       /* Init from file - Set recursion indicator _init */
       if (_params.isPresent("file") && !_init){
-         
+
          string name;
          _params.GetValue("file", name);
          _init = true;
-         
+
          File()->Suffix(BINARY_O_SUFFIX);
          File()->Name(name);
-	 
+
          *File() >> (OHermitianMatrix*) this; /* Read Matrix */
-         
+
          /* Adjust min. diag value to zero */
          bool set_zero;
          _params.GetValue("setzero", set_zero);
@@ -62,58 +62,58 @@ namespace QDLIB {
          _valid = false;
          return;
       }
-      
+
       /* Init with params */
-      
+
       /* Zero size matrix doesn't make sense */
       if (size == 0) {
 	 ParamContainer missing;
 	 missing.SetValue("size", 0);
 	 throw( EParamProblem(missing, "Missing size") );
       }
-      
+
       dMat::newsize(size,size);
       _valid = false;
-      
+
       /* Check if we diagonalize imidiately */
       bool initDiag;
-      _params.GetValue("qdiag", initDiag, true);
+      _params.GetValue("qdiag", initDiag, false);
       if (initDiag){
          if (_X == NULL) _X = new dMat(rows(),rows());
          InitDspace();
       }
-      
-      
+
+
    }
-   
+
    void OHermitianMatrix::Init(WaveFunction * Psi)
    {
       WFLevel *psi=dynamic_cast<WFLevel*>(Psi);
-      
+
       if (!psi)
          throw ( EIncompatible("Matrix operator not compatible with wavefunction ",Name(), Psi->Name()) );
-      
+
       if (psi->size() != rows())
          throw ( EIncompatible("Wavefunction has wrong size") );
    }
-   
+
    /**
     * Set size of Matrix.
     */
    void OHermitianMatrix::Size(int size)
-   {  
+   {
       int s;
-      
+
       _params.GetValue("size", s);
-      
+
       if (s != size) {
          _params.SetValue("size", size);
          dMat::newsize(size,size);
          _valid = false;
       }
-      
+
    }
-   
+
    /**
     * \return size of matrix
     */
@@ -121,7 +121,7 @@ namespace QDLIB {
    {
       return rows();
    }
-   
+
    /**
     * Tell your name.
     */
@@ -129,10 +129,10 @@ namespace QDLIB {
    {
       return _name;
    }
-   
+
    /**
     * Calulate a "matrix" element.
-    * 
+    *
     * This looks strange because we are a matrix at the moment.
     * But never the less \f$ \langle \psi_1 \vert \hat O \vert \psi_2 \rangle\f$ is calculated
     * and thus it is still straight forward.
@@ -140,12 +140,12 @@ namespace QDLIB {
    dcomplex OHermitianMatrix::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
    {
       WaveFunction *ket = PsiKet->NewInstance();
-      
+
       *ket = PsiKet;
       Apply(ket, PsiKet);
       return *PsiBra * ket;
    }
-   
+
    /**
     * Calulate an expectation value.
     */
@@ -153,25 +153,25 @@ namespace QDLIB {
    {
       return MatrixElement(Psi, Psi).real();
    }
-   
+
    /** Return the largest eigenvalue */
    double OHermitianMatrix::Emax()
    {
       if (!_valid) InitDspace();
       /* Overestimate Emax to avoid conflicts due to incorrect diagonalization in sums */
-      return 3 * (*_dspace)[_dspace->size()-1]; 
+      return 3 * (*_dspace)[_dspace->size()-1];
    }
-	 
+
    /** Return the smallest diagonal */
    double OHermitianMatrix::Emin()
    {
       if (!_valid) InitDspace();
       return (*_dspace)[0];
    }
-   
+
    /**
     * Matrix-Vector multiplication.
-    * 
+    *
     * Works with every type of WaveFunction (relies only on cVec).
     */
    WaveFunction* OHermitianMatrix::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
@@ -179,51 +179,51 @@ namespace QDLIB {
       MatVecMult((cVec*) destPsi, (dMat*) this, (cVec*) sourcePsi);
       return destPsi;
    }
-   
+
    /**
     * Matrix-Vector multiplication (in place).
-    * 
+    *
     * Works with every type of WaveFunction (relies only on cVec).
-    * 
+    *
     * \todo Optimize for real inplace.
-    */   
+    */
    WaveFunction* OHermitianMatrix::Apply(WaveFunction *Psi)
    {
       WaveFunction *result;
-      
+
       result = Psi->NewInstance();
       MatVecMult((cVec*) result, (dMat*) this, (cVec*) Psi);
       *Psi = result;
       delete result;
       return Psi;
    }
-   
+
    /**
     * Copy operator.
     */
    Operator* OHermitianMatrix::Copy(Operator *O)
    {
       OHermitianMatrix* op = dynamic_cast<OHermitianMatrix*>(O);
-      
+
       cout << "Copy!" << endl;
       if (op==NULL)
          throw ( EIncompatible ("Copy, not of type OHermitianMatrix", O->Name() ) );
-      
+
       *((dMat*) this) = *((dMat*) op);
-      
+
       if (_X != NULL)
          *_X = *(op->_X);
-      
+
       if (_dspace != NULL)
          *_dspace = *(op->_dspace);
 
       op->_XT.SetMatrix(op->_X);
       _params =  op->Params();
-      
+
       _valid = op->_valid;
       return this;
    }
-   
+
    /**
     * Copy operator.
     */
@@ -232,7 +232,7 @@ namespace QDLIB {
      Copy(O);
       return this;
    }
-   
+
    /**
     * Copy operator.
     */
@@ -240,14 +240,14 @@ namespace QDLIB {
    {
       *(dMat*) this = (dMat) O;
       _params =  O.Params();
-      
+
       _valid = false;
       return *this;
    }
-   
+
    /**
     * Diagonlize the matrix.
-    * 
+    *
     * The eigenvalues & eigenvectors will be stored in the class.
     */
    void OHermitianMatrix::Diag()
@@ -259,23 +259,23 @@ namespace QDLIB {
 //       FullDiagHermitian();
 //       _valid = true;
    }
-   
+
    /**
     * Mulitiplies a matrix (dMat) with another matrix (of type dMat).
-    * 
+    *
     * Matrix*Matrix has to be defined for the types used.
     */
    Operator* OHermitianMatrix::operator*(Operator *O)
    {
       Operator *result;
-      
+
       result = this->NewInstance();
-      
+
       MatrixMatrixMult( (dynamic_cast<dMat*>(result) ), this, ( dynamic_cast<dMat*>(O) ) );
-      
+
       return result;
    }
-   
+
    Operator * OHermitianMatrix::Offset(const double d)
    {
       for (int i=0; i < rows() ; i++){
@@ -283,8 +283,8 @@ namespace QDLIB {
          if(_valid)
             (*_dspace)[i] += d;
       }
-      
-      
+
+
       return this;
    }
 
@@ -292,10 +292,10 @@ namespace QDLIB {
    Operator * OHermitianMatrix::Scale(const double d)
    {
       *((dMat*) this) *= d;
-      
+
       if (_valid)
          (*_dspace) *= d;
-      
+
       scaling=d;
       return this;
    }
@@ -306,27 +306,26 @@ namespace QDLIB {
 
       PsiLv = dynamic_cast<WFLevel*>(Psi);
       if ( PsiLv == NULL) return false;
-      
+
       if ( Psi->size() != rows() ) return false;
-      
+
       return true;
    }
-   
+
    void OHermitianMatrix::InitDspace()
    {
       if (_dspace == NULL)
          _dspace = new dVec(rows());
-     
+
       if (_X == NULL){
          _X = new dMat(rows(),rows());
          _XT.SetMatrix(_X);
       }
-      
+
       *_X = *((dMat*) this);
       _dspace->newsize(rows());
-      
-      LAPACK::FullDiagHermitian(_X, _dspace);
 
+      LAPACK::FullDiagHermitian(_X, _dspace);
       _valid = true;
    }
 

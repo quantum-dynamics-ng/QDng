@@ -28,6 +28,9 @@ Test				Type		Level	Status
 * OGridNablaSq			AFNT		3
 * OGridPotential		AFNT		3
 * OMultistate			AFNIT		4
+* ODMultistate			AFNIT		4
+* OHermitianMatrix		AFNIT		4	done (some tests missing)
+* OMatDipole			AFNIT		5	done (some tests missing)
 * OSum				AFNIT		4
 
 * Butterworth			AFN		2
@@ -40,6 +43,8 @@ Test				Type		Level	Status
 
 * OCheby			AFNIT		4
 * OSPO				AFNIT		4
+* OSIL				AFNIT		4
+* GSPO				AFNIT		4
 
 
 
