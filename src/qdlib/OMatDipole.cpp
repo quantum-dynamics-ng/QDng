@@ -113,6 +113,7 @@ namespace QDLIB
    {
       if (_dspace == NULL)
          InitDspace();
+
       ExpElements(exp, _dspace, c * _laser.Get());
    }
 }

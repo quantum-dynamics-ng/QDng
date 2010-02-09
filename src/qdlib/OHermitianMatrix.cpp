@@ -9,6 +9,7 @@ namespace QDLIB {
    {
       if (_X != NULL) delete _X;
       if (_file != NULL) delete _file;
+      if (_dspace != NULL) delete _dspace;
    }
 
 
@@ -205,7 +206,6 @@ namespace QDLIB {
    {
       OHermitianMatrix* op = dynamic_cast<OHermitianMatrix*>(O);
 
-      cout << "Copy!" << endl;
       if (op==NULL)
          throw ( EIncompatible ("Copy, not of type OHermitianMatrix", O->Name() ) );
 

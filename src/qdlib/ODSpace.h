@@ -27,8 +27,6 @@ namespace QDLIB
 
          ~ODSpaceT()
          {
-            if (_dspace != NULL)
-               delete _dspace;
          }
 
          /**

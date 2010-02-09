@@ -4,7 +4,7 @@ namespace QDLIB
 {
 
    OGSPO::OGSPO() :
-      _name("GSPO"), _spoLen(0), _laststep(-1)
+      _name("OGSPO"), _spoLen(0), _laststep(-1)
    {
       _needs.SetValue("A", "");
       _needs.SetValue("B", "opt");
@@ -18,11 +18,11 @@ namespace QDLIB
 
    OGSPO::~OGSPO()
    {
-      for (int i = 0; i < GSPO_MAX_LEN; i++) {
-         if (_ops[i] != NULL) {
-            delete _ops[i];
-         }
-      }
+//      for (int i = 0; i < GSPO_MAX_LEN; i++) {
+//         if (_ops[i] != NULL) {
+//            delete _ops[i];
+//         }
+//      }
    }
 
    /**
@@ -38,7 +38,7 @@ namespace QDLIB
          if ((_ops[i]->isTimeDep() && _laststep != clock->TimeStep()) || _laststep == -1) {
             _ops[i]->InitExponential(&(_exp[i]), Exponent() * sf);
          }
-         sf = 1 / 2; /* All other elements are outer ones => factor 1/2 */
+         sf = 0.5; /* All other elements are outer ones => factor 1/2 */
       }
       _laststep = clock->TimeStep();
    }
@@ -78,7 +78,7 @@ namespace QDLIB
          if (_ops[i] == NULL)
             throw(EParamProblem("GSPO misses an operator. Sequence must be A, B, C, ..."));
 
-         _ops[i]->Init(Psi); /* Operators init round */
+//         _ops[i]->Init(Psi); /* Operators init round */
          _exp[i].newsize(Psi->size(), Psi->strides());
       }
 
@@ -116,7 +116,9 @@ namespace QDLIB
       for (int i = _spoLen - 1; i > 0; i--) {
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Forward(Psi);
+
          MultElements((cVec*) Psi, &(_exp[i]));
+
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Backward(Psi);
       }
@@ -125,7 +127,9 @@ namespace QDLIB
       for (int i = 0; i < _spoLen; i++) {
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Forward(Psi);
+
          MultElements((cVec*) Psi, &(_exp[i]));
+
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Backward(Psi);
       }
