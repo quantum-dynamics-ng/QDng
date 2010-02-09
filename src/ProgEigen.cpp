@@ -150,6 +150,7 @@ namespace QDLIB
       log.cout().precision(2);
       log.cout() << "Time step: " << fixed << clock->Dt() << endl;
       log.cout() << "Check cycles: " << _ncycle << endl;
+      log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
       log.cout() <<  "Requestet convergence: " << scientific << _convergence << endl;
       log.cout() << "Name for eigenenergy file: " << _ename << endl;
