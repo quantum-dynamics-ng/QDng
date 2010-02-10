@@ -16,7 +16,9 @@ namespace QDLIB
    class TransformMSD: public QDLIB::Transform
    {
       private:
-         dMat **_X;
+         dMat **_X;        /* Array of Matrices, one per grid point*/
+         bool _adjoint;    /* Can we use the adjoint Matrix? */
+         Transform **_T;     /* External Transformation, array over states */
       public:
          TransformMSD();
          virtual ~TransformMSD();
@@ -24,13 +26,26 @@ namespace QDLIB
          virtual void Forward(WaveFunction *Psi);
          virtual void Backward(WaveFunction *Psi);
 
-         void SetMatrixArray(dMat **X, bool adjoint = true);
+         /**
+          * Set an external tranformer.
+          * This is needed if the basis transformation isn't done by us. (e.g. Tkin)
+          */
+         void ExternalTransform(Transform **T) { _T = T; }
+         
+         Transform** ExternalTransform() { return _T; }
+         
+         /** 
+          * Set Matrix Array.
+          * \param adjoint Indicates, that matrix inversion is not needed.
+          */
+         void SetMatrixArray(dMat **X, bool adjoint = true) { _X = X; _adjoint = adjoint; }
 
          /** Get the transformation matrix. */
-         dMat** GetMatrix() {return _X;}
+         dMat** GetMatrixArray() {return _X;}
 
    };
 
 }
 
 #endif /* TRANSFORMMSD_H_ */
+

@@ -9,6 +9,7 @@
 #include "qdlib/OGridSum.h"
 #include "qdlib/OGridsystem.h"
 #include "qdlib/OMultistate.h"
+#include "qdlib/ODMultistate.h"
 #include "qdlib/WFMultistate.h"
 #include "qdlib/FileWF.h"
 
@@ -65,13 +66,15 @@ namespace QDLIB
 	    child->NextNode();
 	 }
 	 return sum;
-      } else if (name == "Multistate") { /* Matrix of operators */
+      } else if (name == "Multistate" || name == "DMultistate") { /* Matrix of operators */
 	 log.cout() << "Multistate operator:\n";
 	 log.IndentInc();
 	 child = Onode->NextChild();
 	 child->AdjustElementNode();
 	 Operator *osub;
-	 OMultistate *matrix = new OMultistate();
+	 OMultistate *matrix = NULL;
+         if (name == "Multistate") matrix = new OMultistate();
+         if (name == "DMultistate") matrix = new ODMultistate();
 	 
 	 matrix->Init(pm);
 	 while (child->EndNode()){
