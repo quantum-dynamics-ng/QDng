@@ -9,7 +9,8 @@ namespace QDLIB {
    {
    }
 
-   OGridNabla::OGridNabla(bool momentum) : _name("OGridNabla"), _fac(1), _kspace(NULL), _momentum(momentum), _dim(-1)
+   OGridNabla::OGridNabla(bool momentum) :
+         ODSpaceCplx(), GridSystem(),_name("OGridNabla"), _fac(1), _kspace(NULL), _momentum(momentum), _dim(-1)
    {
    }
 
@@ -40,7 +41,7 @@ namespace QDLIB {
          _params.GetValue("dim", _dim);
 
          if (_dim < 0)
-            throw ( EParamProblem("Invalid dimension chosen for position operator: ", _dim)  );
+            throw ( EParamProblem("Invalid dimension chosen for momentum operator: ", _dim)  );
       }
    }
 
@@ -248,7 +249,7 @@ namespace QDLIB {
    {
       if (_dspace == NULL) InitDspace();
       
-      ExpElements(exp, _dspace, c);
+      ExpElements(exp, _dspace, c * _fac);
       *exp *= 1/double(GridSystem::Size());
    }
 
