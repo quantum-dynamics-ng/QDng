@@ -98,7 +98,7 @@ namespace QDLIB {
         MultElementsCopy((cVec*) buf1, (cVec*) _Lzb[0], _alpha[0]);
         *(_Lzb[1]) -= buf1;
 
-        _beta[0] = sqrt(_Lzb[1]->Norm());
+        _beta[0] = _Lzb[1]->Norm();
 
         *(_Lzb[1]) *= 1 / _beta[0];     /* b0 = Norm(q1) = <q1 | H | q0 > */
 
@@ -114,7 +114,7 @@ namespace QDLIB {
             MultElementsCopy((cVec*) buf0, (cVec*) _Lzb[it-2], _beta[it-2]);
             *(_Lzb[it]) -= buf0;
 
-            _beta[it-1] = sqrt(_Lzb[it]->Norm());
+            _beta[it-1] = _Lzb[it]->Norm();
 
             *(_Lzb[it]) *= 1 / _beta[it-1];
 
