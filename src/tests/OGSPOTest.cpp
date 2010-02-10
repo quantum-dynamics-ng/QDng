@@ -8,13 +8,10 @@ CPPUNIT_TEST_SUITE_REGISTRATION( OGSPOTest);
 
 OGSPOTest::OGSPOTest()
 {
-   // TODO Auto-generated constructor stub
-
 }
 
 OGSPOTest::~OGSPOTest()
 {
-   // TODO Auto-generated destructor stub
 }
 
 void OGSPOTest::setUp()
@@ -46,7 +43,7 @@ void OGSPOTest::setUp()
    ht = dynamic_cast<OMatDipole*> (Ht);
    (*ht)(0, 0) = (*ht)(1, 1) = 0;
    (*ht)(0, 1) = (*ht)(1, 0) = 1;
-
+   
    TheLaser = ht->GetLaser();
 
    TheLaser->Dt(M_PI);
@@ -60,6 +57,7 @@ void OGSPOTest::setUp()
    psi0 = new WFLevel();
    psi0->Init(pm);
    (*psi0)[0] = 1;
+   (*psi0)[1] = 0;
 
    H->Init(psi0);
    psi1 = psi0->NewInstance();
@@ -90,8 +88,6 @@ void OGSPOTest::API_Test()
       abc[0] = a + i;
       CPPUNIT_ASSERT_MESSAGE(abc, key == string(abc));
    }
-   key = "A";
-   pm.clear();
 
 }
 

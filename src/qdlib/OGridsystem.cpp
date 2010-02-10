@@ -3,7 +3,7 @@
 
 namespace QDLIB {
 
-   OGridSystem::OGridSystem() : _file(NULL) {}
+   OGridSystem::OGridSystem() : ODSpace(), _file(NULL) {}
 
    OGridSystem::~OGridSystem()
    {

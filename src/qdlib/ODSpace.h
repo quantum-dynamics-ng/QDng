@@ -21,7 +21,7 @@ namespace QDLIB
          Vector<T> *_dspace;
       public:
          ODSpaceT() :
-            _dspace(NULL)
+            Operator(), _dspace(NULL)
          {
          }
 

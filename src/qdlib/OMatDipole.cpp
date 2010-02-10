@@ -12,7 +12,7 @@ namespace QDLIB
 {
 
    OMatDipole::OMatDipole() :
-      _name("OMatDipole"), _init(false)
+      OHermitianMatrix(), _name("OMatDipole"), _init(false)
    {
       _isTimedependent = true;
    }

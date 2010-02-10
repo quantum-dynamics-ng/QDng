@@ -13,7 +13,7 @@ namespace QDLIB {
    }
 
 
-   OHermitianMatrix::OHermitianMatrix() : dMat(), ODSpaceT<double>(), _X(NULL),  _valid(false),
+   OHermitianMatrix::OHermitianMatrix() : dMat(), ODSpace(), _X(NULL),  _valid(false),
                                       _file(NULL) ,_init(false), _name("OHermitianMatrix") {}
 
 

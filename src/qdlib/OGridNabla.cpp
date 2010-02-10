@@ -5,7 +5,7 @@
 
 namespace QDLIB {
 
-   OGridNabla::OGridNabla() : _name("OGridNabla"), _fac(1), _kspace(NULL),  _momentum(false), _dim(-1)
+   OGridNabla::OGridNabla() : ODSpaceCplx(), GridSystem(), _name("OGridNabla"), _fac(1), _kspace(NULL),  _momentum(false), _dim(-1)
    {
    }
 
