@@ -79,12 +79,15 @@ namespace QDLIB
    {
       OHermitianMatrix::Apply(destPsi, sourcePsi);
       *destPsi *= _laser.Get();
+      
+      return destPsi;
    }
 
    WaveFunction * OMatDipole::Apply(WaveFunction *Psi)
    {
       OHermitianMatrix::Apply(Psi);
       *Psi *= _laser.Get();
+      return Psi;
    }
 
    Operator * OMatDipole::operator =(Operator * O)

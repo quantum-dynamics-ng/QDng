@@ -89,6 +89,7 @@ namespace QDLIB {
          /*Interface implementation, ODSpace  */ 
          virtual Transform* Transformation() { return &_FFT; }
          virtual void InitDspace();
+         virtual void InitExponential (cVec *exp, dcomplex c);
          
          
          

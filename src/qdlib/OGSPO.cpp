@@ -192,7 +192,7 @@ namespace QDLIB
          if (op == NULL)
             throw(EIncompatible("GSPO: Operator has no diagonal representation", O->Name()));
 
-         _ops[i] = op;
+         _ops[int(i)] = op;
          _spoLen++;
       } else {
          throw(EParamProblem("GSPO: Invalid SPO - key given ", key));

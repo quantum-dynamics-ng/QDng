@@ -28,6 +28,7 @@ namespace QDLIB
          {
             /* Avoid disambigious virtual overload */
             OMultistate::Scale(d);
+            return NULL;
          }
 
          void InitDspace();
