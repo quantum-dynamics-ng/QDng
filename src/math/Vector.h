@@ -29,7 +29,7 @@
 #include <cmath>
 #include <string.h>
 
-#define TNT_MAX_STRIDES 32
+
 #define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD */
 
 using namespace std;
@@ -66,7 +66,7 @@ class Vector
  
     
   private:
-    T* v_[TNT_MAX_STRIDES];
+    T** v_;
     lint n_;
 
     size_type nstrides_;
@@ -92,15 +92,18 @@ class Vector
       stride_size_ = N / strides;
       n_ = N;
       
+      v_ = new T*[strides];
+      
+      isRef_ = false;
+      
       for (lint i=0; i < nstrides_; i++){
-	 if (align_){
-	    if ( (posix_memalign((void**) &v_[i], QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_)) != 0)
-	       v_[i] = new T[stride_size_];
-	 } else {
+         if (stride_size_ == 0)
+            v_[i] = NULL;
+         else
             v_[i] = new T[stride_size_];
-	 }
+	    //posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
       }
-
+      
       
     }
    
@@ -143,14 +146,16 @@ class Vector
     void destroy()
     {     
         /* do nothing, if no memory has been previously allocated */
-       for (lint s=0; s < nstrides_; s++){
- 	  if (v_[s] != NULL){
-	     if(align_)
-		free(v_[s]);
-	     else 
-	        delete[] v_[s];
-	     v_[s] = NULL;
- 	  }
+       if (v_ != NULL && !isRef_){
+         for (lint s=0; s < nstrides_; s++){
+            if(v_[s] != NULL){
+               //free(v_[s]);
+               delete[] v_[s];
+               v_[s] = NULL;
+            }
+         }
+         delete[] v_;
+         v_ = NULL;
        }
     }
 
@@ -165,7 +170,7 @@ class Vector
         * 
         * \param vec    The vector to inject
         * \param source The source stride in vec
-        * \param dest   The destination stride
+        * \param dest   The destination stride (Number must be larger!!!)
         */
        bool StrideRef(Vector<T> &vec, lint source, lint dest = 0)
        {
@@ -173,8 +178,8 @@ class Vector
 	     return false;
 	  
 	  if (!isRef_){
-	     if (dest >= TNT_MAX_STRIDES) return false;
-	     destroy();
+	     if (dest >= nstrides_) return false;
+	     if (stride_size_ > 0) destroy();
 	     
 	     stride_size_ = vec.stride_size_;
 	     isRef_ = true;
@@ -263,10 +268,8 @@ class Vector
 
     Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(false)
     {
-       for(lint i=0; i < TNT_MAX_STRIDES; i++)
-       {
-	  v_[i] = NULL;
-       }
+       v_ = new T*[nstrides_];
+       v_[0] = NULL;
     }
 
     
@@ -324,7 +327,6 @@ class Vector
 
         if (!isRef_) destroy();
         initialize(N, 1);
-	isRef_ = false;
 
         return *this;
     }

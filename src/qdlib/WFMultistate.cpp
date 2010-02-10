@@ -53,8 +53,6 @@ namespace QDLIB
       if (Psi->strides() > 1)
 	 throw( EOverflow( "WFMultistate can't handle strided vectors") );
      
-      if (! cVec::StrideRef(*((cVec*) Psi), 0, index))
-	 throw(Exception("Stride Failure"));
    }
       
    lint WFMultistate::States( )
@@ -72,6 +70,7 @@ namespace QDLIB
       WFMultistate *r = new WFMultistate();
       
       r->_nstates=_nstates;
+      r->newsize(0,_nstates);
       for (int i=0; i < _nstates; i++){
 	 r->_states[i] =  _states[i]->NewInstance();
 	 r->StrideRef(*(r->_states[i]), 0, i);
@@ -91,12 +90,6 @@ namespace QDLIB
       
       _params.GetValue("states", reqsize);
       
-      if (reqsize >= QD_MAX_STATES )
-	 throw( EOverflow( "More states requested than possible (QD_MAX_STATES)") );
-      
-      if (reqsize < _nstates )
-	 throw( EParamProblem( "Less states requested than provided!?") );
-      
       /* look for empty states */
       for (int i=0; i < _nstates; i++){
 	 if (_states[i] != NULL)
@@ -104,7 +97,6 @@ namespace QDLIB
 	 else if (wflast != NULL){
 	    _states[i] = wflast->NewInstance();
 	    *((cVec*) _states[i]) = dcomplex(0,0);
-	    cVec::StrideRef(*((cVec*) (_states[i])), 0, i);
 	 }
       }
       /* same thing again to refill lower states */
@@ -114,7 +106,6 @@ namespace QDLIB
 	 else if (wflast != NULL){
 	    _states[i] = wflast->NewInstance();
 	    *((cVec*) _states[i]) = dcomplex(0,0);
-	    cVec::StrideRef(*((cVec*) (_states[i])), 0, i);
 	 }
       }
       
@@ -122,16 +113,22 @@ namespace QDLIB
 	 throw (EParamProblem("Empty multi state wave function"));
       
       /* resize if needed */
-      if (_nstates != reqsize){
+      if (_nstates < reqsize){
 	 for (int i=_nstates; i < reqsize; i++){
 	    _states[i] = wflast->NewInstance();
 	    *((cVec*) _states[i]) = dcomplex(0,0);
-	    cVec::StrideRef(*((cVec*) (_states[i])), 0, i);
 	 }
+         _nstates = reqsize;
       }
-      _nstates = reqsize;
       
+      _params.SetValue("states", _nstates);
       
+      /* Link states into our vector space */
+      cVec::newsize(0,_nstates);
+      for (int i=0; i < _nstates; i++){
+         if (! cVec::StrideRef(*((cVec*) (_states[i])), 0, i))
+         throw(Exception("Stride Failure"));
+      }
       
    }
 
@@ -169,11 +166,9 @@ namespace QDLIB
       if (_nstates != psi->_nstates)
 	 throw( EIncompatible("Multistate WFs differ in number of states") ) ;
       
-     // _destroy(); /* remove old content */
       
       for(lint i=0; i < psi->_nstates; i++){
 	 *(_states[i]) = psi->_states[i];
-	 //cVec::StrideRef(*(_states[i]), 0, i);
       }
       _params = psi->_params;
       return this;

@@ -180,11 +180,7 @@ void FileWFTest::IO_Test_Multistate()
    file.Name("TESTMS");
    file.Suffix(".wftest");
    
-   try {
-      file << wfm;
-   } catch (Exception e) {
-      cout << e.GetMessage();
-   }
+   CPPUNIT_ASSERT_NO_THROW(wfm->Init(p));
             
    /* Write File */
    CPPUNIT_ASSERT_NO_THROW(file << wfm);
@@ -229,7 +225,7 @@ void FileWFTest::IO_Test_Multistate()
    CPPUNIT_ASSERT(n == -5);
    p_in.GetValue("xmax0", n);
    CPPUNIT_ASSERT(n == 5);
-   
+  
    /* Values should match exactly */
    for (int i=0; i < psi0->size(); i++){
       CPPUNIT_ASSERT( (*psi0_in)[i].real() == (*psi0)[i].real() );
@@ -265,7 +261,7 @@ void FileWFTest::IO_Test_Multistate()
 
    delete wfm_in;
    wfm_in = NULL;
-   
+  
    /* Check load-by-meta style */
    CPPUNIT_ASSERT_NO_THROW (file >> (WaveFunction**) &wfm_in);
    
