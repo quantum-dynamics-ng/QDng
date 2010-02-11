@@ -22,7 +22,8 @@ namespace QDLIB {
          
          virtual void Forward(WaveFunction *Psi);
          virtual void Backward(WaveFunction *Psi);
-      
+         virtual double Normalization(){ return 1; }
+         
          void SetMatrix(dMat *X, bool adjoint = true);
          
          /** Get the transformation matrix. */

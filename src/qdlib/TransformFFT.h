@@ -14,6 +14,7 @@ namespace QDLIB
    class TransformFFT : public Transform
    {
       private:
+         double _norm;
       public:
          TransformFFT();
          ~TransformFFT();
@@ -21,7 +22,7 @@ namespace QDLIB
          virtual void Forward(WaveFunction *Psi);
          virtual void Backward(WaveFunction *Psi);
          
-         
+         virtual double Normalization(){ return _norm; }
    };
 
 } /* namespace QDLIB */

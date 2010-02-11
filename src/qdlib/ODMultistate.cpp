@@ -5,15 +5,17 @@ namespace QDLIB
 {
 
    ODMultistate::ODMultistate() :
-         _name("ODMultistate"), _T(NULL),  _state_size(0)
+         _name("ODMultistate"), _X(NULL), _T(NULL),  _state_size(0)
    {
 
    }
 
    ODMultistate::~ODMultistate()
    {
-      for (int i = 0; i < _state_size; i++) {
-         delete _X[i];
+      if (_X != NULL){
+         for (int i = 0; i < _state_size; i++) {
+            delete _X[i];
+         }
       }
       if (_T != NULL)  delete[] _T;
    }
@@ -49,12 +51,12 @@ namespace QDLIB
             if ( od == NULL && State(i,j) != NULL)
                throw ( EIncompatible ("ODMultistate can only handle DSpace operators") );
             
-            if ( State(i,j) != NULL ) {
+            if ( State(i,j) != NULL ) {      /* Check for external transformation */
                if ( od->Transformation() != NULL ) {
                   external = true;
                   if ( i != j )
                      throw ( EIncompatible ("ODMultistate can't transform non-diagonal operators in non-diagonal matrices") );
-                  
+
                   _T[i] = od->Transformation();
                }
             }
@@ -101,31 +103,54 @@ namespace QDLIB
             _X[i] = new dMat(States(), States());
          }
       }
-      dVec evals(States());
-
-      /* diagonalize at every grid point */
-      for (int i = 0; i < _state_size; i++) { /* Run over Levels _in_ the states */
-         for (int k = 0; k < States(); k++) {   /*  loop over states => create Matrix */
-            for (int l = 0; l < States(); l++) {
-               if ( State(k,l) != NULL){
-                  ODSpace *state = dynamic_cast<ODSpace*>(State(k,l));
-                  (*(_X[i]))(k,l) = (*(state->Dspace()))[i];  /* get gridpoint */ 
-               } else
-                  (*(_X[i]))(k,l) = 0;
+      if (_T != NULL){ /* Grid Diagonalization - Internal Transform */
+         dVec evals(States());
+   
+         /* diagonalize at every grid point */
+         for (int i = 0; i < _state_size; i++) { /* Run over Levels _in_ the states */
+            for (int k = 0; k < States(); k++) {   /*  loop over states => create Matrix */
+               for (int l = 0; l < States(); l++) {
+                  if ( State(k,l) != NULL){
+                     ODSpace *state = dynamic_cast<ODSpace*>(State(k,l));
+                     (*(_X[i]))(k,l) = (*(state->Dspace()))[i];  /* get gridpoint */ 
+                  } else
+                     (*(_X[i]))(k,l) = 0;
+               }
+            }
+            LAPACK::FullDiagHermitian(_X[i], &evals);
+            for (int j = 0; j < States(); j++) {   /* Put Eigenvektor to states */
+               double *d = _dspace->begin(j);
+               d[i] = evals[j];
             }
          }
-         LAPACK::FullDiagHermitian(_X[i], &evals);
-         for (int j = 0; j < States(); j++) {   /* Put Eigenvektor to states */
-            double *d = _dspace->begin(j);
-            d[i] = evals[j];
+         _XT.SetMatrixArray(_X);
+      } else { /* Use external diagonalization, copy dspace */
+         for (int s=0; s < States(); s++){
+            ODSpace *state = dynamic_cast<ODSpace*>(State(s,s));
+            _dspace->StrideCopy(*(state->Dspace()), 0, s);
          }
       }
-      _XT.SetMatrixArray(_X);
+      
    }
    
-
+   void ODMultistate::InitExponential(cVec * exp, dcomplex c)
+   {
+      if (_T == NULL)
+         ODSpace::InitExponential(exp, c);
+      else {
+         cVec tmpe(_state_size);
+         for (int s=0; s < States(); s++){
+            ODSpace *state = dynamic_cast<ODSpace*>(State(s,s));
+            state->InitExponential(&tmpe, c);
+            if (!exp->StrideCopy(tmpe, 0, s))
+               throw ( EIncompatible ("Stride Error"));
+         }
+      }
+   }
    
 } /* namespace QDLIB */
+
+
 
 
 

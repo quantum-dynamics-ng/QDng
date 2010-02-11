@@ -5,7 +5,7 @@
 namespace QDLIB
 {
 
-   TransformMSD::TransformMSD() : _X(NULL), _T(NULL)
+   TransformMSD::TransformMSD() : _X(NULL), _T(NULL), _norm(1)
    {
 
    }
@@ -23,10 +23,15 @@ void QDLIB::TransformMSD::Forward(WaveFunction * Psi)
    int states;
    
    states = wfm->States();
+   _norm = 1;
    
    if (_T != NULL) { /* Use external transform */
-      for (int i=0; i < states; i++)
-         _T[i]->Forward(wfm->State(i));
+      for (int i=0; i < states; i++){
+         if( _T[i] != NULL) {
+            _T[i]->Forward(wfm->State(i));
+            _norm *= _T[i]->Normalization();
+         }
+      }
       
    } else {
       cVec psiI,psiR;
@@ -54,11 +59,15 @@ void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
    int states;
    
    states = wfm->States();
+   _norm = 1;
    
    if (_T != NULL) { /* Use external transform */
-      for (int i=0; i < states; i++)
-         if( _T[i] != NULL) _T[i]->Backward(wfm->State(i));
-      
+      for (int i=0; i < states; i++){
+         if( _T[i] != NULL) {
+            _T[i]->Backward(wfm->State(i));
+            _norm *= _T[i]->Normalization();
+         }
+      }
    } else {
       cVec psiI,psiR;
    

@@ -21,6 +21,13 @@ namespace QDLIB {
        */      
       virtual void Backward(WaveFunction *Psi) = 0;
    
+      /**
+       * The factor which normalizes a one-way transformation.
+       * 
+       * The correct value is available after use of forward/backward.
+       * (that means for the last transformation)
+       */
+      virtual double Normalization() = 0;
    }; /* class Transform */
 
 } /* namespace QDLIB */

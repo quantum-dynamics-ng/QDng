@@ -5,7 +5,7 @@ namespace QDLIB
 {
 
    TransformFFT::TransformFFT()
-               : Transform()
+               : Transform(), _norm(1)
    {
    }
    
@@ -23,8 +23,10 @@ namespace QDLIB
       WFGridSystem* psi=dynamic_cast<WFGridSystem*>(Psi);
       
       if (!psi) throw( EIncompatible("FFT can't transform", Psi->Name()) );
+     
       if (!psi->fft) throw( EParamProblem("FFT not initialized (maybe NoFFT is switched on?") );
       
+      _norm = 1./psi->Size();
       psi->fft->forward();
       psi->IsKspace(true);
    }
@@ -38,7 +40,8 @@ namespace QDLIB
       WFGridSystem* psi=dynamic_cast<WFGridSystem*>(Psi);
       
       if (!psi) throw( EIncompatible("FFT can't transform", Psi->Name()) );
-      
+     
+      _norm = 1./psi->Size();
       psi->fft->backward();
       psi->IsKspace(false);
    }

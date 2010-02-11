@@ -60,6 +60,7 @@ namespace QDLIB
          }
 
          void InitDspace();
+         virtual void InitExponential (cVec *exp, dcomplex c);
          
          Transform* Transformation() { return &_XT; }
          

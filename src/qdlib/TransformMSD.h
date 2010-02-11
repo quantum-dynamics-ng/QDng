@@ -12,20 +12,25 @@
 
 namespace QDLIB
 {
-
+   
+   /**
+    * Transformation class for special Multistate diagonalizations.
+    */
    class TransformMSD: public QDLIB::Transform
    {
       private:
          dMat **_X;        /* Array of Matrices, one per grid point*/
          bool _adjoint;    /* Can we use the adjoint Matrix? */
          Transform **_T;     /* External Transformation, array over states */
+         double _norm;     /* Last normalizationn factor */
       public:
          TransformMSD();
          virtual ~TransformMSD();
 
          virtual void Forward(WaveFunction *Psi);
          virtual void Backward(WaveFunction *Psi);
-
+         virtual double Normalization(){ return _norm; }
+         
          /**
           * Set an external tranformer.
           * This is needed if the basis transformation isn't done by us. (e.g. Tkin)
