@@ -163,6 +163,19 @@ namespace QDLIB {
       log.IndentDec();
       log.flush();
       
+      
+      /* Initialization filters */
+      section = _ContentNodes->FindNode( "filterinit" );
+      if (section != NULL) {
+         FiltersList filter;
+         log.Header( "Using pre propagation initialization filters", Logger::SubSection);
+         log.IndentInc();
+         filter.Init( section );
+         filter.Apply(Psi);
+         log.IndentDec();
+         delete section;
+      }
+      
       /* Pre step filters */
       section = _ContentNodes->FindNode( "filterpre" );
       if (section != NULL) {
@@ -258,6 +271,18 @@ namespace QDLIB {
       p.SetValue("Wcycle", _wcycle );
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
       if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
+      
+      /* Initialization filters */
+      section = _ContentNodes->FindNode( "filterend" );
+      if (section != NULL) {
+         FiltersList filter;
+         log.Header( "Using post propagation filters", Logger::SubSection);
+         log.IndentInc();
+         filter.Init( section );
+         filter.Apply(Psi);
+         log.IndentDec();
+         delete section;
+      }
       
       delete _h;
       delete Psi;

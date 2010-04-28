@@ -12,6 +12,7 @@
 #include "OGridDipole.h"
 #include "OGridPosition.h"
 #include "OGridNAC.h"
+#include "OGridKick.h"
 
 #include "OHermitianMatrix.h"
 #include "OMatDipole.h"
@@ -72,6 +73,7 @@ namespace QDLIB
    }
 
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNAC)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridKick)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGobbler)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OProjection)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OScalar)
@@ -107,6 +109,7 @@ namespace QDLIB
 
       QDNG_STRING_TO_INSTANCE_PTR(OGridNabla)
       QDNG_STRING_TO_INSTANCE_PTR(OGridNAC)
+      QDNG_STRING_TO_INSTANCE_PTR(OGridKick)
 
       QDNG_STRING_TO_INSTANCE_PTR(OHermitianMatrix)
       QDNG_STRING_TO_INSTANCE_PTR(OMatDipole)
