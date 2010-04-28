@@ -5,6 +5,9 @@
  * xsl scheme for input definition
  * Loops (see Program types)
  * "macros" for shorter defs., eg. Tkin on a multistate operator
+ * References on operators (close conn. to macros)
+ * Setup/tearDown Filters => Before beginning, after end of propgation
+ * Add Momentum to WF (Operator in Setup Filter?)
 
 * MPI
  * Vector Classes
@@ -33,9 +36,10 @@
 
 * Operators to implement
  * Dipole Operator (DONE)
- * SIL
+ * SIL (DONE)
  * SOD
  * Projection Operator (DONE)
+ * Extend NAC Operator to N-Dimensions
  * Generalize Cheby to complex plane energy range
 
 * Multistate System
