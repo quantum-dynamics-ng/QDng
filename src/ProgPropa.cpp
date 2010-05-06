@@ -272,17 +272,6 @@ namespace QDLIB {
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
       if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
       
-      /* Initialization filters */
-      section = _ContentNodes->FindNode( "filterend" );
-      if (section != NULL) {
-         FiltersList filter;
-         log.Header( "Using post propagation filters", Logger::SubSection);
-         log.IndentInc();
-         filter.Init( section );
-         filter.Apply(Psi);
-         log.IndentDec();
-         delete section;
-      }
       
       delete _h;
       delete Psi;

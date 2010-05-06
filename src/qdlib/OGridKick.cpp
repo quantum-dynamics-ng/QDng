@@ -82,6 +82,7 @@ namespace QDLIB {
          /* Run over dimension - create exp(i * k_n * x_n) */
          for (int n=0; n < GridSystem::Dim(); n++){
             x1.newsize( GridSystem::DimSizes(n) );
+            view.ActiveDim(n);
             /* init spatial coordinate*/
             for (int i=0; i < GridSystem::DimSizes(n); i++){
                x1[i] = GridSystem::Xmin(n) + double(i)*GridSystem::Dx(n);
