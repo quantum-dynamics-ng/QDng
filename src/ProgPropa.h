@@ -14,7 +14,7 @@
 
 #define DEFAULT_EXPEC_POST_FILENAME "expec_post.dat"
 #define DEFAULT_EXPEC_PRE_FILENAME "expec_pre.dat"
-
+#define DEFAULT_EXPEC_INIT_FILENAME "expec_init.dat"
 
 namespace QDLIB {
 

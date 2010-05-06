@@ -168,11 +168,15 @@ namespace QDLIB {
       section = _ContentNodes->FindNode( "filterinit" );
       if (section != NULL) {
          FiltersList filter;
+         string s(_dir+DEFAULT_EXPEC_INIT_FILENAME);
          log.Header( "Using pre propagation initialization filters", Logger::SubSection);
          log.IndentInc();
+         filter.SetDefaultName(s);
          filter.Init( section );
          filter.Apply(Psi);
          log.IndentDec();
+         log.cout() << endl;
+         log.flush();
          delete section;
       }
       
@@ -186,6 +190,8 @@ namespace QDLIB {
 	 _prefilter.Init( section );
 	 _usepre = true;
 	 log.IndentDec();
+         log.cout() << endl;
+         log.flush();
 	 delete section;
       }
 
@@ -200,6 +206,7 @@ namespace QDLIB {
 	 _usepost = true;
 	 log.IndentDec();
 	 log.cout() << endl;
+         log.flush();
 	 delete section;
       }
       
