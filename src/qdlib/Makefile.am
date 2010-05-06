@@ -19,3 +19,8 @@ noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h OGridDipole.h \
 AM_CXXFLAGS = -pedantic -pedantic-errors -ansi -g -fPIC -O3 -funroll-loops -ffast-math
 libqd_la_LDFLAGS = -module
 
+
+if HAVE_OPENMP
+  AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
+endif
+

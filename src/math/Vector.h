@@ -117,23 +117,31 @@ class Vector
        
     void copy(T* const *v)
     {
-	for (lint s=0; s < nstrides_; s++)
-	   for (lint i=0; i< stride_size_; i++)
+	for (lint s=0; s < nstrides_; s++){
+           lint i;
+#pragma omp parallel for default(shared) private(i)
+	   for (i=0; i< stride_size_; i++)
             v_[s][i] = v[s][i];
+        }
     }
 
     void copy(const T *v)
     {
-       for (lint s=0; s < nstrides_; s++)
-	  for (lint i=0; i< stride_size_; i++)
+       for (lint s=0; s < nstrides_; s++){
+          lint i;
+#pragma omp parallel for default(shared) private(i)
+	  for (i=0; i< stride_size_; i++)
 	     v_[s][i] = v[i];
+       }
     }
 
     
     void set(const T& val)
     {
        for (lint s=0; s < nstrides_; s++){
-	  for (lint i=0; i< stride_size_; i++){
+          lint i;
+#pragma omp parallel for default(shared) private(i)
+	  for (i=0; i< stride_size_; i++){
 	     v_[s][i] = val;
 	  }
        }
@@ -209,19 +217,19 @@ class Vector
    /**
     * Return a pointer to the local stride.
     */
-    inline T* begin(lint stride) { return v_[stride];}
+    inline T* begin(lint stride) const { return v_[stride];}
     
     /**
      * Return a pointer to the tride set.
      * 
      * This is a 2D array with sizes [strides][stride_size]
      */
-    T** begin() { return v_;}
+    T** begin() const { return v_;}
     
     /**
      * Get Size of a stride in bytes.
      */
-    size_t sizeBytes() { return stride_size_ * sizeof(T); }
+    size_t sizeBytes() const { return stride_size_ * sizeof(T); }
     
     /**
      * Swap the content of two vectors.

@@ -147,7 +147,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-	 for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++){
 	    {
 	       a[i] = cexp(b[i] * c);
 	    }
@@ -173,7 +175,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-	 for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++){
 	    {
 	       a[i] = cexp(b[i] * c);
 	    }
@@ -199,7 +203,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-	 for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++){
 	    a[i] += b[i];
 	 }
       }
@@ -223,7 +229,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          b = B->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             a[i] += b[i] * d;
          }
       }
@@ -247,7 +255,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          b = B->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             a[i] += b[i] * c;
          }
       }
@@ -281,7 +291,9 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             c[i] = a[i] * (I * b[i]) * d;
          }
       }
@@ -315,7 +327,9 @@ namespace QDLIB {
 	 a = A->begin(s);
 	 b = B->begin(s);
          c = C->begin(s);
-	 for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++){
             c[i] *= a[i] * I * b[i] * d;
 	 }
       }
@@ -349,7 +363,9 @@ namespace QDLIB {
 	 a = A->begin(s);
 	 b = B->begin(s);
          c = C->begin(s);
-	 for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++){
             c[i] = a[i].conj()  * b[i] * d;
 	 }
       }
@@ -380,7 +396,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          b = B->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             a[i] = a[i].conj() * b[i] * d;
          }
       }
@@ -410,7 +428,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          b = B->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             a[i] = a[i] * I * b[i] * d;
          }
       }
@@ -440,7 +460,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          b = B->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             a[i] = (a[i] * I) * b[i] * d;
          }
       }
@@ -464,7 +486,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-	 for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++){
 	    {
 	       a[i] *= b[i];
 	    }
@@ -493,7 +517,9 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             {
                c[i] = a[i] * b[i];
             }
@@ -522,7 +548,9 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             {
                c[i] = a[i] * b[i] * d;
             }
@@ -575,7 +603,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
          b = B->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= b[i];
 	 }
@@ -601,7 +631,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= b[i] * c;
 	 }
@@ -627,10 +659,11 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
+         lint i;
 #ifdef _OPENMP
          #pragma omp parallel for
 #endif
-	 for (lint i=0; i < size; i++)
+	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= b[i] * c;
 	 }
@@ -658,7 +691,9 @@ namespace QDLIB {
 	 a = A->begin(s);
 	 b = B->begin(s);
 	 c = C->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    c[i] = a[i] * b[i] * d;
 	 }
@@ -687,8 +722,9 @@ namespace QDLIB {
 	 a = A->begin(s);
 	 b = B->begin(s);
 	 c = C->begin(s);
-
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    c[i] = a[i] * b[i];
 	 }
@@ -715,7 +751,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= b[i] * c;
 	 }
@@ -738,7 +776,9 @@ namespace QDLIB {
       lint s;
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= c;
 	 }
@@ -760,7 +800,9 @@ namespace QDLIB {
       lint s;
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= c;
 	 }
@@ -783,7 +825,9 @@ namespace QDLIB {
       lint s;
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= c;
 	 }
@@ -807,7 +851,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 b = B->begin(s);
-	 for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++){
 	    {
 	       a[i] = d * b[i];
 	    }
@@ -834,7 +880,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          b = B->begin(s);
-         for (lint i=0; i < size; i++){
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++){
             {
                a[i] += c * b[i];
             }
@@ -862,7 +910,9 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
 	 a = A->begin(s);
 	 c = C->begin(s);
-	 for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+	 for (i=0; i < size; i++)
 	 {
 	    c[i] = a[i] * d;
 	 }
@@ -890,7 +940,9 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
-         for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++)
          {
             c[i] = a[i] * b[i];
          }
@@ -918,7 +970,9 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
-         for (lint i=0; i < size; i++)
+         lint i;
+#pragma omp parallel for default(shared) private(i)
+         for (i=0; i < size; i++)
          {
             c[i] = a[i] * b[i] * d;
          }

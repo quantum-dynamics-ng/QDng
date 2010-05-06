@@ -4,3 +4,8 @@ noinst_LTLIBRARIES = libmath.la
 libmath_la_SOURCES = dcomplex.cpp math_functions.cpp
 AM_CXXFLAGS = -O3 -pedantic -pedantic-errors -fPIC -ansi -ffast-math -funroll-loops $(BLAS_LIBS)
 noinst_HEADERS = Matrix.h
+
+if HAVE_OPENMP
+  AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
+endif
+

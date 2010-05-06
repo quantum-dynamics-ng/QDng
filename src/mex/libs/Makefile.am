@@ -2,7 +2,7 @@ INCLUDES = $(LIBXML2_CFLAGS) $(all_includes) -I$(top_srcdir)/src -I$(MATLAB_DIR)
 
 METASOURCES = AUTO
 
-CXXFLAGS  = -O1
+AM_CXXFLAGS  = -O1
 
 pkglib_LTLIBRARIES = libObjectHandle.la 
 

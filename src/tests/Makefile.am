@@ -3,6 +3,12 @@ INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/fftw/api -I/usr/include/cppun
 METASOURCES = AUTO
 AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 
+if HAVE_OPENMP
+  AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
+  AM_LDFLAGS = $(OPENMP_CXXFLAGS)
+endif
+
+
 noinst_HEADERS = ComplexNumbers.h MatrixTest.h LapackTest.h GridSystem.h FileWFTest.h MultElementsTest.h \
 	OGridHarmonic.h OGridNablaSqTest.h OGridNablaTest.h QDClock.h TestCheby.h \
 	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
