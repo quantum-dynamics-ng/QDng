@@ -23,7 +23,8 @@ namespace QDLIB
                             _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS),
-			    _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true)
+                                      _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true),
+                                      _start(0)
    {
    }
 
@@ -102,10 +103,19 @@ namespace QDLIB
 	    throw ( EParamProblem ("Less than one eigenfunction given requested") );
       }
       
+      if ( attr.isPresent("start") ){
+         attr.GetValue("start", _start);
+         if (_start < 0)
+            throw ( EParamProblem ("Can't start with negative ef") );
+         if (_start > _Nef) 
+            throw ( EParamProblem ("Can't start above number of desired EFs") );
+      }
+         
       /* Filter diagonalization */
       if ( attr.isPresent("diag"))
          attr.GetValue("diag", _diag);
       
+      /* Default convergence */
       if (_diag)
          _convergence = DEFAULT_CONVERGENCE_EF_DIAG;
       else
@@ -161,6 +171,9 @@ namespace QDLIB
       log.cout() << "Number of steps: " <<  clock->Steps() << endl;
       log.cout().precision(2);
       log.cout() << "Time step: " << fixed << clock->Dt() << endl;
+      if (_start > 0){
+         log.cout() << "Restart Calculation at EF " << _start << endl;
+      }
       log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
       log.cout() <<  "Requested convergence: " << scientific << _convergence << endl;
@@ -251,10 +264,27 @@ namespace QDLIB
       Psi = Psi_initial->NewInstance();
       _buf = Psi_initial->NewInstance();
 	    
+      /* Prepare Restart */
+      if (_start > 0) {
+         ParamContainer pres;
+         pres.SetValue("start", 0);
+         pres.SetValue("num", _start);
+         pres.SetValue("step", 1);
+         pres.SetValue("files", _dir+_fname);
+         _P.Init(pres);
+      }
+      
       _P.Init(Psi_initial);
 	    
+      /* Recalc Energies */
+      if (_start > 0) {
+         for (int i=0; i < _start; i++){
+            _Energies_raw[i] = _H->Expec(_P.Get(i) );
+         }
+      }
+      
       /* EF loop */
-      for (int i=0; i < _Nef; i++){
+      for (int i=_start; i < _Nef; i++){
 	 *Psi = Psi_initial;
 	 /* propagation loop */
 	 int s=0;
@@ -296,10 +326,11 @@ namespace QDLIB
          WaveFunction *bra,*ket;
          for (int i=0; i < _Nef; i++){
             bra = _P.Get(i);
-            for (int j=0; j <= i; j++){
+            for (int j=0; j < i; j++){
                ket = _P.Get(j);
                S(j,i) =  _H->MatrixElement(bra, ket).real();
             }
+            S(i,i) = _Energies_raw[i];
          }
 
          if (LAPACK::FullDiagHermitian(&S, &_Energies_diag) != 0)
@@ -316,8 +347,8 @@ namespace QDLIB
                *_buf *= S(j,i);
                *Psi += _buf;
             }
-            log.cout() << i << "\t" << _Energies_diag[i] - _Energies_raw[i];
-            log.cout() << "\t" << (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
+            log.cout() << i << "\t" <<fixed<< _Energies_diag[i] - _Energies_raw[i];
+            log.cout() << "\t" <<fixed<< (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
             log.flush();
             efile << Psi;
          }

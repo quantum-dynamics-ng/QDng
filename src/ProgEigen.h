@@ -35,6 +35,7 @@ namespace QDLIB
     *  \li fname  Base name for ef output
     *  \li ename  Name for energy.dat
     *  \li diag   true/false diagonalize the eigen basis
+    *  \li start  Do not start with zeroeth EF but read already calculated
     * 
     *  \todo diagonalization
     *  @author Markus Kowalewski
@@ -61,7 +62,8 @@ namespace QDLIB
 	 string _ename;
 	 double _dt;
 	 bool _diag; /* Diagonalize Basis */
-	 
+         int _start;
+         
 	 dVec _Energies_raw;
 	 dVec _Energies_diag;
 	 
