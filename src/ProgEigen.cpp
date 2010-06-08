@@ -14,14 +14,16 @@
 #include "qdlib/FileWF.h"
 #include "qdlib/Conversion.h"
 
+#include "linalg/LapackDiag.h"
+
 namespace QDLIB
 {
 
    ProgEigen::ProgEigen(XmlNode &EigenNode) : _EigenNode(EigenNode),
                             _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
-			    _convergence(DEFAULT_CONVERGENCE_EF),
+			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS), _ncycle(DEFAULT_NCYCLE),
-			    _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME)
+			    _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true)
    {
    }
 
@@ -47,13 +49,24 @@ namespace QDLIB
 	 if (!enfile.is_open()) throw;
 	
 	 for (int i=0; i < _Nef; i++){
-	    enfile.precision(8);
-	    enfile << i << "\t" << fixed << _Energies_raw[i];
-	    enfile.precision(2);
-	    enfile << "\t" << _Energies_raw[i]*AU2WAVENUMBERS;
-	    enfile << "\t" << (_Energies_raw[i]-_Energies_raw[0])*AU2WAVENUMBERS;
-	    if (i>0)
-	       enfile << "\t" << (_Energies_raw[i]-_Energies_raw[i-1])*AU2WAVENUMBERS;
+
+            if (_diag) { /* Use diagonalized energies */
+               enfile.precision(8);
+               enfile << i << "\t" << fixed << _Energies_diag[i];
+               enfile.precision(2);
+               enfile << "\t" << _Energies_diag[i]*AU2WAVENUMBERS;
+               enfile << "\t" << (_Energies_diag[i]-_Energies_diag[0])*AU2WAVENUMBERS;
+               if (i>0)
+                  enfile << "\t" << (_Energies_diag[i]-_Energies_diag[i-1])*AU2WAVENUMBERS;
+            } else { /* Raw energies  */
+               enfile.precision(8);
+               enfile << i << "\t" << fixed << _Energies_raw[i];
+               enfile.precision(2);
+               enfile << "\t" << _Energies_raw[i]*AU2WAVENUMBERS;
+               enfile << "\t" << (_Energies_raw[i]-_Energies_raw[0])*AU2WAVENUMBERS;
+               if (i>0)
+                  enfile << "\t" << (_Energies_raw[i]-_Energies_raw[i-1])*AU2WAVENUMBERS;
+            }
 	    enfile << endl;
 	 }
 	 enfile.close();
@@ -88,6 +101,16 @@ namespace QDLIB
 	 if ( _Nef < 1)
 	    throw ( EParamProblem ("Less than one eigenfunction given requested") );
       }
+      
+      /* Filter diagonalization */
+      if ( attr.isPresent("diag"))
+         attr.GetValue("diag", _diag);
+      
+      if (_diag)
+         _convergence = DEFAULT_CONVERGENCE_EF_DIAG;
+      else
+         _convergence = DEFAULT_CONVERGENCE_EF_RAW;
+         
       
       /* Convergence */
       if ( attr.isPresent("conv") ) {
@@ -135,11 +158,7 @@ namespace QDLIB
 	    _dir += "/";
       }
       CreateDir(_dir);
-      
-      /* Filter diagonalization */
-      if ( attr.isPresent("diag"))
-	 throw ( EParamProblem ("Filter diagonalization not implementet yet!") );
-	      
+           
       
       clock->Dt(_dt);
       clock->Steps(_MaxSteps);
@@ -152,7 +171,9 @@ namespace QDLIB
       log.cout() << "Check cycles: " << _ncycle << endl;
       log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
-      log.cout() <<  "Requestet convergence: " << scientific << _convergence << endl;
+      log.cout() <<  "Requested convergence: " << scientific << _convergence << endl;
+      if (_diag)
+         log.cout() <<  "Diagonalize basis" << endl;
       log.cout() << "Name for eigenenergy file: " << _ename << endl;
       log.cout() << "Basename for wave function output: " << _fname << endl;
       log.cout().precision(6); cout << scientific;
@@ -228,6 +249,7 @@ namespace QDLIB
       
       _Energies_raw.newsize(_Nef);
       
+      log.Header("EF - Relaxation", Logger::SubSection);
       log.cout() << "EF\tNt\tEnergy\n";
      
    
@@ -269,7 +291,47 @@ namespace QDLIB
 	 log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
 	 log.flush();
       }
+      log.cout() << "\n\n";
       
+      
+      /* Optional basis diagonalization */
+      if (_diag){
+         log.Header("Diagonalize Hamiltonian", Logger::SubSection);
+         /* Create Hamiltonian Matrix */
+         dMat S;
+         S.newsize(_Nef,_Nef);
+         _Energies_diag.newsize(_Nef);
+         S = 0;
+         WaveFunction *bra,*ket;
+         for (int i=0; i < _Nef; i++){
+            bra = _P.Get(i);
+            for (int j=0; j <= i; j++){
+               ket = _P.Get(j);
+               S(j,i) =  _H->MatrixElement(bra, ket).real();
+            }
+         }
+
+         if (LAPACK::FullDiagHermitian(&S, &_Energies_diag) != 0)
+            throw (EOverflow("Problem with diagonlization routine"));
+         
+         /* Build EFs in diag basis & write to file */
+         efile.ResetCounter();
+         log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
+         for (int i=0; i < _Nef; i++){
+            *Psi = _P.Get(0);
+            *Psi *= S(0,i);
+            for (int j=1; j < _Nef; j++){ /* make linear combination */
+               *_buf = _P.Get(j);
+               *_buf *= S(j,i);
+               *Psi += _buf;
+            }
+            log.cout() << i << "\t" << _Energies_diag[i] - _Energies_raw[i];
+            log.cout() << "\t" << (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
+            log.flush();
+            efile << Psi;
+         }
+      }
+      log.cout() << endl;
 
       WriteEnergyFile();
       
