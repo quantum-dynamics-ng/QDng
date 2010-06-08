@@ -253,11 +253,7 @@ namespace QDLIB
       efile.ActivateSequence();
       
       _Energies_raw.newsize(_Nef);
-      
-      log.Header("EF - Relaxation", Logger::SubSection);
-      log.cout() << "EF\tNt\tEnergy\n";
-     
-   
+         
       Psi_initial->Normalize();
       
       Psi_old = Psi_initial->NewInstance();
@@ -272,6 +268,7 @@ namespace QDLIB
          pres.SetValue("step", 1);
          pres.SetValue("files", _dir+_fname);
          _P.Init(pres);
+         log.cout() << "Re-read eigenfunctions 0-" << _start-1 << endl<<endl;
       }
       
       _P.Init(Psi_initial);
@@ -282,6 +279,9 @@ namespace QDLIB
             _Energies_raw[i] = _H->Expec(_P.Get(i) );
          }
       }
+      
+      log.Header("EF - Relaxation", Logger::SubSection);
+      log.cout() << "EF\tNt\tEnergy\n";
       
       /* EF loop */
       for (int i=_start; i < _Nef; i++){
