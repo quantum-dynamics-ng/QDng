@@ -95,6 +95,8 @@ namespace LAPACK {
    /**
     * Diagonalize a real symmetric matrix.
     * 
+    * The Upper triangular matrix is used.
+    * 
     * \param mat     The matrix to diagonalize. On exit it contains the eigenvectors.
     * \param evals   Contains the eigenvalues 
     */
