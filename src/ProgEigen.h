@@ -12,7 +12,6 @@
 #define DEFAULT_NUMBER_EFS      20
 #define DEFAULT_CONVERGENCE_EF_RAW  1e-8
 #define DEFAULT_CONVERGENCE_EF_DIAG  1e-5
-#define DEFAULT_NCYCLE          01
 #define DEFAULT_MAXSTEPS        10000
 #define DEFAULT_EF_BASE_NAME    "ef"
 #define DEFAULT_EF_ENERGY_NAME  "energy.dat"
@@ -31,7 +30,6 @@ namespace QDLIB
     *  \li dt
     *  \li conv   Convergence
     *  \li steps  Maximum number of steps
-    *  \li ncycle Normalize & check for convergence every ncycle steps
     *  \li Nef    Number of eigenfunctions
     *  \li dir    Output directory
     *  \li fname  Base name for ef output
@@ -59,7 +57,6 @@ namespace QDLIB
 	 lint _Nef;
 	 double _convergence;
 	 int _MaxSteps;
-	 int _ncycle;
 	 string _fname;
 	 string _ename;
 	 double _dt;

@@ -22,7 +22,7 @@ namespace QDLIB
    ProgEigen::ProgEigen(XmlNode &EigenNode) : _EigenNode(EigenNode),
                             _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
-			    _MaxSteps(DEFAULT_MAXSTEPS), _ncycle(DEFAULT_NCYCLE),
+			    _MaxSteps(DEFAULT_MAXSTEPS),
 			    _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true)
    {
    }
@@ -130,13 +130,6 @@ namespace QDLIB
       clock->Dt(_dt);
       clock->Steps(_MaxSteps);
       
-      /* Normalization & convergence check cycle */
-      if ( attr.isPresent("ncycle") ) {
-	 attr.GetValue("ncycle", _ncycle);
-	 if ( _ncycle < 1)
-	    throw ( EParamProblem ("Check cycle smaller than one requested") );
-      }
-      
       /* ef base name */
       if ( attr.isPresent("fname") ) {
 	 attr.GetValue("fname", _fname);
@@ -168,7 +161,6 @@ namespace QDLIB
       log.cout() << "Number of steps: " <<  clock->Steps() << endl;
       log.cout().precision(2);
       log.cout() << "Time step: " << fixed << clock->Dt() << endl;
-      log.cout() << "Check cycles: " << _ncycle << endl;
       log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
       log.cout() <<  "Requested convergence: " << scientific << _convergence << endl;
@@ -276,10 +268,9 @@ namespace QDLIB
 	       *Psi -= _buf;
 	    }
 	    /* normalization and convergence check */
-	    if (s % _ncycle == 0){
-	       Psi->Normalize();
-	       diff = cabs(1-*Psi_old * Psi);
-	    }
+            Psi->Normalize();
+            diff = cabs(1-*Psi_old * Psi);
+
 	    ++(*clock);                     /* Step the clock */
 	    s++;
 	 }
