@@ -47,8 +47,10 @@ namespace QDLIB {
 
         if (_params.isPresent("order"))
             _params.GetValue("order", _order);
-        else
+        else {
             _order = SIL_DEF_ORDER;
+            _params.SetValue("order", _order);
+        }
 
         if (_order == 1)
             throw(EParamProblem("SIL: order doesn't make sense", _order));
@@ -148,7 +150,6 @@ namespace QDLIB {
         for (int i = 1; i < _order; i++){
             AddElements((cVec*) Psi, (cVec*) _Lzb[i], _vect[i]);
         }
-
     }
 
 
