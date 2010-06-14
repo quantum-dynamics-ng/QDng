@@ -71,7 +71,6 @@ namespace QDLIB
          delete[] _T;
          _T = NULL;
       }
-      cout << "external " << external << ", _IsFullDiag " << _IsFullDiag << ", _T " << _T << endl;
    }
    
    Operator * ODMultistate::Copy(Operator * O)
@@ -149,7 +148,7 @@ namespace QDLIB
                }
             }
             LAPACK::FullDiagHermitian(_X[i], &evals);
-            cout << evals;
+            
             for (int j = 0; j < States(); j++) {   /* Put Eigenvektor to states */
                double *d = _dspace->begin(j);
                d[i] = evals[j];
@@ -181,9 +180,3 @@ namespace QDLIB
    }
    
 } /* namespace QDLIB */
-
-
-
-
-
-

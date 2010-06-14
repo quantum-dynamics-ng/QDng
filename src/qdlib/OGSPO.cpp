@@ -122,7 +122,7 @@ namespace QDLIB
             _ops[i]->Transformation()->Forward(Psi);
 
          MultElements((cVec*) Psi, (cVec*) &(_exp[i]));
-         
+
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Backward(Psi);
       }
@@ -133,7 +133,7 @@ namespace QDLIB
             _ops[i]->Transformation()->Forward(Psi);
 
          MultElements((cVec*) Psi, (cVec*) &(_exp[i]));
-         
+
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Backward(Psi);
       }

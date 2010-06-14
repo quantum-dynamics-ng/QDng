@@ -17,6 +17,7 @@ namespace QDLIB
 
 }
 
+/** \bug Result is not saved in k-space (stays in real-space buffer) */
 void QDLIB::TransformMSD::Forward(WaveFunction * Psi)
 {
    WFMultistate *wfm = dynamic_cast<WFMultistate*>(Psi);
@@ -32,7 +33,7 @@ void QDLIB::TransformMSD::Forward(WaveFunction * Psi)
             _norm = _T[i]->Normalization();
          }
       }
-      
+      wfm->IsKspace(true);
    } else {
       cVec psiI,psiR;
    
@@ -51,9 +52,9 @@ void QDLIB::TransformMSD::Forward(WaveFunction * Psi)
          }
       }
    }
-   wfm->IsKspace(true);
 }
 
+/** \bug Input is not taken from k-space (from real-space buffer) */
 void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
 {
    WFMultistate *wfm = dynamic_cast<WFMultistate*>(Psi);
@@ -69,6 +70,7 @@ void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
             _norm = _T[i]->Normalization();
          }
       }
+      wfm->IsKspace(false);
    } else {
       cVec psiI,psiR;
    
@@ -87,6 +89,5 @@ void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
          }
       }
    }
-   wfm->IsKspace(false);
 }
 

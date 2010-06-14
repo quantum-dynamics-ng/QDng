@@ -232,7 +232,6 @@ namespace QDLIB
 
    void OGridNablaSq::InitExponential(cVec *exp, dcomplex c)
    {
-      cout << "Running Tkin exp\n";
       if (_dspace == NULL) InitDspace();
       ExpElements(exp, _dspace, c);
       *exp *= 1/double(GridSystem::Size());
