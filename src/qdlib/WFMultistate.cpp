@@ -191,8 +191,21 @@ namespace QDLIB
       return c;
    }
    
+   /** \todo This is an ugly hack to treat k-space consistently 
+    *  \bug GetSpaceBuffer will fail here!!! */
+   void WFMultistate::IsKspace(bool is)
+   {
+      /* We need a special handling, for strided init of k-space links */
+      if (_IsKspace != is){
+         dcomplex **strides = cVec::begin();
+         for (int i=0; i < _nstates; i++){
+            _states[i]->IsKspace(is);
+            strides[i] = _states[i]->begin(0); /* Relink strides to spacebuffers of states */
+         }
+         _IsKspace = is;
+      }
+   }
 
-   
 }
 
 /* namespace QDLIB */

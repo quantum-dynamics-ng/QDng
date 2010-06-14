@@ -5,7 +5,7 @@ namespace QDLIB
 {
 
    ODMultistate::ODMultistate() :
-         _name("ODMultistate"), _X(NULL), _T(NULL),  _state_size(0)
+         _name("ODMultistate"), _X(NULL), _T(NULL),  _state_size(0), _IsFullDiag(true)
    {
 
    }
@@ -29,9 +29,11 @@ namespace QDLIB
    
    void ODMultistate::Init(WaveFunction *Psi)
    {
+      /* Parent initalization */
       OMultistate::Init(Psi);
       
       WFMultistate* wfm = dynamic_cast<WFMultistate*>(Psi);
+
       
       lint last_size = wfm->State(0)->size();
       for (int i=1; i < States(); i++){
@@ -41,6 +43,7 @@ namespace QDLIB
       _state_size = last_size;
       
       bool external=false;
+      _IsFullDiag=true;
       _T = new Transform*[States()];
       
       
@@ -54,11 +57,12 @@ namespace QDLIB
             if ( State(i,j) != NULL ) {      /* Check for external transformation */
                if ( od->Transformation() != NULL ) {
                   external = true;
+                  _IsFullDiag = false;
                   if ( i != j )
                      throw ( EIncompatible ("ODMultistate can't transform non-diagonal operators in non-diagonal matrices") );
 
                   _T[i] = od->Transformation();
-               }
+               } else if (i != j) _IsFullDiag = false;
             }
          }
       }
@@ -67,6 +71,7 @@ namespace QDLIB
          delete[] _T;
          _T = NULL;
       }
+      cout << "external " << external << ", _IsFullDiag " << _IsFullDiag << ", _T " << _T << endl;
    }
    
    Operator * ODMultistate::Copy(Operator * O)
@@ -80,7 +85,22 @@ namespace QDLIB
       OMultistate::Copy(O);
       
       _state_size = o->_state_size;
-      InitDspace();
+      _IsFullDiag = o->_IsFullDiag;
+      /* Copy external transformations */ 
+      if (o->_T != NULL) {
+         _T = new Transform*[States()];
+         for (int i=0; i < States(); i++){
+            for (int j=0; j < States(); j++){
+               ODSpace *od =  dynamic_cast<ODSpace*>(State(i,j));
+               if (od != NULL)
+                  if ( od->Transformation() != NULL )
+                     _T[i] = od->Transformation();
+            }
+         }
+         _XT.ExternalTransform(_T);
+      }
+      
+      if (o->_dspace != NULL) InitDspace();
       
       return (OMultistate*) this;
    }
@@ -93,17 +113,28 @@ namespace QDLIB
    
    void ODMultistate::InitDspace()
    {
-      
       /* First init */
       if (_dspace == NULL) {
+         /* Create d-space */
          _dspace = new dVec();
          _dspace->newsize(_state_size * States(), States());
-         _X = new dMat*[_state_size];
-         for (int i = 0; i < _state_size; i++) {
-            _X[i] = new dMat(States(), States());
+         
+         if (_IsFullDiag){ /* Diagonal H*/
+            for (int k = 0; k < States(); k++) {
+               ODSpace *state = dynamic_cast<ODSpace*>(State(k,k));
+               _dspace->StrideCopy(*(state->Dspace()), 0,k);
+            }
+         }
+         
+         if (_T == NULL && ! _IsFullDiag){ /* Init Grid of Matrices */
+            _X = new dMat*[_state_size];
+            for (int i = 0; i < _state_size; i++) {
+               _X[i] = new dMat(States(), States());
+            }
          }
       }
-      if (_T != NULL){ /* Grid Diagonalization - Internal Transform */
+      
+      if (_T == NULL && !_IsFullDiag){ /* Grid Diagonalization - Internal Transform */
          dVec evals(States());
    
          /* diagonalize at every grid point */
@@ -118,13 +149,14 @@ namespace QDLIB
                }
             }
             LAPACK::FullDiagHermitian(_X[i], &evals);
+            cout << evals;
             for (int j = 0; j < States(); j++) {   /* Put Eigenvektor to states */
                double *d = _dspace->begin(j);
                d[i] = evals[j];
             }
          }
          _XT.SetMatrixArray(_X);
-      } else { /* Use external diagonalization, copy dspace */
+      } else if (_T != NULL) { /* Use external diagonalization, copy dspace */
          for (int s=0; s < States(); s++){
             ODSpace *state = dynamic_cast<ODSpace*>(State(s,s));
             _dspace->StrideCopy(*(state->Dspace()), 0, s);

@@ -22,10 +22,9 @@ namespace QDLIB {
     */
    class WaveFunction: public cVec
    {
-      private:
+      protected:
          bool _IsKspace;      /* To remember in which basis we are */
          cVec *_spacebuffer;   /* transformation buffer for different basis */
-      protected:
 	 ParamContainer _params;
       public:
          WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) {}

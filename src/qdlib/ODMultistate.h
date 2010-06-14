@@ -11,8 +11,11 @@ namespace QDLIB
    /**
     * Simple Extension to OMultistates for Diagonalization of Operators.
     *
-    * This class only makes sense if every Matrix Element is already diagonal
+    * This class only makes sense if every off-diagonal Matrix Element is already diagonal
     * (e.g. Grids in position representation)
+    * 
+    * K-Space operators like \f$ \nabla^2 \f$ are handled via an external transformation
+    * for consistensy here (only for diagonals).
     */
    class ODMultistate : public OMultistate, public ODSpace
    {
@@ -22,6 +25,7 @@ namespace QDLIB
          TransformMSD _XT; /* Transformation object */
          Transform **_T;   /* Storage for external transformation objects */
          int _state_size;  /* Size of a single state */
+         bool _IsFullDiag; /* Indicate if transformation is really needed */
       public:
          ODMultistate();
          virtual ~ODMultistate();
@@ -62,7 +66,7 @@ namespace QDLIB
          void InitDspace();
          virtual void InitExponential (cVec *exp, dcomplex c);
          
-         Transform* Transformation() { return &_XT; }
+         Transform* Transformation() { if (_IsFullDiag) return NULL; else return &_XT; }
          
    };
 

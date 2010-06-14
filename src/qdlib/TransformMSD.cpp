@@ -29,7 +29,7 @@ void QDLIB::TransformMSD::Forward(WaveFunction * Psi)
       for (int i=0; i < states; i++){
          if( _T[i] != NULL) {
             _T[i]->Forward(wfm->State(i));
-            _norm *= _T[i]->Normalization();
+            _norm = _T[i]->Normalization();
          }
       }
       
@@ -51,6 +51,7 @@ void QDLIB::TransformMSD::Forward(WaveFunction * Psi)
          }
       }
    }
+   wfm->IsKspace(true);
 }
 
 void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
@@ -65,7 +66,7 @@ void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
       for (int i=0; i < states; i++){
          if( _T[i] != NULL) {
             _T[i]->Backward(wfm->State(i));
-            _norm *= _T[i]->Normalization();
+            _norm = _T[i]->Normalization();
          }
       }
    } else {
@@ -86,5 +87,6 @@ void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
          }
       }
    }
+   wfm->IsKspace(false);
 }
 

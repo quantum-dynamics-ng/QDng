@@ -23,7 +23,7 @@ namespace QDLIB
     * A, B, C,... corresponding to
     * \f$ e^{A+B+C} = e^{\frac{1}{2}C} e^{\frac{1}{2}B} e^{A} e^{\frac{1}{2}B} e^{\frac{1}{2}C}\f$
     * If a transformation is needed for exponentiation, this step is inserted e.g.:
-    * \f$ X_B~e^{\frac{1}{2}B}~X_B^\dagger~X_A~e^{A}~X_A\dagger~
+    * \f$ X_B~e^{\frac{1}{2}B}~X_B^\dagger~X_A~e^{A}~X_A^\dagger~
     * X_B~e^{\frac{1}{2}B}~X_B^\dagger\f$
     */
    class OGSPO: public QDLIB::OPropagator

@@ -37,6 +37,10 @@ namespace QDLIB
       for (int i = 0; i < _spoLen; i++) {
          if ((_ops[i]->isTimeDep() && _laststep != clock->TimeStep()) || _laststep == -1) {
             _ops[i]->InitExponential(&(_exp[i]), Exponent() * sf);
+            /* Include transform normalization here */
+            if (_ops[i]->Transformation() != NULL){
+               _exp[i] *= _ops[i]->Transformation()->Normalization();
+            }
          }
          sf = 0.5; /* All other elements are outer ones => factor 1/2 */
       }
@@ -117,8 +121,8 @@ namespace QDLIB
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Forward(Psi);
 
-         MultElements((cVec*) Psi, &(_exp[i]));
-
+         MultElements((cVec*) Psi, (cVec*) &(_exp[i]));
+         
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Backward(Psi);
       }
@@ -128,8 +132,8 @@ namespace QDLIB
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Forward(Psi);
 
-         MultElements((cVec*) Psi, &(_exp[i]));
-
+         MultElements((cVec*) Psi, (cVec*) &(_exp[i]));
+         
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Backward(Psi);
       }
