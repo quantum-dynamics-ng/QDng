@@ -16,8 +16,10 @@ namespace QDLIB
          for (int i = 0; i < _state_size; i++) {
             delete _X[i];
          }
+         delete[] _X;
       }
       if (_T != NULL)  delete[] _T;
+      if (_dspace != NULL) delete _dspace;
    }
 
    Operator * ODMultistate::NewInstance()

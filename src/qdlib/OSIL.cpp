@@ -13,7 +13,11 @@ namespace QDLIB {
 
     OSIL::~OSIL()
     {
-        if (_Lzb != NULL) delete[] _Lzb;
+        if (_Lzb != NULL) {
+           for (int i=0; i < _order; i++)
+              if (_Lzb[i] != NULL) delete _Lzb[i];
+           delete[] _Lzb;
+        }
         if (buf0 != NULL) delete buf0;
         if (buf1 != NULL) delete buf1;
         if (buf2 != NULL) delete buf2;
@@ -69,8 +73,6 @@ namespace QDLIB {
         buf0 = Psi->NewInstance();
         buf1 = Psi->NewInstance();
         buf2 = Psi->NewInstance();
-
-        _hamilton->Init(Psi);
     }
 
 

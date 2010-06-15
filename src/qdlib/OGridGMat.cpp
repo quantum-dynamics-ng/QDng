@@ -7,7 +7,7 @@
 
 namespace QDLIB {
 
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL), _KinCoup(true), buf(NULL)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL), buf(NULL), _KinCoup(true)
    {
    }
    

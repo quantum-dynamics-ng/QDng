@@ -49,7 +49,7 @@ namespace QDLIB
 	 }
 	 log.flush();
 	 log.IndentDec();
-	 return sum;	 
+	 return sum;
       } else if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
 	 child->AdjustElementNode();

@@ -71,7 +71,7 @@ namespace QDLIB
 
       /* Write header */
       if (_step == 0){
- 	 _specbuf.newsize(clock->Steps()+1);
+ 	 _specbuf.newsize(clock->Steps());
 	 log.cout() << "Step\tTime[au]";
 	 if (_norm) log.cout() << "\tPopulation";
 	 if (_multistate && _norm){

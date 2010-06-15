@@ -33,6 +33,7 @@ namespace QDLIB
    {
       if (_U != NULL) delete _U;
       if (_H != NULL) delete _H;
+      if (_h != NULL) delete _h;
    }
 
    /**
@@ -361,6 +362,7 @@ namespace QDLIB
       delete Psi_old;
       delete Psi;
       delete _buf;
+      delete h;
       delete Psi_initial;
    }
 

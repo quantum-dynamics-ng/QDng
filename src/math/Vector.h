@@ -119,7 +119,9 @@ class Vector
     {
 	for (lint s=0; s < nstrides_; s++){
            lint i;
+#ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
+#endif
 	   for (i=0; i< stride_size_; i++)
             v_[s][i] = v[s][i];
         }
@@ -129,7 +131,9 @@ class Vector
     {
        for (lint s=0; s < nstrides_; s++){
           lint i;
+#ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
+#endif
 	  for (i=0; i< stride_size_; i++)
 	     v_[s][i] = v[i];
        }
@@ -140,7 +144,9 @@ class Vector
     {
        for (lint s=0; s < nstrides_; s++){
           lint i;
+#ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
+#endif
 	  for (i=0; i< stride_size_; i++){
 	     v_[s][i] = val;
 	  }
@@ -270,6 +276,7 @@ class Vector
     ~Vector() 
     {
        if (!isRef_) destroy();   /* Only destroy data if it's our own*/
+       else delete[] v_;
     }
 
     // constructors

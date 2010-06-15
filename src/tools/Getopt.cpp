@@ -11,7 +11,7 @@ namespace QDLIB {
    */
    Getopt::Getopt()
    {
-   SetHelp('h', "Show this help");
+      SetHelp('h', "Show this help");
    }
    
    
@@ -290,4 +290,5 @@ namespace QDLIB {
       } else return false;
    
 }
+
 

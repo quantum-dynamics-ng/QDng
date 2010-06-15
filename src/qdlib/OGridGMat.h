@@ -13,6 +13,7 @@ namespace QDLIB {
     * parameters:
     * \li dims       Number of internal coordiantes
     * \li gmat   G-matrix element file name
+    * \li coup   Turn on kinetic coupling [default: true]
     * 
     * \todo possibility to turn of specific matrix elements
     * \todo enable constant-g mode / mixed g-mode

@@ -10,7 +10,7 @@ namespace QDLIB {
    
    OGridKick::~OGridKick()
    {
-      if (_exp == NULL) delete _exp;
+      if (_exp != NULL) delete _exp;
    }
 
    Operator * OGridKick::NewInstance()

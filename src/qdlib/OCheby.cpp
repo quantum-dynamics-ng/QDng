@@ -114,7 +114,9 @@ namespace QDLIB
       for (int i=2; i < _order; i++){
  	 _hamilton->Apply( buf, ket1);
          int s,j;
+#ifdef _OPENMP
 #pragma omp parallel for default(shared) private(s,k2,bf,k0,psi,j)
+#endif
 	 for (s=0; s < strides; s++){
 	    k2 = ket2->begin(s);
 	    bf = buf->begin(s);
@@ -199,9 +201,6 @@ namespace QDLIB
 	 throw ( EParamProblem("Chebychev Progagator is missing a clock") );
       if (clock->Dt() == 0)
 	 throw ( EParamProblem("No time step defined") );
-      
-      /* Initalize H*/
-      _hamilton->Init(Psi);
       
       /* Energy range & offset */
       Rdelta = (_hamilton->Emax() - _hamilton->Emin())/ 2;

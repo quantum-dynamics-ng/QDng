@@ -140,11 +140,15 @@ namespace QDLIB {
     */
    dcomplex OHermitianMatrix::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
    {
+      dcomplex c;
       WaveFunction *ket = PsiKet->NewInstance();
 
       *ket = PsiKet;
       Apply(ket, PsiKet);
-      return *PsiBra * ket;
+      c = *PsiBra * ket;
+      
+      delete ket;
+      return c;
    }
 
    /**

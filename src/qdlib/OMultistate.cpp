@@ -120,8 +120,6 @@ namespace QDLIB
       _buf1 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
       _buf2 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
       
-      
-      
       if (_hermitian){
 	 for(int i=0; i< _nstates; i++){
 	    for(int j=0; j<= i; j++){
@@ -282,9 +280,7 @@ namespace QDLIB
 
       _buf1 =  dynamic_cast<WFMultistate*>(o->_buf1->NewInstance());
       _buf2 =  dynamic_cast<WFMultistate*>(o->_buf2->NewInstance());
-      
-      *_buf1 = o->_buf1;
-      *_buf2 = o->_buf2;
+
       
       if (_hermitian){
 	 for(int i=0; i< _nstates; i++){

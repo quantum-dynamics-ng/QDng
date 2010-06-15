@@ -6,7 +6,9 @@ namespace QDLIB {
 
    OProjection::OProjection() : _name("OProjection"), _sign(1), _size(0),  _buf(NULL)
    {
-      
+      for (int i=0; i < _size; i++){
+         _wfbuf[MAX_WFSPACE] = NULL;
+      }
    }
    
    
@@ -19,7 +21,7 @@ namespace QDLIB {
    void OProjection::_destroy()
    {
       for (int i=0; i < _size; i++){
-	 delete _wfbuf[i];
+         if (_wfbuf[i] != NULL) delete _wfbuf[i];
       }
       
       if (_buf != NULL) delete _buf;
@@ -41,7 +43,7 @@ namespace QDLIB {
 	 throw( EOverflow("Projector has reached max capaticity: MAX_WFSPACE"));
 	 
       if (Psi != NULL){
-	 if (_size == 0)
+         if (_buf == NULL)
 	    _buf = Psi->NewInstance();
 		  
 	 _wfbuf[_size] = Psi->NewInstance();
@@ -85,6 +87,7 @@ namespace QDLIB {
       if (_size == 0){
          WFMultistate* wfm;
          wfm = dynamic_cast<WFMultistate*>(Psi);
+         if (_buf != NULL) delete _buf;
          if (wfm == NULL)
             _buf = Psi->NewInstance();
          else

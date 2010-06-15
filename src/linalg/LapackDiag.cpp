@@ -25,6 +25,7 @@ namespace LAPACK {
 	    for (int i=0; i < LAPACK_MAX_WSLIST; i++){
 	       sized[i] = 0;
 	       sizec[i] = 0;
+               dbuf[i] = NULL;
 	    }
 	 }
 	 WsList(WsList &cp){}
