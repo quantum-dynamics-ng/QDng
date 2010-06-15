@@ -7,15 +7,18 @@
 
 namespace QDLIB {
 
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL), _NoKinCoup(false)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL), _KinCoup(true), buf(NULL)
    {
    }
    
    
    OGridGMat::~OGridGMat()
    {
-      for(lint i=0; i < GridSystem::Dim(); i++){
-	 if (_wfbuf[i] != NULL) delete _wfbuf[i];
+      if (_wfbuf != NULL){
+         for(lint i=0; i < GridSystem::Dim(); i++){
+            if (_wfbuf[i] != NULL) delete _wfbuf[i];
+         }
+         delete[] _wfbuf;
       }
       if (_kspace != NULL) delete[] _kspace;
       if (buf != NULL) delete buf;
@@ -63,8 +66,8 @@ namespace QDLIB {
       if (buf == NULL)
 	 throw (EIncompatible ("Psi not a WFGridSystem"), Psi->Name() );
       
-/*      if ( *((GridSystem*) this) == *((GridSystem*) buf) )
-	 throw (EIncompatible ("Gmatrix: Different Grid parameters!"));*/
+     if ( *((GridSystem*) this) != *((GridSystem*) _Gmat[0][0]) )
+	 throw (EIncompatible ("Gmatrix is incompatible with wave function!"));
       
       for (int i=0; i < _size; i++){
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*> (Psi->NewInstance());
@@ -102,6 +105,7 @@ namespace QDLIB {
       _wfbuf = new WFGridSystem*[n];
       
       for (i=0; i < n; i++){
+         _wfbuf[i] = NULL;
 	 _Gmat[i] = new OGridPotential*[n];
 	 for (int j=0; j <= i; j++){
 	    _Gmat[i][j] = new OGridPotential();
@@ -113,7 +117,7 @@ namespace QDLIB {
       if (name.empty())
 	 throw( EParamProblem ("No G-matrix elements given"));
       
-      _params.GetValue("coup", _NoKinCoup);
+      _params.GetValue("coup", _KinCoup, true);
       
       OGridSystem::FileOGrid file;
       file.Suffix(BINARY_O_SUFFIX);
@@ -121,19 +125,23 @@ namespace QDLIB {
       /* Read Matrix elements */
       char si[32], sj[32];
       string s;
-      for (i=0; i < n; i++){
+      for (i=0; i < n; i++){ /* Loop over matrix elem. */
 	 for(int j=0; j <= i; j++){
-	    if (!(i != j && _NoKinCoup)){ /* No off-diagonals if kinetic coupling is turned off*/
+	    if (!(i != j && !_KinCoup)){ /* No off-diagonals if kinetic coupling is turned off*/
 	       snprintf (si, 32, "%d", i);
 	       snprintf (sj, 32, "%d", j);
 	       s = name + string("_") + string(si) + string(sj);
 	       file.Name(s);
 	       file >> ((OGridSystem*) _Gmat[i][j]);
-	       //*((GridSystem*) this) = *((GridSystem*) _Gmat[i][j]);
+               
+               if (i != 0 && j != 0) { /* Check grid compatibility of G-Mat elem. */
+                  if ( *((GridSystem*)  _Gmat[i][j]) != *((GridSystem*) _Gmat[0][0]) )
+                     throw (EIncompatible ("Gmatrix elements incompatible"));
+               }
 	    }
 	 }
       }
-      
+      *((GridSystem*) this) = *((GridSystem*) _Gmat[0][0]);
    }
    
    const string & OGridGMat::Name( )
@@ -210,7 +218,7 @@ namespace QDLIB {
 	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(buf->size()) );
          _FFT.Backward(_wfbuf[i]);
  	 for (lint j=0; j < _size; j++){
-	    if (!(i != j && _NoKinCoup)){ /* Kinetic coupling ?*/
+	    if (!(i != j && !_KinCoup)){ /* Kinetic coupling ?*/
 	       *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	       /* Multiply Gmatrix element */
 	       if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
