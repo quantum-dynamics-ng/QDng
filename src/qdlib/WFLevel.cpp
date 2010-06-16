@@ -115,6 +115,36 @@ namespace QDLIB {
       cVec::newsize(size);
    }
    
+   void WFLevel::Reduce(double tolerance)
+   {
+      cVec *out = GetSpaceBuffer(); /* Result is written in spacebuffer */
+      double norm = Norm();
+      int size = cVec::size();
+      
+      norm = norm / double(size) * tolerance; /* This is the cut-off criteria */
+      
+      for (int i=0; i <  size; i++){
+         /* treat real & imag seperately */
+         if ( (*this)[i].real() < norm )
+            (*out)[i]._real = 0;
+         else
+            (*out)[i]._real = (*this)[i].real();
+         
+         if ( (*this)[i].imag() < norm )
+            (*out)[i]._imag = 0;
+         else
+            (*out)[i]._imag = (*this)[i].imag();
+      }
+      
+      IsKspace(true);
+   }
+
+   void WFLevel::Restore()
+   {
+      /* Nothing to do here. Just switch the buffer to the right position */
+      cVec::swap(*_spacebuffer);
+      _IsKspace = false;
+   }
    
 } /* namespace QDLIB */
 

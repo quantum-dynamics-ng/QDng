@@ -206,7 +206,25 @@ namespace QDLIB
       }
    }
 
+   
+   void WFMultistate::Reduce(double tolerance)
+   {
+      for(lint i=0; i < _nstates; i++){
+         _states[i]->Reduce(tolerance);
+      }
+      IsKspace(true); /* Set our self also to k-space representation */
+   }
+
+   void WFMultistate::Restore()
+   { 
+      for(lint i=0; i < _nstates; i++){
+         _states[i]->Restore();
+      }
+      IsKspace(false); /* Set our self also to x-space representation */
+   }
 }
 
 /* namespace QDLIB */
+
+
 

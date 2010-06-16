@@ -95,10 +95,26 @@ namespace QDLIB {
           */
          cVec* GetSpaceBuffer()
          {
-            if (!_spacebuffer) _spacebuffer = new cVec(size());
+            if (!_spacebuffer) _spacebuffer = new cVec(size(),strides());
             return _spacebuffer;
          }
 
+         /**
+          * Reduce/Clean up the wavefunction as preparation to compression.
+          * 
+          * The result must be stored in the k-space buffer as
+          * in most cases the reduction will be combinded with a transformation.
+          * The orginal Wavefunction must not be affected by this operation.
+          */
+         virtual void Reduce(double tolerance) = 0;
+         
+         /**
+          * This is the inverse operation of Reduce.
+          * 
+          * The input is present in the k-space buffer.
+          * The result must be stored in real space.
+          */
+         virtual void Restore() = 0;
          
 	 /** Copy. */
 	 virtual WaveFunction* operator=(WaveFunction* Psi) = 0;
@@ -198,6 +214,7 @@ namespace QDLIB {
 	    
          }
          
+
    }; /* class WaveFunction */
 
    /** Pointwise multiplication. */

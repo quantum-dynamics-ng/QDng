@@ -29,6 +29,9 @@ class WFT : public QDLIB::WaveFunction
       void Normalize() {}
       virtual WaveFunction* operator=(WaveFunction* Psi){return NULL;}
       virtual dcomplex operator*(WaveFunction* Psi){return dcomplex(0,9);}
+      
+      virtual void Reduce(double tolerance) {}
+      virtual void Restore() {}
 };
 
 

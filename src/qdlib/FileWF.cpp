@@ -1,20 +1,92 @@
 #include "FileWF.h"
 #include "WFMultistate.h"
 #include "modules/ModuleLoader.h"
+#include "tools/GlobalParams.h"
 
+#include "zlib.h"
 
 namespace QDLIB {
 
-   FileWF::FileWF()
+   FileWF::FileWF() : _compress(FILEWF_COMPRESSION), _compLevel(Z_DEFAULT_COMPRESSION), _compTolerance(FILEWF_COMPRESSION_TOLERANCE),
+                  _buf(NULL)
    {
       _suffix = BINARY_WF_SUFFIX;
+      
+      /* Compression options from global params */
+      ParamContainer& gp = GlobalParams::Instance();
+      gp.GetValue("compress", _compress, FILEWF_COMPRESSION);
+      
+      if ( _compress ) {
+         if ( gp.isPresent("complevel") )
+            gp.GetValue("complevel", _compLevel);
+         if ( gp.isPresent("comptol") )
+            gp.GetValue("comptol", _compTolerance);
+      }
    }
    
    
    FileWF::~FileWF()
    {
+      if (_buf != NULL)
+         delete _buf;
    }
 
+   /**
+    * Check the compression buffer for right initalization.
+    */
+   void FileWF::CheckBuf(WaveFunction * data)
+   {
+      if (_buf == NULL) _buf = new cVec();
+      
+      _buf->newsize(data->size(), data->strides());
+   }
+
+   /** 
+    * Read a single WF from file and handle compression.
+    */
+   void QDLIB::FileWF::_ReadFromFile(WaveFunction * data)
+   {
+      FileSingle<WaveFunction>::ReadFile(data);
+      
+      ParamContainer& p = data->Params();
+      cout << p;
+      
+      bool comp;
+      p.GetValue("compress",comp,false);
+      
+      if ( comp && data->sizeBytes() == FileSize()) { /* Zero compression */
+         data->GetSpaceBuffer()->FastCopy(*data); /* Just copy to k-space*/
+         data->Restore();
+      } else if (comp && data->sizeBytes() != FileSize()) { /* Decompress */
+         z_stream strm;
+         dcomplex *in, *out;
+            
+         strm.zalloc = Z_NULL;
+         strm.zfree = Z_NULL;
+         strm.opaque = Z_NULL;
+         
+         if ( inflateInit(&strm) != Z_OK ) /* Init stream */
+            throw (EIOError ("z-lib init failed") );
+               
+         in = data->begin(0);                     /* compressed input is in real space */
+         out = data->GetSpaceBuffer()->begin(0);  /* decompress into k-space buffer */
+         /* input */
+         strm.next_in = (Bytef*) in;
+         strm.avail_in = FileSize();
+         /* output buffer */
+         strm.next_out = (Bytef*) out;
+         strm.avail_out = data->sizeBytes();
+         
+         if ( inflate(&strm, Z_FINISH) != Z_STREAM_END ) { /* Compression */
+            throw (EIOError ("decompression failed") );
+         }
+         
+         inflateEnd(&strm);
+
+         data->Restore();
+      }
+   }
+   
    /**
     * Create WF Instance based on meta file information.
     * 
@@ -52,7 +124,7 @@ namespace QDLIB {
          wf = wfm;
       } else { /* handling for Single state WFs */
          wf = mods->LoadWF(classname);
-         FileSingle<WaveFunction>::ReadFile(wf); /* Load data */
+         _ReadFromFile(wf); /* Load data */
       }
       
       _name = basename; /* We modfied the name => switch back to original */
@@ -93,7 +165,7 @@ namespace QDLIB {
          
          wfm->Init(p);
       } else { /* Load Single WaveFunction */
-         FileSingle<WaveFunction>::ReadFile(data);
+         _ReadFromFile(data);
       }
      
    }
@@ -129,7 +201,68 @@ namespace QDLIB {
          p.SetValue("CLASS", wfm->Name() );
          WriteMeta(p);
       } else {
-         FileSingle<WaveFunction>::WriteFile(data);
+         /* Compression */
+         if (_compress) {
+            data->Reduce(_compTolerance); /* Data reduction */
+
+            bool cfail = true;
+            
+            /* zlib compression */
+            if (_compLevel > 0) {
+               /* zlib-compression */
+               z_stream strm;
+               dcomplex *in, *out;
+            
+               strm.zalloc = Z_NULL;
+               strm.zfree = Z_NULL;
+               strm.opaque = Z_NULL;
+               if ( deflateInit(&strm, _compLevel) != Z_OK ) /* Init stream */
+                  throw (EIOError ("z-lib init failed") );
+               
+               CheckBuf(data);
+               
+               cfail = false;
+               out = _buf->begin(0);
+               in = data->begin(0);
+               /* input */
+               strm.next_in = (Bytef*) in;
+               strm.avail_in = data->sizeBytes();
+               /* output buffer */
+               strm.next_out = (Bytef*) out;
+               strm.avail_out = data->sizeBytes();
+               
+               /* hack to handle bad compression which is larger than input - just ignore compressed data */
+               if ( deflate(&strm, Z_FINISH) != Z_STREAM_END ) { /* Compression */
+                  cfail = true;
+               }
+               
+//               cout << fixed <<double(data->sizeBytes()-strm.avail_out)/double(sizeof(dcomplex))/data->size()*100 <<"%"<< endl;
+               
+               deflateEnd(&strm);
+               
+               FileSize(data->sizeBytes()-strm.avail_out);
+               if (strm.avail_out == 0) cfail = true;
+            }
+            
+            ParamContainer& p = data->Params();  /* indicate compression in meta data */
+            p.SetValue("compress", true);
+            p.SetValue("compressLevel", _compLevel);
+            p.SetValue("compressTol", _compTolerance);
+            
+            if (!cfail){
+               data->swap(*_buf);
+            }
+            
+            /* Write and switch back to real space */
+            FileSingle<WaveFunction>::WriteFile(data);
+            
+            if (!cfail)
+               data->swap(*_buf);
+            
+            data->IsKspace(false);
+            FileSize(0);
+         } else /* w/o compression */
+            FileSingle<WaveFunction>::WriteFile(data);
       }
    }
    
@@ -154,6 +287,9 @@ namespace QDLIB {
    }
 
 }
+
+
+
 
 
 

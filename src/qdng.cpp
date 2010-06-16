@@ -99,6 +99,9 @@ int main(int argc, char **argv)
       exit(0);
    }
    
+   log.Header("QDng - Quantum Dynamics", Logger::Chapter);
+   log.flush();
+   
    /* Version Info */
    log.cout() << endl;
    log.cout() << "QDng " << VERSION;
@@ -135,6 +138,11 @@ int main(int argc, char **argv)
             dir += "/";
          gp.SetValue("dir", dir);
       }
+      
+      log.cout() <<  endl;
+      log.Header("Global Parameters", Logger::SubSection);
+      log.cout() << gp;
+      log.flush();
       
       if (prognodes == NULL)
 	 throw ( EParamProblem ("Empty parameter file provided") );

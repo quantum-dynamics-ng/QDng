@@ -63,6 +63,8 @@ namespace QDLIB {
       private:
          bool _drop_meta;      // Ignore metadata
 	 int _counter_last;
+         int _fsize;          /* Specify write size other than suggested by vector etc. */
+         size_t _freadsize;      /* Contains number of bytes from last read operation */
          
 	 void _ReadMeta(C *data);
 	 void _WriteMeta(C *data);
@@ -118,6 +120,19 @@ namespace QDLIB {
 	 int Counter();
 	 void Counter(int counter);
 	 
+         /** Get true file size.
+          *
+          * After reading this returns the true size.
+          */
+         size_t FileSize() const { return  _freadsize; }
+         
+         /**
+          * Set the true file size for writing.
+          * 
+          * \param size if 0 it is ignored.
+          */
+         void FileSize(lint size) { _fsize = size; }
+         
          void ReadFile(C *data);
          void WriteFile(C *data);
 	
@@ -141,7 +156,7 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle() :
-         _drop_meta(false), _counter_last(0), _type(binary),  _name("default"), _suffix(""), _sequence(false),
+         _drop_meta(false), _counter_last(0), _fsize(0), _freadsize(0), _type(binary),  _name("default"), _suffix(""), _sequence(false),
                     _sequence_init(false), _counter(0), _increment(1) {}
    
    /**
@@ -150,7 +165,7 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, bool Sequence) :
-         _type(type), _drop_meta(false), _counter_last(0), _name("default"), _suffix(""), _sequence(Sequence),
+         _type(type), _drop_meta(false), _counter_last(0), _fsize(0), _freadsize(0), _name("default"), _suffix(""), _sequence(Sequence),
                _sequence_init(false), _counter(0),_increment(1) {}
    
    /**
@@ -158,7 +173,7 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence) :
-         _counter_last(0), _type(type), _name(name), _suffix(suffix), _sequence(Sequence),
+         _counter_last(0), _fsize(0), _freadsize(0), _type(type), _name(name), _suffix(suffix), _sequence(Sequence),
                        _sequence_init(false), _counter(0), _increment(1) {}
    
    
@@ -382,7 +397,11 @@ namespace QDLIB {
       file.open(s.c_str(), ofstream::binary);
       if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing", s) );
       
-      file.write((char*) data->begin(0), data->sizeBytes() );
+      if (_fsize == 0)
+         file.write((char*) data->begin(0), data->sizeBytes() );
+      else 
+         file.write((char*) data->begin(0), _fsize );
+      
       if( file.bad() ) throw( EIOError("Can not write binary file", s) );
       
       file.close();
@@ -505,9 +524,10 @@ namespace QDLIB {
 	 if( file.fail() ) {
 	    throw ( EIOError("Can not open binary file for reading", s) );
 	 }
-	 
+         
 	 file.read((char*) data->begin(i), data->sizeBytes());
-	 if( file.fail() || file.eof() ){
+         _freadsize = file.gcount();
+         if( _freadsize <= 0 ){
 	    throw( EIOError("Can not read binary file", s) );
 	 }
 	 

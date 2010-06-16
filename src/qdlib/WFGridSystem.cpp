@@ -15,6 +15,13 @@ namespace QDLIB {
       if (fft != NULL) delete fft;
    }
    
+   void QDLIB::WFGridSystem::CheckFFT()
+   {
+      if (fft == NULL){
+         fft = new FFT(*((GridSystem*) this), *((cVec*) this), *GetSpaceBuffer());
+      }
+   }
+   
    void WFGridSystem::Init(ParamContainer &params)
    {
       if (GridSystem::Dim() == 0 || GridSystem::Dim() > MAX_DIMS)
@@ -23,9 +30,7 @@ namespace QDLIB {
       bool nofft;
       params.GetValue("NoFFT", nofft, false);
       /* Initialize FFT */
-      if (fft == NULL && !nofft){
-         fft = new FFT(*((GridSystem*) this), *((cVec*) this), *GetSpaceBuffer());
-      }
+      if (!nofft) CheckFFT();
    }
 
    
@@ -41,7 +46,41 @@ namespace QDLIB {
       *((cVec*) this) = *((cVec*) G);
    }
 
+   void WFGridSystem::Reduce(double tolerance)
+   {
+      double norm;
+      int size = cVec::size();
+ 
+      CheckFFT();
+      
+      fft->forward();
+      IsKspace(true);
+      
+      norm = Norm() / double(size) * tolerance; /* This is the cut-off criteria */
+      
+      for (int i=0; i <  size; i++){
+         /* cut down real & imag seperately */
+         if ( abs((*this)[i].real()) < norm )
+            (*this)[i]._real = 0;
+         
+         if ( abs((*this)[i].imag()) < norm )
+            (*this)[i]._imag = 0;
+      }
+      
+      *this *= 1./sqrt(double(size)); /* Normalize */
+   }
+
+   void WFGridSystem::Restore()
+   {
+      CheckFFT();
+      
+      fft->backward();
+      IsKspace(false);
+      
+      *this *= 1./sqrt(double(cVec::size())); /* Normalize */
+   }
    
 } /* namespace QDLIB */
+
 
 

@@ -19,6 +19,8 @@ namespace QDLIB {
          bool _isKspace;
          FFT *fft;
          friend class TransformFFT;
+         
+         void CheckFFT();
       public:
          WFGridSystem();
  
@@ -28,6 +30,9 @@ namespace QDLIB {
 	 	 
 	 void operator=(WFGridSystem *G);
 
+         virtual void Reduce(double tolerance);
+         
+         virtual void Restore();
          
    }; /* class WFGridSystem */
    

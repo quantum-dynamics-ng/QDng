@@ -46,6 +46,10 @@ namespace QDLIB
 	 virtual dcomplex operator*(WaveFunction* Psi);
          
          virtual void IsKspace(bool is);
+         
+         virtual void Reduce(double tolerance);
+         
+         virtual void Restore();
    };
 
 }
