@@ -34,6 +34,9 @@ namespace QDLIB
       if (_U != NULL) delete _U;
       if (_H != NULL) delete _H;
       if (_h != NULL) delete _h;
+      
+      /* remove the clock */
+      QDGlobalClock::Destroy();
    }
 
    /**
@@ -234,6 +237,7 @@ namespace QDLIB
       *_H = h;
       
       /* Let the Propagator do it's initalisation */
+      clock->Begin();
       _U->Clock( clock );
       _H->UpdateTime();
       /* Force backward imaginary time */

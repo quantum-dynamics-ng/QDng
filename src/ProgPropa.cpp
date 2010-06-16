@@ -52,6 +52,7 @@ namespace QDLIB {
    
       clock->Dt(dt);
       clock->Steps(steps);
+      clock->Begin();
    
       /* Init write cycles */
       if ( attr.isPresent("wcycle") ) {
