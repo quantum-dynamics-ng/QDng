@@ -13,6 +13,7 @@
 #include "tools/Getopt.h"
 #include "tools/XmlParser.h"
 #include "tools/Logger.h"
+#include "tools/GlobalParams.h"
 
 #include "modules/ModuleLoader.h"
 
@@ -32,6 +33,7 @@ int main(int argc, char **argv)
    int retval = EXIT_SUCCESS;
    
    Logger& log = Logger::InstanceRef();
+   ParamContainer& gp = GlobalParams::Instance();
    
    XmlParser XMLfile;
    XmlNode   rnodes;
@@ -79,8 +81,6 @@ int main(int argc, char **argv)
       /* The global output path */
       if (cmdline.GetOption('d')){
 	 cmdline.GetOption('d', dir);
-	 if (dir[dir.length()-1] != '/' && ! dir.empty())
-	    dir += "/";
       }
       
 #ifdef _OPENMP
@@ -118,10 +118,23 @@ int main(int argc, char **argv)
       rnodes = XMLfile.Root();
       
       /* enables multiple programm nodes*/
-      if (rnodes.Name() == "multi")
+      if (rnodes.Name() == "multi" || rnodes.Name() == "qdng") {
+         /* Read out global attributes/parameters */
+         gp = rnodes.Attributes();
 	 prognodes = rnodes.NextChild();
-      else 
+      } else 
 	 prognodes = &rnodes;
+      
+      /* overide path from command line */
+      if ( ! dir.empty() )
+         gp.SetValue("dir", dir);
+      
+      if ( gp.isPresent("dir") ) {
+         gp.GetValue("dir", dir);
+         if (dir[dir.length()-1] != '/' && ! dir.empty())
+            dir += "/";
+         gp.SetValue("dir", dir);
+      }
       
       if (prognodes == NULL)
 	 throw ( EParamProblem ("Empty parameter file provided") );
