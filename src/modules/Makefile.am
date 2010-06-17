@@ -21,3 +21,5 @@ AM_CXXFLAGS = -O3 -g -fPIC
 #	$(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS)
 noinst_LTLIBRARIES = libModuleLoader.la
 libModuleLoader_la_SOURCES = ModuleLoader.cpp
+
+noinst_HEADERS = ModuleLoader.h

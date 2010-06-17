@@ -2,7 +2,7 @@ AC_INIT
 AC_CONFIG_SRCDIR([configure.in])
 
 AM_CONFIG_HEADER(src/config.h)
-AM_INIT_AUTOMAKE([QDng], [alpha-0.5])
+AM_INIT_AUTOMAKE([QDng], [alpha-0.5.1])
 
 AC_LANG([C++])
 AC_PROG_CXX
@@ -77,7 +77,7 @@ dnl	    [],with_mpi-prefix=no)
 AC_CONFIG_SUBDIRS([src/fftw/])
 
 
-AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile src/tnt/Makefile])
 
 AC_ARG_WITH([cppunit], 
       [AS_HELP_STRING([--with-cppunit], [Enable CppUnit tests])],

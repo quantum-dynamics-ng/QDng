@@ -8,11 +8,12 @@ libqd_la_SOURCES = GridSystem.cpp InternalMods.cpp Kspace.cpp Laser.cpp \
 	OScalar.cpp OSum.cpp WFGridCartesian.cpp WFGridSystem.cpp WFLevel.cpp OSIL.cpp\
 	WFMultistate.cpp FileWF.cpp TransformFFT.cpp TransformMat.cpp TransformMSD.cpp \
 	OGSPO.cpp ODMultistate.cpp OMatDipole.cpp OGridKick.cpp
-noinst_HEADERS = Butterworth.h GridSystem.h OCheby.h OGridDipole.h \
-	OGridNablaSq.h OGridPotential.h OGridSum.h OGridsystem.h OMultistate.h \
-	OPropagator.h OSPO.h OSum.h Operator.h TransformFFT.h WFGridCartesian.h \
-	WFGridSystem.h WFLevel.h WFMultistate.h WaveFunction.h TransformMSD.h FileWF.h OSIL.h \
-	OGSPO.h ODMultistate.h OMatDipole.h OGridKick.h
+noinst_HEADERS = Butterworth.h Conversion.h FileWF.h GridSystem.h InternalMods.h Kspace.h Laser.h \
+	OCheby.h ODMultistate.h ODSpace.h OGobbler.h OGridDipole.h OGridGMat.h OGridKick.h \
+	OGridNabla.h OGridNablaSq.h OGridNAC.h OGridPosition.h OGridPotential.h OGridSum.h OGridsystem.h \
+	OGSPO.h OHermitianMatrix.h OMatDipole.h OMultistate.h Operator.h OProjection.h \
+	OPropagator.h OScalar.h OSPO.h OSIL.h OSum.h  TransformFFT.h Transform.h TransformMat.h \
+	TransformMSD.h 	WaveFunction.h WFGridCartesian.h WFGridSystem.h WFLevel.h
 
 
 
