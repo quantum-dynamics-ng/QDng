@@ -7,7 +7,7 @@
 
 namespace QDLIB {
 
-   FileWF::FileWF() : _compress(FILEWF_COMPRESSION), _compLevel(Z_DEFAULT_COMPRESSION), _compTolerance(FILEWF_COMPRESSION_TOLERANCE),
+   FileWF::FileWF() : _compress(FILEWF_COMPRESSION), _compLevel(1), _compTolerance(FILEWF_COMPRESSION_TOLERANCE),
                   _buf(NULL)
    {
       _suffix = BINARY_WF_SUFFIX;

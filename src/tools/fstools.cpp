@@ -18,15 +18,13 @@ namespace QDLIB {
       /* strip trailing slashes */
       while (dir[dir.length()-1] == '/')
          dir.erase(dir.length()-1,1);
-      cout << dir << endl;
+      
       /* Erase last dir in string */
       pos = dir.find_last_of("/");
       if (pos != dir.npos)
          dir.erase(pos);
       else
          dir.erase();
-      
-      cout << dir << endl;
    }
    
    /** 
@@ -59,10 +57,6 @@ namespace QDLIB {
          mode_t cmode;
          cmode = S_IRWXU | S_IRWXG | S_IRWXO;
          ret = mkdir (dir.c_str(), cmode);
-         
-         
-         cout << "ENOENT" << ENOENT << endl;
-         cout << errno << " " << ret << endl;
          
          if (ret != 0)
             throw ( EIOError(errno, dir) );

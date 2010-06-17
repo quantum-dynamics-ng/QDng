@@ -185,7 +185,7 @@ namespace QDLIB
          log.cout() <<  "Diagonalize basis" << endl;
       log.cout() << "Name for eigenenergy file: " << _ename << endl;
       log.cout() << "Basename for wave function output: " << _fname << endl;
-      log.cout().precision(6); cout << scientific;
+      log.cout().precision(6); log.cout() << scientific;
       log.flush();
    }
 
