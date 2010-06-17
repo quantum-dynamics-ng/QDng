@@ -24,6 +24,26 @@
 using namespace std;
 using namespace QDLIB;
 
+
+/**
+ * Show the version information.
+ */
+void show_version()
+{
+   Logger& log = Logger::InstanceRef();
+   
+   /* Version Info */
+   log.cout() << endl;
+   log.cout() << "QDng " << VERSION;
+   log.cout() << " (build " << QDNG_BUILD_DATE;
+   log.cout() << ", " << QDNG_BUILD_HOST;
+   log.cout() << ", " << QDNG_BUILD_MACH;
+#ifdef QDNG_REV
+   log.cout() << ", " << QDNG_REV;
+#endif
+   log.cout() << ")" << endl; log.flush();
+}
+
 int main(int argc, char **argv)
 {
 
@@ -95,6 +115,7 @@ int main(int argc, char **argv)
       
    } catch (Exception e) {
       cerr << e.GetMessage() << "\n";
+      show_version();
       cmdline.ShowHelp();
       exit(0);
    }
@@ -102,16 +123,7 @@ int main(int argc, char **argv)
    log.Header("QDng - Quantum Dynamics", Logger::Chapter);
    log.flush();
    
-   /* Version Info */
-   log.cout() << endl;
-   log.cout() << "QDng " << VERSION;
-   log.cout() << " (build " << QDNG_BUILD_DATE;
-   log.cout() << ", " << QDNG_BUILD_HOST;
-   log.cout() << ", " << QDNG_BUILD_MACH;
-#ifdef QDNG_REV
-   log.cout() << ", " << QDNG_REV;
-#endif
-   log.cout() << ")" << endl; log.flush();
+   show_version();
    
    /* This is the global try-catch block */
    try {    
