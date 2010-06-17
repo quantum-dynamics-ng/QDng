@@ -47,5 +47,19 @@ namespace QDLIB {
       return r;
    }
    
+   /**
+    * Returns the maximum abs value in the vector.
+    */
+   double VecMax(cVec & v)
+   {
+      double d;
+      d = cabs(v[0]);
+      for (int i=1; i < v.size(); i++){
+         if (cabs(v[i]) >  d) d = cabs(v[i]);
+      }
+      return d;
+   }
 }
+
+
 

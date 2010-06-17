@@ -49,7 +49,6 @@ namespace QDLIB {
       FileSingle<WaveFunction>::ReadFile(data);
       
       ParamContainer& p = data->Params();
-      cout << p;
       
       bool comp;
       p.GetValue("compress",comp,false);
@@ -235,8 +234,6 @@ namespace QDLIB {
                if ( deflate(&strm, Z_FINISH) != Z_STREAM_END ) { /* Compression */
                   cfail = true;
                }
-               
-//               cout << fixed <<double(data->sizeBytes()-strm.avail_out)/double(sizeof(dcomplex))/data->size()*100 <<"%"<< endl;
                
                deflateEnd(&strm);
                

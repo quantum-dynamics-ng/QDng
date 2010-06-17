@@ -1,8 +1,7 @@
-
-
 #include "WFGridSystem.h"
 #include "tools/Exception.h"
 #include "fft/fft.h"
+#include "math/math_functions.h"
 
 namespace QDLIB {
          
@@ -56,7 +55,7 @@ namespace QDLIB {
       fft->forward();
       IsKspace(true);
       
-      norm = Norm() / double(size) * tolerance; /* This is the cut-off criteria */
+      norm = VecMax(*this) * tolerance; /* This is the cut-off criteria */
       
       for (int i=0; i <  size; i++){
          /* cut down real & imag seperately */

@@ -5,6 +5,8 @@ namespace QDLIB {
    extern double VecMin(dVec &v);
    extern double VecMax(dVec &v);
    
+   extern double VecMax(cVec &v);
+   
    extern double Faculty (int arg);
    
    //extern "C" { int dbesj_(double *x, double *alpha, int *n, double *coeffs, int *nz); }
