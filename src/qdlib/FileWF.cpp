@@ -2,8 +2,11 @@
 #include "WFMultistate.h"
 #include "modules/ModuleLoader.h"
 #include "tools/GlobalParams.h"
+#include "config.h"
 
-#include "zlib.h"
+#ifdef HAVE_LIBZ
+  #include "zlib.h"
+#endif
 
 namespace QDLIB {
 
@@ -12,6 +15,7 @@ namespace QDLIB {
    {
       _suffix = BINARY_WF_SUFFIX;
       
+#ifdef HAVE_LIBZ
       /* Compression options from global params */
       ParamContainer& gp = GlobalParams::Instance();
       gp.GetValue("compress", _compress, FILEWF_COMPRESSION);
@@ -22,6 +26,7 @@ namespace QDLIB {
          if ( gp.isPresent("comptol") )
             gp.GetValue("comptol", _compTolerance);
       }
+#endif
    }
    
    
@@ -48,6 +53,7 @@ namespace QDLIB {
    {
       FileSingle<WaveFunction>::ReadFile(data);
       
+#ifdef HAVE_LIBZ
       ParamContainer& p = data->Params();
       
       bool comp;
@@ -84,6 +90,7 @@ namespace QDLIB {
 
          data->Restore();
       }
+#endif
    }
    
    /**
@@ -200,6 +207,7 @@ namespace QDLIB {
          p.SetValue("CLASS", wfm->Name() );
          WriteMeta(p);
       } else {
+#ifdef HAVE_LIBZ
          /* Compression */
          if (_compress) {
             data->Reduce(_compTolerance); /* Data reduction */
@@ -259,6 +267,7 @@ namespace QDLIB {
             data->IsKspace(false);
             FileSize(0);
          } else /* w/o compression */
+#endif
             FileSingle<WaveFunction>::WriteFile(data);
       }
    }
