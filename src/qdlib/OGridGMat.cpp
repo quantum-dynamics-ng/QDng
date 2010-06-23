@@ -184,12 +184,17 @@ namespace QDLIB {
          double t[2];
 	 g0 =  VecMin(*(_Gmat[0][0]));
 	 g1 = VecMin(*(_Gmat[1][1]));
-	 g10 = VecMin(*(_Gmat[1][0]));
-	
-	 diag22symm(g0, g1, g10, t);
+         if (_KinCoup){
+            g10 = VecMin(*(_Gmat[1][0]));
+	    diag22symm(g0, g1, g10, t);
+            T = t[0]/ (GridSystem::Dx(0) * GridSystem::Dx(0));
+            T += t[1]/ (GridSystem::Dx(1) * GridSystem::Dx(1));
+         } else {
+            T = g0/ (GridSystem::Dx(0) * GridSystem::Dx(0));
+            T += g1/ (GridSystem::Dx(1) * GridSystem::Dx(1));
+         }
 	 
-	 T = t[0]/ (GridSystem::Dx(0) * GridSystem::Dx(0));
-	 T += t[1]/ (GridSystem::Dx(1) * GridSystem::Dx(1));
+         
       } else {
 	 for (int i=0; i < GridSystem::Dim(); i++)
 	    T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));
@@ -217,8 +222,9 @@ namespace QDLIB {
 	 _FFT.Forward(_wfbuf[i]);
 	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(buf->size()) );
          _FFT.Backward(_wfbuf[i]);
+         
  	 for (lint j=0; j < _size; j++){
-	    if (!(i != j && !_KinCoup)){ /* Kinetic coupling ?*/
+	    if (i == j || _KinCoup){ /* Kinetic coupling ?*/
 	       *((cVec*) buf) = *((cVec*) _wfbuf[i]);
 	       /* Multiply Gmatrix element */
 	       if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
@@ -270,6 +276,8 @@ namespace QDLIB {
       *((GridSystem*) this) = *((GridSystem*) o);
       _params = o->_params;
       _size = o->_size;
+      
+      _KinCoup = o->_KinCoup;
       
       if(_kspace == NULL) _kspace = new dVec[_size];
       if (_Gmat == NULL) _Gmat = new OGridPotential**[_size];

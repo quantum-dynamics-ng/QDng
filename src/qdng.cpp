@@ -88,7 +88,7 @@ int main(int argc, char **argv)
       
    try {
       /*Show the help ?*/
-      if ( cmdline.GetOption('h') ) throw (Exception());
+      if ( cmdline.GetOption('h') ) exit(retval);
       
 #ifdef USE_DYNMODS
       /* Provide a user path for module loading */

@@ -313,6 +313,10 @@ namespace QDLIB
 	 efile << Psi;
 	 
 	 _Energies_raw[i] = _H->Expec(Psi);
+         
+         if ( fpclassify(_Energies_raw[i]) == FP_NAN)
+            throw ( EOverflow("Energy is not a number") );
+         
 	 log.cout().precision(8);
 	 log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
 	 log.flush();

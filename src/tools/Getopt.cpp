@@ -130,9 +130,9 @@ namespace QDLIB {
    {
       /* Header */
       #ifdef PACKAGE_NAME
-	 cerr << endl << PACKAGE_NAME;
+	 cerr << endl << PACKAGE;
       #ifdef PACKAGE_VERSION
-	 cerr << " - " << PACKAGE_VERSION << endl;
+	 cerr << " - " << VERSION << endl;
       #endif
       #endif
       cerr << endl;
@@ -198,7 +198,8 @@ namespace QDLIB {
    */
    bool Getopt::GetOption(char letter)
    {
-      if ( !value_map[letter].empty() ) return true;
+      if (value_map.find(letter) != value_map.end()) return true;
+      //if ( !value_map[letter].empty() ) return true;
       return false;
    }
    
