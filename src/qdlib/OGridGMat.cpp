@@ -127,7 +127,7 @@ namespace QDLIB {
       string s;
       for (i=0; i < n; i++){ /* Loop over matrix elem. */
 	 for(int j=0; j <= i; j++){
-	    if (!(i != j && !_KinCoup)){ /* No off-diagonals if kinetic coupling is turned off*/
+	    if (i == j || _KinCoup){ /* No off-diagonals if kinetic coupling is turned off*/
 	       snprintf (si, 32, "%d", i);
 	       snprintf (sj, 32, "%d", j);
 	       s = name + string("_") + string(si) + string(sj);
@@ -224,8 +224,8 @@ namespace QDLIB {
          _FFT.Backward(_wfbuf[i]);
          
  	 for (lint j=0; j < _size; j++){
-	    if (i == j || _KinCoup){ /* Kinetic coupling ?*/
-	       *((cVec*) buf) = *((cVec*) _wfbuf[i]);
+	    if ( (i == j) | _KinCoup){ /* Kinetic coupling ?*/
+	       buf->FastCopy(*(_wfbuf[i]));
 	       /* Multiply Gmatrix element */
 	       if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
 	         MultElements( (cVec*) buf, (dVec*) _Gmat[j][i]);
@@ -288,8 +288,10 @@ namespace QDLIB {
 	 buf = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 _Gmat[i] = new OGridPotential*[_size];
 	 for(int j=0; j <= i; j++){
-	    _Gmat[i][j] = new OGridPotential();
-	    *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
+            if (o->_Gmat[i][j] != NULL){
+               _Gmat[i][j] = new OGridPotential();
+               *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
+            }
 	 }
       }
       return this;

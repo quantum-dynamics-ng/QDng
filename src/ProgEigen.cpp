@@ -20,7 +20,7 @@ namespace QDLIB
 {
 
    ProgEigen::ProgEigen(XmlNode &EigenNode) : _EigenNode(EigenNode),
-                            _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
+                            _U(NULL), _H(NULL), _h(NULL), _Nef(DEFAULT_NUMBER_EFS),
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS),
                                       _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true),
@@ -316,9 +316,15 @@ namespace QDLIB
          
          if ( fpclassify(_Energies_raw[i]) == FP_NAN)
             throw ( EOverflow("Energy is not a number") );
-         
+        
+
 	 log.cout().precision(8);
 	 log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
+	 /* Check for bad convergence behavior */
+	 if ( i > 0 )
+	    if ( _Energies_raw[i] < _Energies_raw[i-1] )
+	       log.cout() << "Warning: Energy decreases. You should tighten the convergence criteria!\n";
+
 	 log.flush();
       }
       log.cout() << "\n\n";

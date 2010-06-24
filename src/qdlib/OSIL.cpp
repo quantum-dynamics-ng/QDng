@@ -43,6 +43,10 @@ namespace QDLIB {
        _expHD.newsize(_order);
        
        _Lzb = new WaveFunction*[_order];
+
+       for (int i=0; i<_order; i++){
+	  _Lzb[i] = NULL;
+       }
     }
     
     void OSIL::Init(ParamContainer & params)
