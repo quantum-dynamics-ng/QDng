@@ -8,6 +8,8 @@
   #include "zlib.h"
 #endif
 
+#define ZLIB_MAGIC "ZLIBCOM"
+
 namespace QDLIB {
 
    FileWF::FileWF() : _compress(FILEWF_COMPRESSION), _compLevel(1), _compTolerance(FILEWF_COMPRESSION_TOLERANCE),
@@ -53,16 +55,12 @@ namespace QDLIB {
    {
       FileSingle<WaveFunction>::ReadFile(data);
       
+      /* Check if file is compressed */
+      string magic(ZLIB_MAGIC);
+      char *c_magic = reinterpret_cast<char*>(data->begin(0));
+      
 #ifdef HAVE_LIBZ
-      ParamContainer& p = data->Params();
-      
-      bool comp;
-      p.GetValue("compress",comp,false);
-      
-      if ( comp && data->sizeBytes() == FileSize()) { /* Zero compression */
-         data->GetSpaceBuffer()->FastCopy(*data); /* Just copy to k-space*/
-         data->Restore();
-      } else if (comp && data->sizeBytes() != FileSize()) { /* Decompress */
+      if ( magic == &(c_magic[FileSize()-8]) ) { /* Decompress */
          z_stream strm;
          dcomplex *in, *out;
             
@@ -77,7 +75,7 @@ namespace QDLIB {
          out = data->GetSpaceBuffer()->begin(0);  /* decompress into k-space buffer */
          /* input */
          strm.next_in = (Bytef*) in;
-         strm.avail_in = FileSize();
+         strm.avail_in = FileSize()-8;             /* Buffer - magic bytes */
          /* output buffer */
          strm.next_out = (Bytef*) out;
          strm.avail_out = data->sizeBytes();
@@ -90,6 +88,9 @@ namespace QDLIB {
 
          data->Restore();
       }
+#elif
+      if (magic == &(c_magic[FileSize()-8]))
+         throw (EIncompatible ("Reading of compressed wave functions is not supported. Please recompile with zlib support") );
 #endif
    }
    
@@ -206,13 +207,14 @@ namespace QDLIB {
          p = wfm->Params();
          p.SetValue("CLASS", wfm->Name() );
          WriteMeta(p);
-      } else {
+      } else { /* Write single file */
 #ifdef HAVE_LIBZ
          /* Compression */
          if (_compress) {
             data->Reduce(_compTolerance); /* Data reduction */
 
             bool cfail = true;
+            size_t fsize=0;
             
             /* zlib compression */
             if (_compLevel > 0) {
@@ -245,26 +247,35 @@ namespace QDLIB {
                
                deflateEnd(&strm);
                
-               FileSize(data->sizeBytes()-strm.avail_out);
-               if (strm.avail_out == 0) cfail = true;
+               fsize = data->sizeBytes()-strm.avail_out;
+               FileSize(fsize+8); /* data + magic */
+               if (strm.avail_out < 8 ) cfail = true; /* compressd size + magic must be smaller than original size */
             }
             
-            ParamContainer& p = data->Params();  /* indicate compression in meta data */
-            p.SetValue("compress", true);
-            p.SetValue("compressLevel", _compLevel);
-            p.SetValue("compressTol", _compTolerance);
             
             if (!cfail){
+               ParamContainer& p = data->Params();  /* indicate compression in meta data */
+               p.SetValue("compress", true);
+               p.SetValue("compressLevel", _compLevel);
+               p.SetValue("compressTol", _compTolerance);
                data->swap(*_buf);
-            }
-            
+               /* Append magic bytes */
+               string magic(ZLIB_MAGIC);
+               char *c_magic = reinterpret_cast<char*>(data->begin(0));
+               
+               magic.copy( &(c_magic[fsize]), 7);
+               c_magic[fsize+7] = '\0';
+            } else 
+               data->IsKspace(false); /* Do nothing if compression had failed */
+               
             /* Write and switch back to real space */
             FileSingle<WaveFunction>::WriteFile(data);
             
-            if (!cfail)
+            if (!cfail){
                data->swap(*_buf);
+               data->IsKspace(false);
+            }
             
-            data->IsKspace(false);
             FileSize(0);
          } else /* w/o compression */
 #endif
