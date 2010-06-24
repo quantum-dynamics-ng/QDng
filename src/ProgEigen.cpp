@@ -286,7 +286,7 @@ namespace QDLIB
       }
       
       log.Header("EF - Relaxation", Logger::SubSection);
-      log.cout() << "EF\tNt\tEnergy\n";
+      log.cout() << "EF\tNt\tEnergy\t\tDelta <psi|psi_last>\n";
       
       /* EF loop */
       for (int i=_start; i < _Nef; i++){
@@ -319,7 +319,9 @@ namespace QDLIB
         
 
 	 log.cout().precision(8);
-	 log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] << endl;
+         log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] <<"\t";
+         log.cout().precision(2);
+         log.cout() << scientific << diff << endl;
 	 /* Check for bad convergence behavior */
 	 if ( i > 0 )
 	    if ( _Energies_raw[i] < _Energies_raw[i-1] )
@@ -362,7 +364,9 @@ namespace QDLIB
                *_buf *= S(j,i);
                *Psi += _buf;
             }
+            log.cout().precision(8);
             log.cout() << i << "\t" <<fixed<< _Energies_diag[i] - _Energies_raw[i];
+            log.cout().precision(3);
             log.cout() << "\t" <<fixed<< (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
             log.flush();
             efile << Psi;
