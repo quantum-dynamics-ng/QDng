@@ -171,34 +171,26 @@ namespace QDLIB {
       return d.real();
    }
 
+   /**
+    * Maximum kintetic energy is given by the maximum  possible momenta:
+    * \f$T_{max}  = \frac{\pi^2}{2} \sum_r \sum_s \frac{1}{\Delta x_r} G_{rs} \frac{1}{\Delta x_s}
+    */
    double OGridGMat::Emax()
    {
       if (GridSystem::Dim() == 0) throw ( EParamProblem("Gmatrix operator not initalized") );
       
       /* Calc Tmax on the Grid */
       double T=0;
-      if (_size == 1 ){ // Simple case
-	 T = VecMin(*(_Gmat[0][0])) / (GridSystem::Dx(0) * GridSystem::Dx(0));
-      } else  if (_size == 2 ){ // Quick diag
-	 double g0, g1, g10;
-         double t[2];
-	 g0 =  VecMin(*(_Gmat[0][0]));
-	 g1 = VecMin(*(_Gmat[1][1]));
-         if (_KinCoup){
-            g10 = VecMin(*(_Gmat[1][0]));
-	    diag22symm(g0, g1, g10, t);
-            T = t[0]/ (GridSystem::Dx(0) * GridSystem::Dx(0));
-            T += t[1]/ (GridSystem::Dx(1) * GridSystem::Dx(1));
-         } else {
-            T = g0/ (GridSystem::Dx(0) * GridSystem::Dx(0));
-            T += g1/ (GridSystem::Dx(1) * GridSystem::Dx(1));
-         }
-	 
-         
-      } else {
-	 for (int i=0; i < GridSystem::Dim(); i++)
-	    T += 1/ ( VecMin(*(_Gmat[i][i])) *  GridSystem::Dx(i) * GridSystem::Dx(i));
+
+      for (int i=0; i < GridSystem::Dim(); i++){
+	 for(int j=0; j <= i; j++) {
+	    if (i != j) 
+	       T += 2 * VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
+	    else
+	       T += VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
+	 }
       }
+      
       T *= ( M_PI*M_PI / 2 );
       return T;
    }
