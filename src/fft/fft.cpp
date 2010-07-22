@@ -50,20 +50,19 @@ namespace QDLIB {
 	 }
 	 fftwFlag = FFTW_PATIENT;
 #ifdef _OPENMP
-	 nthreads = omp_get_num_threads();
+	 nthreads = omp_get_max_threads();
 	 //cerr << "FFTW run init" << endl;
 	 /* Initalisation */
 	 if (fftw_init_threads() == 0)
 	    cerr << "FFTW init thread error" << endl;
-	 else
-	    cerr << "FFTW init thread success " << nthreads << endl;
- 	 fftw_plan_with_nthreads(nthreads);
+	
+	 fftw_plan_with_nthreads(nthreads);
 #endif	 
       } else {
 	 fftwFlag = FFTW_ESTIMATE;
       }
 #ifdef _OPENMP
-      nthreads = omp_get_num_threads();
+      nthreads = omp_get_max_threads();
        fftw_plan_with_nthreads(nthreads);
 #endif
       switch (grid.Dim()){

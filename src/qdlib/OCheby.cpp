@@ -114,15 +114,15 @@ namespace QDLIB
       for (int i=2; i < _order; i++){
  	 _hamilton->Apply( buf, ket1);
          int s,j;
-#ifdef _OPENMP
-#pragma omp parallel for default(shared) private(s,k2,bf,k0,psi,j)
-#endif
+
 	 for (s=0; s < strides; s++){
 	    k2 = ket2->begin(s);
 	    bf = buf->begin(s);
 	    k0 = ket0->begin(s);
 	    psi = Psi->begin(s);
-//#pragma omp parallel for default(shared) private(j)
+#ifdef _OPENMP    
+#pragma omp parallel for default(shared) private(j)
+#endif
 	    for(j=0; j< size; j++){
 	       bf[j] *= exp2;
 	       k2[j] = k0[j];

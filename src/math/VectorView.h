@@ -111,9 +111,15 @@ namespace QDLIB
 	 /* Set the pointer array */
 	 int me;
 	 me = _dims[dim];
-	 for (int i=0; i < _dims[dim]; i++){ /* Loop over points in dim */
+	 
+	 lint i,j;
+	 
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,j)
+#endif
+	 for (i=0; i < _dims[dim]; i++){ /* Loop over points in dim */
 	    _view[dim][i] = new T*[_nothers];
-	    for (int j=0; j < _nothers; j++) /* Loop over other dim */
+	    for (j=0; j < _nothers; j++) /* Loop over other dim */
 	    {
 	       _view[dim][i][j] = _v+( (j/lothers) * me * lothers + j%lothers  + i * lothers);
 	    }
@@ -148,8 +154,12 @@ namespace QDLIB
    template <class T>
 	 inline void VectorView<T>::operator=(const Vector<T> &vec)
    {
-      for (int i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
-	 for (int j=0; j < _nothers; j++) /* Loop over other dim */
+      lint i,j;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,j)
+#endif
+      for (i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
+	 for (j=0; j < _nothers; j++) /* Loop over other dim */
 	 {
 	    *(_view[_adim][i][j]) = vec[i];
 	 }
@@ -163,8 +173,12 @@ namespace QDLIB
    template <class T>
 	 inline void VectorView<T>::operator*=(const Vector<T> &vec)
    {
-      for (int i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
-	 for (int j=0; j < _nothers; j++) /* Loop over other dim */
+      lint i,j;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,j)
+#endif
+      for (i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
+	 for (j=0; j < _nothers; j++) /* Loop over other dim */
 	 {
 	    *(_view[_adim][i][j]) *= vec[i];
 	 }
@@ -177,8 +191,12 @@ namespace QDLIB
    template <class T>
 	 inline void VectorView<T>::operator+=(const Vector<T> &vec)
    {
-      for (int i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
-	 for (int j=0; j < _nothers; j++) /* Loop over other dim */
+      lint i,j;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,j)
+#endif
+      for (i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
+	 for (j=0; j < _nothers; j++) /* Loop over other dim */
 	 {
 	    *(_view[_adim][i][j]) += vec[i];
 	 }

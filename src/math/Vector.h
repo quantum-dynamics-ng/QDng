@@ -366,7 +366,11 @@ class Vector
     void operator *=(const T &scalar)
     {
        for (lint s=0; s < nstrides_; s++){
-          for (lint i=0; i< stride_size_; i++){
+	  lint i;
+#ifdef _OPENMP    
+#pragma omp parallel for default(shared) private(i)
+#endif	  
+          for (i=0; i< stride_size_; i++){
              v_[s][i] *= scalar;
           }
        }
