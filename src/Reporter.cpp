@@ -103,7 +103,7 @@ namespace QDLIB
 	     log.cout() << "\t" << fixed << norm;
          } 
          
-         if ( fpclassify(norm) == FP_NAN)
+         if ( fpclassify(norm) == FP_NAN || fpclassify(norm) == FP_INFINITE)
             throw ( EOverflow("Norm is not a number") );
          
 	 if (_multistate){ /* Norm of single states */

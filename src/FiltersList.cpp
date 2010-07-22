@@ -95,9 +95,9 @@ namespace QDLIB {
 	    _action[_size] = expeconly;
 	    _writefile = true;
 	 } else {
-	    string error("Unknown filter action provided: ");
-	    error += faction;
-	    throw EParamProblem (error.c_str());
+	    string errormsg("Unknown filter action provided: ");
+	    errormsg += faction;
+	    throw EParamProblem (errormsg.c_str());
 	 }
 	 if (faction != "normalize"){
 	     _olist[_size] = ChainLoader::LoadOperatorChain( filters );  /* Load operator */

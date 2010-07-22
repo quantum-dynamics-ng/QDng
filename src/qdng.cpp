@@ -5,6 +5,10 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <time.h>
+#include <sys/times.h>
+#include <unistd.h>
+
 #ifdef _OPENMP
  #include <omp.h>
 #endif
@@ -44,11 +48,18 @@ void show_version()
    log.cout() << ")" << endl; log.flush();
 }
 
+/**
+ * This is the QDng main program.
+ */
 int main(int argc, char **argv)
 {
 
    Getopt cmdline;
    string fname, dir;
+   
+   time_t wall_time;
+   clock_t cpu_time;
+   struct tms proc_time, proc_time_new;
    
    int retval = EXIT_SUCCESS;
    
@@ -161,6 +172,8 @@ int main(int argc, char **argv)
       
       /* Loop over program nodes */
       while (prognodes->EndNode()) {
+	 cpu_time = times(&proc_time);
+	 wall_time = time(NULL);
 	 progname = prognodes->Name();
 	 if (progname == "propa"){
 	    ProgPropa propa(*prognodes);
@@ -187,6 +200,14 @@ int main(int argc, char **argv)
 	 } else {
 	    throw ( EParamProblem ("Programm type not known") );
 	 }
+	 
+	 /* Show time consumption */
+	 log.cout().precision(0);
+	 log.cout() << "\nWall time: " << fixed << difftime(time(NULL), wall_time) << " s";
+	 
+	 cpu_time = times(&proc_time_new);
+	 log.cout() << "\tCPU time: " << double(proc_time_new.tms_utime - proc_time.tms_utime)/double(sysconf(_SC_CLK_TCK)) << " s";
+	 log.cout() << "\tSYS time: " << double(proc_time_new.tms_stime - proc_time.tms_stime)/double(sysconf(_SC_CLK_TCK)) << " s \n\n";
 	 
 	 prognodes->NextNode();
       }
