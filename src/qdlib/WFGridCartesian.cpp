@@ -92,38 +92,50 @@ namespace QDLIB {
    dcomplex WFGridCartesian::operator *(WaveFunction *Psi)
    {
       dcomplex c(0,0);
-//       WaveFunction *ket;
-   
-      /* Copy */
-//       ket = Psi->NewInstance();
-//       *ket = Psi;
+      dcomplex cglob(0,0);
+      
    
       /** \todo make mpi-save */
       int s;
+      lint size = lsize();
       dcomplex *a, *b;
       for (s=0; s < strides(); s++){
 	 a = begin(s);
          b = Psi->begin(s);
-	 for(int i=0; i < lsize(); i++){
+	 int i;
+#ifdef _OPENMP
+#pragma parallel shared(cglob) private(i) local(c)
+{   
+#endif	 
+	 for(i=0; i < size; i++){
 	    c += a[i].conj() * b[i];
 	 }
+#ifdef _OPENMP
+#pragma omp critical
+	 {
+	 cglob += c;
+	 }
+}
+#else
+         cglob = c;
+#endif
       }
    
       /* k-space has different Norm! */
       if (IsKspace())
       {
 	 for(int i=0; i < GridSystem::Dim(); i++){
-	    c *= 2*M_PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i)) ;
+	    cglob *= 2*M_PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i)) ;
 	 }
 
       } else {
 	 for(int i=0; i < GridSystem::Dim(); i++){
-	    c *= GridSystem::Dx(i);
+	    cglob *= GridSystem::Dx(i);
 	 }
 	 
       }
       
-      return c;
+      return cglob;
    }
 
 
