@@ -13,6 +13,7 @@ AM_PROG_LIBTOOL
 dnl Check for standard functions
 AC_CHECK_FUNCS([pow],,AC_MSG_ERROR(power function not found))
 AC_CHECK_FUNCS([sqrt],,AC_MSG_ERROR(sqrt function not found))
+AC_CHECK_FUNCS([mkdir],,AC_MSG_ERROR(mkdir function not found))
 AC_C_INLINE
 AC_HEADER_STDBOOL
 AC_PROG_CPP
@@ -20,7 +21,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+
 AC_TYPE_SIZE_T
+AC_TYPE_MODE_T
+
 
 dnl
 dnl Matlab Library
