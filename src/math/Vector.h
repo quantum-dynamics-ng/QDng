@@ -261,8 +261,16 @@ class Vector
     {
        if (n_ == A.n_ && nstrides_ == A.nstrides_){
 	  /* no need to re-alloc */
-	  for (lint s=0; s < nstrides_; s++)
+	  for (lint s=0; s < nstrides_; s++){
+#ifdef _OPENMP  
+	     lint i;
+#pragma omp parallel for default(shared) private(i)
+	     for (i=0; i < stride_size_; i++)
+		v_[s][i] =  A.v_[s][i];
+#else
 	     memcpy(v_[s], A.v_[s], sizeof(T) *  stride_size_);
+#endif
+	  }
        } else {
 	  if (!isRef_) destroy();
 	  initialize(A.n_, A.nstrides_);

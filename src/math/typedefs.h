@@ -693,7 +693,7 @@ namespace QDLIB {
 	 b = B->begin(s);
          lint i;
 #ifdef _OPENMP
-         #pragma omp parallel for
+#pragma omp parallel for default(shared) private(i)
 #endif
 	 for (i=0; i < size; i++)
 	 {

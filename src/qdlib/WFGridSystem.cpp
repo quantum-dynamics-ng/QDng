@@ -57,7 +57,11 @@ namespace QDLIB {
       
       norm = VecMax(*this) * tolerance; /* This is the cut-off criteria */
       
-      for (int i=0; i <  size; i++){
+      int i;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i)
+#endif
+      for (i=0; i <  size; i++){
          /* cut down real & imag seperately */
          if ( abs((*this)[i].real()) < norm )
             (*this)[i]._real = 0;

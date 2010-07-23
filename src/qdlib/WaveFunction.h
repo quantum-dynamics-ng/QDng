@@ -185,10 +185,9 @@ namespace QDLIB {
 	 /** Difference */
 	 WaveFunction* operator-=(WaveFunction* Psi)
 	 {
-	    if (cVec::size() != Psi->size()) throw ( EParamProblem("Grids differ in size") );
-	    for (int i=0; i < cVec::size(); i++){
-	       (*(cVec*)this)[i] += -1*(*(cVec*) Psi)[i];
-	    }
+	    if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
+	    
+	    AddElements((cVec*) this, (cVec*) Psi, -1);
 	    return this;
 	    
 	 }
