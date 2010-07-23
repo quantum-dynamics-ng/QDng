@@ -7,7 +7,7 @@
 
 namespace QDLIB {
 
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _kspace(NULL), _wfbuf(NULL), buf(NULL), _KinCoup(true)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _kspace(NULL), _wfbuf(NULL), buf(NULL), _KinCoup(true)
    {
    }
    
@@ -101,15 +101,18 @@ namespace QDLIB {
       
       int i;
       _Gmat = new OGridPotential**[n];
+      _GmatC = new double*[n];
       _kspace = new dVec[n];
       _wfbuf = new WFGridSystem*[n];
       
       for (i=0; i < n; i++){
          _wfbuf[i] = NULL;
 	 _Gmat[i] = new OGridPotential*[n];
+	 _GmatC[i] = new double[n];
 	 for (int j=0; j <= i; j++){
 	    _Gmat[i][j] = new OGridPotential();
-	   
+	    _GmatC[i][j] = 0;
+	    _GmatC[j][i] = 0;
 	 }
       }
      
@@ -130,14 +133,20 @@ namespace QDLIB {
 	    if (i == j || _KinCoup){ /* No off-diagonals if kinetic coupling is turned off*/
 	       snprintf (si, 32, "%d", i);
 	       snprintf (sj, 32, "%d", j);
-	       s = name + string("_") + string(si) + string(sj);
-	       file.Name(s);
-	       file >> ((OGridSystem*) _Gmat[i][j]);
-               
-               if (i != 0 && j != 0) { /* Check grid compatibility of G-Mat elem. */
-                  if ( *((GridSystem*)  _Gmat[i][j]) != *((GridSystem*) _Gmat[0][0]) )
-                     throw (EIncompatible ("Gmatrix elements incompatible"));
-               }
+	       s = string("G") +  string(si) + string(sj);
+	       if ( _params.isPresent (s) ) { /* Constant element - has precedence over grided element */
+		  _params.GetValue(s, _GmatC[i][j]);
+		  _GmatC[i][j] = _GmatC[j][i]; /* Symetrize */
+	       } else { /* Coordinate dependent element */
+		  s = name + string("_") + string(si) + string(sj);
+		  file.Name(s);
+		  file >> ((OGridSystem*) _Gmat[i][j]);
+		  
+		  if (i != 0 && j != 0) { /* Check grid compatibility of G-Mat elem. */
+		     if ( *((GridSystem*)  _Gmat[i][j]) != *((GridSystem*) _Gmat[0][0]) )
+			throw (EIncompatible ("Gmatrix elements incompatible"));
+		  }
+	       }
 	    }
 	 }
       }
@@ -173,7 +182,7 @@ namespace QDLIB {
 
    /**
     * Maximum kintetic energy is given by the maximum  possible momenta:
-    * \f$T_{max}  = \frac{\pi^2}{2} \sum_r \sum_s \frac{1}{\Delta x_r} G_{rs} \frac{1}{\Delta x_s}
+    * \f$ T_{max}  = \frac{\pi^2}{2} \sum_r \sum_s \frac{1}{\Delta x_r} G_{rs} \frac{1}{\Delta x_s} \f$
     */
    double OGridGMat::Emax()
    {
@@ -184,9 +193,15 @@ namespace QDLIB {
 
       for (int i=0; i < GridSystem::Dim(); i++){
 	 for(int j=0; j <= i; j++) {
-	    if (i != j) 
-	       T += 2 * VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
-	    else
+	    if (i != j) {
+	       double max, min;
+	       max = VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
+	       min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
+	       if (min < 0 && fabs(min) > fabs(max))
+		  T += 2 * fabs(min);
+	       else
+		  T += 2 * max;
+	    } else
 	       T += VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
 	 }
       }
@@ -197,7 +212,16 @@ namespace QDLIB {
 	 
    double OGridGMat::Emin()
    {
-      return 0; /* Minimum kinetic energy is zero */
+      double Tmin = 0;
+      for (int i=0; i < GridSystem::Dim(); i++){
+	 for(int j=0; j < i; j++) {
+	    double max, min;
+	    min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
+	    if (min < 0)
+	       Tmin += min;
+	 }
+      }
+      return Tmin;
    }
    
    WaveFunction * OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
@@ -219,15 +243,23 @@ namespace QDLIB {
 	    if ( (i == j) | _KinCoup){ /* Kinetic coupling ?*/
 	       buf->FastCopy(*(_wfbuf[i]));
 	       /* Multiply Gmatrix element */
-	       if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
-	         MultElements( (cVec*) buf, (dVec*) _Gmat[j][i]);
-	       else
-	         MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
-	       /* d/dx from G* d/dx WF */
-               _FFT.Forward(buf);
-	       MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
-               _FFT.Backward(buf);
-	       
+	       if (_GmatC[i][j] != 0 ){ /* Constant G-Element*/
+		  /* d/dx from G* d/dx WF */
+		  _FFT.Forward(buf);
+		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) * _GmatC[i][j]);
+		  _FFT.Backward(buf);
+		  
+	       } else { /* Coordinate dependent lu*/
+		  if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
+		    MultElements( (cVec*) buf, (dVec*) _Gmat[j][i]);
+		  else
+		    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
+	       	       
+		  /* d/dx from G* d/dx WF */
+		  _FFT.Forward(buf);
+		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
+		  _FFT.Backward(buf);
+	       }
 	       *destPsi += buf;
 	    }
  	 }
@@ -273,16 +305,25 @@ namespace QDLIB {
       
       if(_kspace == NULL) _kspace = new dVec[_size];
       if (_Gmat == NULL) _Gmat = new OGridPotential**[_size];
+      if (_GmatC == NULL) _GmatC = new double*[_size];
       if (_wfbuf == NULL) _wfbuf = new WFGridSystem*[_size];
+      
       for (int i=0; i < _size; i++){
 	 _kspace[i] = o->_kspace[i];
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 buf = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 _Gmat[i] = new OGridPotential*[_size];
+	 _GmatC[i] = new double[_size];
+	 
 	 for(int j=0; j <= i; j++){
             if (o->_Gmat[i][j] != NULL){
-               _Gmat[i][j] = new OGridPotential();
-               *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
+	       if (o->_GmatC[i][j] != 0) {
+		  _GmatC[i][j] = o->_GmatC[i][j];
+		  _GmatC[j][i] = o->_GmatC[j][i];
+	       } else {
+                  _Gmat[i][j] = new OGridPotential();
+                  *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
+	       }
             }
 	 }
       }

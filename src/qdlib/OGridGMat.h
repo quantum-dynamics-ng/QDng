@@ -28,7 +28,8 @@ namespace QDLIB {
 	 
 	 string _name;
 	 lint _size;
-	 OGridPotential*** _Gmat;     /* 2D Array*/
+	 OGridPotential*** _Gmat;     /* 2D Array coordinate dependent elements*/
+	 double** _GmatC;             /* 2D Array constant G elements */
 	 dVec* _kspace;
 	 WFGridSystem** _wfbuf;      /* 1D Array */
 	 WFGridSystem* buf;
