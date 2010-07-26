@@ -26,6 +26,7 @@ namespace QDLIB {
     * \li steps   number of time steps [required]
     * \li wcycle  number of step to make until a wf will be written and the reporter will analyze.
     * \li fname   basename for the propagated files.
+    * \li start   File Sequence number to begin with. If > 0 then the initial WF will not be written.
     * \li dir     Output directory
     * 
     * printing options:
@@ -48,6 +49,7 @@ namespace QDLIB {
 	 int _wcycle;     /* Write ratio */
 	 Reporter _reporter;
 	 string _fname;
+	 int    _start;   /* Start writing at number */
 	 string _dir;
 	 
 	 string _nfile;

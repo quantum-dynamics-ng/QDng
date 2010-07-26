@@ -10,7 +10,7 @@ namespace QDLIB {
 
    ProgPropa::ProgPropa(XmlNode & PropaNode) :
 	 _propaNode(PropaNode), _ContentNodes(NULL),
-	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _dir(""), _nfile(DEFAULT_NORMFILE), _writenorm(false),
+	 _wcycle(DEFAULT_WRITE_CYCLE), _fname(DEFAULT_BASENAME), _start(0), _dir(""), _nfile(DEFAULT_NORMFILE), _writenorm(false),
          _scinorm(false), _U(NULL), _H(NULL), _usepost(false), _usepre(false)
    {
    }
@@ -75,12 +75,20 @@ namespace QDLIB {
 	 attr.GetValue("fname", _fname);
       }
             
+      /* Init propagation file counter */
+      if ( attr.isPresent("start") ) {
+	 attr.GetValue("start", _start);
+	 if (_start < 0)
+	    throw ( EParamProblem ("Only positive counter start counter numbers are allowed") );
+      }
+      
       log.Header("Propagation parameters", Logger::Section);
     
       log.IndentInc();
       log.cout() << "Number of steps: " <<  clock->Steps() << endl;
       log.cout().precision(2);
       log.cout() << "Time step: " << fixed << clock->Dt() << endl;
+      log.cout() << "First step number : " << _start << endl;
       log.cout() << "Write cycles: " << _wcycle << endl;
       log.cout() << "Overall time: " << fixed << clock->Steps() * clock->Dt() << endl;
       log.cout() << "Basename for wave function output: " << _fname << endl;
@@ -246,18 +254,30 @@ namespace QDLIB {
       wfile.Name(_dir+_fname);
       wfile.Suffix(BINARY_WF_SUFFIX);
       wfile.ActivateSequence();
-      wfile << Psi;
+      
+      if (_start != 0)
+	 wfile.Counter(_start);
+      else
+         wfile << Psi;
       
       /* The propagation loop */
       log.Header( "Free propagation", Logger::Section);
       log.flush();
+      
       /* redirect to to normfile */
       if( _writenorm ) {
          log.cout() << "Propagation table is redirected to Norm file: " << _nfile << endl;
          log.flush();
          log.FileOutput( _nfile );
       }
-      for (lint i=1; i <= clock->Steps(); i++){
+      
+      lint start;
+      if (_start == 0)
+	 start=1;
+      else
+	 start = _start;
+      
+      for (lint i=start; i <= clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
 	_U->Apply(Psi);                 /* Propagate */

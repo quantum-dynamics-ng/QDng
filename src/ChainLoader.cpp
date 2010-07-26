@@ -137,30 +137,6 @@ namespace QDLIB
       
       pm = WFNode->Attributes();
       pm.GetValue( "name", name );
-      if (name.length() == 1 && pm.isPresent("file")){ /* Lets try to load blind via file name & meta files */
-         pm.GetValue( "file", name );
-         FileWF file;
-         file.Suffix(BINARY_WF_SUFFIX);
-         file.Name(name);
-
-         log.cout() << "Loading wavefunction from file definition: " << name;
-         if (seqnum > -1 || pm.isPresent("num") ){ /* Read file from a sequence => only basename is given */
-            file.ActivateSequence();
-            int num = seqnum;
-            
-            if (pm.isPresent("num")){
-               pm.GetValue("num", num);
-            }
-            file.Counter(num);
-            log.cout() << " ("<< num << ")";
-         }
-         log.cout()  << endl;
-         log.flush();
-         
-         file >> &WF;
-         
-         return WF;
-      }
       
       if (name == "Multistate"){ /* Further recursion for multistate WF */
 	 log.cout() << "Multi state wave function:" << endl;
@@ -243,24 +219,33 @@ namespace QDLIB
 	 log.IndentDec();
 	 return WF; 
       } else { /* load a specific wf */
+	 string fname;
 	 
-	 WF = mods->LoadWF( name );
-	 if (WF == NULL)
-	    throw ( EParamProblem("WaveFunction module loading failed") );
-	 
+	 if ( name.length() != 1 ){ /* modules name is given */
+	    WF = mods->LoadWF( name );
+	    if (WF == NULL)
+	       throw ( EParamProblem("WaveFunction module loading failed") );
+	 }
+	    
 	 if (!pm.isPresent("file"))
 	    throw ( EParamProblem("No file for loading wave function given") );
 	 
 	 /* load wf */
-         pm.GetValue( "file", name );
-         FileWF file;
+	 FileWF file;
+         
+	 pm.GetValue( "file", fname );
          file.Suffix(BINARY_WF_SUFFIX);
-         file.Name(name);
+         file.Name(fname);
          if (seqnum > -1){ /* Read file from a sequence => only basename is given */
             file.ActivateSequence();
             file.Counter(seqnum);
          }
-         file >> WF;
+	 
+	 if ( name.length() != 1 ) /* modules name is given */
+            file >> WF;
+	 else                      /* Load by meta */
+	    file >> &WF;
+	 
          pm.GetValue( "normalize", onoff);
          if ( onoff) {
             log.cout() << "Normalizing...\n";
@@ -273,6 +258,7 @@ namespace QDLIB
             *WF *= cexpI(phase * M_PI);
          }
 	 
+	 if ( name.length() == 1 ) log.cout() << WF->Params() << endl;
 	 log.cout() << pm << "------------------\n" << endl;
       }
       return WF;
