@@ -88,6 +88,9 @@ class Vector
     {
       // adjust pointers so that they are 1-offset:
       // v_[] is the internal contiguous array, it is still 0-offset
+       
+      int ret;
+      
       nstrides_ = strides;
       stride_size_ = N / strides;
       n_ = N;
@@ -100,8 +103,10 @@ class Vector
          if (stride_size_ == 0)
             v_[i] = NULL;
          else
-            v_[i] = new T[stride_size_];
-	    //posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
+            if (align_)
+	       ret = posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
+	    else
+	       v_[i] = new T[stride_size_];
       }
       
       
@@ -289,14 +294,14 @@ class Vector
 
     // constructors
 
-    Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(false)
+    Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
     {
        v_ = new T*[nstrides_];
        v_[0] = NULL;
     }
 
     
-    Vector(const Vector<T> &A) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(false)
+    Vector(const Vector<T> &A) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
     {
        initialize(A.n_, A.nstrides_);
         copy(A.v_);
@@ -318,13 +323,13 @@ class Vector
         set(value);
     }
 
-    Vector(lint N, lint strides, const T** v) :  n_(N), nstrides_(strides), stride_size_(0), isRef_(false), align_(false)
+    Vector(lint N, lint strides, const T** v) :  n_(N), nstrides_(strides), stride_size_(0), isRef_(false), align_(true)
     {
         initialize(N, strides);
         copy(v);
     }
 
-    Vector(lint N, const T* v) :  n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(false)
+    Vector(lint N, const T* v) :  n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
     {
        initialize(N, nstrides_);
        copy(v);

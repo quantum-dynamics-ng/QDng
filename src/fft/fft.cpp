@@ -22,9 +22,9 @@ namespace QDLIB {
    FFT::FFT(cVec &in, cVec &out, bool oneway) : _dims(NULL)
    {
 //       cerr << "FFTW 1D init" << endl;
-      _planf = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
+      _planf = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);
       if (!(_oneway = oneway)){
-	 _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
+	 _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_FORWARD, FFTW_MEASURE);
       }
       
    }
@@ -44,6 +44,16 @@ namespace QDLIB {
       cVec inbuf;
       int fftwFlag;
       
+#ifdef _OPENMP
+      _nthreads = omp_get_max_threads();
+	 //cerr << "FFTW run init" << endl;
+      /* Initalisation */
+      if (fftw_init_threads() == 0)
+	 cerr << "FFTW init thread error" << endl;
+	
+      fftw_plan_with_nthreads(_nthreads);
+#endif
+      
       /* Read plan */
       if (!_planed){
 	 Logger& log = Logger::InstanceRef();
@@ -60,10 +70,13 @@ namespace QDLIB {
          inbuf = in;
 	 FILE * pFile;
 	 if ((pFile = fopen(wisdom.c_str() , "r"))){
-	    log.cout() << "Reading fftw3 wisdom from file: " << wisdom << endl;
-	    fftw_import_wisdom_from_file(pFile);
+	    if (fftw_import_wisdom_from_file(pFile) == 1)
+	       log.cout() << "Reading fftw3 wisdom from file: " << wisdom << endl;
+	    else
+	       log.cout() << "Reading fftw3 wisdom from file: " << wisdom << " failed!" << endl;
+	    
 	    fclose(pFile); 
-	    fftwFlag = FFTW_ESTIMATE;
+	    fftwFlag = FFTW_MEASURE;
 	 } else { 
 	    if ( fftwOptimize ) { /* Optimal fftw plan */
 	      fftwFlag = FFTW_PATIENT;
@@ -73,18 +86,10 @@ namespace QDLIB {
 	    }
 	 }
 	 log.flush();
-#ifdef _OPENMP
-	 _nthreads = omp_get_max_threads();
-	 //cerr << "FFTW run init" << endl;
-	 /* Initalisation */
-	 if (fftw_init_threads() == 0)
-	    cerr << "FFTW init thread error" << endl;
-	
-	 fftw_plan_with_nthreads(_nthreads);
-#endif
       } else {
 	 fftwFlag = FFTW_ESTIMATE;
       }
+      
       
       switch (grid.Dim()){
 	 case 1:  /* 1D */
@@ -117,10 +122,10 @@ namespace QDLIB {
 	       _dims[grid.Dim() - i - 1] = grid.DimSizes(i);
 	    }
 	    _planf = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) in.begin(0),
-				   (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);	
+				   (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);	
 	    if (!(_oneway = oneway)){
 	       _planb = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) out.begin(0),
-				      (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_MEASURE);
+				      (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
 	    }
 	 
       } /* switch  */
