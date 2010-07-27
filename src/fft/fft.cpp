@@ -5,6 +5,9 @@
  #include <omp.h>
 #endif
 
+#include "tools/GlobalParams.h"
+#include "tools/Logger.h"
+
 namespace QDLIB {
   
    /**
@@ -41,37 +44,55 @@ namespace QDLIB {
       cVec inbuf;
       int fftwFlag;
       
+      /* Read plan */
       if (!_planed){
+	 Logger& log = Logger::InstanceRef();
+	 ParamContainer& gp = GlobalParams::Instance();
+	 string wisdom("wisdom"); /* This is the default: wisdom in the current directory */
+	 bool fftwOptimize;
+	 
+	 if ( gp.isPresent("wisdom") )
+	    gp.GetValue("wisdom", wisdom);
+	 
+	 gp.GetValue("fftwOptimize", fftwOptimize, true);
+	 
+	 /* Read wisdom */
          inbuf = in;
 	 FILE * pFile;
-	 if ((pFile = fopen("wisdom", "r"))){
+	 if ((pFile = fopen(wisdom.c_str() , "r"))){
+	    log.cout() << "Reading fftw3 wisdom from file: " << wisdom << endl;
 	    fftw_import_wisdom_from_file(pFile);
-	    fclose(pFile);
+	    fclose(pFile); 
+	    fftwFlag = FFTW_ESTIMATE;
+	 } else { 
+	    if ( fftwOptimize ) { /* Optimal fftw plan */
+	      fftwFlag = FFTW_PATIENT;
+	      log.cout() << "No wisdom found. Creating an optimal plan. This can take while..." << endl;
+	    } else {
+	       fftwFlag = FFTW_ESTIMATE;
+	    }
 	 }
-	 fftwFlag = FFTW_PATIENT;
+	 log.flush();
 #ifdef _OPENMP
-	 nthreads = omp_get_max_threads();
+	 _nthreads = omp_get_max_threads();
 	 //cerr << "FFTW run init" << endl;
 	 /* Initalisation */
 	 if (fftw_init_threads() == 0)
 	    cerr << "FFTW init thread error" << endl;
 	
-	 fftw_plan_with_nthreads(nthreads);
-#endif	 
+	 fftw_plan_with_nthreads(_nthreads);
+#endif
       } else {
 	 fftwFlag = FFTW_ESTIMATE;
       }
-#ifdef _OPENMP
-      nthreads = omp_get_max_threads();
-       fftw_plan_with_nthreads(nthreads);
-#endif
+      
       switch (grid.Dim()){
 	 case 1:  /* 1D */
 	    _planf = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) in.begin(0),
-				      (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_ESTIMATE);
+				      (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);
 	    if (!(_oneway = oneway)){
 	       _planb = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) out.begin(0),
-					 (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_ESTIMATE);
+					 (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
 	    }
 	    break;
 	 case 2: /* 2D */
@@ -84,10 +105,10 @@ namespace QDLIB {
 	    break;
 	 case 3: /* 3D */
 	    _planf = fftw_plan_dft_3d(grid.DimSizes(2) , grid.DimSizes(1), grid.DimSizes(0),
-				      (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);	
+				      (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);	
 	    if (!(_oneway = oneway)){
 	       _planb = fftw_plan_dft_3d(grid.DimSizes(2) , grid.DimSizes(1), grid.DimSizes(0),
-					 (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_MEASURE);
+					 (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
 	    }
 	    break;
 	 default: /* arb. dims */
@@ -104,11 +125,20 @@ namespace QDLIB {
 	 
       } /* switch  */
       
+      /* Save plan */
       if (!_planed) {
+	 Logger& log = Logger::InstanceRef();
+	 ParamContainer& gp = GlobalParams::Instance();
+	 string wisdom("wisdom"); /* This is the default: wisdom in the current directory */
+	 
+	 if ( gp.isPresent("wisdomsave") )
+	    gp.GetValue("wisdomsave", wisdom);
+	 
 	 in = inbuf;
 	 _planed = true;
 	 FILE * pFile;
-	 if ((pFile = fopen("wisdom", "w"))){
+	 if ((pFile = fopen(wisdom.c_str(), "w"))){
+	    log.cout() << "Write fftw3 wisdom to file: " << wisdom << endl;
 	    fftw_export_wisdom_to_file(pFile);
 	    fclose(pFile);
 	 }
@@ -163,7 +193,7 @@ namespace QDLIB {
    }
 
    bool FFT::_planed = false;
-   int FFT::nthreads = 0;
+   int FFT::_nthreads = 1;
    
    
 } /* namespace QDLIB */

@@ -29,7 +29,7 @@ namespace QDLIB {
 	 int *_dims;
 	 bool _oneway;
 	 static bool _planed;
-	 static int nthreads;
+	 static int _nthreads;
       public:
 	 FFT(cVec &in, cVec &out, bool oneway = false);
 	 FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway = false);

@@ -118,7 +118,6 @@ int main(int argc, char **argv)
       /* Get the number of openmp threads */
       cmdline.GetOption( 'p', procs);
       omp_set_num_threads(procs);
-      cout << "Running with " << procs << " threads.\n";
 #endif
       
       if(! cmdline.GetNonOption(0, fname) )
@@ -164,6 +163,9 @@ int main(int argc, char **argv)
       
       log.cout() <<  endl;
       log.Header("Global Parameters", Logger::SubSection);
+#ifdef _OPENMP
+      cout << "Running with " << omp_get_max_threads() << " threads.\n";
+#endif
       log.cout() << gp;
       log.flush();
       
