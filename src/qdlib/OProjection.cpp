@@ -198,24 +198,22 @@ namespace QDLIB {
    WaveFunction * QDLIB::OProjection::Apply( WaveFunction * Psi )
    {
       WaveFunction* in = Psi->NewInstance();
-      *in = Psi;
-      Apply( Psi, in );
-      delete in;
+      *_buf = Psi;
+      Apply( Psi, _buf );
+
       return Psi;
    }
    
-   /**
-    * \todo replace with a muladd low level func.
-    */
    WaveFunction * QDLIB::OProjection::Apply( WaveFunction * destPsi, WaveFunction * sourcePsi )
    {
       *destPsi = dcomplex(0,0);
       
-      for (int i=0; i < _size; i++){
-	 *_buf = _wfbuf[i];
-	 *_buf *= *(_wfbuf[i]) * sourcePsi;
-         *_buf *= _sign;
-	 *destPsi += _buf;
+      int i;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i)
+#endif
+      for (i=0; i < _size; i++){
+	 MultElementsAdd(destPsi, _wfbuf[i], *(_wfbuf[i]) * sourcePsi * _sign);
       }
       
       return destPsi;
