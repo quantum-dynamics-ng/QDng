@@ -47,10 +47,9 @@ namespace QDLIB {
          sprintf(c, "k%d", i);
          s = c;
    
-         if (_params.isPresent(s)) {
+         if (_params.isPresent(s)) 
             _params.GetValue(string(c), _kn[i]);
-   
-         } else _kn[i] = 0; /* Mark as -1 => don't build k-space */
+         else _kn[i] = 0; /* Mark as 0 => don't build k-space */
       }
    
    }
@@ -81,14 +80,16 @@ namespace QDLIB {
          
          /* Run over dimension - create exp(i * k_n * x_n) */
          for (int n=0; n < GridSystem::Dim(); n++){
-            x1.newsize( GridSystem::DimSizes(n) );
-            view.ActiveDim(n);
-            /* init spatial coordinate*/
-            for (int i=0; i < GridSystem::DimSizes(n); i++){
-               x1[i] = GridSystem::Xmin(n) + double(i)*GridSystem::Dx(n);
-               x1[i] *= _kn[n];
-            }
+	    if (_kn[n] != 0){
+	       x1.newsize( GridSystem::DimSizes(n) );
+	       view.ActiveDim(n);
+	       /* init spatial coordinate*/
+	       for (int i=0; i < GridSystem::DimSizes(n); i++){
+		  x1[i] = GridSystem::Xmin(n) + double(i)*GridSystem::Dx(n);
+		  x1[i] *= _kn[n];
+	       }
             view += x1;
+	    }	 
          }
          ExpElements(_exp, &exp, 1*I);
       }
