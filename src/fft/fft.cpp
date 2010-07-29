@@ -80,7 +80,7 @@ namespace QDLIB {
 	 } else { 
 	    if ( fftwOptimize ) { /* Optimal fftw plan */
 	      fftwFlag = FFTW_PATIENT;
-	      log.cout() << "No wisdom found. Creating an optimal plan. This can take while..." << endl;
+	      log.cout() << "No wisdom found. Creating an optimal plan. This can take a while..." << endl;
 	    } else {
 	       fftwFlag = FFTW_ESTIMATE;
 	    }

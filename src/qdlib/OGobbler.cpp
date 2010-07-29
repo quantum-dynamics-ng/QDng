@@ -153,11 +153,10 @@ namespace QDLIB {
 	    
       
       ket = PsiKet->NewInstance();
-    
       Apply(ket, PsiKet);
-      
       c = *PsiBra * ket;
       
+      delete ket;
       
       return c;
    }

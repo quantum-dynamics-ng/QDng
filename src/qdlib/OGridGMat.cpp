@@ -22,6 +22,22 @@ namespace QDLIB {
       }
       if (_kspace != NULL) delete[] _kspace;
       if (buf != NULL) delete buf;
+      
+      if (_Gmat != NULL){
+	 for (int i=0; i < _size; i++){
+	    for (int j=0; j <= i; j++){
+	       if (_Gmat[i][j] != NULL)  delete _Gmat[i][j];
+	    }
+	    delete[] _Gmat[i];
+	 }
+	 delete[] _Gmat;
+      }
+      
+      if (_GmatC != NULL)
+	 for (int i=0; i < _size; i++)
+	    delete[] _GmatC[i];
+      
+      delete[] _GmatC;
    }
 
    
@@ -57,6 +73,7 @@ namespace QDLIB {
 	 delete view;
 	 delete kspace1;
       }
+      delete Psi;
    }
    
    void OGridGMat::Init(WaveFunction *Psi)

@@ -168,8 +168,11 @@ class Vector
        if (v_ != NULL && !isRef_){
          for (lint s=0; s < nstrides_; s++){
             if(v_[s] != NULL){
-               //free(v_[s]);
-               delete[] v_[s];
+	       if (align_)
+                  free(v_[s]);
+	       else
+		  delete[] v_[s];
+	       
                v_[s] = NULL;
             }
          }
