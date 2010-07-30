@@ -128,9 +128,9 @@ namespace QDLIB {
 	 _GmatC[i] = new double[n];
 	 for (int j=0; j <= i; j++){
 	    _Gmat[i][j] = new OGridPotential();
-	    _GmatC[i][j] = 0;
-	    _GmatC[j][i] = 0;
 	 }
+	 for (int j=0; j < n; j++)
+	    _GmatC[i][j] = 0;
       }
      
       _params.GetValue( "gmat", name);
@@ -325,19 +325,20 @@ namespace QDLIB {
       if (_GmatC == NULL) _GmatC = new double*[_size];
       if (_wfbuf == NULL) _wfbuf = new WFGridSystem*[_size];
       
+      for (int i=0; i < _size; i++)
+         _GmatC[i] = new double[_size];
+      
       for (int i=0; i < _size; i++){
 	 _kspace[i] = o->_kspace[i];
 	 _wfbuf[i] = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 buf = dynamic_cast<WFGridSystem*>(o->_wfbuf[i]->NewInstance());
 	 _Gmat[i] = new OGridPotential*[_size];
-	 _GmatC[i] = new double[_size];
 	 
 	 for(int j=0; j <= i; j++){
             if (o->_Gmat[i][j] != NULL){
-	       if (o->_GmatC[i][j] != 0) {
-		  _GmatC[i][j] = o->_GmatC[i][j];
-		  _GmatC[j][i] = o->_GmatC[j][i];
-	       } else {
+	       _GmatC[i][j] = o->_GmatC[i][j];
+	       _GmatC[j][i] = o->_GmatC[i][j];
+	       if (o->_GmatC[i][j] == 0) {
                   _Gmat[i][j] = new OGridPotential();
                   *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
 	       }
