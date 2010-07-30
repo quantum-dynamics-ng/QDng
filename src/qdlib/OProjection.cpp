@@ -197,7 +197,6 @@ namespace QDLIB {
    
    WaveFunction * QDLIB::OProjection::Apply( WaveFunction * Psi )
    {
-      WaveFunction* in = Psi->NewInstance();
       *_buf = Psi;
       Apply( Psi, _buf );
 

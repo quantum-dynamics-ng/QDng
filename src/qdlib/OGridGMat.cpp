@@ -232,7 +232,7 @@ namespace QDLIB {
       double Tmin = 0;
       for (int i=0; i < GridSystem::Dim(); i++){
 	 for(int j=0; j < i; j++) {
-	    double max, min;
+	    double min;
 	    min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
 	    if (min < 0)
 	       Tmin += min;

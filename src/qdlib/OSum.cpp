@@ -96,7 +96,7 @@ namespace QDLIB {
    
    
    /**
-    * We take can't take parameters.
+    * We can't take parameters.
     */
    void OSum::Init(ParamContainer &params)
    {
@@ -207,7 +207,7 @@ namespace QDLIB {
       
       r = dynamic_cast<OSum*> (O);
       if (r == NULL)
-	 throw( EIncompatible ("Incompatible in Assginment", this->Name(), O->Name() ) );
+	 throw( EIncompatible ("Incompatible in Assignment", this->Name(), O->Name() ) );
       
       scaling = r->scaling;
       _offset = r->_offset;
@@ -229,12 +229,6 @@ namespace QDLIB {
    
    Operator* QDLIB::OSum::Offset(const double d)
    {
-//       for (int i=0; i < _size; i++){
-//          if ( abs (_O[i]->Emin()) > 0){
-//             _O[i]->Offset(d);
-//             break;
-//          }
-//       }
       _offset = d;
       return this;
    }
