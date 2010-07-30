@@ -9,3 +9,4 @@ if HAVE_OPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
 endif
 
+

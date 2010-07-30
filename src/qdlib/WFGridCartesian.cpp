@@ -104,9 +104,10 @@ namespace QDLIB {
          b = Psi->begin(s);
 	 int i;
 #ifdef _OPENMP
-#pragma parallel shared(cglob) private(i) local(c)
+#pragma omp parallel shared(cglob) private(i) firstprivate(c)
 {   
-#endif	 
+#pragma omp  for nowait
+#endif
 	 for(i=0; i < size; i++){
 	    c += a[i].conj() * b[i];
 	 }

@@ -6,8 +6,8 @@ namespace QDLIB {
 
    OProjection::OProjection() : _name("OProjection"), _sign(1), _size(0),  _buf(NULL)
    {
-      for (int i=0; i < _size; i++){
-         _wfbuf[MAX_WFSPACE] = NULL;
+      for (int i=0; i < MAX_WFSPACE; i++){
+         _wfbuf[i] = NULL;
       }
    }
    

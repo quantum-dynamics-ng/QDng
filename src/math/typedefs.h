@@ -25,6 +25,10 @@ namespace QDLIB {
  #include <omp.h>
 #endif
 	       
+#ifdef HAVE_SSE2
+ #include "cplx_sse2.h"
+#endif
+	       
 namespace QDLIB {
    /**
     * Enable multiplication of type double with arbitrary Types of Vector.
@@ -208,12 +212,26 @@ namespace QDLIB {
 	 a = A->begin(s);
 	 b = B->begin(s);
          lint i;
+
+#ifdef HAVE_SSE2
+	 __m128d ma, mb;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,ma,mb)
+#endif
+	 for (i=0; i < size; i++){
+	    ma = _mm_set_pd(a[i]._imag, a[i]._real);
+	    mb = _mm_set_pd(b[i]._imag, b[i]._real);
+	    ma = _mm_add_pd(ma, mb);
+	    QDSSE::Store(a[i], ma);
+	 }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
 	 for (i=0; i < size; i++){
 	    a[i] += b[i];
 	 }
+#endif
       }
    }
 
@@ -236,12 +254,27 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+	 __m128d ma, mb, md;
+	 md = _mm_set1_pd(d);
+ #ifdef _OPENMP
+ #pragma omp parallel for default(shared) private(i,ma,mb)
+ #endif
+	 for (i=0; i < size; i++){
+	    ma = _mm_set_pd(a[i]._imag, a[i]._real);
+	    mb = _mm_set_pd(b[i]._imag, b[i]._real);
+	    mb = _mm_mul_pd(mb, md);
+	    ma = _mm_add_pd(ma, mb);
+	    QDSSE::Store(a[i], ma);
+	 }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] += b[i] * d;
          }
+#endif
       }
    }
    
@@ -447,12 +480,27 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+	 __m128d ma, mb, md;
+	 md = _mm_set1_pd( d );
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,ma,mb)
+#endif
+	 for (i=0; i < size; i++){
+	    mb = _mm_set1_pd( b[i] );
+	    ma = _mm_set_pd( a[i]._real, -1*a[i]._imag);
+	    ma = _mm_mul_pd(ma, mb);
+	    ma = _mm_mul_pd(ma, md);
+	    QDSSE::Store(a[i], ma);
+	 }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] = a[i] * I * b[i] * d;
          }
+#endif
       }
    }
    
@@ -632,13 +680,28 @@ namespace QDLIB {
 	 a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+	 __m128d ma, mb;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,ma,mb)
+#endif
+	 for (i=0; i < size; i++)
+	 {
+	    ma = _mm_set_pd(a[i]._imag, a[i]._real);
+	    mb = _mm_load1_pd(&(b[i]));
+	    ma = _mm_mul_pd(ma, mb);
+	    QDSSE::Store(a[i], ma);
+	 }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
+
 	 for (i=0; i < size; i++)
 	 {
 	    a[i] *= b[i];
 	 }
+#endif
       }
    }
 
@@ -757,6 +820,20 @@ namespace QDLIB {
 	 b = B->begin(s);
 	 c = C->begin(s);
          lint i;
+
+#ifdef HAVE_SSE2
+	 __m128d ma, mb;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,ma,mb)
+#endif
+	 for (i=0; i < size; i++)
+	 {
+	    ma = _mm_set_pd(a[i]._imag, a[i]._real);
+	    mb = _mm_set1_pd(b[i]);
+	    ma = _mm_mul_pd(ma, mb);
+	    QDSSE::Store(c[i], ma);
+	 }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -764,6 +841,7 @@ namespace QDLIB {
 	 {
 	    c[i] = a[i] * b[i];
 	 }
+#endif
       }
    }
    

@@ -164,7 +164,10 @@ int main(int argc, char **argv)
       log.cout() <<  endl;
       log.Header("Global Parameters", Logger::SubSection);
 #ifdef _OPENMP
-      cout << "Running with " << omp_get_max_threads() << " threads.\n";
+      log.cout() << "Running with " << omp_get_max_threads() << " threads.\n";
+#endif
+#ifdef HAVE_SSE2
+      log.cout() << "Using SSE2 optimizations.\n";
 #endif
       log.cout() << gp;
       log.flush();
