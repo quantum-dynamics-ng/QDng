@@ -9,9 +9,11 @@ libqdng_la_LIBADD = $(top_builddir)/src/fftw/libfftw3.la \
 	$(top_builddir)/src/modules/libModuleLoader.la $(top_builddir)/src/math/libmath.la \
 	$(top_builddir)/src/linalg/liblinalg.la $(top_builddir)/src/fft/libfft.la \
 	$(FLIBS) $(LAPACK_LIBS) $(LIBXML2_LIBS) 
-if HAVE_OPENMP
-  libqdng_la_LIBADD += $(top_builddir)/src/fftw/threads/.libs/libfftw3_threads.la
-endif
+
+#if HAVE_OPENMP
+#  libqdng_la_LIBADD += $(top_builddir)/src/fftw/threads/.libs/libfftw3_threads.la
+#endif
+
 libqdng_la_LDFLAGS = -all-static
 #libqdng_la_LDFLAGS = -Wl,-static
 #-Wl,--whole-archive 
