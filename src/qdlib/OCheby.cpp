@@ -3,6 +3,10 @@
 #include "math/math_functions.h"
 #include "linalg/Bessel.h"
 
+#ifdef HAVE_SSE2
+ #include "math/cplx_sse2.h"
+#endif
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -120,6 +124,44 @@ namespace QDLIB
 	    bf = buf->begin(s);
 	    k0 = ket0->begin(s);
 	    psi = Psi->begin(s);
+#ifdef HAVE_SSE2
+       QDSSE::cplx_sse_packed cbf, ck2, cpsi, cexp2, ccoeff;
+       __m128d r1, r2;
+
+       LoadPacked(cexp2, exp2, exp2);
+       LoadPacked(ccoeff, _coeff[i], _coeff[i]);
+#ifdef _OPENMP    
+#pragma omp parallel for default(shared) private(j, cbf, ck2, cpsi, r1, r2)
+#endif
+	    for(j=0; j< size; j+=2){
+          QDSSE::LoadPacked(cbf, bf[j], bf[j+1]);
+          QDSSE::LoadPacked(ck2, k0[j], k0[j+1]);
+          QDSSE::LoadPacked(cpsi, psi[j], psi[j+1]);
+			 
+          cbf = QDSSE::MulPacked(cbf, cexp2);
+	       //bf[j] *= exp2;
+          
+	       //k2[j] = k0[j];
+          ck2 = QDSSE::AddPacked(ck2, cbf);
+	       //k2[j] += bf[j];
+          
+	       //k0[j] = k2[j];
+			 cpsi = QDSSE::AddPacked(cpsi, QDSSE::MulPacked(ck2, ccoeff));
+	       //psi[j] += k2[j] *  _coeff[i];
+			 
+			 QDSSE::UnPack(r1, r2, cbf);
+			 QDSSE::Store(bf[j], bf[j+1], r1, r2);
+			 
+			 QDSSE::UnPack(r1, r2, ck2);
+			 QDSSE::Store(k2[j], k2[j+1], r1, r2);
+			 QDSSE::Store(k0[j], k0[j+1], r1, r2);
+
+ 			 QDSSE::UnPack(r1, r2, cpsi);
+			 QDSSE::Store(psi[j], psi[j+1], r1, r2);
+	    }
+	 }
+
+#else
 #ifdef _OPENMP    
 #pragma omp parallel for default(shared) private(j)
 #endif
@@ -131,6 +173,7 @@ namespace QDLIB
 	       psi[j] += k2[j] *  _coeff[i];
 	    }
 	 }
+#endif
 	 	 
 	 swap = ket1;
 	 ket1 = ket0;

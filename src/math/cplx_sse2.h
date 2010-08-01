@@ -1,3 +1,5 @@
+#ifndef CPLX_SSE2_H
+#define CPLX_SSE2_H
 #include <emmintrin.h>
 #include "dcomplex.h"
 
@@ -53,12 +55,30 @@ namespace QDSSE {
    /**
     * Multiply packed complex numbers,
     */
-   inline void MulPacked(cplx_sse_packed& c, const cplx_sse_packed& c1, const cplx_sse_packed& c2)
+	inline cplx_sse_packed MulPacked(const cplx_sse_packed& c1, const cplx_sse_packed& c2)
    {
+		cplx_sse_packed c;
+		
       c.real = _mm_sub_pd(_mm_mul_pd(c1.real,c2.real), _mm_mul_pd(c1.imag,c2.imag));
       c.imag = _mm_add_pd(_mm_mul_pd(c1.real,c2.imag), _mm_mul_pd(c1.imag,c2.real));
+		
+		return c;
    }
-   
+
+	/**
+	* Add packed complex numbers,
+	*/
+	inline cplx_sse_packed AddPacked(const cplx_sse_packed& c1, const cplx_sse_packed& c2)
+	{
+		cplx_sse_packed c;
+		
+		c.real = _mm_add_pd(c1.real,c2.real);
+		c.imag = _mm_add_pd(c1.imag,c2.imag);
+		
+		return c;
+	}
+
+
    /**
     * Vectorized, complex a *= b;
     */
@@ -70,7 +90,7 @@ namespace QDSSE {
       LoadPacked(c1, a1, a2);
       LoadPacked(c2, b1, b2);
 
-      MulPacked(c, c1, c2);
+      c = MulPacked(c1, c2);
 	    
       UnPack(r1, r2, c);
       
@@ -78,3 +98,4 @@ namespace QDSSE {
    }
    
 }
+#endif
