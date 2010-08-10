@@ -94,9 +94,9 @@ namespace QDLIB {
    /** \todo Refine function
     * \return 0
     */
-   double OGridNabla::Emax()
+   dcomplex OGridNabla::Emax()
    {
-      return 0;
+      return dcomplex(0);
    }
 
    WaveFunction * OGridNabla::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)

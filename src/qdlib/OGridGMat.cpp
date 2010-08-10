@@ -201,7 +201,7 @@ namespace QDLIB {
     * Maximum kintetic energy is given by the maximum  possible momenta:
     * \f$ T_{max}  = \frac{\pi^2}{2} \sum_r \sum_s \frac{1}{\Delta x_r} G_{rs} \frac{1}{\Delta x_s} \f$
     */
-   double OGridGMat::Emax()
+   dcomplex OGridGMat::Emax()
    {
       if (GridSystem::Dim() == 0) throw ( EParamProblem("Gmatrix operator not initalized") );
       
@@ -224,10 +224,10 @@ namespace QDLIB {
       }
       
       T *= ( M_PI*M_PI / 2 );
-      return T;
+      return dcomplex(T);
    }
 	 
-   double OGridGMat::Emin()
+   dcomplex OGridGMat::Emin()
    {
       double Tmin = 0;
       for (int i=0; i < GridSystem::Dim(); i++){
@@ -238,7 +238,7 @@ namespace QDLIB {
 	       Tmin += min;
 	 }
       }
-      return Tmin;
+      return dcomplex(Tmin);
    }
    
    WaveFunction * OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)

@@ -65,14 +65,14 @@ namespace QDLIB
 
    }
 
-   double OMatDipole::Emax()
+   dcomplex OMatDipole::Emax()
    {
-      return OHermitianMatrix::Emax() * VecMax((dVec&) _laser);
+      return dcomplex(OHermitianMatrix::Emax() * VecMax((dVec&) _laser));
    }
 
-   double OMatDipole::Emin()
+   dcomplex OMatDipole::Emin()
    {
-      return OHermitianMatrix::Emin() * VecMin((dVec&) _laser);
+      return dcomplex(OHermitianMatrix::Emin() * VecMin((dVec&) _laser));
    }
 
    WaveFunction * OMatDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)

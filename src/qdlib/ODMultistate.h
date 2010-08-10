@@ -42,8 +42,8 @@ namespace QDLIB
             return OMultistate::MatrixElement(PsiBra, PsiKet);
          }
  	 virtual double Expec(WaveFunction *Psi) { return OMultistate::Expec(Psi); }
- 	 virtual double Emax() { return OMultistate::Emax(); }
-         virtual double Emin() { return OMultistate::Emin(); }
+	 virtual dcomplex Emax() { return OMultistate::Emax(); }
+	 virtual dcomplex Emin() { return OMultistate::Emin(); }
  	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
          {
             return OMultistate::Apply(destPsi, sourcePsi);

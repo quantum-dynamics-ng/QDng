@@ -103,7 +103,17 @@ namespace QDLIB {
       return c.real();
    }
 
+   dcomplex OGridPosition::Emax()
+   {
+      return(dcomplex(GridSystem::Xmax(_dim)));
+   }
+   
+   dcomplex OGridPosition::Emin()
+   {
+      return(dcomplex(GridSystem::Xmin(_dim)));
+   }
 
+   
    WaveFunction* OGridPosition::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       MultElementsCopy( (cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
@@ -137,9 +147,4 @@ namespace QDLIB {
    }
 
 } /* namespace QDLIB */
-
-
-
-
-
 

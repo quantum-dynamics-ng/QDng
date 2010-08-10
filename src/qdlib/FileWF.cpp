@@ -9,6 +9,8 @@
 #endif
 
 #define ZLIB_MAGIC "ZLIBCOM"
+/** Length of the magic + terminating zero */
+#define ZLIB_MLEN 8 
 
 namespace QDLIB {
 
@@ -57,10 +59,17 @@ namespace QDLIB {
       
       /* Check if file is compressed */
       string magic(ZLIB_MAGIC);
-      char *c_magic = reinterpret_cast<char*>(data->begin(0));
+      char lastbytes[ZLIB_MLEN];
+      
+      /* Cut out the magic bytes for clean string comparison */
+      if (FileSize() > ZLIB_MLEN) {
+	 char *c_magic = reinterpret_cast<char*>(data->begin(0));
+	 strncpy(lastbytes, &(c_magic[FileSize()-ZLIB_MLEN]), ZLIB_MLEN);
+      } else
+	 lastbytes[0] = '\0';
       
 #ifdef HAVE_LIBZ
-      if ( magic == &(c_magic[FileSize()-8]) ) { /* Decompress */
+      if ( magic == lastbytes ) { /* Decompress */
          z_stream strm;
          dcomplex *in, *out;
             
@@ -75,7 +84,7 @@ namespace QDLIB {
          out = data->GetSpaceBuffer()->begin(0);  /* decompress into k-space buffer */
          /* input */
          strm.next_in = (Bytef*) in;
-         strm.avail_in = FileSize()-8;             /* Buffer - magic bytes */
+	 strm.avail_in = FileSize()-ZLIB_MLEN;             /* Buffer - magic bytes */
          /* output buffer */
          strm.next_out = (Bytef*) out;
          strm.avail_out = data->sizeBytes();
@@ -91,8 +100,8 @@ namespace QDLIB {
          if ( FileSize() < data->sizeBytes() )
             throw ( EIOError("WaveFunction truncated!") );
       }
-#else
-      if (magic == &(c_magic[FileSize()-8]))
+#elif
+      if (magic == &(c_magic[FileSize()-ZLIB_MLEN]))
          throw (EIncompatible ("Reading of compressed wave functions is not supported. Please recompile with zlib support") );
       
       if ( FileSize() < data->SizeBytes() )
@@ -255,7 +264,7 @@ namespace QDLIB {
                
                fsize = data->sizeBytes()-strm.avail_out;
                FileSize(fsize+8); /* data + magic */
-               if (strm.avail_out < 8 ) cfail = true; /* compressd size + magic must be smaller than original size */
+	       if (strm.avail_out < ZLIB_MLEN ) cfail = true; /* compressd size + magic must be smaller than original size */
             }
             
             
@@ -269,8 +278,8 @@ namespace QDLIB {
                string magic(ZLIB_MAGIC);
                char *c_magic = reinterpret_cast<char*>(data->begin(0));
                
-               magic.copy( &(c_magic[fsize]), 7);
-               c_magic[fsize+7] = '\0';
+	       magic.copy( &(c_magic[fsize]), ZLIB_MLEN-1);
+	       c_magic[fsize+ZLIB_MLEN-1] = '\0';
             } else 
                data->IsKspace(false); /* Do nothing if compression had failed */
                
@@ -296,6 +305,9 @@ namespace QDLIB {
     */
    void operator>>(FileWF &file,  WaveFunction *data)
    {
+      if (data == NULL)
+	 throw EIncompatible("Can't WF read into NULL pointer");
+	       
       file.ReadFile(data);
    }
 

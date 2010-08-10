@@ -130,8 +130,8 @@ namespace QDLIB {
 	 }
 
 	 /* This doesn't make sense with Propagators => define dummies. */
-	 virtual double Emax(){return 0;}
-	 virtual double Emin(){return 0;}
+	 virtual dcomplex Emax(){return 0;}
+	 virtual dcomplex Emin(){return 0;}
 	 
 	 virtual Operator* Copy(Operator *O)
 	 {

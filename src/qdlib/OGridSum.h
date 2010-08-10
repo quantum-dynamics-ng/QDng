@@ -52,9 +52,9 @@ namespace QDLIB {
 	 
 	 virtual double Expec(WaveFunction *Psi);
 	 
-	 virtual double Emax();
+	 virtual dcomplex Emax();
 	 
-	 virtual double Emin();
+	 virtual dcomplex Emin();
 	 
 // 	 virtual WaveFunction* operator*(WaveFunction *Psi);
 	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);

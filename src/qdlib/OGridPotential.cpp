@@ -48,7 +48,7 @@ namespace QDLIB
 	 
 	 /* Put grid minimum to zero */
 	 if (set_zero){
-	    double min = Emin();
+	    double min = Emin().real();
 	    for (lint i=0; i < size(); i++){
 	       (*this)[i] -= min;
 	    }
@@ -126,14 +126,14 @@ namespace QDLIB
    }
    
    	 
-   double OGridPotential::Emax( )
+   dcomplex OGridPotential::Emax( )
    {
-      return VecMax( *((dVec*) this) );
+      return dcomplex(VecMax( *((dVec*) this) ));
    }
 
-   double OGridPotential::Emin( )
+   dcomplex OGridPotential::Emin( )
    {
-      return VecMin( *((dVec*) this) );
+      return dcomplex(VecMin( *((dVec*) this) ));
    }
    
    WaveFunction* OGridPotential::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)

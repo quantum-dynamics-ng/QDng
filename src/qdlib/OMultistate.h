@@ -85,9 +85,9 @@ namespace QDLIB
 	 
 	 virtual void UpdateTime();
 	 
-	 virtual double Emax();
+	 virtual dcomplex Emax();
 	 
-	 virtual double Emin();
+	 virtual dcomplex Emin();
 	 
 	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 

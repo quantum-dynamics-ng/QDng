@@ -138,16 +138,18 @@ namespace QDLIB {
 	 virtual double Expec(WaveFunction *Psi) = 0;
 	 
 	 /**
-	  * Maximum energy of the operator.
+	  * Maximum eigenvalue of the operator.
 	  * This is used by e.g. by propagators for Hamiltonian scaling.
+	  * Min and Max referes to the absoulute value of the complex number.
 	  */
-	 virtual double Emax() = 0;
+	 virtual dcomplex Emax() = 0;
 	 
 	 /**
-	  * Minimum energy of the operator.
+	  * Minimum eigenvalue of the operator.
 	  * This is used by e.g. by propagators for Hamiltonian scaling.
+	  * Min and Max referes to the absoulute value of the complex number.
 	  */
-	 virtual double Emin() = 0;
+	 virtual dcomplex Emin() = 0;
 	 
 	 /**
 	  * Apply operator to wavefunction.
