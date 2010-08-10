@@ -1,5 +1,7 @@
 #include "OMultistate.h"
 #include "WFMultistate.h"
+#include "linalg/LapackDiag.h"
+#include "math/math_functions.h"
 
 namespace QDLIB
 {
@@ -195,38 +197,40 @@ namespace QDLIB
    }
    
    /** \todo Diagonalize Matrix => allow large couplings with Cheby */
-   double OMultistate::Emax()
+   dcomplex OMultistate::Emax()
    {
-      double d=0;
-      double max;
+      dMat Mmax;
+      dVec Evals;
       
-      for (lint i=0; i < _nstates; i++){
-	 if (_matrix[i][i] != NULL){
-	    max = _matrix[i][i]->Emax();
-	    if (max  > d) d = max;
+      for(int i=0; i< _nstates; i++){
+	 for(int j=0; j<= i; j++){
+	    if (_matrix[i][j] != NULL)
+	       Mmax(i,j) = cabs(_matrix[i][j]->Emax());
 	 }
       }
       
-      return d;
+      LAPACK::FullDiagHermitian(&Mmax, &Evals);
+      
+      return dcomplex(VecMax(Evals));
    }
 	 
-   double OMultistate::Emin()
+   dcomplex OMultistate::Emin()
    {
-      double d=0;
-      double min;
+      dMat Mmin;
+      dVec Evals;
       
-      if (_matrix[0][0] != NULL)
-         d = _matrix[0][0]->Emin();
-      
-      for (lint i=1; i < _nstates; i++){
-	 if (_matrix[i][i] != NULL){
-	    min = _matrix[i][i]->Emin();
-	    if ( min < d) d = min;
+      for(int i=0; i< _nstates; i++){
+	 for(int j=0; j<= i; j++){
+	    if (_matrix[i][j] != NULL)
+	       Mmin(i,j) = cabs(_matrix[i][j]->Emin());
 	 }
       }
       
-      return d;
+      LAPACK::FullDiagHermitian(&Mmin, &Evals);
+      
+      return dcomplex(VecMin(Evals));
    }
+
    
    WaveFunction * OMultistate::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {

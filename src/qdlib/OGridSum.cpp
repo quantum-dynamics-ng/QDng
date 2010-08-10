@@ -91,28 +91,28 @@ namespace QDLIB {
       return d.real();
    }
 
-   double OGridSum::Emax()
+   dcomplex OGridSum::Emax()
    {
       if (_size == 0)
 	 throw ( EParamProblem("Sum Operator is empty") );
       
-      double d = 0;
+      dcomplex d = 0;
       for (int i=0; i < _size; i++)
 	 d += _O[i]->Emax();
       
-      return d;
+      return dcomplex(d);
    }
 	 
-   double OGridSum::Emin()
+   dcomplex OGridSum::Emin()
    {
       if (_size == 0)
 	 throw ( EParamProblem("Sum Operator is empty") );
       
-      double d = 0;
+      dcomplex d = 0;
       for (int i=0; i < _size; i++)
 	 d += _O[i]->Emin();
       
-      return d;
+      return dcomplex(d);
    }
    
    WaveFunction * OGridSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)

@@ -60,15 +60,15 @@ namespace QDLIB {
    }
 
 
-   double OGridDipole::Emax()
+   dcomplex OGridDipole::Emax()
    {
 
-      return VecMax( *((dVec*) this) ) * VecMax( (dVec&) _laser );
+      return dcomplex(VecMax( *((dVec*) this) ) * VecMax( (dVec&) _laser ));
    }
 
-   double OGridDipole::Emin()
+   dcomplex OGridDipole::Emin()
    {
-      return 0;
+      return dcomplex(0);
    }
 
    WaveFunction * OGridDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)

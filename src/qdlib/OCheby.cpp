@@ -203,8 +203,8 @@ namespace QDLIB
 	 throw ( EParamProblem("No time step defined") );
       
       /* Energy range & offset */
-      Rdelta = (_hamilton->Emax() - _hamilton->Emin())/ 2;
-      Gmin =  _hamilton->Emin();
+      Rdelta = cabs(_hamilton->Emax() - _hamilton->Emin())/ 2;
+      Gmin =  cabs(_hamilton->Emin());
       
       /* This is an estimate for the recursion depth */
       if (_order <= 0)

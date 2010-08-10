@@ -31,6 +31,7 @@ namespace QDLIB {
 	 bool _rp[MAX_DIMS];    /* build right pass for dim */
 	 double _rpx[MAX_DIMS];  /* cut-off center */
 	 int _order;           /* filter order */
+	 double _gain;         /* Gain value */
 	 bool _nip;            /* Negative imaginary potential */
          bool _residue;        /* Don't calculate a expectation value but the residue after application */
 	 
@@ -55,9 +56,9 @@ namespace QDLIB {
 	 
 	 virtual double Expec(WaveFunction *Psi);
 	 
-	 virtual double Emax(){return 0;}
+	 virtual dcomplex Emax();
 	 
-	 virtual double Emin(){return 0;}
+	 virtual dcomplex Emin();
 	 
 	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 

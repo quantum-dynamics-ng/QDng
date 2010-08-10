@@ -54,7 +54,7 @@ namespace QDLIB {
          bool set_zero;
          _params.GetValue("setzero", set_zero);
          if (set_zero){
-            double min = Emin();
+            double min = Emin().real();
             for (lint i=0; i < Size(); i++){
                (*this)(i,i) -= min;
             }
@@ -160,18 +160,18 @@ namespace QDLIB {
    }
 
    /** Return the largest eigenvalue */
-   double OHermitianMatrix::Emax()
+   dcomplex OHermitianMatrix::Emax()
    {
       if (!_valid) InitDspace();
       /* Overestimate Emax to avoid conflicts due to incorrect diagonalization in sums */
-      return 3 * (*_dspace)[_dspace->size()-1];
+      return dcomplex(3 * (*_dspace)[_dspace->size()-1]);
    }
 
    /** Return the smallest diagonal */
-   double OHermitianMatrix::Emin()
+   dcomplex OHermitianMatrix::Emin()
    {
       if (!_valid) InitDspace();
-      return (*_dspace)[0];
+      return dcomplex((*_dspace)[0]);
    }
 
    /**

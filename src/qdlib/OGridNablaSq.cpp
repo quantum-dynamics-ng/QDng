@@ -99,7 +99,7 @@ namespace QDLIB
       return c.real();
    }
 
-   double OGridNablaSq::Emax()
+   dcomplex OGridNablaSq::Emax()
    {
       if (GridSystem::Dim() == 0)
          throw(EParamProblem("Nabla operator not initalized"));
@@ -110,12 +110,12 @@ namespace QDLIB
             T += 1 / (_mass[i] * GridSystem::Dx(i) * GridSystem::Dx(i));
 
       T *= (M_PI * M_PI / 2);
-      return T;
+      return dcomplex(T);
    }
 
-   double OGridNablaSq::Emin()
+   dcomplex OGridNablaSq::Emin()
    {
-      return 0; /* Minimum kinetic energy is zero */
+      return dcomplex(0); /* Minimum kinetic energy is zero */
    }
 
    WaveFunction * OGridNablaSq::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)

@@ -6,7 +6,7 @@
 namespace QDLIB {
 
    OGobbler::OGobbler()
-      : OGridSystem(), _name("OGobbler"), _order(0), _nip(false)
+      : OGridSystem(), _name("OGobbler"), _order(0), _gain(1),_nip(false)
    {
       for (int i=0; i < MAX_DIMS; i++){
 	 _lp[i] = false;
@@ -61,6 +61,9 @@ namespace QDLIB {
 	    
       }
 	 
+      if (_gain != 1)
+	 MultElements((dVec*) this, _gain);
+      
    }
    
    
@@ -108,17 +111,15 @@ namespace QDLIB {
       }
       
       /* negative imaginary potential */
-      if (_params.isPresent("nip")) _nip = true;
+      _params.GetValue("nip", _nip, false);
       
       /* Gain value. */
       if (_params.isPresent("gain")){
-	 double gain;
-	 _params.GetValue("gain", gain);
-	 MultElements((cVec*) this, gain);
+	 _params.GetValue("gain", _gain);
       }
       
       /* Behavior of Expec() */
-      _params.GetValue("residue", _residue);
+      _params.GetValue("residue", _residue, false);
    }
    
    void OGobbler::Init(WaveFunction *Psi)
@@ -178,6 +179,18 @@ namespace QDLIB {
       return c.real();
    }
    
+   dcomplex OGobbler::Emax()
+   {
+      if (_nip) return (dcomplex(0,-_gain));
+      else return (dcomplex(_gain));
+   }
+
+   dcomplex OGobbler::Emin()
+   {
+      return dcomplex(0);
+   }
+
+   
    WaveFunction * OGobbler::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       WFGridSystem *ket;
@@ -218,19 +231,11 @@ namespace QDLIB {
    
    Operator * OGobbler::operator =(Operator * O)
    {
-      return O;
+      return Copy(O);
    }
    
-   Operator * QDLIB::OGobbler::Copy(Operator * O)
+   Operator * OGobbler::Copy(Operator * O)
    {
-      string _name;
-      bool _lp[MAX_DIMS];    /* build left pass for dim */
-      double _lpx[MAX_DIMS];  /* cut-off center */
-      bool _rp[MAX_DIMS];    /* build right pass for dim */
-      double _rpx[MAX_DIMS];  /* cut-off center */
-      int _order;           /* filter order */
-      bool _nip;            /* Negative imaginary potential */
-      
       OGobbler *o;
       
       o = dynamic_cast<OGobbler*>(O);
@@ -240,6 +245,7 @@ namespace QDLIB {
       _nip = o->_nip;
       _order = o->_order;
       _residue = o->_residue;
+      _gain = o->_gain;
 	    
       
       for (int i=0; i < Dim(); i++){
@@ -280,3 +286,4 @@ namespace QDLIB {
    }
 
 }
+

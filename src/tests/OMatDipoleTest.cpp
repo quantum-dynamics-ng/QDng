@@ -65,8 +65,8 @@ void OMatDipoleTest::API_Test()
    M->InitDspace();
    clock.Begin();
 
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emin", -0.5, M->Emin(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emax", 6, M->Emax(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emin", -0.5, M->Emin().real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emax", 6, M->Emax().real(), LOOSE_EPS);
 }
 
 
