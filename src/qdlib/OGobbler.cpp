@@ -193,39 +193,22 @@ namespace QDLIB {
    
    WaveFunction * OGobbler::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WFGridSystem *ket;
-      WaveFunction *opPsi;
-      
-      opPsi = dynamic_cast<WFGridSystem*>(destPsi);
-      if (opPsi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", sourcePsi->Name()) );
-      
-      ket = dynamic_cast<WFGridSystem*>(sourcePsi);
-      if (ket == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", destPsi->Name()) );
-      
       if (_nip) 
-         MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, (dVec*) this, -1);
+	 MultElementsComplexEq((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, -1);
       else 
-	 MultElements((cVec*) opPsi, (cVec*) ket, (dVec*) this);
+	 MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
       
-      return ket;
+      return destPsi;
    }
    
    WaveFunction * OGobbler::Apply(WaveFunction * Psi)
    {
-      WFGridSystem *ket;
-      
-      ket = dynamic_cast<WFGridSystem*>(Psi);
-      if (ket == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-      
       if (_nip)
-         MultElements( (cVec*) ket, (dVec*) this, dcomplex(0,-1));
+	 MultElements( (cVec*) Psi, (dVec*) this, dcomplex(0,-1));
       else
-         MultElements( (cVec*) ket, (dVec*) this);
+	 MultElements( (cVec*) Psi, (dVec*) this);
       
-      return ket;
+      return Psi;
       
    }
    
