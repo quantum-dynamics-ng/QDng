@@ -100,7 +100,7 @@ namespace QDLIB {
          if ( FileSize() < data->sizeBytes() )
             throw ( EIOError("WaveFunction truncated!") );
       }
-#elif
+#else
       if (magic == &(c_magic[FileSize()-ZLIB_MLEN]))
          throw (EIncompatible ("Reading of compressed wave functions is not supported. Please recompile with zlib support") );
       

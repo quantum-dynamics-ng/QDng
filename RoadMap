@@ -1,9 +1,9 @@
 * Coding issues
  * Collector (non-singleton) to handle Operators and wavefunction buffers more easy
- * Allow Complex ranges in operators. [planed for alpha-0.6]
+ * Allow Complex ranges in operators. [planed for alpha-0.6] (DONE)
  * Add Output to operators Init functions. [planed for alpha-0.6]
  * Replace fixed operator scaling with dynamic scaling => save memory [planed for alpha-0.6]
- * Optimize core routines for SSE2
+ * Optimize core routines for SSE2 (DONE, Mostly not needed newer gcc can optimize)
  * Cleanup optimization flags => configure should decide
 
 * QDng input
