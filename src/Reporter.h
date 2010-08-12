@@ -4,6 +4,9 @@
 #include "qdlib/WFMultistate.h"
 #include "qdlib/Operator.h"
 
+#include <iostream>
+#include <fstream>
+
 namespace QDLIB
 {
 

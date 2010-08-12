@@ -2,6 +2,8 @@
 #define FILESINGLE_H
 
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #include "ParamContainer.h"
 #include "KeyValFile.h"
@@ -18,6 +20,8 @@
 #define ASCII_O_SUFFIX ".aop"
 
 #define METAFILE_SUFFIX ".meta"
+
+using namespace std;
 
 namespace QDLIB {
 
@@ -394,7 +398,7 @@ namespace QDLIB {
       }
       
       /* Write binary data */
-      file.open(s.c_str(), ofstream::binary);
+      file.open(s.c_str(), ios_base::binary);
       if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing", s) );
       
       if (_fsize == 0)
@@ -438,7 +442,7 @@ namespace QDLIB {
 	 }
 	 
 	 /* Write binary data */
-	 file.open(s.c_str(), ofstream::binary);
+	 file.open(s.c_str(), ios_base::binary);
 	 if( ! file.is_open() ) throw( EIOError("Can not open binary file for writing", s) );	 
 	 file.write((char*) data->begin(i), data->sizeBytes() );
 	 if( file.bad() ) throw( EIOError("Can not write binary file", s) );
