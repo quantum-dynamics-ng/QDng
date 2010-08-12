@@ -181,13 +181,13 @@ namespace QDLIB {
    
    dcomplex OGobbler::Emax()
    {
-      if (_nip) return (dcomplex(0,-_gain));
-      else return (dcomplex(_gain));
+      return (dcomplex(_gain));
    }
 
    dcomplex OGobbler::Emin()
    {
-      return dcomplex(0);
+      if (_nip) return (dcomplex(0,-_gain));
+      else return dcomplex(0);
    }
 
    

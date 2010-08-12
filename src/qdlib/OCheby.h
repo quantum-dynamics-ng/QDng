@@ -26,12 +26,12 @@ namespace QDLIB
 	 string _name;
 	 ParamContainer _needs;
 	 
-	 Operator *_hamilton;   /* The Hamiltonian */
-	 int _order;           /* Recursion depth */
-	 cVec _coeff;          /* Coefficients including the Bessel functions at k'th order */
-	 dcomplex _exp;        /* Scaled exponent:  e.g. -i*dt/Rdelta */
-	 double Rdelta;        /* Energy range of the hamiltonian */
-	 dcomplex Gmin;          /* Energy offset of the hamiltonian */
+	 Operator *_hamilton; /* The Hamiltonian */
+	 int _order;          /* Recursion depth */
+	 cVec _coeff;         /* Coefficients including the Bessel functions at k'th order */
+	 dcomplex _exp;       /* Scaled exponent:  e.g. -i*dt/Rdelta */
+	 double _scaling;     /* Energy range of the hamiltonian => the Scaling*/
+	 dcomplex _offset;    /* Energy offset of the hamiltonian */
          WaveFunction *ket0, *ket1, *ket2, *buf;
 	 
       public:

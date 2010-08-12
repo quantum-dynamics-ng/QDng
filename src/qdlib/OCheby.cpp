@@ -12,7 +12,7 @@ namespace QDLIB
 
    OCheby::OCheby()
       : OPropagator(), _name("OCheby"), _hamilton(NULL),
-      _order(0), _coeff(0), Rdelta(0.0), Gmin(0), ket0(NULL), ket1(NULL), ket2(NULL), buf(NULL)
+      _order(0), _coeff(0), _scaling(1.), _offset(0), ket0(NULL), ket1(NULL), ket2(NULL), buf(NULL)
    {
       _needs.SetValue("hamiltonian", 0);
    }
@@ -98,8 +98,8 @@ namespace QDLIB
       ket1->FastCopy(*Psi);
       _hamilton->Apply(ket1);
       
-      AddElements((cVec*) ket1, (cVec*) Psi, -(Rdelta+Gmin.real()) ); /* Offset*/
-      MultElements( (cVec*) ket1, _exp / Rdelta);
+      AddElements((cVec*) ket1, (cVec*) Psi, -1*_offset ); /* Offset*/
+      MultElements( (cVec*) ket1, _exp / _scaling);
       
       MultElements( (cVec*) Psi, _coeff[0]);
       MultElementsCopy( (cVec*) buf, (cVec*) ket1, _coeff[1]);
@@ -127,7 +127,7 @@ namespace QDLIB
 #pragma omp parallel for default(shared) private(j)
 #endif
 	    for(j=0; j< size; j++){
-	       bf[j] = (bf[j] - (Rdelta+Gmin) * k1[j]) / Rdelta; /* Offset + Scaling */
+	       bf[j] = (bf[j] - _offset * k1[j]) / _scaling; /* Offset + Scaling */
 	       bf[j] *= exp2;
 	       k2[j] = k0[j];
 	       k2[j] += bf[j];
@@ -171,8 +171,8 @@ namespace QDLIB
       *_hamilton = P->_hamilton;
       _order = P->_order;
       _coeff = P->_coeff;
-      Rdelta = P->Rdelta;
-      Gmin = P->Gmin;
+      _scaling = P->_scaling;
+      _offset = P->_offset;
       
       return this;
    }
@@ -207,13 +207,13 @@ namespace QDLIB
 	 throw ( EParamProblem("No time step defined") );
       
       /* Energy range & offset */
-      Rdelta = (_hamilton->Emax() - _hamilton->Emin()).real()/ 2;
-      Gmin =  (_hamilton->Emin());
+      _scaling = cabs(_hamilton->Emax() - _hamilton->Emin())/ 2;
+      _offset =  (_hamilton->Emax() + _hamilton->Emin())/2;
       
       
       /* This is an estimate for the recursion depth */
       if (_order <= 0)
-	 _order =  abs(int(5 * Rdelta * clock->Dt()));
+	 _order =  abs(int(5 * _scaling * clock->Dt()));
       
       if (_order < 10) _order=10;
 
@@ -222,7 +222,7 @@ namespace QDLIB
       int zeroes=0;
       
       /* Manual scaling, very dangerous */
-      if (_params.isPresent("scaling")) _params.GetValue("scaling", Rdelta);
+      if (_params.isPresent("scaling")) _params.GetValue("scaling", _scaling);
       /* Manual choice of recursion depth */
       if (_params.isPresent("order")) _params.GetValue("order", _order);
       
@@ -231,10 +231,10 @@ namespace QDLIB
 	 
       /* Check for Real/imag time */
       if (fabs(OPropagator::Exponent().imag()) != 0 && fabs(OPropagator::Exponent().real()) == 0){
-	 if ( BesselJ0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
+	 if ( BesselJ0(_order, _scaling * clock->Dt(), bessel, zeroes) != 0)
 	    throw ( EOverflow("Error while calculating Bessel coefficients") );
       } else if (fabs(OPropagator::Exponent().imag()) == 0 && fabs(OPropagator::Exponent().real()) != 0){
-	 if ( BesselI0(_order, Rdelta * clock->Dt(), bessel, zeroes) != 0)
+	 if ( BesselI0(_order, _scaling * clock->Dt(), bessel, zeroes) != 0)
 	    throw ( EOverflow("Error while calculating Bessel coefficients") );
       } else {
 	 throw (EParamProblem("Chebychev propagator doesn't support mixed real/complex exponents") );
@@ -260,19 +260,19 @@ namespace QDLIB
 
 	
       /* Check Recursion order */
-      if (_order > 0 && _order <= int(Rdelta * clock->Dt()) )
+      if (_order > 0 && _order <= int(_scaling * clock->Dt()) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
       
       _params.SetValue("order", _order);
-      _params.SetValue("scaling", Rdelta);
-      _params.SetValue("offset.real", Gmin.real());
-      _params.SetValue("offset.imag", Gmin.imag());
+      _params.SetValue("scaling", _scaling);
+      _params.SetValue("offset.real", _offset.real());
+      _params.SetValue("offset.imag", _offset.imag());
       
       /* Setup coefficients */
       _coeff.newsize(_order);
-      _coeff[0] = cexp(OPropagator::Exponent()*(Rdelta + Gmin)) * bessel[0];
+      _coeff[0] = cexp(OPropagator::Exponent()*_offset) * bessel[0];
       for (int i=1; i < _coeff.size(); i++){
-	 _coeff[i] = 2.0 * cexp(OPropagator::Exponent()*(Rdelta + Gmin)) * bessel[i];
+	 _coeff[i] = 2.0 * cexp(OPropagator::Exponent()*_offset) * bessel[i];
       }
       
       _exp  = OPropagator::Exponent()/clock->Dt();
