@@ -31,7 +31,7 @@ namespace QDLIB
 	 cVec _coeff;          /* Coefficients including the Bessel functions at k'th order */
 	 dcomplex _exp;        /* Scaled exponent:  e.g. -i*dt/Rdelta */
 	 double Rdelta;        /* Energy range of the hamiltonian */
-	 double Gmin;          /* Energy offset of the hamiltonian */
+	 dcomplex Gmin;          /* Energy offset of the hamiltonian */
          WaveFunction *ket0, *ket1, *ket2, *buf;
 	 
       public:

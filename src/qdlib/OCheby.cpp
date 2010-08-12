@@ -97,14 +97,16 @@ namespace QDLIB
       
       ket1->FastCopy(*Psi);
       _hamilton->Apply(ket1);
-      MultElements( (cVec*) ket1, _exp);
+      
+      AddElements((cVec*) ket1, (cVec*) Psi, -(Rdelta+Gmin.real()) ); /* Offset*/
+      MultElements( (cVec*) ket1, _exp / Rdelta);
       
       MultElements( (cVec*) Psi, _coeff[0]);
       MultElementsCopy( (cVec*) buf, (cVec*) ket1, _coeff[1]);
       
       *Psi += buf;
       
-      dcomplex *k2, *bf, *k0, *psi;
+      dcomplex *k2, *bf, *k0, *k1, *psi;
 
       int strides = Psi->strides();
       int size = Psi->lsize();
@@ -119,16 +121,18 @@ namespace QDLIB
 	    k2 = ket2->begin(s);
 	    bf = buf->begin(s);
 	    k0 = ket0->begin(s);
+	    k1 = ket1->begin(s);
 	    psi = Psi->begin(s);
 #ifdef _OPENMP    
 #pragma omp parallel for default(shared) private(j)
 #endif
 	    for(j=0; j< size; j++){
+	       bf[j] = (bf[j] - (Rdelta+Gmin) * k1[j]) / Rdelta; /* Offset + Scaling */
 	       bf[j] *= exp2;
 	       k2[j] = k0[j];
 	       k2[j] += bf[j];
 	       k0[j] = k2[j];
-	       psi[j] += k2[j] *  _coeff[i];
+	       psi[j] += k2[j] * _coeff[i];
 	    }
 	 }
 	 	 
@@ -203,8 +207,9 @@ namespace QDLIB
 	 throw ( EParamProblem("No time step defined") );
       
       /* Energy range & offset */
-      Rdelta = cabs(_hamilton->Emax() - _hamilton->Emin())/ 2;
-      Gmin =  cabs(_hamilton->Emin());
+      Rdelta = (_hamilton->Emax() - _hamilton->Emin()).real()/ 2;
+      Gmin =  (_hamilton->Emin());
+      
       
       /* This is an estimate for the recursion depth */
       if (_order <= 0)
@@ -258,14 +263,10 @@ namespace QDLIB
       if (_order > 0 && _order <= int(Rdelta * clock->Dt()) )
 	 throw ( EParamProblem("Chebychev recursion order is to small") );
       
-      /* Scale the Hamiltonian */
-      _hamilton->Offset( -1*(Rdelta+Gmin) );
-      
-      _hamilton->Scale( 1/Rdelta );
-      
       _params.SetValue("order", _order);
       _params.SetValue("scaling", Rdelta);
-      _params.SetValue("offset", Gmin);
+      _params.SetValue("offset.real", Gmin.real());
+      _params.SetValue("offset.imag", Gmin.imag());
       
       /* Setup coefficients */
       _coeff.newsize(_order);
