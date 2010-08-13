@@ -16,7 +16,7 @@ namespace QDLIB {
 
 
 #include "dcomplex.h"
-#include "tnt/tnt.h"
+//#include "tnt/tnt.h"
 #include "Vector.h"
 #include "VectorView.h"
 #include "Matrix.h"
@@ -29,6 +29,8 @@ namespace QDLIB {
  #include "cplx_sse2.h"
 #endif
 	       
+using namespace std;
+	 
 namespace QDLIB {
    /**
     * Enable multiplication of type double with arbitrary Types of Vector.

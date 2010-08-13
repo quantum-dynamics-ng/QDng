@@ -1,6 +1,9 @@
 #ifndef QDLIBFILTERSLIST_H
 #define QDLIBFILTERSLIST_H
 
+#include <iostream>
+#include <fstream>
+
 #include "qdlib/Operator.h"
 #include "tools/XmlNode.h"
 #include "tools/QDGlobalClock.h"
