@@ -31,7 +31,12 @@ namespace QDLIB {
       
       dVec::newsize(GridSystem::Size());
       
-      *((dVec*) this) = 1;
+      if (_nip)
+         *((dVec*) this) = 0;
+      else
+	 *((dVec*) this) = 1;
+      
+      
       dVecView view( *((dVec*) this), GridSystem::Dim(), GridSystem::DimSizes());
       
       /* Loop over dimension */
@@ -56,7 +61,11 @@ namespace QDLIB {
 	    Butterworth<dVec>::Highpass(filter, x, _order);
 	    
 	    view.ActiveDim(i);
-	    view *= filter;
+	    
+	    if (_nip)
+	       view += filter;
+	    else
+	       view *= filter;
 	 }
 	    
       }
