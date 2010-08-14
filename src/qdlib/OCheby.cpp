@@ -207,8 +207,12 @@ namespace QDLIB
 	 throw ( EParamProblem("No time step defined") );
       
       /* Energy range & offset */
-      _scaling = cabs(_hamilton->Emax() - _hamilton->Emin())/ 2;
-      _offset =  (_hamilton->Emax() + _hamilton->Emin())/2;
+      _offset._real =  (_hamilton->Emax() + _hamilton->Emin()).real()/2; /* [-i:i] */
+      _offset._imag =  (_hamilton->Emax() + _hamilton->Emin()).imag();   /* [-1:0] */
+      if (_offset.imag() != 0)
+	_scaling = cabs(_hamilton->Emax() - _hamilton->Emin());
+      else
+	_scaling = cabs(_hamilton->Emax() - _hamilton->Emin())/2;
       
       
       /* This is an estimate for the recursion depth */
