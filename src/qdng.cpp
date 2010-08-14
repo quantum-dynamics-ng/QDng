@@ -108,7 +108,12 @@ int main(int argc, char **argv)
 	 mods->UserPath( fname );
       }
 #endif
-      
+
+      /* Try to get output path from environment variable */      
+      char *qddir;
+      qddir = getenv("QD_DIR");
+      if (qddir != NULL) dir = qddir;
+ 
       /* The global output path */
       if (cmdline.GetOption('d')){
 	 cmdline.GetOption('d', dir);
