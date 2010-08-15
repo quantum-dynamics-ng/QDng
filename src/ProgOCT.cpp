@@ -28,8 +28,6 @@ namespace QDLIB {
 	 if (PsiI[i] != NULL) delete PsiI[i];
 	 if (PsiT[i] != NULL) delete PsiT[i];
       }
-      if (_Uf != NULL) delete _Uf;
-      if (_Ub != NULL) delete _Ub;
       if (_opwf != NULL) delete _opwf;
       
       if (_membuf && _membuf_init){
@@ -37,8 +35,7 @@ namespace QDLIB {
             for (int t=0; t < _ntargets; t++)
                delete _memwfbuf[s][t];
       }
-      for(int i=0; i < _ntargets; i++)
-         if (_Otarget[i] != NULL) delete _Otarget[i];
+      DELETE_ALL_OP();
    }
 
    /**
@@ -839,8 +836,10 @@ namespace QDLIB {
       if (section == NULL)
 	 throw ( EParamProblem ("No propagator found") );
       
-      _Uf = ChainLoader::LoadPropagator( section, &_hf );
-      _Ub = ChainLoader::LoadPropagator( section, &_hb );
+      _Uf = ChainLoader::LoadPropagator( section );
+      _hf = _Uf->Hamiltonian();
+      _Ub = ChainLoader::LoadPropagator( section );
+      _hb = _Ub->Hamiltonian();
       delete section;
       
       

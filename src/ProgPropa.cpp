@@ -18,11 +18,9 @@ namespace QDLIB {
    
    ProgPropa::~ProgPropa()
    {
-      if (_H != NULL) delete _H;
-      if (_U != NULL) delete _U;
-
       /* remove the clock */
       QDGlobalClock::Destroy();
+      DELETE_ALL_OP();
    }
    
    
@@ -155,7 +153,8 @@ namespace QDLIB {
       if (section == NULL)
 	 throw ( EParamProblem ("No propagator found") );
       
-      _U = ChainLoader::LoadPropagator( section, &_H );
+      _U = ChainLoader::LoadPropagator( section );
+      _H = _U->Hamiltonian();
       delete section;
             
       /* Load the initial Wavefunction */

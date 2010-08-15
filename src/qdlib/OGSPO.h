@@ -10,6 +10,7 @@
 
 #include "OPropagator.h"
 #include "ODSpace.h"
+#include "OSum.h"
 
 #define GSPO_MAX_LEN 4
 
@@ -31,6 +32,9 @@ namespace QDLIB
       private:
          string _name;
          ParamContainer _needs;
+         
+         OSum* _H;
+         
          int _spoLen;                  /* Number of split elements */
          ODSpace* _ops[GSPO_MAX_LEN];  /* operator list */
          cVec _exp[GSPO_MAX_LEN];     /* storage for exponentials */

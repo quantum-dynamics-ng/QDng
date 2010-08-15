@@ -194,7 +194,12 @@ namespace QDLIB
       } else {
          throw(EParamProblem("GSPO: Invalid SPO - key given ", key));
       }
-
+      
+      if (H == NULL) {
+         _H = new OSum();
+         H = _H;
+      }   
+      _H->Add(O);
    }
 
 }

@@ -325,6 +325,14 @@ namespace QDLIB {
    
    void OSPO::AddNeeds( string &Key, Operator *O )
    {
+      /* Generate sum for mother class */
+      if (H == NULL){   
+         _H = new OSum();
+         H = _H;         
+      }
+      
+      _H->Add(O);
+      
       if (Key != "Tkin" && Key != "Vpot"  && Key != "Vcoup" && Key != "VcoupI")
 	 throw ( EParamProblem("SPO only knows Tkin, Vpot or Vcoup") );
       

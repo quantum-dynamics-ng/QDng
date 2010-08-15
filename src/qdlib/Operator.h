@@ -4,6 +4,10 @@
 #include "WaveFunction.h"
 #include "tools/Exception.h"
 #include "tools/QDClock.h"
+#include "tools/Collector.h"
+
+#define DELETE_OP(OP) Collector<Operator>::Instance().Delete(OP)
+#define DELETE_ALL_OP() Collector<Operator>::Instance().Delete()
 
 namespace QDLIB {
 
@@ -44,17 +48,23 @@ namespace QDLIB {
 	 /**
           * Make class pure virtual
           */
-         virtual ~Operator(){}
+         virtual ~Operator() {}
          
 	 /**
 	  * Standard constructor
 	  */
-	 Operator() :  _isTimedependent(false), clock(NULL) {}
+	 Operator() :  _isTimedependent(false), clock(NULL)
+	 {
+            Collector<Operator>::Instance().Register(this);
+         }
 	  
 	 /**
 	  * Constructor with full parameter set.
 	  */
-	 Operator(ParamContainer &params):  _params(params), _isTimedependent(false){}
+	 Operator(ParamContainer &params):  _params(params), _isTimedependent(false)
+	 {
+            Collector<Operator>::Instance().Register(this);         
+         }
          
 	 /**
 	  * This method should create a new instance.

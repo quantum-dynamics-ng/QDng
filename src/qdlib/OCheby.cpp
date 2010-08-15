@@ -15,7 +15,7 @@ namespace QDLIB
 {
 
    OCheby::OCheby()
-      : OPropagator(), _name("OCheby"), _hamilton(NULL),
+      : OPropagator(), _name("OCheby"),
       _order(0), _coeff(0), _scaling(1.), _offset(0), ket0(NULL), ket1(NULL), ket2(NULL), buf(NULL)
    {
       _needs.SetValue("hamiltonian", 0);
@@ -42,9 +42,9 @@ namespace QDLIB
    /**
     * Add a hamiltonian.
     */
-   void OCheby::Hamiltonian(Operator *H)
+   void OCheby::Hamiltonian(Operator *Op)
    {
-      _hamilton = H;
+      H = Op;
    }
    
    Operator * OCheby::NewInstance( )
@@ -99,7 +99,7 @@ namespace QDLIB
       ket0->FastCopy(*Psi);   /* phi_0 */
       
       ket1->FastCopy(*Psi);
-      _hamilton->Apply(ket1);
+      H->Apply(ket1);
       
       AddElements((cVec*) ket1, (cVec*) Psi, -1*_offset ); /* Offset*/
       MultElements( (cVec*) ket1, _exp / _scaling);
@@ -117,7 +117,7 @@ namespace QDLIB
       dcomplex exp2 = 2*_exp;
 	    
       for (int i=2; i < _order; i++){
- 	 _hamilton->Apply( buf, ket1);
+ 	 H->Apply( buf, ket1);
          int s,j;
 
 	 for (s=0; s < strides; s++){
@@ -206,9 +206,9 @@ namespace QDLIB
       clock = P->clock;
       
       /* Copy own stuff */
-      if (_hamilton != NULL) delete _hamilton;
-      _hamilton = P->_hamilton->NewInstance();
-      *_hamilton = P->_hamilton;
+      if (H != NULL) DELETE_OP(H);
+      H = P->H->NewInstance();
+      *H = P->H;
       _order = P->_order;
       _coeff = P->_coeff;
       _scaling = P->_scaling;
@@ -225,7 +225,7 @@ namespace QDLIB
    
    void OCheby::AddNeeds( string & Key, Operator * O )
    {
-      if (Key == "hamiltonian") _hamilton = O;
+      if (Key == "hamiltonian") H = O;
       else throw ( EParamProblem("Unknown operator key") );
    }
 
@@ -233,7 +233,7 @@ namespace QDLIB
    void OCheby::Init( WaveFunction *Psi )
    {
       
-      if (_hamilton == NULL)
+      if (H == NULL)
 	 throw ( EParamProblem("Chebychev Progagator is missing a hamiltonian") );
       if (clock == NULL)
 	 throw ( EParamProblem("Chebychev Progagator is missing a clock") );
@@ -241,12 +241,12 @@ namespace QDLIB
 	 throw ( EParamProblem("No time step defined") );
       
       /* Energy range & offset */
-      _offset._real =  (_hamilton->Emax() + _hamilton->Emin()).real()/2; /* [-i:i] */
-      _offset._imag =  (_hamilton->Emax() + _hamilton->Emin()).imag();   /* [-1:0] */
+      _offset._real =  (H->Emax() + H->Emin()).real()/2; /* [-i:i] */
+      _offset._imag =  (H->Emax() + H->Emin()).imag();   /* [-1:0] */
       if (_offset.imag() != 0)
-	_scaling = cabs(_hamilton->Emax() - _hamilton->Emin());
+	_scaling = cabs(H->Emax() - H->Emin());
       else
-	_scaling = cabs(_hamilton->Emax() - _hamilton->Emin())/2;
+	_scaling = cabs(H->Emax() - H->Emin())/2;
       
       
       /* This is an estimate for the recursion depth */
@@ -327,7 +327,7 @@ namespace QDLIB
    
    bool OCheby::Valid(WaveFunction * Psi)
    {
-      return _hamilton->Valid(Psi);
+      return H->Valid(Psi);
    }
    
 } /* namespace QDLIB */

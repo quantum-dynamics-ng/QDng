@@ -7,4 +7,4 @@ libtools_la_SOURCES = Exception.cpp Getopt.cpp KeyValFile.cpp Logger.cpp \
 AM_CXXFLAGS = -pedantic -fPIC -g -pedantic-errors -ansi
 noinst_HEADERS = Exception.h FileSingleDefs.h FileSingle.h fstools.h Getopt.h \
 	GlobalParams.h helpers.h KeyValFile.h Logger.h ParamContainer.h QDClock.h \
-	QDGlobalClock.h tnt_io.h XmlNode.h XmlParser.h
+	QDGlobalClock.h tnt_io.h XmlNode.h XmlParser.h Collector.h

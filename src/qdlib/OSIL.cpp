@@ -5,7 +5,7 @@
 namespace QDLIB {
 
     OSIL::OSIL()
-            : OPropagator(), _name("OSIL"), _order(0), _hamilton(NULL), _Lzb(NULL), buf0(NULL), buf1(NULL), buf2(NULL)
+            : OPropagator(), _name("OSIL"), _order(0), _Lzb(NULL), buf0(NULL), buf1(NULL), buf2(NULL)
     {
         _needs.SetValue("hamiltonian", 0);
     }
@@ -99,7 +99,7 @@ namespace QDLIB {
         int it;
 
         *(_Lzb[0]) = Psi;
-        _hamilton->Apply(buf0,  _Lzb[0]);           /* H*q_0 */
+        H->Apply(buf0,  _Lzb[0]);           /* H*q_0 */
         _alpha[0] = (*(_Lzb[0]) * buf0).real();     /* a_0 = <q_0 | H | _q0 > */
         
         *(_Lzb[1]) = buf0;
@@ -113,7 +113,7 @@ namespace QDLIB {
         for (it = 2; it < _order; it++)
         {
             /* buf0 = H * q_i-1 */
-            _hamilton->Apply(_Lzb[it], _Lzb[it-1]);
+            H->Apply(_Lzb[it], _Lzb[it-1]);
             _alpha[it-1] = (*(_Lzb[it-1]) * _Lzb[it]).real();
             /* - a_i-1 * q_i-1 */
             MultElementsCopy((cVec*) buf0, (cVec*) _Lzb[it-1], _alpha[it-1]);
@@ -128,7 +128,7 @@ namespace QDLIB {
 
         }
 
-        _alpha[it-1] = _hamilton->Expec(_Lzb[it-1]);
+        _alpha[it-1] = H->Expec(_Lzb[it-1]);
     }
 
     /**
@@ -194,17 +194,17 @@ namespace QDLIB {
         buf1 = o->buf0->NewInstance();
         buf2 = o->buf0->NewInstance();
         
-        _hamilton = o->_hamilton->NewInstance();
-        _hamilton->Copy(o->_hamilton);
+        H = o->H->NewInstance();
+        H->Copy(o->H);
 
         return this;
     }
 
     bool QDLIB::OSIL::Valid(WaveFunction * Psi)
     {
-        if (_hamilton == NULL) return false;
+        if (H == NULL) return false;
 
-        return _hamilton->Valid(Psi);
+        return H->Valid(Psi);
     }
 
     ParamContainer & QDLIB::OSIL::TellNeeds()
@@ -215,10 +215,10 @@ namespace QDLIB {
     void QDLIB::OSIL::AddNeeds(string & Key, Operator * O)
     {
         if (Key == "hamiltonian"){
-            _hamilton = O;
-
             if (O == NULL)
                 throw(EParamProblem("SIL: Invalid hamiltonian"));
+            
+            H = O;
         } else
             throw(EParamProblem("SIL: Unknown operator key"));
     }

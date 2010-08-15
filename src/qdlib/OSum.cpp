@@ -7,7 +7,7 @@ namespace QDLIB {
    OSum::~OSum()
    {
       for(int i=0; i < _size; i++){
-	 delete _O[i];
+	 DELETE_OP(_O[i]);
 	 delete _WFbuf[i];
       }
    }

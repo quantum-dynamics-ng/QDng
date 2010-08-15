@@ -4,6 +4,7 @@
 #include "modules/ModuleLoader.h"
 #include "tools/QDGlobalClock.h"
 #include "tools/Logger.h"
+#include "GlobalOpList.h"
 
 #include "qdlib/OSum.h"
 #include "qdlib/OGridSum.h"
@@ -20,26 +21,48 @@ namespace QDLIB
     * Recursive method to load an operator chain.
     * 
     * Should recognize special collective operators (OSum, OGridSum, OMultistate)
+    *
+    * \param Onode       The XML node conataining the operator definition
+    *
+    * Registering the operator means that the GlobalOpList takes responsibility for destruction.
     */
    Operator* ChainLoader::LoadOperatorChain( XmlNode * Onode )
    {
       ModuleLoader* mods = ModuleLoader::Instance();
       Logger& log = Logger::InstanceRef();
+      GlobalOpList& OpList = GlobalOpList::Instance();
+      
       ParamContainer pm;
-      string name;
+      string name, key, ref;
       Operator *O=NULL;
       XmlNode *child;
       
       pm = Onode->Attributes();
       pm.GetValue( "name", name );
       
+      if (pm.isPresent("ref")) {
+         pm.GetValue("ref", ref);
+         return OpList[ref];
+      }
+      
+      if (pm.isPresent("key"))
+         pm.GetValue("key", key);
+      else { /* If no key is given, we produce an internal key with a serial number */
+         stringstream ss;
+         ss << OP_LIST_ANONYMOUS_PREFIX << OpListAnonKey;
+         key = ss.rdbuf()->str();
+         OpListAnonKey++;
+      }
+      
       if (name == "Sum"){ /* Sum operator */
 	 log.cout() << "Sum of operators:\n";
 	 log.IndentInc();
 	 child = Onode->NextChild();
 	 child->AdjustElementNode();
-	 Operator *osub;
+	 
+         Operator *osub;
 	 OSum *sum = new OSum();
+         
 	 while (child->EndNode()){
 	    osub = LoadOperatorChain( child );
 	    if (osub == NULL)
@@ -47,9 +70,7 @@ namespace QDLIB
 	    sum->Add( osub );
 	    child->NextNode();
 	 }
-	 log.flush();
-	 log.IndentDec();
-	 return sum;
+	 O = sum;
       } else if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
 	 child->AdjustElementNode();
@@ -65,7 +86,7 @@ namespace QDLIB
 	    sum->Add( gsub );
 	    child->NextNode();
 	 }
-	 return sum;
+	 O = sum;
       } else if (name == "Multistate" || name == "DMultistate") { /* Matrix of operators */
 	 log.cout() << "Multistate operator:\n";
 	 log.IndentInc();
@@ -97,15 +118,20 @@ namespace QDLIB
 	    
 	    matrix->Add(osub, row, col);
 	    child->NextNode();
-	 }
-	 log.flush();
-	 log.IndentDec();
-	 return matrix;
+         }
+         
+         O = matrix;
       } else { 
 	 O = mods->LoadOp( name );
 	 log.cout() << pm << "---------------\n";
 	 O->Init(pm);
       }
+      
+      /* Register & prepare to exit */
+      OpList.Add(key, O);
+      log.flush();
+      log.IndentDec();
+
       return O;
    }
 
@@ -272,19 +298,40 @@ namespace QDLIB
     * \param Hamiltonian  Constains the loaded Hamiltonian on exit.
     * \return The pre-initialized propagator (still need a ReInit)
     */
-   OPropagator* ChainLoader::LoadPropagator( XmlNode *Unode, Operator **Hamiltonian)
+   OPropagator* ChainLoader::LoadPropagator( XmlNode *Unode )
    {
       ModuleLoader* mods = ModuleLoader::Instance();
       Logger& log = Logger::InstanceRef();
+      GlobalOpList& OpList = GlobalOpList::Instance();
       
       ParamContainer pm, needs;
-      string name, s;
+      string name, s, key, ref;
       
       Operator *h=NULL;
       OPropagator *U=NULL;
       
       /* get the Parameters for the propagator */
       pm = Unode->Attributes();
+
+      if (pm.isPresent("ref")) {
+         pm.GetValue("ref", ref);
+         U = dynamic_cast<OPropagator*>(OpList[ref]);
+         
+         if (U == NULL)
+            throw (EIncompatible("Operator in reference is not a propagator", ref));
+         
+         return U;
+      }
+      
+      if (pm.isPresent("key"))
+         pm.GetValue("key", key);
+      else { /* If no key is given, we produce an internal key with a serial number */
+         stringstream ss;
+         ss << OP_LIST_ANONYMOUS_PREFIX << OpListAnonKey;
+         key = ss.rdbuf()->str();
+         OpListAnonKey++;
+      }
+      
       
       if (!pm.isPresent("name"))
 	 throw (EParamProblem ("Missing propagator name") );
@@ -311,10 +358,7 @@ namespace QDLIB
       XmlNode *child = Unode->NextChild();
       XmlNode *ops;
       
-      /* Search for needs and add it */
-      int i=0;
-      OSum *sum = new OSum(); /* Add single parts to sum operator (if more than one part) */
-      
+      /* Search for needs and add it */      
       log.cout() << "Intialize Operators:\n\n";
       
       while (needs.GetNextValue( name, s )){
@@ -322,7 +366,6 @@ namespace QDLIB
 	 if ( ops == NULL && s != "opt") /* N error if need is an option */
 	    throw ( EParamProblem ("Can't find an operator for the propagation", name) );
 	 if ( ops != NULL ) { 
-	    if (i > 0) sum->Add(h);
 	    log.Header( name, Logger::SubSection );
 	    log.IndentInc();
 	    h = LoadOperatorChain( ops );
@@ -330,16 +373,9 @@ namespace QDLIB
 	    log.cout() << endl;
 	    U->AddNeeds( name, h );
 	    delete ops;
-	    i++;
 	 }
-      }
-      if ( i > 1 ) { /* need for a sum or single operator ? */
-	 sum->Add(h);
-	 *Hamiltonian = sum;
-      } else {
-	 *Hamiltonian = h;
-	 delete sum;
-      }
+      }      
+      OpList.Add(key, U);
       
       log.flush();
       log.IndentDec();
@@ -347,6 +383,6 @@ namespace QDLIB
       return U;
    }
    
-
+   int ChainLoader::OpListAnonKey = 0;
 
 }

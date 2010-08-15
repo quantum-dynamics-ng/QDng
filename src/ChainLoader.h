@@ -6,6 +6,8 @@
 #include "qdlib/OSum.h"
 #include "qdlib/OMultistate.h"
 
+#include "GlobalOpList.h"
+
 namespace QDLIB
 {
 
@@ -16,10 +18,12 @@ namespace QDLIB
     */
    class ChainLoader
    {
+      private:
+         static int OpListAnonKey; /* Counter for anonymous key names */ 
       public:
 	 static Operator* LoadOperatorChain( XmlNode *Onode );
 	 static WaveFunction* LoadWaveFunctionChain( XmlNode *WFNode, int seqnum=-1);
-	 static OPropagator* LoadPropagator( XmlNode *Unode, Operator **Hamiltonian);
+	 static OPropagator* LoadPropagator( XmlNode *Unode );
    };
 
    /**

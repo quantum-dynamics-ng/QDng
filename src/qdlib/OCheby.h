@@ -26,7 +26,6 @@ namespace QDLIB
 	 string _name;
 	 ParamContainer _needs;
 	 
-	 Operator *_hamilton; /* The Hamiltonian */
 	 int _order;          /* Recursion depth */
 	 cVec _coeff;         /* Coefficients including the Bessel functions at k'th order */
 	 dcomplex _exp;       /* Scaled exponent:  e.g. -i*dt/Rdelta */
@@ -51,7 +50,7 @@ namespace QDLIB
 	 
 	 virtual const string& Name();
 	 
-	 virtual void UpdateTime(){ if (_hamilton != NULL) _hamilton->UpdateTime(); }
+	 virtual void UpdateTime(){ if (H != NULL) H->UpdateTime(); }
 	 
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	 

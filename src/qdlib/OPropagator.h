@@ -26,12 +26,16 @@ namespace QDLIB {
 	 bool forward;
 	 /** Indicates imaginary time propagation. */
 	 bool imaginary;
+         /** The associated Hamiltonian
+          * Must initialized by the implementing class after AddNeed is finished
+          */
+         Operator* H;
       public:
-	 OPropagator() : _c0(0,0), forward(true), imaginary(false)
+	 OPropagator() : _c0(0,0), forward(true), imaginary(false), H(NULL)
 	 {
 	 }
       
-	 ~OPropagator() {}
+	 ~OPropagator() { DELETE_OP(H); }
 	    
 	 /**
 	 * Should return a ParameterContainer reference which contains some keywords.
@@ -144,6 +148,8 @@ namespace QDLIB {
 	   
 	    return this;
 	 }	 
+	 
+	 Operator* Hamiltonian() { return H; }
    };
 
 }

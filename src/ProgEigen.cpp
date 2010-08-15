@@ -31,11 +31,9 @@ namespace QDLIB
 
    ProgEigen::~ProgEigen()
    {
-      if (_U != NULL) delete _U;
-      if (_H != NULL) delete _H;
-      
       /* remove the clock */
       QDGlobalClock::Destroy();
+      DELETE_ALL_OP();
    }
 
    /**
@@ -213,7 +211,8 @@ namespace QDLIB
       if (section == NULL)
 	 throw ( EParamProblem ("No propagator found") );
       
-      _U = ChainLoader::LoadPropagator( section, &_H );
+      _U = ChainLoader::LoadPropagator( section );
+      _H = _U->Hamiltonian();
       delete section;
       
       /* Load the initial Wavefunction */

@@ -26,7 +26,7 @@ namespace QDLIB {
    {
       for (int i=0; i < MAX_FILTERS; i++){
 	 if (_olist[i] != NULL) {
-	    delete _olist[i];
+	    DELETE_OP(_olist[i]);
 	    _olist[i] = NULL;
 	 }
       }

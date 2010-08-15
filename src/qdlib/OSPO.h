@@ -4,6 +4,7 @@
 #include "ODSpace.h"
 #include "OPropagator.h"
 #include "OGridSum.h"
+#include "OSum.h"
 #include "tools/Exception.h"
 
 
@@ -36,6 +37,8 @@ namespace QDLIB {
 	 string _name;
 	 ParamContainer *_needs;
 	 
+         OSum* _H;                  /* The Hamiltonian  as a sum of all components */
+         
 	 ODSpace *_Tkin;
          Transform* _X;             /* Transformation into diags space of Tkin */
 	 dVec    *_Tkin_kspace;

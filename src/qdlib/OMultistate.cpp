@@ -24,9 +24,9 @@ namespace QDLIB
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j< _nstates; j++){
 	    if (_matrix[i][j] != NULL && i <= j)
-	       delete _matrix[i][j];
+	       DELETE_OP(_matrix[i][j]);
 	    if (_matrix[i][j] != NULL && i > j && !_hermitian)
-	       delete _matrix[i][j];
+	       DELETE_OP(_matrix[i][j]);
 	 }
       }
    }

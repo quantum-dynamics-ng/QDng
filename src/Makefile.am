@@ -25,14 +25,14 @@ endif
 SUBDIRS = fft linalg math modules qdlib slatec tools fftw lib tnt $(OPT_DIRS)
 
 bin_PROGRAMS = qdng qdz
-qdng_SOURCES = ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
+qdng_SOURCES = GlobalOpList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
 	ProgOCT.cpp ProgPropa.cpp Reporter.cpp qdng.cpp
 qdng_LDADD = $(top_builddir)/src/lib/libqdng.la 
 
 qdz_SOURCES = qdz.cpp
 qdz_LDADD = $(top_builddir)/src/lib/libqdng.la
 
-noinst_HEADERS = ChainLoader.h FiltersList.h ProgAutocorr.h \
+noinst_HEADERS = GlobalOpList.h ChainLoader.h FiltersList.h ProgAutocorr.h \
 	ProgEigen.h ProgPropa.h Reporter.h ProgOCT.h
 
 

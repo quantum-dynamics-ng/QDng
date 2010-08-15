@@ -21,7 +21,6 @@ namespace QDLIB {
             string _name;
             ParamContainer _needs;
             int _order;       /* Recursion depth, size of basis */
-            Operator* _hamilton;      /* The hamiltonian */
             WaveFunction** _Lzb;  /* Buffer for Lanczos basis */
             WaveFunction *buf0, *buf1, *buf2;   /* Buffers */ 
             dVec _alpha;      /* Store alpha coeffs */
@@ -43,7 +42,7 @@ namespace QDLIB {
             virtual void Init(ParamContainer &params);
             virtual void Init(WaveFunction *Psi);
             virtual const string& Name() {return _name;}
-            virtual void UpdateTime() {if (_hamilton != NULL) _hamilton->UpdateTime();}
+            virtual void UpdateTime() {if (H != NULL) H->UpdateTime();}
             virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
             virtual double Expec(WaveFunction *Psi);
             virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
