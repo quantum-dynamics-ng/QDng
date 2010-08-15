@@ -53,13 +53,11 @@ namespace QDLIB
          virtual double Expec(WaveFunction *Psi);
 	 virtual dcomplex Emax();
 	 virtual dcomplex Emin();
-         virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
-         virtual WaveFunction* Apply(WaveFunction *Psi);
+         virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
+         virtual void Apply(WaveFunction *Psi);
          virtual Operator* operator=(Operator* O);
          virtual Operator* Copy(Operator* O);
-         virtual Operator* operator*(Operator* O);
-         virtual Operator* Offset(const double d);
-         virtual Operator* Scale(const double d);
+         virtual void Apply(Operator *destOp, Operator *sourceOp);
          bool Valid(WaveFunction *Psi);
 
          /* Interface implementation, ODSpace */

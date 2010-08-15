@@ -79,16 +79,15 @@ namespace QDLIB
    }
 
    
-   WaveFunction * OCheby::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OCheby::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
      
       destPsi->FastCopy(*sourcePsi);
       Apply(destPsi);
-      return destPsi;
    }
 
          
-   WaveFunction * OCheby::Apply( WaveFunction * Psi )
+   void OCheby::Apply( WaveFunction * Psi )
    {
       WaveFunction *swap;
       
@@ -183,8 +182,6 @@ namespace QDLIB
 	 ket1 = ket0;
 	 ket0 = swap;
       }
-
-      return Psi;
    }
 
    Operator * OCheby::operator =( Operator * O )
@@ -220,12 +217,6 @@ namespace QDLIB
       return this;
    }
    
-   Operator * OCheby::operator *( Operator * O )
-   {
-      throw ( EIncompatible ("Can't apply the Chebychev propagator to another operator") );
-      return O;
-   }
-
    ParamContainer & OCheby::TellNeeds( )
    {      
       return _needs;

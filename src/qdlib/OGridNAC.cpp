@@ -82,7 +82,7 @@ namespace QDLIB {
       return c.real();
    }
 
-   WaveFunction * OGridNAC::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   void OGridNAC::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       /* 1/2 f del psi*/
       PreFactor(0.5 * _sign / _mass);
@@ -95,10 +95,9 @@ namespace QDLIB {
       OGridNabla::Apply(destPsi);
 
       *destPsi += _buf;
-      return destPsi;
    }
 
-   WaveFunction * OGridNAC::Apply(WaveFunction * Psi)
+   void OGridNAC::Apply(WaveFunction * Psi)
    {
       /* 1/2 f del psi*/
       PreFactor(0.5 * _sign / _mass);
@@ -111,8 +110,6 @@ namespace QDLIB {
       OGridNabla::Apply(Psi);
 
       *Psi += _buf;
-      
-      return Psi;
    }
 
    Operator * OGridNAC::operator =(Operator * O)
@@ -136,14 +133,6 @@ namespace QDLIB {
       _buf = o->_buf->NewInstance();
       return this;
    }
-
-   Operator * OGridNAC::operator *(Operator * O)
-   {
-      throw (EIncompatible("Operator apply not supported", Name(),O->Name()) );
-      return this;
-   }
-
-   
 }
 
 

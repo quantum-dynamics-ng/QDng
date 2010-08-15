@@ -75,7 +75,7 @@ namespace QDLIB {
       
       ket = PsiKet->NewInstance();
       
-      ket = Apply(PsiKet);
+      Apply(ket, PsiKet);
       d = *PsiBra * ket;
       delete ket;
       
@@ -115,22 +115,18 @@ namespace QDLIB {
       return dcomplex(d);
    }
    
-   WaveFunction * OGridSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OGridSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {   
       if(! _isUpTodate) _Update( );
         
       MultElements( (cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
-   
-      return destPsi;
    }
 
-   WaveFunction * OGridSum::Apply( WaveFunction * Psi )
+   void OGridSum::Apply( WaveFunction * Psi )
    {   
       if(! _isUpTodate) _Update( );
       
       MultElements( (cVec*) Psi, (dVec*) this);
-   
-      return Psi;
    }
       
    
@@ -161,30 +157,6 @@ namespace QDLIB {
       
       return this;
    }
-   
-   Operator* OGridSum::operator *( Operator * O )
-   {
-      /** \todo implement OGridSum*O. How should this work? */
-      throw( EIncompatible("Can't apply to another operator") );
-      return O;
-   }
-
-   Operator* OGridSum::Offset(const double d)
-   {
-      for (int i=0; i < _size; i++)
-	 _O[i]->Offset(d);
-      return this;
-   }
-
-   
-   Operator* OGridSum::Scale(const double d)
-   {
-      for (int i=0; i < _size; i++)
-         _O[i]->Scale(d);
-      scaling=d;
-      return this;
-   }
-
    
    /**
     * Return an operator.

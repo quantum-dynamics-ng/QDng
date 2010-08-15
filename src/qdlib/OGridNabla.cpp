@@ -99,7 +99,7 @@ namespace QDLIB {
       return dcomplex(0);
    }
 
-   WaveFunction * OGridNabla::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   void OGridNabla::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       WFGridSystem *ket, *opPsi;
 
@@ -115,12 +115,10 @@ namespace QDLIB {
          MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
       ket->IsKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
       _FFT.Backward(opPsi);
-
-      return destPsi;
    }
 
 
-   WaveFunction * OGridNabla::Apply(WaveFunction * Psi)
+   void OGridNabla::Apply(WaveFunction * Psi)
    {
       WFGridSystem *opPsi;
 
@@ -132,9 +130,6 @@ namespace QDLIB {
       else
          MultElementsComplex((cVec*) opPsi, _kspace, _fac/double(GridSystem::Size()));
       _FFT.Backward(opPsi);
-
-
-      return opPsi;
    }
 
    Operator * OGridNabla::operator =(Operator * O)
@@ -160,26 +155,6 @@ namespace QDLIB {
          _kspace = new dVec(GridSystem::Size(), true);
 
       *_kspace = *(o->_kspace);
-
-      return this;
-   }
-
-   Operator * QDLIB::OGridNabla::operator *(Operator * O)
-   {
-      throw (EIncompatible("Operator apply not supported", Name(),O->Name()) );
-      return this;
-   }
-
-
-   Operator * OGridNabla::Scale(const double d)
-   {
-      if (_kspace == NULL)
-         throw ( EParamProblem("k-space not initialized: ", Name()) );
-
-      MultElements(_kspace, d);
-
-      /* Redirect to parent */
-      ODSpaceCplx::Scale(d);
 
       return this;
    }

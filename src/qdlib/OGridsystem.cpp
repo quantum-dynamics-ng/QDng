@@ -19,22 +19,6 @@ namespace QDLIB {
       return _file;
    }
 
-   Operator* OGridSystem::Offset(const double d)
-   {
-      for(lint i=0; i < lsize(); i++){
-         (*this)[i] += d;
-      }
-      return this;
-   }
-
-
-   Operator* OGridSystem::Scale(const double d)
-   {
-      MultElements( (dVec*) this, d );
-      scaling = d;
-      return this;
-   }
-
    Operator* OGridSystem::Copy(Operator * O)
    {
       OGridSystem *o = dynamic_cast<OGridSystem*>(O);

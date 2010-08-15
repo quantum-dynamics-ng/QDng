@@ -136,22 +136,7 @@ namespace QDLIB {
 
    }
 
-  
-   Operator * QDLIB::OProjection::Scale( const double d )
-   {
-      for (int i=0; i < _size; i++){
-	 *(_wfbuf[i]) *= d;
-      }
-      return this;
-   }
-      
-   Operator * QDLIB::OProjection::operator *( Operator * O )
-   {
-      throw(EIncompatible("Projection operator not appliable to other operators"));
-      
-      return this;
-   }
-   
+     
    Operator * QDLIB::OProjection::operator =( Operator * O )
    {
       Copy(O);
@@ -195,15 +180,13 @@ namespace QDLIB {
    }
 	    
    
-   WaveFunction * QDLIB::OProjection::Apply( WaveFunction * Psi )
+   void QDLIB::OProjection::Apply( WaveFunction * Psi )
    {
       *_buf = Psi;
       Apply( Psi, _buf );
-
-      return Psi;
    }
    
-   WaveFunction * QDLIB::OProjection::Apply( WaveFunction * destPsi, WaveFunction * sourcePsi )
+   void QDLIB::OProjection::Apply( WaveFunction * destPsi, WaveFunction * sourcePsi )
    {
       *destPsi = dcomplex(0,0);
       
@@ -214,8 +197,6 @@ namespace QDLIB {
       for (i=0; i < _size; i++){
 	 MultElementsAdd(destPsi, _wfbuf[i], *(_wfbuf[i]) * sourcePsi * _sign);
       }
-      
-      return destPsi;
    }
 
 

@@ -71,16 +71,14 @@ namespace QDLIB {
       return dcomplex(0);
    }
 
-   WaveFunction * OGridDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OGridDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, (-1) * _laser.Get());
-      return destPsi;
    }
 
-   WaveFunction * OGridDipole::Apply(WaveFunction *Psi)
+   void OGridDipole::Apply(WaveFunction *Psi)
    {
       MultElements((cVec*) Psi, (dVec*) this, (-1) * _laser.Get());
-      return Psi;
    }
 
    Operator * OGridDipole::operator =(Operator * O)

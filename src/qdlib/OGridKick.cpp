@@ -147,16 +147,14 @@ namespace QDLIB {
       return this;
    }
    
-   WaveFunction * OGridKick::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   void OGridKick::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
-      MultElementsCopy((cVec*) destPsi, (cVec*) sourcePsi, _exp, scaling);
-      return destPsi;
+      MultElementsCopy((cVec*) destPsi, (cVec*) sourcePsi, _exp);
    }
 
-   WaveFunction * OGridKick::Apply(WaveFunction * Psi)
+   void OGridKick::Apply(WaveFunction * Psi)
    {
-      MultElements( (cVec*) Psi, _exp, scaling);
-      return Psi;
+      MultElements( (cVec*) Psi, _exp);
    }
    
    bool OGridKick::Valid(WaveFunction * Psi)
@@ -171,12 +169,7 @@ namespace QDLIB {
          return false;
 
       return true;
-   }
-   
-   Operator * OGridKick::operator *(Operator * O)
-   {
-      throw(EIncompatible("OGridKick apply to operator not implementet", O->Name()));
-   }
+   }   
 }
 
 

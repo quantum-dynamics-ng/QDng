@@ -196,12 +196,11 @@ namespace QDLIB {
    /**
     * \todo implement
     */
-   WaveFunction* OSPO::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OSPO::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {      
-      return sourcePsi;
    }
 
-   WaveFunction* OSPO::Apply(WaveFunction *Psi)
+   void OSPO::Apply(WaveFunction *Psi)
    {
 
       if (_last_time != clock->TimeStep() && _isTimedependent) /* Re-init Vpot if is time dep.*/
@@ -258,7 +257,6 @@ namespace QDLIB {
 	    MultElements( (cVec*) psi->State(i),  (cVec*) _expT, 1/ double(psi->State(i)->size()) );
             _X->Backward(dynamic_cast<WFGridSystem*>(psi->State(i)));
 	 }
-	 return psi;
       } else { /* Without coupling */
 	 WFGridSystem *psi = dynamic_cast<WFGridSystem*>(Psi);
 	 /* exp(-i/2 V dt) */
@@ -274,8 +272,7 @@ namespace QDLIB {
 	 /* exp(-i/2 V dt) */
 	 MultElements( (cVec*) psi,  (cVec*) _expV );
          if (_coupdiag)
-            MultElements( (cVec*) psi, (cVec*) _expVcoupI );
-	 return psi;
+            MultElements( (cVec*) psi, (cVec*) _expVcoupI );	
       }
    }
    
@@ -310,13 +307,7 @@ namespace QDLIB {
       
       return this;
    }
-   
-   Operator * OSPO::operator *(Operator * O)
-   {
-      throw ( EIncompatible("Can't apply the SPO to another operator") );
-   }
-
-   
+      
    ParamContainer& OSPO::TellNeeds( )
    {
       

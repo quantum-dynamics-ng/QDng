@@ -200,25 +200,21 @@ namespace QDLIB {
    }
 
    
-   WaveFunction * OGobbler::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OGobbler::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       if (_nip) 
 	 MultElementsComplexEq((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, -1);
       else 
 	 MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
-      
-      return destPsi;
+
    }
    
-   WaveFunction * OGobbler::Apply(WaveFunction * Psi)
+   void OGobbler::Apply(WaveFunction * Psi)
    {
       if (_nip)
 	 MultElements( (cVec*) Psi, (dVec*) this, dcomplex(0,-1));
       else
 	 MultElements( (cVec*) Psi, (dVec*) this);
-      
-      return Psi;
-      
    }
    
    Operator * OGobbler::operator =(Operator * O)
@@ -253,29 +249,5 @@ namespace QDLIB {
       return this;
    }
    
-   /**
-    * We can gobble other OGridSystem operators.
-    * 
-    * No idea wether this makes sense.
-    */
-   Operator * OGobbler::operator *(Operator * O)
-   {
-      
-      throw ( EIncompatible("Gobbler can't be applied to other operators") );
-      
-/*      OGridSystem *op;
-      op = dynamic_cast<OGridSystem*>(O);
-      if (op == NULL)
-	 throw ( EIncompatible("O is not of type OGridSystem", O->Name()) );
-      
-      
-      if ( *((GridSystem*) this) != *((GridSystem*) op) ) _Init();
-      
-      MultElements( (dVec*) op, (dVec*) this);*/
-      
-//       return op;
-      return NULL;
-   }
-
 }
 

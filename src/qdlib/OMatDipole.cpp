@@ -75,19 +75,16 @@ namespace QDLIB
       return dcomplex(OHermitianMatrix::Emin() * VecMin((dVec&) _laser));
    }
 
-   WaveFunction * OMatDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OMatDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       OHermitianMatrix::Apply(destPsi, sourcePsi);
       *destPsi *= _laser.Get();
-      
-      return destPsi;
    }
 
-   WaveFunction * OMatDipole::Apply(WaveFunction *Psi)
+   void OMatDipole::Apply(WaveFunction *Psi)
    {
       OHermitianMatrix::Apply(Psi);
       *Psi *= _laser.Get();
-      return Psi;
    }
 
    Operator * OMatDipole::operator =(Operator * O)

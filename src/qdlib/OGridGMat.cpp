@@ -241,7 +241,7 @@ namespace QDLIB {
       return dcomplex(Tmin);
    }
    
-   WaveFunction * OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   void OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       /* Make a copy from Psi */
       for (int i=0; i < GridSystem::Dim(); i++)
@@ -281,11 +281,9 @@ namespace QDLIB {
 	    }
  	 }
       }
-      
-      return destPsi;
    }
 
-   WaveFunction * OGridGMat::Apply( WaveFunction * Psi )
+   void OGridGMat::Apply( WaveFunction * Psi )
    {
      
       WaveFunction *ket;
@@ -297,7 +295,6 @@ namespace QDLIB {
       *Psi = ket;
 
       delete ket;
-      return Psi;
    }
    
    Operator * OGridGMat::operator =( Operator * O )
@@ -347,22 +344,6 @@ namespace QDLIB {
       }
       return this;
    }
-   
-   
-   Operator * OGridGMat::operator *( Operator * O )
-   {
-      throw ( EIncompatible("Can't apply", Name(), O->Name()) );
-   }
-   
-   
-   Operator* OGridGMat::Scale(const double d)
-   {
-      for (lint i=0; i < _size; i++)
-         MultElements(&_kspace[i], sqrt(d));
-      scaling=d;
-      return this;
-   }
-
    
    bool OGridGMat::Valid(WaveFunction * Psi)
    {

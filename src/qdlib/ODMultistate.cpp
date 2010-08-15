@@ -105,12 +105,6 @@ namespace QDLIB
       
       return (OMultistate*) this;
    }
-
-   Operator * ODMultistate::operator *(Operator * O)
-   {
-      return OMultistate::operator*(O);
-   }
-
    
    void ODMultistate::InitDspace()
    {

@@ -46,7 +46,7 @@
  * SOD (Worth implementing?)
  * Projection Operator (DONE)
  * Extend NAC Operator to N-Dimensions
- * Generalize Cheby to complex plane energy range [planed for alpha-0.6]
+ * Generalize Cheby to complex plane energy range [planed for alpha-0.6] (DONE)
 
 * Multistate System
  * efficient SPO Scheme (DONE)

@@ -72,27 +72,20 @@ namespace QDLIB {
 	 
 	 virtual dcomplex Emin() { return dcomplex(0); }
 	 
-         virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
+         virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
-         virtual WaveFunction* Apply(WaveFunction *Psi);
+         virtual void Apply(WaveFunction *Psi);
 
          virtual Operator* operator=(Operator* O);
 	 
          virtual Operator* Copy(Operator* O);
 	 
-         virtual Operator* operator*(Operator* O);
-         
-         virtual Operator* Scale(const double d);
-
          virtual bool Valid(WaveFunction *Psi);
          
          /*Interface implementation, ODSpace  */ 
          virtual Transform* Transformation() { return &_FFT; }
          virtual void InitDspace();
          virtual void InitExponential (cVec *exp, dcomplex c);
-         
-         
-         
    };
 
 }

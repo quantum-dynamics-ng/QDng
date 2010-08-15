@@ -114,18 +114,14 @@ namespace QDLIB {
    }
 
    
-   WaveFunction* OGridPosition::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   void OGridPosition::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       MultElementsCopy( (cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
-      
-      return destPsi;
    }
 
-   WaveFunction* OGridPosition::Apply(WaveFunction * Psi)
+   void OGridPosition::Apply(WaveFunction * Psi)
    {
       MultElements( (cVec*) Psi, (dVec*) this);
-      
-      return Psi;
    }
    
    Operator * OGridPosition::operator =(Operator * O)
@@ -139,12 +135,5 @@ namespace QDLIB {
       OGridSystem::Copy(O);
       return this;
    }
-
-   Operator * OGridPosition::operator *(Operator * O)
-   {
-      throw ( EIncompatible("OGridPosition can't operate on other operators"));
-      return this;
-   }
-
 } /* namespace QDLIB */
 

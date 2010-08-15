@@ -105,14 +105,14 @@ namespace QDLIB
       return MatrixElement(Psi, Psi).real();
    }
 
-   WaveFunction* OGSPO::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OGSPO::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       *destPsi = sourcePsi;
 
-      return Apply(destPsi);
+      Apply(destPsi);
    }
 
-   WaveFunction* OGSPO::Apply(WaveFunction *Psi)
+   void OGSPO::Apply(WaveFunction *Psi)
    {
       InitExp();
 
@@ -137,7 +137,6 @@ namespace QDLIB
          if (_ops[i]->Transformation() != NULL)
             _ops[i]->Transformation()->Backward(Psi);
       }
-      return Psi;
    }
 
    Operator* OGSPO::operator=(Operator* O)
@@ -163,12 +162,6 @@ namespace QDLIB
       }
       _laststep = -1;
 
-      return this;
-   }
-
-   Operator* OGSPO::operator*(Operator* O)
-   {
-      throw(EIncompatible("GSPO: Density Matrix propagation not implemented"));
       return this;
    }
 

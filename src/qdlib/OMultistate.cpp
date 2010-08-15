@@ -232,7 +232,7 @@ namespace QDLIB
    }
 
    
-   WaveFunction * OMultistate::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OMultistate::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       WFMultistate *psi, *dPsi;
       psi = dynamic_cast<WFMultistate*>(sourcePsi);
@@ -250,17 +250,13 @@ namespace QDLIB
             }
 	 }
       }
-     
-      return dPsi;
    }
 
 
-   WaveFunction * OMultistate::Apply( WaveFunction *Psi )
+   void OMultistate::Apply( WaveFunction *Psi )
    {
       Apply( _buf2, Psi);
       *Psi = _buf2;
-      
-      return Psi;
    }
    
    Operator * OMultistate::operator =( Operator * O )
@@ -310,61 +306,6 @@ namespace QDLIB
       return this;
    }
    
-   Operator * OMultistate::operator *( Operator * O )
-   {
-      throw (EIncompatible("Multistate operator can't be applied to other operators"));
-      return O;
-   }
-
-   
-   Operator* OMultistate::Offset(const double d)
-   {
-      
-      for(int i=0; i< _nstates; i++){
-	 if (_matrix[i][i] != NULL)
-	    _matrix[i][i]->Offset(d);
-      }
-      return this;
-      
-//       if (_hermitian){
-// 	 for(int i=0; i< _nstates; i++){
-// 	    for(int j=0; j<= i; j++){
-// 	       if (_matrix[i][j] != NULL)
-// 		  _matrix[i][j]->Offset(d);
-// 	    }
-// 	 }
-//       } else {
-// 	 for(int i=0; i< _nstates; i++){
-// 	    for(int j=0; j< _nstates; j++){
-// 	       if (_matrix[i][j] != NULL)
-// 		  _matrix[i][j]->Offset(d);
-// 	    }
-// 	 }
-//       }
-       return this;
-   }
-
-   Operator* OMultistate::Scale(const double d)
-   {
-      if (_hermitian){
-	 for(int i=0; i< _nstates; i++){
-	    for(int j=0; j<= i; j++){
-	       if (_matrix[i][j] != NULL)
-		  _matrix[i][j]->Scale(d);
-	    }
-	 }
-      } else {
-	 for(int i=0; i< _nstates; i++){
-	    for(int j=0; j< _nstates; j++){
-	       if (_matrix[i][j] != NULL)
-		  _matrix[i][j]->Scale(d);
-	    }
-	 }
-      }
-      scaling=d;
-      return this;
-   }
-
    bool OMultistate::Valid(WaveFunction * Psi)
    {
       bool valid = true;

@@ -179,10 +179,9 @@ namespace QDLIB {
     *
     * Works with every type of WaveFunction (relies only on cVec).
     */
-   WaveFunction* OHermitianMatrix::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OHermitianMatrix::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       MatVecMult((cVec*) destPsi, (dMat*) this, (cVec*) sourcePsi);
-      return destPsi;
    }
 
    /**
@@ -192,7 +191,7 @@ namespace QDLIB {
     *
     * \todo Optimize for real inplace.
     */
-   WaveFunction* OHermitianMatrix::Apply(WaveFunction *Psi)
+   void OHermitianMatrix::Apply(WaveFunction *Psi)
    {
       WaveFunction *result;
 
@@ -200,7 +199,6 @@ namespace QDLIB {
       MatVecMult((cVec*) result, (dMat*) this, (cVec*) Psi);
       *Psi = result;
       delete result;
-      return Psi;
    }
 
    /**
@@ -264,39 +262,11 @@ namespace QDLIB {
     *
     * Matrix*Matrix has to be defined for the types used.
     */
-   Operator* OHermitianMatrix::operator*(Operator *O)
+   void OHermitianMatrix::Apply(Operator *destOp, Operator *sourceOp)
    {
-      Operator *result;
-
-      result = this->NewInstance();
-
-      MatrixMatrixMult( (dynamic_cast<dMat*>(result) ), this, ( dynamic_cast<dMat*>(O) ) );
-
-      return result;
-   }
-
-   Operator * OHermitianMatrix::Offset(const double d)
-   {
-      for (int i=0; i < rows() ; i++){
-	 (*this)(i,i) += d;
-         if(_valid)
-            (*_dspace)[i] += d;
-      }
-
-
-      return this;
-   }
-
-
-   Operator * OHermitianMatrix::Scale(const double d)
-   {
-      *((dMat*) this) *= d;
-
-      if (_valid)
-         (*_dspace) *= d;
-
-      scaling=d;
-      return this;
+      dMat* dOp = dynamic_cast<dMat*>(destOp);
+      
+      MatrixMatrixMult( dOp, this, ( dynamic_cast<dMat*>(sourceOp) ) );      
    }
 
    bool QDLIB::OHermitianMatrix::Valid(WaveFunction * Psi)

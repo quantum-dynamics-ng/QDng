@@ -136,16 +136,14 @@ namespace QDLIB
       return dcomplex(VecMin( *((dVec*) this) ));
    }
    
-   WaveFunction* OGridPotential::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OGridPotential::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
-      return destPsi;
    }
 	 
-   WaveFunction* OGridPotential::Apply(WaveFunction *Psi)
+   void OGridPotential::Apply(WaveFunction *Psi)
    {
       MultElements((cVec*) Psi, (dVec*) this);
-      return Psi;
    }
 	 
    Operator* OGridPotential::operator=(Operator* O)
@@ -167,41 +165,7 @@ namespace QDLIB
 
       return this;
    }
-   
-   /**
-    * This is compatible to dVec and cVec
-    */
-   Operator* OGridPotential::operator*(Operator* O)
-   {
       
-//       try {
-// 	 dVec *n;
-// 	 n = dynamic_cast<dVec*> (O);
-// 	 Operator *o = O->NewInstance();
-// 	 o = dynamic_cast<dVec*> (o);
-// 	 
-//       } 
-//       catch (bad_cast b) {
-// 	 try {
-// 	    cVec *n;
-// 	    n = dynamic_cast<cVec*> O;
-// 	    Operator *o = O->NewInstance();
-// 	    o = dynamic_cast<dVec*> o;
-// 	    
-// 	 } catch(bad_cast b) {
-// 	    throw ( EIncompatible("Can't apply operator OGridPotential to other operator")  );
-// 	 }
-//       }
-//       
-//       
-//       
-//       for (int i=0; i < size(); i++){
-// 	 (*n)[i] = (*this)[i] * (*o)[i];
-//       }
-//       return n;
-      return NULL;
-   }
-   
 }
 
 

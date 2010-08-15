@@ -143,13 +143,7 @@ namespace QDLIB {
 	    imaginary = P->imaginary;
 	   
 	    return this;
-	 }
-	 
-	 /** We don't do offsetting. */
-	 virtual Operator* Offset(const double d){return this;}
-
-	 /** We don't scale. */
-	 virtual Operator* Scale(const double d){return this;}
+	 }	 
    };
 
 }

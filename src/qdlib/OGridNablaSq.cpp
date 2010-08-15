@@ -118,7 +118,7 @@ namespace QDLIB
       return dcomplex(0); /* Minimum kinetic energy is zero */
    }
 
-   WaveFunction * OGridNablaSq::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OGridNablaSq::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       WFGridSystem *ket, *opPsi;
 
@@ -130,11 +130,9 @@ namespace QDLIB
       MultElements((cVec*) opPsi, (cVec*) ket, _dspace, 1 / double(GridSystem::Size()));
       ket->IsKspace(false); /* switch back to X-space -> we don't change sourcePsi */
       _FFT.Backward(opPsi);
-
-      return destPsi;
    }
 
-   WaveFunction * OGridNablaSq::Apply(WaveFunction * Psi)
+   void OGridNablaSq::Apply(WaveFunction * Psi)
    {
       WFGridSystem *opPsi;
 
@@ -143,8 +141,6 @@ namespace QDLIB
       _FFT.Forward(opPsi);
       MultElements((cVec*) opPsi, _dspace, 1 / double(GridSystem::Size()));
       _FFT.Backward(opPsi);
-
-      return opPsi;
    }
 
    Operator * OGridNablaSq::operator =(Operator * O)
@@ -174,12 +170,6 @@ namespace QDLIB
       }
 
       return this;
-   }
-
-   Operator * OGridNablaSq::operator *(Operator * O)
-   {
-      throw(EIncompatible("Can't apply OGridNablaSq to another operator"));
-      return O;
    }
 
    bool QDLIB::OGridNablaSq::Valid(WaveFunction * Psi)

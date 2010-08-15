@@ -40,12 +40,6 @@ namespace QDLIB {
 	  * This is needed by time dependent operators.
 	  */
 	 QDClock *clock;
-	 
-	 /**
-	  * The applied scaling factor.
-	  * This must be set by the implementing class.
-	  */
-	 double scaling;
       public:
 	 /**
           * Make class pure virtual
@@ -55,7 +49,7 @@ namespace QDLIB {
 	 /**
 	  * Standard constructor
 	  */
-	 Operator() :  _isTimedependent(false), clock(NULL), scaling(1){}
+	 Operator() :  _isTimedependent(false), clock(NULL) {}
 	  
 	 /**
 	  * Constructor with full parameter set.
@@ -159,15 +153,12 @@ namespace QDLIB {
 	  * 
 	  * \return destPsi
 	  */
-	 //virtual WaveFunction* operator*(WaveFunction *Psi) = 0;
-	 virtual WaveFunction* Apply(WaveFunction *destPsi, WaveFunction *sourcePsi) = 0;
+	 virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi) = 0;
 	 
 	 /**
 	  * Apply operator to wavefunction in place.
-	  * \return the input wavefunction.
 	  */
-	 //virtual WaveFunction* operator*=(WaveFunction *Psi) = 0;
-	 virtual WaveFunction* Apply(WaveFunction *Psi) = 0;
+	 virtual void Apply(WaveFunction *Psi) = 0;
 	 	 
 	 /**
 	  * Copy operator.
@@ -190,24 +181,21 @@ namespace QDLIB {
 	  * this type of operation. In this case the method should throw
 	  * and exception.
 	  */
-	 virtual Operator* operator*(Operator* O) = 0;
-   
-	 /**
-	  * Change the Operators offset.
-	  * 
-	  */
-          virtual Operator* Offset(const double d) = 0;
-
- 	 /**
-	  * Scale the Operator.
-	  */
-	 virtual Operator* Scale(const double d) = 0;
-
-	 /**
-	  * Returns the applied scaling factor.
-	  */
-	 double Scaling() {return scaling;}
+         virtual void Apply(Operator* destOp, Operator* sourceOp)
+         {
+            throw (EIncompatible("Not implemented"));
+         }
          
+         /**
+          * Apply Operator to another operator.
+          *
+          * In place variant
+          */         
+         virtual void Apply(Operator* Op)
+         {
+            throw (EIncompatible("Not implemented"));
+         }
+                  
          /**
           * Check if the provided Wavefunction is valid with respect to initialization.
           * 
@@ -216,10 +204,7 @@ namespace QDLIB {
           * \return true if is compatible with initalized. If incompatible or NULL => false.
           */
          virtual bool Valid(WaveFunction *Psi) = 0;
-         
-         typedef WaveFunction* (Operator::*METHODWF) (WaveFunction*);
-	 typedef WaveFunction* (Operator::*METHODWF2) (WaveFunction*, dcomplex);
-	 
+         	 
    }; /* class Operator */
 
    

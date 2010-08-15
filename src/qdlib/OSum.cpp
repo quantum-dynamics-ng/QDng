@@ -161,7 +161,7 @@ namespace QDLIB {
       return d;
    }
    
-   WaveFunction* OSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   void OSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       if (_WFbuf[0] == NULL) _WFbuf[0] = sourcePsi->NewInstance();
 
@@ -172,11 +172,9 @@ namespace QDLIB {
 	 _O[i]->Apply(_WFbuf[0], sourcePsi);
 	 AddElements(destPsi, _WFbuf[0]);
       }
-      AddElements(destPsi, sourcePsi, _offset*scaling);
-      return destPsi;
    }
    
-   WaveFunction* OSum::Apply(WaveFunction *Psi)
+   void OSum::Apply(WaveFunction *Psi)
    {
       
       if (_WFbuf[0] == NULL) _WFbuf[0] = Psi->NewInstance();
@@ -190,8 +188,6 @@ namespace QDLIB {
 	 _O[i]->Apply(_WFbuf[1], _WFbuf[0]);
 	 AddElements(Psi, _WFbuf[1]);
       }
-      AddElements(Psi, _WFbuf[0], _offset*scaling);
-      return Psi;
    }
       
    
@@ -209,7 +205,6 @@ namespace QDLIB {
       if (r == NULL)
 	 throw( EIncompatible ("Incompatible in Assignment", this->Name(), O->Name() ) );
       
-      scaling = r->scaling;
       _offset = r->_offset;
       _size = r->_size;
       
@@ -221,27 +216,6 @@ namespace QDLIB {
       return r;
    }
    
-   Operator* OSum::operator*(Operator* O)
-   {
-      throw( EIncompatible("Not Implementet")  );
-   }
-	    
-   
-   Operator* QDLIB::OSum::Offset(const double d)
-   {
-      _offset = d;
-      return this;
-   }
-
-   Operator* QDLIB::OSum::Scale(const double d)
-   {
-      for (int i=0; i < _size; i++){
-	 _O[i]->Scale(d);
-      }
-      scaling=d;
-      return this;
-   }
-
    bool OSum::Valid(WaveFunction * Psi)
    {
       bool valid = true;

@@ -52,18 +52,15 @@ namespace QDLIB {
       return c.real();
    }
    
-   WaveFunction * OScalar::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   void OScalar::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       MultElementsCopy((cVec*) destPsi, (cVec*) sourcePsi, _value);
-      
-      return destPsi;
    }
 
    
-   WaveFunction * OScalar::Apply(WaveFunction * Psi)
+   void OScalar::Apply(WaveFunction * Psi)
    {
       MultElements((cVec*) Psi, _value);
-      return Psi;
    }
 
    Operator * OScalar::operator =(Operator * O)
@@ -85,11 +82,6 @@ namespace QDLIB {
          _buf = o->_buf->NewInstance();
       
       return this;
-   }
-
-   Operator * OScalar::operator *(Operator * O)
-   {
-      throw ( EIncompatible("No operator application implementet", _name ) );
    }
    
    bool OScalar::Valid(WaveFunction * Psi)

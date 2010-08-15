@@ -64,21 +64,6 @@ namespace QDLIB
             ExpElements(exp, _dspace, c);
          }
 
-         /** We don't do offsetting. */
-         virtual Operator* Offset(const double d)
-         {
-            return this;
-         }
-
-         virtual Operator* Scale(const double d)
-         {
-            if (_dspace == NULL)
-               InitDspace();
-
-            MultElements(_dspace, d);
-            scaling = d;
-            return this;
-         }
    };
 
    /* Provide types for complex and real numbers */

@@ -159,21 +159,17 @@ namespace QDLIB {
     }
 
 
-    WaveFunction * OSIL::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+    void OSIL::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
     {
        *destPsi = sourcePsi;
        BuildLZB(destPsi);
        DiagLZB(destPsi);
-       
-       return destPsi;
     }
 
-    WaveFunction * OSIL::Apply(WaveFunction * Psi)
+    void OSIL::Apply(WaveFunction * Psi)
     {
         BuildLZB(Psi);
         DiagLZB(Psi);
-        
-        return Psi;
     }
 
     Operator * OSIL::operator =(Operator * O)
@@ -202,12 +198,6 @@ namespace QDLIB {
         _hamilton->Copy(o->_hamilton);
 
         return this;
-    }
-
-    Operator * QDLIB::OSIL::operator *(Operator * O)
-    {
-        throw(EIncompatible("OSIL: Apply to operator not implement"));
-        return NULL;
     }
 
     bool QDLIB::OSIL::Valid(WaveFunction * Psi)

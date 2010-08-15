@@ -24,10 +24,6 @@ namespace QDLIB
 
          FileOGrid* File();
 
-         virtual Operator* Offset(const double d);
-
-         virtual Operator* Scale(const double d);
-
          virtual Operator* Copy(Operator* O);
 
          virtual bool Valid(WaveFunction *Psi);
