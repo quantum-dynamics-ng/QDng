@@ -139,7 +139,6 @@ namespace QDLIB {
       Logger& log = Logger::InstanceRef();
       
       XmlNode *section;
-      Operator *_h;
       
       /* Init global Propa parameters */
       _InitParams();
@@ -156,7 +155,7 @@ namespace QDLIB {
       if (section == NULL)
 	 throw ( EParamProblem ("No propagator found") );
       
-      _U = ChainLoader::LoadPropagator( section, &_h );
+      _U = ChainLoader::LoadPropagator( section, &_H );
       delete section;
             
       /* Load the initial Wavefunction */
@@ -223,16 +222,10 @@ namespace QDLIB {
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
            
       /* Make sure our hamiltonian is initalized */
-      _h->Clock( clock );
-      _h->Init(Psi);
-      log.cout() << "Initial energy: " << _h->Expec(Psi) << endl;
-      
-      /* Copy, since the propagator will propably scale it/modify etc. */
-      _H = _h->NewInstance();
-      *_H = _h; 
-
-       _H->Clock( clock );
-      
+      _H->Clock( clock );
+      _H->Init(Psi);
+      log.cout() << "Initial energy: " << _H->Expec(Psi) << endl;
+            
       /* Give the reporter module what it needs */
       _reporter.PsiInitial( Psi );
       _reporter.Hamilton( _H );
@@ -300,8 +293,6 @@ namespace QDLIB {
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
       if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
       
-      
-      delete _h;
       delete Psi;
    }
 

@@ -50,7 +50,7 @@ namespace QDLIB
 	 
 	 /* Operators */
 	 OPropagator *_U;
-	 Operator *_H, *_h;
+	 Operator *_H;
 	 OProjection _P;
 	 
 	 /* Parameters */

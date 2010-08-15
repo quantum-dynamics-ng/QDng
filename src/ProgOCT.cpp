@@ -927,12 +927,7 @@ namespace QDLIB {
          log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
          log.cout() << "Initial Overlapp: " << *(PsiI[0]) * (PsiT[0])<< endl;
       }
-      log.flush();
-      /* Copy, since the propagator will propably scale it/modify etc. */
-      _H = _hf->NewInstance();
-      *_H = _hf; 
-      _H->Clock( clock );
-            
+      log.flush();            
 
       /* Check & reference the coupling operator */
       bool coupling_ok = false;
@@ -1013,7 +1008,7 @@ namespace QDLIB {
       /* Let the Propagator do it's initalisation */
       _Uf->Clock( clock );
       _Ub->Clock( clock );
-      _H->UpdateTime();
+      _hf->UpdateTime();
       _Uf->Init(PsiI[0]);
       
       _Ub->Backward();

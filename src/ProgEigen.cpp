@@ -20,7 +20,7 @@ namespace QDLIB
 {
 
    ProgEigen::ProgEigen(XmlNode &EigenNode) : _EigenNode(EigenNode),
-                            _U(NULL), _H(NULL), _h(NULL), _Nef(DEFAULT_NUMBER_EFS),
+                            _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS),
                                       _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true),
@@ -33,7 +33,6 @@ namespace QDLIB
    {
       if (_U != NULL) delete _U;
       if (_H != NULL) delete _H;
-      if (_h != NULL) delete _h;
       
       /* remove the clock */
       QDGlobalClock::Destroy();
@@ -196,7 +195,6 @@ namespace QDLIB
       XmlNode *section;
       
       WaveFunction *Psi_old, *Psi, *Psi_initial, *_buf;
-      Operator *h;
       
       FileWF efile;
       
@@ -215,7 +213,7 @@ namespace QDLIB
       if (section == NULL)
 	 throw ( EParamProblem ("No propagator found") );
       
-      _U = ChainLoader::LoadPropagator( section, &h );
+      _U = ChainLoader::LoadPropagator( section, &_H );
       delete section;
       
       /* Load the initial Wavefunction */
@@ -229,13 +227,9 @@ namespace QDLIB
       log.IndentDec();
       
       /* Make sure our hamiltonian is initalized */
-      h->Init(Psi_initial);
-      log.cout() << "Initial Norm & energy: " << Psi_initial->Norm() << "\t" << h->Expec(Psi_initial) << endl;
-      
-      /* Copy, since the propagator will propably scale it/modify etc. */
-      _H = h->NewInstance();
-      *_H = h;
-      
+      _H->Init(Psi_initial);
+      log.cout() << "Initial Norm & energy: " << Psi_initial->Norm() << "\t" << _H->Expec(Psi_initial) << endl;
+            
       /* Let the Propagator do it's initalisation */
       clock->Begin();
       _U->Clock( clock );
@@ -380,7 +374,6 @@ namespace QDLIB
       delete Psi_old;
       delete Psi;
       delete _buf;
-      delete h;
       delete Psi_initial;
    }
 

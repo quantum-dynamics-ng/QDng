@@ -73,7 +73,6 @@ namespace QDLIB {
 	 
 	 OPropagator *_Uf;  /* Forward Propagation */
          OPropagator *_Ub;  /* Backward Propagation */
-	 Operator *_H;      /* Hamiltonian */
 	 Operator *_Coup;   /* The coupling to optimize */
          
          Operator *_Gobbler;   /* Gobbler operator */
