@@ -96,7 +96,8 @@ libinit_wf_struct_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)
 libwf_mod_la_SOURCES = wf_mod.cpp
 libwf_mod_la_CXXFLAGS  = $(MATLAB_FLAGS)
 libwf_mod_la_LDFLAGS = -Wl,-owf_mod.mexa64 -module  $(MATLAB_LINK)
-libwf_mod_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+#libwf_mod_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+libwf_mod_la_LIBADD = $(top_builddir)/src/lib/libqdng.la -L$(top_builddir)/src/mex/libs/.libs -lObjectHandle $(MATLAB_LIB)
 
 libget_all_wf_handle_la_SOURCES = get_all_wf_handle.cpp
 libget_all_wf_handle_la_CXXFLAGS  = $(MATLAB_FLAGS)

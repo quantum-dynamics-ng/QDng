@@ -22,7 +22,7 @@ if HAVE_OPENMP
   AM_LDFLAGS = $(OPENMP_CXXFLAGS)
 endif
 
-SUBDIRS = fft linalg math modules qdlib slatec tools fftw lib tnt $(OPT_DIRS)
+SUBDIRS = fft linalg math modules qdlib slatec tools fftw lib $(OPT_DIRS)
 
 bin_PROGRAMS = qdng qdz
 qdng_SOURCES = GlobalOpList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
