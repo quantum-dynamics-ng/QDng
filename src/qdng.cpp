@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 		    "All output files are saved in this directory", "");
 
 #ifdef _OPENMP
-   int procs;
+   int procs=1;
    cmdline.SetHelp( 'p', "num threads", false, "Specify the number of threads to use", "1");
 #endif
    
@@ -121,8 +121,10 @@ int main(int argc, char **argv)
       
 #ifdef _OPENMP
       /* Get the number of openmp threads */
-      cmdline.GetOption( 'p', procs);
-      omp_set_num_threads(procs);
+      if (cmdline.GetOption('p')){
+         cmdline.GetOption( 'p', procs);
+         omp_set_num_threads(procs);
+      }
 #endif
       
       if(! cmdline.GetNonOption(0, fname) )

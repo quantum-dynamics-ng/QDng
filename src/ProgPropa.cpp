@@ -5,6 +5,7 @@
 #include "tools/fstools.h"
 #include "qdlib/WFMultistate.h"
 #include "qdlib/FileWF.h"
+#include "GlobalOpList.h"
 
 namespace QDLIB {
 
@@ -20,6 +21,7 @@ namespace QDLIB {
    {
       /* remove the clock */
       QDGlobalClock::Destroy();
+      GlobalOpList::Instance().Destroy();
       DELETE_ALL_OP();
    }
    

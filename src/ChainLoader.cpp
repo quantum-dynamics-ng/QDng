@@ -71,6 +71,10 @@ namespace QDLIB
 	    sum->Add( osub );
 	    child->NextNode();
 	 }
+	 
+	 log.flush();
+	 log.IndentDec();
+	 
 	 O = sum;
       } else if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
@@ -87,6 +91,10 @@ namespace QDLIB
 	    sum->Add( gsub );
 	    child->NextNode();
 	 }
+	 
+	 log.flush();
+	 log.IndentDec();
+	 
 	 O = sum;
       } else if (name == "Multistate" || name == "DMultistate") { /* Matrix of operators */
 	 log.cout() << "Multistate operator:\n";
@@ -120,8 +128,10 @@ namespace QDLIB
 	    matrix->Add(osub, row, col);
 	    child->NextNode();
          }
-         
          O = matrix;
+	 
+	 log.flush();
+	 log.IndentDec();
       } else { 
 	 O = mods->LoadOp( name );
 	 log.cout() << pm << "---------------\n";
@@ -130,8 +140,7 @@ namespace QDLIB
       
       /* Register & prepare to exit */
       OpList.Add(key, O);
-      log.flush();
-      log.IndentDec();
+
 
       return O;
    }

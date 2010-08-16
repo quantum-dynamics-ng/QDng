@@ -11,7 +11,7 @@ libqdng_la_LIBADD = $(top_builddir)/src/fftw/libfftw3.la \
 	$(FLIBS) $(LAPACK_LIBS) $(LIBXML2_LIBS) 
 
 #if HAVE_OPENMP
-#  libqdng_la_LIBADD += $(top_builddir)/src/fftw/threads/.libs/libfftw3_threads.la
+  libqdng_la_LIBADD += $(top_builddir)/src/fftw/threads/.libs/libfftw3_threads.la
 #endif
 
 libqdng_la_LDFLAGS = -all-static

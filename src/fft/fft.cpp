@@ -43,7 +43,17 @@ namespace QDLIB {
    {
       cVec inbuf;
       int fftwFlag;
-          
+      
+#ifdef _OPENMP
+      _nthreads = omp_get_max_threads();
+      /* Initalisation */
+      
+      if (fftw_init_threads() == 0)
+          cerr << "FFTW init thread error" << endl;
+      
+      fftw_plan_with_nthreads(_nthreads);
+#endif
+      
       /* Read plan */
       if (!_planed){
 	 Logger& log = Logger::InstanceRef();
