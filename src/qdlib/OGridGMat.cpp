@@ -26,7 +26,7 @@ namespace QDLIB {
       if (_Gmat != NULL){
 	 for (int i=0; i < _size; i++){
 	    for (int j=0; j <= i; j++){
-	       if (_Gmat[i][j] != NULL)  delete _Gmat[i][j];
+	       if (_Gmat[i][j] != NULL)  DELETE_OP(_Gmat[i][j]);
 	    }
 	    delete[] _Gmat[i];
 	 }

@@ -21,19 +21,20 @@ namespace QDLIB {
         };
         
          static GlobalOpList *_ref;
-        
+	 int OpListAnonKey; /* Counter for anonymous key names */ 
+
          map<string,_OpEntry> _OpStore;
          
-         GlobalOpList(){};
+	 GlobalOpList() : OpListAnonKey(0) {};
          GlobalOpList(const GlobalOpList &p){};
       public:
          ~GlobalOpList();
          static GlobalOpList& Instance();
          static void Destroy();
          
-         void Add(const string &key, Operator* op);
+         void Add(string &key, Operator* op);
          
-         void Init(WaveFunction* Psi);
+	 void Init(Operator* Op, WaveFunction* Psi);
          
          void Init(const string &key, WaveFunction* Psi);
          

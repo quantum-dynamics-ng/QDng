@@ -45,16 +45,9 @@ namespace QDLIB
 	 log.cout() << "Reference to " << ref << endl;
          return OpList[ref];
       }
-      
-      if (pm.isPresent("key"))
-         pm.GetValue("key", key);
-      else { /* If no key is given, we produce an internal key with a serial number */
-         stringstream ss;
-         ss << OP_LIST_ANONYMOUS_PREFIX << name << "#" << OpListAnonKey;
-         key = ss.rdbuf()->str();
-         OpListAnonKey++;
-      }
-      
+
+      pm.GetValue("key", key);
+
       if (name == "Sum"){ /* Sum operator */
 	 log.cout() << "Sum of operators:\n";
 	 log.IndentInc();
@@ -338,15 +331,7 @@ namespace QDLIB
 	 throw (EParamProblem ("Missing propagator name") );
       
       pm.GetValue("name", name);
-      
-      if (pm.isPresent("key"))
-         pm.GetValue("key", key);
-      else { /* If no key is given, we produce an internal key with a serial number */
-         stringstream ss;
-         ss << OP_LIST_ANONYMOUS_PREFIX << name << "#" << OpListAnonKey;
-         key = ss.rdbuf()->str();
-         OpListAnonKey++;
-      }
+      pm.GetValue("key", key);
       
       /* Load the module */
       h = mods->LoadOp( name );
@@ -393,6 +378,6 @@ namespace QDLIB
       return U;
    }
    
-   int ChainLoader::OpListAnonKey = 0;
+   
 
 }

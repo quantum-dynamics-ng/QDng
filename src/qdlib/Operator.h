@@ -6,8 +6,8 @@
 #include "tools/QDClock.h"
 #include "tools/Collector.h"
 
-#define DELETE_OP(OP) Collector<Operator>::Instance().Delete(OP)
-#define DELETE_ALL_OP() Collector<Operator>::Instance().Delete()
+#define DELETE_OP(OP) Collector<Operator>::Instance()->Delete(OP)
+#define DELETE_ALL_OP() Collector<Operator>::Instance()->Delete()
 
 namespace QDLIB {
 
@@ -55,7 +55,7 @@ namespace QDLIB {
 	  */
 	 Operator() :  _isTimedependent(false), clock(NULL)
 	 {
-            Collector<Operator>::Instance().Register(this);
+            Collector<Operator>::Instance()->Register(this);
          }
 	  
 	 /**
@@ -63,7 +63,7 @@ namespace QDLIB {
 	  */
 	 Operator(ParamContainer &params):  _params(params), _isTimedependent(false)
 	 {
-            Collector<Operator>::Instance().Register(this);         
+            Collector<Operator>::Instance()->Register(this);
          }
          
 	 /**

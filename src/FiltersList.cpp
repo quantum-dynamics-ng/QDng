@@ -130,7 +130,7 @@ namespace QDLIB {
          _ofile << "time \t";
 	 for(int i=0; i < _size; i++){
 	    _olist[i]->Clock(_clock);
-	    _olist[i]->Init(Psi);
+	    GlobalOpList::Instance().Init(_olist[i], Psi);
 	    if (_writefile && (_action[i] == expec || _action[i] == expeconly))
 	       _ofile << _labels[i] << "\t";
 	 }

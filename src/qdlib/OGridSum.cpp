@@ -13,7 +13,7 @@ namespace QDLIB {
    OGridSum::~OGridSum()
    {
       for (int i=0; i < MAX_OPS; i++)
-	 if (_O[i] != NULL) delete _O[i];
+	 if (_O[i] != NULL) DELETE_OP(_O[i]);
    }
 
    /**

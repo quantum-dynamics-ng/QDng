@@ -22,9 +22,9 @@ namespace QDLIB {
          
          Collector(){}
          Collector(const Collector&){}
+	 ~Collector();
       public:
-         ~Collector();
-         static Collector<T>& Instance();
+         static Collector<T>* Instance();
          void Register(T* obj);
          void Delete(T* obj);
          void Delete();
@@ -34,7 +34,8 @@ namespace QDLIB {
    template<typename T>
    Collector<T>::~Collector()
    {
-      Delete();
+      cout << "Coll Destruction" << endl;
+      this->Delete();
    }
 
    
@@ -42,10 +43,10 @@ namespace QDLIB {
     * Get Reference to an instance of the Collector.
     */
    template<typename T>
-   Collector<T>& Collector<T>::Instance()
+   Collector<T>* Collector<T>::Instance()
    {
       static Collector<T> ref;
-      return ref;
+      return &ref;
    }
    
    /**
@@ -94,9 +95,10 @@ namespace QDLIB {
    template<typename T>
    void Collector<T>::Delete()
    {
+      cout << "Coll Del" << endl;
       typename map<T*,int>::iterator it;
 
-      for ( it=_RefCount.begin() ; it != _RefCount.end(); it++ ){
+      for ( it = _RefCount.begin(); it != _RefCount.end(); it++ ){
 	 delete (*it).first;
          _RefCount.erase(it);
       }

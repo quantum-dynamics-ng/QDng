@@ -32,18 +32,26 @@ namespace QDLIB {
     *
     * An Exception is thrown if an operator with the same identifier already exists.
     *
-    * \param key String identifier.
+    * \param key String identifier. May be empty, in this case an internal name is generated
     * \param op  A parameter initialized operator
     * \param maintain Register also for destruction
     */
-   void GlobalOpList::Add(const string &key, Operator* Op)
+   void GlobalOpList::Add(string &key, Operator* Op)
    {
+      
       /* Check if key exists */
       if (_OpStore.find(key) != _OpStore.end())
          throw (EIncompatible("Key already exists in operator list: ", key));
       
       if (Op == NULL)
          throw (EIncompatible("Operator not initalized"));
+      
+       if (key.length() <= 1) { /* If no key is given, we produce an internal key with a serial number */
+	 stringstream ss;
+	 ss << OP_LIST_ANONYMOUS_PREFIX << Op->Name() << "#" << OpListAnonKey;
+	 key = ss.rdbuf()->str();
+	 OpListAnonKey++;
+      }
       
       _OpStore[key].Op = Op;
       _OpStore[key].initialized = false;
@@ -53,15 +61,25 @@ namespace QDLIB {
     * Initialize all registered operator with a wave function.
     *
     */
-   void GlobalOpList::Init(WaveFunction* Psi)
+   void GlobalOpList::Init(Operator* Op, WaveFunction* Psi)
    {
       map<string, _OpEntry>::iterator it;
+      bool found = false;
       
       for ( it=_OpStore.begin() ; it != _OpStore.end(); it++ ){
-         if (! ((*it).second).initialized ) {
+	 if ( ((*it).second).Op == Op && ! ((*it).second).initialized) {
             ((*it).second).Op->Init(Psi);
             ((*it).second).initialized = true;
+	    found = true;
          }
+      }
+      
+      /* If the operator was not found, we register it and do the initialization */
+      if ( ! found ) {
+	 string key;
+	 Add(key ,Op);
+	 _OpStore[key].Op->Init(Psi);
+	 _OpStore[key].initialized = true;
       }
    }
    
@@ -103,7 +121,8 @@ namespace QDLIB {
       map<string, _OpEntry>::iterator it;
       
       for ( it=_OpStore.begin() ; it != _OpStore.end(); it++ ){
-         log.cout() << (*it).first << "\t\t\t" << ((*it).second).Op->Name();
+         log.cout() << (*it).first;log.flush();
+	 log.cout() << "\t\t\t" << ((*it).second).Op->Name();
          log.cout() << "\t\t";
          if (((*it).second).initialized)
             log.cout() << "initialized\t";

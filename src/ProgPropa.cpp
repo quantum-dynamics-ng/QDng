@@ -175,8 +175,8 @@ namespace QDLIB {
       
       /* Initialization filters */
       section = _ContentNodes->FindNode( "filterinit" );
+      FiltersList filter;
       if (section != NULL) {
-         FiltersList filter;
          string s(_dir+DEFAULT_EXPEC_INIT_FILENAME);
          log.Header( "Using pre propagation initialization filters", Logger::SubSection);
          log.IndentInc();
@@ -224,7 +224,7 @@ namespace QDLIB {
            
       /* Make sure our hamiltonian is initalized */
       _H->Clock( clock );
-      _H->Init(Psi);
+      GlobalOpList::Instance().Init(_H, Psi);
       log.cout() << "Initial energy: " << _H->Expec(Psi) << endl;
             
       /* Give the reporter module what it needs */
@@ -234,7 +234,7 @@ namespace QDLIB {
       /* Let the Propagator do it's initalisation */
       _U->Clock( clock );
       _H->UpdateTime();
-      _U->Init(Psi);
+      GlobalOpList::Instance().Init(_U, Psi);
       
       /* Report what the propagator has chosen */
       ParamContainer Upm;
@@ -264,7 +264,7 @@ namespace QDLIB {
          log.flush();
          log.FileOutput( _nfile );
       }
-      
+      GlobalOpList::Instance().PrintList(); 
       lint start;
       if (_start == 0)
 	 start=1;
@@ -294,7 +294,6 @@ namespace QDLIB {
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
       if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
 
-      GlobalOpList::Instance().PrintList();
       delete Psi;
    }
 
