@@ -21,6 +21,7 @@
 #include <string>
 #include <math.h>
 
+namespace QDMEX {
 
 template<typename T> class Collector;
 
@@ -222,6 +223,7 @@ ObjectHandle<T>* ObjectHandle<T>::from_mex_handle(const mxArray* handle)
 }
 
 
-
+}
 
 #endif
+

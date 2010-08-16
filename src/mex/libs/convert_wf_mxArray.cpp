@@ -32,6 +32,8 @@
 
 using namespace QDLIB;
 
+namespace QDMEX {
+
 /**
     * inits Wavefunctions from File(s)
     */
@@ -885,3 +887,4 @@ int convert_wf_mxArray::write_WF(char *string_File_name , WaveFunction* WF, int 
    return 0;
 }
 
+}

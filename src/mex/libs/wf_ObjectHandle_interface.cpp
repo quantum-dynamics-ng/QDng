@@ -30,6 +30,7 @@
     */
 
 using namespace QDLIB;
+namespace QDMEX {
 
 /**
     * Creates mxArray containing the handle from a Wavefunction
@@ -93,3 +94,4 @@ WaveFunction* wf_ObjectHandle_interface::search_WF ( const mxArray* mxh) {
   return NULL;
 }
 
+}

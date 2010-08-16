@@ -8,6 +8,7 @@
 
 
 using namespace QDLIB;
+namespace QDMEX {
 
 class wf_ObjectHandle_interface
    {
@@ -19,4 +20,5 @@ class wf_ObjectHandle_interface
 	 static void delete_all_WF();
    };
 
+}
 #endif

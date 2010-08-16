@@ -30,6 +30,8 @@
 
 using namespace QDLIB;
 
+namespace QDMEX {
+
 /**
     * Adds two Wavefunctions pointwise (returns result as an new Wavefunction)
     */
@@ -460,3 +462,6 @@ void modify_wf::norm_wf(mxArray *handle_WF1) {
     *WF1 *= (const double) norm;
     
 }
+
+}
+

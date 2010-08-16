@@ -9,6 +9,8 @@
 
 using namespace QDLIB;
 
+namespace QDMEX {
+
 class modify_wf
    {
       public:
@@ -30,5 +32,7 @@ class modify_wf
 	 static void mult_wf_complex(mxArray *handle_WF1, mxArray *handle_WF2);
 	 static void norm_wf(mxArray *handle_WF1);
    };
+
+}
 
 #endif

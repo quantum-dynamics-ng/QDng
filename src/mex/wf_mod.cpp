@@ -1,28 +1,11 @@
-
 #include "mex.h"
 
 #include "mex/libs/modify_wf.h"
 #include "mex/libs/wf_ObjectHandle_interface.h"
 #include "mex/libs/convert_wf_mxArray.h"
 
-#include <iostream>
-#include <string>
-#include <math.h>
 
-#include "tools/Exception.h"
-#include "tools/FileSingleDefs.h"
-#include "modules/ModuleLoader.h"
-#include "tools/QDGlobalClock.h"
-#include "tools/Logger.h"
-
-#include "qdlib/OSum.h"
-#include "qdlib/OGridSum.h"
-#include "qdlib/OGridsystem.h"
-#include "qdlib/OMultistate.h"
-#include "qdlib/WFMultistate.h"
-
-using namespace QDLIB;
-
+using namespace QDMEX;
 /**
     * mexFunction to load a Wavefunction from struct
     * output (one argument) is the ObjectHandle
@@ -48,7 +31,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 		  if (i == 2) { 
 		    if (mxGetClassID(prhs[i]) == mxUINT64_CLASS ) {
 		      
-		      modify_wf::add_wf(&plhs[0],(mxArray*) prhs[1] ,(mxArray*) prhs[i]);
+		       modify_wf::add_wf(&plhs[0],(mxArray*) prhs[1] ,(mxArray*) prhs[i]);
 		      
 		    } else mexErrMsgTxt("Bad input. No Wavefunction Handle");
 		  
@@ -78,12 +61,12 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 		    /*first is double second the Handle*/
 		    if (mxGetClassID(prhs[i-1]) == mxUINT64_CLASS && mxGetClassID(prhs[i]) == mxDOUBLE_CLASS ) {
 		      
-		      modify_wf::mult_wf_double(&plhs[0],(mxArray*) prhs[i-1] ,(mxArray*) prhs[i]);
+		       modify_wf::mult_wf_double(&plhs[0],(mxArray*) prhs[i-1] ,(mxArray*) prhs[i]);
 		    
 		    /*first is handle second the double*/ 
 		    } else if (mxGetClassID(prhs[i]) == mxUINT64_CLASS && mxGetClassID(prhs[i-1]) == mxDOUBLE_CLASS) {
 		      
-		      modify_wf::mult_wf_double(&plhs[0],(mxArray*) prhs[i] ,(mxArray*) prhs[i-1]);
+		       modify_wf::mult_wf_double(&plhs[0],(mxArray*) prhs[i] ,(mxArray*) prhs[i-1]);
 		      
 		    } else mexErrMsgTxt("Bad input. No Wavefunction Handle or no double");
 		  
@@ -114,12 +97,12 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 		    /*first is double second the Handle*/
 		    if (mxGetClassID(prhs[i-1]) == mxUINT64_CLASS && mxGetClassID(prhs[i]) == mxDOUBLE_CLASS ) {
 		      
-		      modify_wf::wf_assigne(&plhs[0],(mxArray*) prhs[i-1] ,(mxArray*) prhs[i]);
+		       modify_wf::wf_assigne(&plhs[0],(mxArray*) prhs[i-1] ,(mxArray*) prhs[i]);
 		    
 		    /*first is handle second the double*/ 
 		    } else if (mxGetClassID(prhs[i]) == mxUINT64_CLASS && mxGetClassID(prhs[i-1]) == mxDOUBLE_CLASS) {
 		      
-		      modify_wf::wf_assigne(&plhs[0],(mxArray*) prhs[i] ,(mxArray*) prhs[i-1]);
+		       modify_wf::wf_assigne(&plhs[0],(mxArray*) prhs[i] ,(mxArray*) prhs[i-1]);
 		      
 		    } else mexErrMsgTxt("Bad input. No Wavefunction Handle or no double");
 		  

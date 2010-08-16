@@ -8,6 +8,9 @@
 
 
 using namespace QDLIB;
+
+namespace QDMEX {
+
 class convert_wf_mxArray
    {
       public:
@@ -29,4 +32,5 @@ class convert_wf_mxArray
 	 static void WF_to_Struct_mxArray( mxArray **mx_WF, WaveFunction* WF,const mxArray *handle);
    };
 
+}
 #endif

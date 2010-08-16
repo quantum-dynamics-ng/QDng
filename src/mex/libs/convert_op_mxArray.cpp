@@ -35,6 +35,8 @@
 
 using namespace QDLIB;
 
+namespace QDMEX {
+
 /**
     * inits Operator from Struct
     */
@@ -167,7 +169,7 @@ try {
     throw ( EParamProblem("Mismatching Operator and Wavefunction") );
   
   /*Apply Operator*/
-  WF = OP->Apply(WF);
+   OP->Apply(WF);
   
   
   } catch (Exception e) {
@@ -194,15 +196,8 @@ try {
 	    throw ( EParamProblem("WaveFunction loading failed") );
   
   /* Init WF_result*/
-  WaveFunction *WF_result=NULL;
+  WaveFunction *WF_result;
   WF_result = WF->NewInstance ();
-  *WF_result = *WF;
-  
-  /*mult WF_result with 0*/
-  dcomplex dc;
-  dc._real = (double) 0;
-  dc._imag = (double) 0;
-  *WF_result *= dc;
   
   /*Create OP pointer*/
   Operator* OP=NULL;
@@ -222,7 +217,7 @@ try {
     throw ( EParamProblem("Mismatching Operator and Wavefunction") );
   
   /*Apply Operator*/
-  WF = OP->Apply(WF_result,WF);
+  OP->Apply(WF_result,WF);
   
   /*return the ObjectHandle (Wavefunction)*/
   wf_ObjectHandle_interface::WF_to_handle_mxArray(out_arg,WF_result);
@@ -484,4 +479,7 @@ void convert_op_mxArray::delete_op_handle(const mxArray *handle) {
   /*delete handle and WF*/
   op_ObjectHandle_interface::deleteOP( handle );
   
+}
+
+
 }

@@ -31,6 +31,8 @@
 
 using namespace QDLIB;
 
+namespace QDMEX {
+
 /**
     * Creates mxArray containing the handle from a Operator
     */
@@ -91,3 +93,4 @@ try {
  return NULL;
 }
 
+}

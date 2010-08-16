@@ -9,6 +9,8 @@
 
 using namespace QDLIB;
 
+namespace QDMEX {
+
 class op_ObjectHandle_interface
    {
       public:
@@ -19,4 +21,5 @@ class op_ObjectHandle_interface
 	 static void delete_all_OP();
    };
 
+}
 #endif

@@ -6,6 +6,9 @@
 #include "qdlib/Operator.h"
 
 using namespace QDLIB;
+
+namespace QDMEX {
+   
 class convert_op_mxArray
    {
       public:
@@ -17,4 +20,5 @@ class convert_op_mxArray
 	 static void delete_op_handle(const mxArray *handle);
    };
 
+}
 #endif
