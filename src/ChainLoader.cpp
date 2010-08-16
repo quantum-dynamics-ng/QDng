@@ -42,6 +42,7 @@ namespace QDLIB
       
       if (pm.isPresent("ref")) {
          pm.GetValue("ref", ref);
+	 log.cout() << "Reference to " << ref << endl;
          return OpList[ref];
       }
       
@@ -49,7 +50,7 @@ namespace QDLIB
          pm.GetValue("key", key);
       else { /* If no key is given, we produce an internal key with a serial number */
          stringstream ss;
-         ss << OP_LIST_ANONYMOUS_PREFIX << OpListAnonKey;
+         ss << OP_LIST_ANONYMOUS_PREFIX << name << "#" << OpListAnonKey;
          key = ss.rdbuf()->str();
          OpListAnonKey++;
       }
@@ -320,23 +321,23 @@ namespace QDLIB
          if (U == NULL)
             throw (EIncompatible("Operator in reference is not a propagator", ref));
          
+	 log.cout() << "Reference to " << ref << endl;
          return U;
       }
-      
-      if (pm.isPresent("key"))
-         pm.GetValue("key", key);
-      else { /* If no key is given, we produce an internal key with a serial number */
-         stringstream ss;
-         ss << OP_LIST_ANONYMOUS_PREFIX << OpListAnonKey;
-         key = ss.rdbuf()->str();
-         OpListAnonKey++;
-      }
-      
       
       if (!pm.isPresent("name"))
 	 throw (EParamProblem ("Missing propagator name") );
       
       pm.GetValue("name", name);
+      
+      if (pm.isPresent("key"))
+         pm.GetValue("key", key);
+      else { /* If no key is given, we produce an internal key with a serial number */
+         stringstream ss;
+         ss << OP_LIST_ANONYMOUS_PREFIX << name << "#" << OpListAnonKey;
+         key = ss.rdbuf()->str();
+         OpListAnonKey++;
+      }
       
       /* Load the module */
       h = mods->LoadOp( name );

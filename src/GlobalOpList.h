@@ -5,7 +5,7 @@
 
 #include "qdlib/Operator.h"
 
-#define OP_LIST_ANONYMOUS_PREFIX "__#"
+#define OP_LIST_ANONYMOUS_PREFIX "__"
 
 namespace QDLIB {
    

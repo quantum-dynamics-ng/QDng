@@ -97,11 +97,11 @@ namespace QDLIB {
       typename map<T*,int>::iterator it;
 
       for ( it=_RefCount.begin() ; it != _RefCount.end(); it++ ){
-         delete (*it).first;
+	 delete (*it).first;
+         _RefCount.erase(it);
       }
-      _RefCount.clear();      
+      _RefCount.clear();
    }
-   
    
 }
 

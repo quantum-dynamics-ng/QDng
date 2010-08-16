@@ -43,7 +43,6 @@ void OGridNablaTest::tearDown()
 {
    p.clear();
    delete wf;
-   delete O;
 }
 
 void OGridNablaTest::API_Test()

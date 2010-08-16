@@ -103,10 +103,11 @@ namespace QDLIB {
       map<string, _OpEntry>::iterator it;
       
       for ( it=_OpStore.begin() ; it != _OpStore.end(); it++ ){
-         log.cout() << (*it).first << "\t\t" << ((*it).second).Op->Name();
+         log.cout() << (*it).first << "\t\t\t" << ((*it).second).Op->Name();
          log.cout() << "\t\t";
          if (((*it).second).initialized)
             log.cout() << "initialized\t";
+	 log.cout() << endl;
       }
       
    }

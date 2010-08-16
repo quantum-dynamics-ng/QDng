@@ -65,7 +65,6 @@ void OGSPOTest::setUp()
 
 void OGSPOTest::tearDown()
 {
-   delete U;
    delete psi0;
    delete psi1;
 }
