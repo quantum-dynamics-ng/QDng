@@ -224,7 +224,6 @@ namespace QDLIB
    {
       if (_dspace == NULL) InitDspace();
       ExpElements(exp, _dspace, c);
-      *exp *= 1/double(GridSystem::Size());
    }
 } /* namespace QDLIB */
 

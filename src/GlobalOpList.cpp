@@ -46,7 +46,7 @@ namespace QDLIB {
       if (Op == NULL)
          throw (EIncompatible("Operator not initalized"));
       
-       if (key.length() <= 1) { /* If no key is given, we produce an internal key with a serial number */
+       if (strlen(key.c_str()) < 1) { /* If no key is given, we produce an internal key with a serial number */
 	 stringstream ss;
 	 ss << OP_LIST_ANONYMOUS_PREFIX << Op->Name() << "#" << OpListAnonKey;
 	 key = ss.rdbuf()->str();

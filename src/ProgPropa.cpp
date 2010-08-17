@@ -172,7 +172,6 @@ namespace QDLIB {
       log.IndentDec();
       log.flush();
       
-      
       /* Initialization filters */
       section = _ContentNodes->FindNode( "filterinit" );
       FiltersList filter;

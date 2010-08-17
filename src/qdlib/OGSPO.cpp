@@ -183,7 +183,11 @@ namespace QDLIB
       const char *key = Key.c_str();
 
       char i = key[0] - base;
+      	 
       if (i < GSPO_MAX_LEN && i > -1) {
+	 if (int(i) < _spoLen)
+	    throw(EParamProblem("GSPO: SPO-key already given ", key)); 
+
          ODSpace *op = dynamic_cast<ODSpace*> (O);
 
          if (op == NULL)
