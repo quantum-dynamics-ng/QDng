@@ -1,7 +1,7 @@
 #ifndef COLLECTOR_H
 #define COLLECTOR_H
 
-#include <map>
+#include <vector>
 
 using namespace std;
 
@@ -18,14 +18,24 @@ namespace QDLIB {
    class Collector
    {
       private:
-         map<T*,int> _RefCount;
-         
+	 /* Structure holding the pointer and reference counters */
+	 class reflist {
+	    public:
+	       T *p;
+	       int refcount;
+	       reflist(T* pointer) : p(pointer), refcount(1){}
+	 };
+	 
+         vector<reflist> _RefCount;
+
+         int find(T* p);
          Collector(){}
          Collector(const Collector&){}
-	 ~Collector();
       public:
+	 ~Collector();
          static Collector<T>* Instance();
          void Register(T* obj);
+	 bool IsAllocated(T* obj);
          void Delete(T* obj);
          void Delete();
          
@@ -34,8 +44,7 @@ namespace QDLIB {
    template<typename T>
    Collector<T>::~Collector()
    {
-      cout << "Coll Destruction" << endl;
-      this->Delete();
+      Delete();
    }
 
    
@@ -48,7 +57,22 @@ namespace QDLIB {
       static Collector<T> ref;
       return &ref;
    }
-   
+  
+
+   /**
+    * Find a pointer in the list
+    */
+   template<typename T>
+   int Collector<T>::find(T* p)
+   {
+      for (unsigned int i=0; i < _RefCount.size(); i++) {
+	 if (p == _RefCount[i].p) return i;
+      }
+      return -1;
+   }
+
+
+
    /**
     * Register the pointer to an object
     *
@@ -57,14 +81,23 @@ namespace QDLIB {
    void Collector<T>::Register(T* obj)
    {
       if (obj == NULL) return;
-      
-      typename map<T*, int>::iterator it;
-      
-      it = _RefCount.find(obj);
-      if (it != _RefCount.end())
-         (*it).second++;
+      int ind;
+
+      ind = find(obj);
+      if (ind != -1)
+         _RefCount[ind].refcount++;
       else
-         _RefCount[obj] = 1;
+	 _RefCount.push_back(reflist(obj));
+   }
+
+   /**
+    * Check wether the object to a pointer is still allocated
+    */
+   template<typename T>
+   bool Collector<T>::IsAllocated(T* obj)
+   {
+      if (find(obj) > -1) return true;
+      else return false;
    }
 
    /**
@@ -76,15 +109,15 @@ namespace QDLIB {
    {
       if (obj == NULL) return;
       
-      typename map<T*,int>::iterator it;
+      int ind;
       
-      it = _RefCount.find(obj);
-      if (it != _RefCount.end()){
-         (*it).second--;
-         if ((*it).second == 0) {
-            delete (*it).first;
-            _RefCount.erase(it);
-         }
+      ind = find(obj);
+      if (ind > -1){
+	 _RefCount[ind].refcount--;
+	 if (_RefCount[ind].refcount == 0){
+	    delete _RefCount[ind].p;
+	    _RefCount.erase (_RefCount.begin()+ind);
+	 }
       }
    }
 
@@ -95,12 +128,8 @@ namespace QDLIB {
    template<typename T>
    void Collector<T>::Delete()
    {
-      cout << "Coll Del" << endl;
-      typename map<T*,int>::iterator it;
-
-      for ( it = _RefCount.begin(); it != _RefCount.end(); it++ ){
-	 delete (*it).first;
-         _RefCount.erase(it);
+      for (unsigned int i= 0; i < _RefCount.size(); i++){
+	 delete _RefCount[i].p;
       }
       _RefCount.clear();
    }
@@ -108,3 +137,4 @@ namespace QDLIB {
 }
 
 #endif // COLLECTOR_H
+
