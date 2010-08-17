@@ -127,39 +127,45 @@ namespace QDLIB
 	    k1 = ket1->begin(s);
 	    psi = Psi->begin(s);
 #ifdef HAVE_SSE2
-       QDSSE::cplx_sse_packed cbf, ck2, cpsi, cexp2, ccoeff;
-       __m128d r1, r2;
+       QDSSE::cplx_sse_packed cbf, ck1, ck2, cpsi, cexp2, ccoeff;
+       QDSSE::cplx_sse_packed coffset;
+       __m128d r1, r2, mscaling;
 
        LoadPacked(cexp2, exp2, exp2);
        LoadPacked(ccoeff, _coeff[i], _coeff[i]);
+       LoadPacked(coffset, _offset, _offset);
+       mscaling = _mm_set_pd(1/_scaling, 1/_scaling);
 #ifdef _OPENMP    
 #pragma omp parallel for default(shared) private(j, cbf, ck2, cpsi, r1, r2)
 #endif
-	    for(j=0; j< size; j+=2){
-          QDSSE::LoadPacked(cbf, bf[j], bf[j+1]);
-          QDSSE::LoadPacked(ck2, k0[j], k0[j+1]);
-          QDSSE::LoadPacked(cpsi, psi[j], psi[j+1]);
-			 
-          cbf = QDSSE::MulPacked(cbf, cexp2);
-	       //bf[j] *= exp2;
-          
-	       //k2[j] = k0[j];
-          ck2 = QDSSE::AddPacked(ck2, cbf);
-	       //k2[j] += bf[j];
-          
-	       //k0[j] = k2[j];
-			 cpsi = QDSSE::AddPacked(cpsi, QDSSE::MulPacked(ck2, ccoeff));
-	       //psi[j] += k2[j] *  _coeff[i];
-			 
-			 QDSSE::UnPack(r1, r2, cbf);
-			 QDSSE::Store(bf[j], bf[j+1], r1, r2);
-			 
-			 QDSSE::UnPack(r1, r2, ck2);
-			 QDSSE::Store(k2[j], k2[j+1], r1, r2);
-			 QDSSE::Store(k0[j], k0[j+1], r1, r2);
-
- 			 QDSSE::UnPack(r1, r2, cpsi);
-			 QDSSE::Store(psi[j], psi[j+1], r1, r2);
+	    for (j = 0; j < size; j += 2){
+	        QDSSE::LoadPacked(cbf, bf[j], bf[j+1]);
+		QDSSE::LoadPacked(ck1, k1[j], k1[j+1]);
+	        QDSSE::LoadPacked(ck2, k0[j], k0[j+1]);
+	        QDSSE::LoadPacked(cpsi, psi[j], psi[j+1]);
+	    
+		cbf = QDSSE::MulPacked(QDSSE::SubPacked(cbf, QDSSE::MulPacked(coffset, ck1)), mscaling);
+		      
+	        cbf = QDSSE::MulPacked(cbf, cexp2);
+	        //bf[j] *= exp2;
+	    
+	        //k2[j] = k0[j];
+	        ck2 = QDSSE::AddPacked(ck2, cbf);
+	        //k2[j] += bf[j];
+	    
+	        //k0[j] = k2[j];
+	        cpsi = QDSSE::AddPacked(cpsi, QDSSE::MulPacked(ck2, ccoeff));
+	        //psi[j] += k2[j] *  _coeff[i];
+	    
+	        QDSSE::UnPack(r1, r2, cbf);
+	        QDSSE::Store(bf[j], bf[j+1], r1, r2);
+	    
+	        QDSSE::UnPack(r1, r2, ck2);
+	        QDSSE::Store(k2[j], k2[j+1], r1, r2);
+	        QDSSE::Store(k0[j], k0[j+1], r1, r2);
+	    
+	        QDSSE::UnPack(r1, r2, cpsi);
+	        QDSSE::Store(psi[j], psi[j+1], r1, r2);
 	    }
 	 }
 
