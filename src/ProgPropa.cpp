@@ -264,7 +264,7 @@ namespace QDLIB {
          log.flush();
          log.FileOutput( _nfile );
       }
-      GlobalOpList::Instance().PrintList(); 
+
       lint start;
       if (_start == 0)
 	 start=1;

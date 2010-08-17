@@ -26,6 +26,7 @@ namespace QDLIB
                                       _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true),
                                       _start(0)
    {
+      _P = new OProjection();
    }
 
 
@@ -226,7 +227,7 @@ namespace QDLIB
       log.IndentDec();
       
       /* Make sure our hamiltonian is initalized */
-      _H->Init(Psi_initial);
+      GlobalOpList::Instance().Init(_H, Psi_initial);
       log.cout() << "Initial Norm & energy: " << Psi_initial->Norm() << "\t" << _H->Expec(Psi_initial) << endl;
             
       /* Let the Propagator do it's initalisation */
@@ -236,7 +237,7 @@ namespace QDLIB
       /* Force backward imaginary time */
       _U->ImaginaryTime();
       _U->Backward();
-      _U->Init(Psi_initial);
+      GlobalOpList::Instance().Init(_U, Psi_initial);
       
       /* Report what the propagator has chosen */
       ParamContainer Upm;
@@ -265,16 +266,16 @@ namespace QDLIB
          pres.SetValue("num", _start);
          pres.SetValue("step", 1);
          pres.SetValue("files", _dir+_fname);
-         _P.Init(pres);
+         _P->Init(pres);
          log.cout() << "Re-read eigenfunctions 0-" << _start-1 << endl<<endl;
       }
       
-      _P.Init(Psi_initial);
+      _P->Init(Psi_initial);
 	    
       /* Recalc Energies */
       if (_start > 0) {
          for (int i=0; i < _start; i++){
-            _Energies_raw[i] = _H->Expec(_P.Get(i) );
+            _Energies_raw[i] = _H->Expec(_P->Get(i) );
          }
       }
       
@@ -292,7 +293,7 @@ namespace QDLIB
 	    _U->Apply(Psi);
 	    /* Remove lower states */
 	    if ( i>0 ){
-	       _P.Apply(_buf, Psi);
+	       _P->Apply(_buf, Psi);
 	       *Psi -= _buf;
 	    }
 	    /* normalization and convergence check */
@@ -302,7 +303,7 @@ namespace QDLIB
 	    ++(*clock);                     /* Step the clock */
 	    s++;
 	 }
-	 _P.Add(Psi);
+	 _P->Add(Psi);
 	 efile << Psi;
 	 
 	 _Energies_raw[i] = _H->Expec(Psi);
@@ -335,9 +336,9 @@ namespace QDLIB
          S = 0;
          WaveFunction *bra,*ket;
          for (int i=0; i < _Nef; i++){
-            bra = _P.Get(i);
+            bra = _P->Get(i);
             for (int j=0; j < i; j++){
-               ket = _P.Get(j);
+               ket = _P->Get(j);
                S(j,i) =  _H->MatrixElement(bra, ket).real();
             }
             S(i,i) = _Energies_raw[i];
@@ -350,10 +351,10 @@ namespace QDLIB
          efile.ResetCounter();
          log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
          for (int i=0; i < _Nef; i++){
-            *Psi = _P.Get(0);
+            *Psi = _P->Get(0);
             *Psi *= S(0,i);
             for (int j=1; j < _Nef; j++){ /* make linear combination */
-               *_buf = _P.Get(j);
+               *_buf = _P->Get(j);
                *_buf *= S(j,i);
                *Psi += _buf;
             }

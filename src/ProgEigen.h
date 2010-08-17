@@ -51,7 +51,7 @@ namespace QDLIB
 	 /* Operators */
 	 OPropagator *_U;
 	 Operator *_H;
-	 OProjection _P;
+	 OProjection *_P;
 	 
 	 /* Parameters */
 	 string _dir;
@@ -68,7 +68,7 @@ namespace QDLIB
 	 dVec _Energies_diag;
 	 
 	 void _InitParams();
-	 void _CreateInitalWF(); 
+	 void _CreateInitalWF();
 	 
       protected:
 	 void WriteEnergyFile();

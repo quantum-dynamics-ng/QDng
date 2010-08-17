@@ -908,7 +908,7 @@ namespace QDLIB {
                throw ( EParamProblem ("Missing target operator", t) );
             _Otarget[t] = ChainLoader::LoadOperatorChain( section );
             _Otarget[t]->Clock(clock);
-            _Otarget[t]->Init(PsiI[0]);
+	    GlobalOpList::Instance().Init(_Otarget[t], PsiI[0]);
             delete section;
          }
       }
@@ -918,9 +918,9 @@ namespace QDLIB {
            
       /* Make sure our hamiltonian is initalized */
       _hf->Clock( clock );
-      _hf->Init(PsiI[0]);
+      GlobalOpList::Instance().Init(_hf, PsiI[0]);
       _hb->Clock( clock );
-      _hb->Init(PsiI[0]);
+      GlobalOpList::Instance().Init(_hb, PsiI[0]);
       log.cout() << "Initial engergy: " << _hf->Expec(PsiI[0]) << endl;
       if (_ttype == ov){
          log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
@@ -990,7 +990,7 @@ namespace QDLIB {
       _Coup->Clock(clock);
       delete section;
 
-       _Coup->Init( PsiI[0] );
+      GlobalOpList::Instance().Init(_Coup, PsiI[0] );
       
        /* Load the Gobbler */
        section = _ContentNodes->FindNode( "gobbler" );
@@ -1000,7 +1000,7 @@ namespace QDLIB {
           log.IndentInc();
           _Gobbler = ChainLoader::LoadOperatorChain(section);
           log.IndentDec();
-          _Gobbler->Init(PsiI[0] );
+	  GlobalOpList::Instance().Init(_Gobbler, PsiI[0] );
           delete section;
        }
        
@@ -1008,10 +1008,10 @@ namespace QDLIB {
       _Uf->Clock( clock );
       _Ub->Clock( clock );
       _hf->UpdateTime();
-      _Uf->Init(PsiI[0]);
+      GlobalOpList::Instance().Init(_Uf, PsiI[0]);
       
       _Ub->Backward();
-      _Ub->Init(PsiI[0]);
+      GlobalOpList::Instance().Init(_Ub, PsiI[0]);
       
       /* Report what the propagator has chosen */
       ParamContainer Upm;

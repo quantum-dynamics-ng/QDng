@@ -13,19 +13,24 @@ namespace QDLIB {
 
 
    /**
-   * Abstract operator class.
-   * 
-   * Defines what an operator must provide.
-   * Since this is an abstract class, all the defined operations apply to pointers.
-   * The left handed argument (in this case the operator) has to dereferenced with *O.
-   * 
-   * An operator has to initialized in the following way:
-   * \li Call Init with parameter set
-   * \li Call Init with WaveFunction
-   * \li update the clock
-   * 
-   * Re-Inits with different parameters or WaveFunctions are forbidden!
-   */
+    * Abstract operator class.
+    * 
+    * Defines what an operator must provide.
+    * Since this is an abstract class, all the defined operations apply to pointers.
+    * The left handed argument (in this case the operator) has to dereferenced with *O.
+    * 
+    * An operator has to initialized in the following way:
+    * \li Give the operator a clock (if needed)
+    * \li Call Init with parameter set
+    * \li Call Init with WaveFunction
+    * \li update the clock
+    * 
+    * Re-Inits with different parameters or WaveFunctions are forbidden!
+    * 
+    * Use the DELETE_OP macro to destroy Operator objects.
+    * Operator Objects are registered with Collector at construction.
+    * Don't create an Operator object on the stack, use new instead.
+    */
    class Operator
    {
 
