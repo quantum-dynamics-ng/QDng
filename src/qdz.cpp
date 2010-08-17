@@ -89,7 +89,7 @@ void DeCompress(string fname, bool series)
          
    }
       
-   delete WF;
+   DELETE_WF(WF);
 }
 
 
@@ -145,7 +145,7 @@ void Compress(string fname, bool series, double tol, int level)
 
    }
    
-   delete WF;
+   DELETE_WF(WF);
 }
 
 

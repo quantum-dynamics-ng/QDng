@@ -371,10 +371,10 @@ namespace QDLIB
       WriteEnergyFile();
       
       /* Cleanup */
-      delete Psi_old;
-      delete Psi;
-      delete _buf;
-      delete Psi_initial;
+      DELETE_WF(Psi_old);
+      DELETE_WF(Psi);
+      DELETE_WF(_buf);
+      DELETE_WF(Psi_initial);
    }
 
 

@@ -10,7 +10,7 @@ namespace QDLIB {
    
    OScalar::~OScalar()
    {
-      if (_buf != NULL) delete _buf;
+      DELETE_WF(_buf);
    }
    
    

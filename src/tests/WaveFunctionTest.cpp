@@ -17,9 +17,9 @@ WaveFunctionTest::WaveFunctionTest()
 
 WaveFunctionTest::~WaveFunctionTest()
 {
-   delete wfr;
-   delete wfc;
-   delete wfbuf;
+   DELETE_WF(wfr);
+   DELETE_WF(wfc);
+   DELETE_WF(wfbuf);
 }
 
 void WaveFunctionTest::setUp()
@@ -84,7 +84,7 @@ void WaveFunctionTest::NUMERIC_Test()
       CPPUNIT_ASSERT_DOUBLES_EQUAL((vc[i] + vr[i]).real(), (*wfsum)[i].real(), TIGHT_EPS);
       CPPUNIT_ASSERT_DOUBLES_EQUAL((vc[i] + vr[i]).imag(), (*wfsum)[i].imag(), TIGHT_EPS);
    }
-   delete wfsum;
+   DELETE_WF(wfsum);
    
 //    WaveFunction* operator+=(WaveFunction* Psi)
    *wfbuf = *wfc; /* Copy operator from cVec parent */

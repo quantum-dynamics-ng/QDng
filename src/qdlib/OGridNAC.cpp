@@ -10,7 +10,7 @@ namespace QDLIB {
    
    OGridNAC::~OGridNAC()
    {
-      if (_buf != NULL) delete _buf;
+      DELETE_WF(_buf);
    }
    
    
@@ -69,7 +69,7 @@ namespace QDLIB {
       
       c = *PsiBra * opPsi;
       
-      delete opPsi;
+      DELETE_WF(opPsi);
       return c;
    }
 

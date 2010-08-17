@@ -15,7 +15,7 @@ namespace QDLIB
 
    Reporter::~Reporter()
    {
-      if (_psi0 != NULL) delete _psi0;
+      DELETE_WF(_psi0);
    }
    
    

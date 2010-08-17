@@ -206,7 +206,7 @@ void TestCheby::Propagation1D( )
    CPPUNIT_ASSERT_NO_THROW( U *= phi );
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of Norm (*=)", 1.0, phi->Norm(), 1e-10);
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE ("Conservation of energy (*=)", energy , H.Expec(phi), 1e-10);
-   delete phi;
+   DELETE_WF(phi);
 }
 
 

@@ -21,6 +21,8 @@
 #include <string>
 #include <math.h>
 
+#include "tools/Collector.h"  /* This is QDLIB Collector not the MEX Collector */
+
 namespace QDMEX {
 
 template<typename T> class Collector;
@@ -150,7 +152,7 @@ template <typename T>
 ObjectHandle<T>::~ObjectHandle() { 
 		std::cout << "Delete ObjectHandle" << std::endl;
 		if (owns) {
-			delete t; // destroy object
+			QDLIB::Collector<T>::Instance()->Delete(t); // destroy object
 		}
 		signature= 0; // destroy signature
 	} 

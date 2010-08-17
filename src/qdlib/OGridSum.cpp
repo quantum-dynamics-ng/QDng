@@ -77,7 +77,7 @@ namespace QDLIB {
       
       Apply(ket, PsiKet);
       d = *PsiBra * ket;
-      delete ket;
+      DELETE_WF(ket);
       
       return d;
    }

@@ -5,20 +5,25 @@
 #include "tools/ParamContainer.h"
 #include "math/typedefs.h"
 #include "tools/Exception.h"
+#include "tools/Collector.h"
 
+#define DELETE_WF(WF) Collector<WaveFunction>::Instance()->Delete(WF)
+#define DELETE_ALL_WF() Collector<WaveFunction>::Instance()->Delete()
 
 namespace QDLIB { 
    /**
     * Abstract Wavefunction class.
     * 
     * Rules and Guidelines:
-    * -If a new cVec component is constructed, it will be not initialized with zeroes.
-    * -Setting of all parameters must be possible trough the ParamContainer interface.
+    * \li If a new cVec component is constructed, it will be not initialized with zeroes.
+    * \li Setting of all parameters must be possible trough the ParamContainer interface.
     * Aditional Getter and Setter methods may be implementet.
     * 
     * -Optional: Define operator= also for derived class.
     * 
-    * \todo check tnt classes for init methods (zeroes or not)
+    * This class is maintained by the Collector. Don't create instances on the stack.
+    * Explictly delete them via the macro DELETE_WF
+    * 
     */
    class WaveFunction: public cVec
    {
@@ -27,7 +32,7 @@ namespace QDLIB {
          cVec *_spacebuffer;   /* transformation buffer for different basis */
 	 ParamContainer _params;
       public:
-         WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) {}
+	 WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) { Collector<WaveFunction>::Instance()->Register(this); }
 	 /**
 	  * Make the class pure virtual.
 	  */
@@ -147,14 +152,14 @@ namespace QDLIB {
 	 }
 
 	 /** Multiply with complex number */
-	 WaveFunction* operator*=(const dcomplex d)
+	 WaveFunction* operator*=(const dcomplex c)
 	 {
       
-	    int size = cVec::size();
+/*	    int size = cVec::size();
 	    for (int i=0; i < size; i++){
 	       (*this)[i] *= d;
-	    }
-	    
+	    }*/
+	    MultElements((cVec*) this, c);
 	    return this;
 	 }
 	 
@@ -165,9 +170,11 @@ namespace QDLIB {
       
             wf = this->NewInstance();
 	    
-            for (int i=0; i < cVec::size(); i++){
+	    AddElementsEq((cVec*) wf, (cVec*) this, (cVec*) Psi);
+
+/*            for (int i=0; i < cVec::size(); i++){
                (*(cVec*)wf)[i] = (*this)[i] + (*Psi)[i];
-	    }
+	    }*/
 	    
 	    return wf;
 	 }

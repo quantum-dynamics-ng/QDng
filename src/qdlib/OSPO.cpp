@@ -19,11 +19,12 @@ namespace QDLIB {
    OSPO::~OSPO()
    {
       if (_expT != NULL) delete _expT;
-      if (_expV != NULL) delete _expV;
-      if (_expVcoup != NULL) delete _expVcoup;
-      if (_V1 != NULL) delete _V1;
+      DELETE_WF(_expV);
+      DELETE_WF(_expVcoup);
+      DELETE_WF(_V1);
       if (_needs != NULL) delete _needs;
-      if (_buf != NULL) delete _buf;
+      DELETE_WF(_buf);
+      DELETE_WF(_buf2);
    }
    
    

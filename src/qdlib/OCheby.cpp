@@ -24,10 +24,10 @@ namespace QDLIB
 
    OCheby::~OCheby()
    {
-      if (ket0 != NULL) delete ket0;
-      if (ket1 != NULL) delete ket1;
-      if (ket2 != NULL) delete ket2;
-      if (buf != NULL) delete buf;
+      DELETE_WF(ket0);
+      DELETE_WF(ket1);
+      DELETE_WF(ket2);
+      DELETE_WF(buf);
    }
 
 
@@ -324,9 +324,9 @@ namespace QDLIB
       _params.SetValue("exponent Im", _exp.imag());
       
       /* Remove WF buffers => new operator type  needs new WF type */
-      if (ket0 != NULL) delete ket0;
-      if (ket1 != NULL) delete ket1;
-      if (ket2 != NULL) delete ket2;
+      DELETE_WF(ket0);
+      DELETE_WF(ket1);
+      DELETE_WF(ket2);
 
    }
 

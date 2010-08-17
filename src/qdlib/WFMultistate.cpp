@@ -23,9 +23,7 @@ namespace QDLIB
    void WFMultistate::_destroy()
    {
       for (lint i=0; i < _nstates; i++){
-	 if (_states[i] != NULL) { 
-	    delete _states[i];
-	 }
+	 DELETE_WF( _states[i] );
       }
       _nstates = 0;
    }

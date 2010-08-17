@@ -32,7 +32,7 @@ void WFGridCartesianTest::setUp()
 void WFGridCartesianTest::tearDown()
 {
    p.clear();
-   delete wf;
+   DELETE_WF(wf);
 }
 
 

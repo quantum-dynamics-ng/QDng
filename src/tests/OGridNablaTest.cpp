@@ -42,7 +42,8 @@ void OGridNablaTest::setUp()
 void OGridNablaTest::tearDown()
 {
    p.clear();
-   delete wf;
+   DELETE_WF(wf);
+   DELETE_WF(wf2);
 }
 
 void OGridNablaTest::API_Test()

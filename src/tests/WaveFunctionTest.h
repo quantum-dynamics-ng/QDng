@@ -19,7 +19,7 @@ class WFT : public QDLIB::WaveFunction
       virtual WaveFunction* NewInstance()
       { 
 	 WFT* res;
-	 res = new WFT;
+	 res = new WFT();
 	 res->newsize(size(),strides());
 	 return res;
       }

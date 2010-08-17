@@ -96,7 +96,7 @@ namespace QDLIB
 
       Apply(opKet, PsiKet);
       c = *PsiBra * PsiKet;
-      delete opKet;
+      DELETE_WF(opKet);
       return c;
    }
 

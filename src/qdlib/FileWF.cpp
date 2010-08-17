@@ -36,8 +36,7 @@ namespace QDLIB {
    
    FileWF::~FileWF()
    {
-      if (_buf != NULL)
-         delete _buf;
+      if (_buf != NULL) delete _buf;
    }
 
    /**

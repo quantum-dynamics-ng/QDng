@@ -294,7 +294,7 @@ namespace QDLIB {
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
       if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
 
-      delete Psi;
+      DELETE_WF(Psi);
    }
 
 }

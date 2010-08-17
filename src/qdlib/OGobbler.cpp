@@ -166,7 +166,7 @@ namespace QDLIB {
       Apply(ket, PsiKet);
       c = *PsiBra * ket;
       
-      delete ket;
+      DELETE_WF(ket);
       
       return c;
    }
@@ -181,7 +181,7 @@ namespace QDLIB {
          Apply(ket, Psi);
          
          c= *ket * ket;
-         delete ket;
+	 DELETE_WF(ket);
       } else 
          c = MatrixElement(Psi, Psi);
       

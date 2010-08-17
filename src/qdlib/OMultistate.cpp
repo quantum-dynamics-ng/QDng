@@ -19,8 +19,8 @@ namespace QDLIB
 
    OMultistate::~OMultistate()
    {
-      if (_buf1 != NULL) delete _buf1;
-      if (_buf2 != NULL) delete _buf2;
+      DELETE_WF(_buf1);
+      DELETE_WF(_buf2);
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j< _nstates; j++){
 	    if (_matrix[i][j] != NULL && i <= j)
@@ -156,7 +156,7 @@ namespace QDLIB
       
       Apply( opPsi, PsiKet);
       c = *PsiBra * opPsi;
-      delete opPsi;
+      DELETE_WF(opPsi);
       
       return c;
    }
@@ -172,7 +172,7 @@ namespace QDLIB
       
       c = *opPsi * Psi;
 
-      delete opPsi;
+      DELETE_WF(opPsi);
       
       return c.real();
    }
@@ -202,6 +202,8 @@ namespace QDLIB
       dMat Mmax;
       dVec Evals;
       
+      Mmax.newsize(_nstates,_nstates);
+      
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j<= i; j++){
 	    if (_matrix[i][j] != NULL)
@@ -218,6 +220,8 @@ namespace QDLIB
    {
       dMat Mmin;
       dVec Evals;
+      
+      Mmin.newsize(_nstates,_nstates);
       
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j<= i; j++){

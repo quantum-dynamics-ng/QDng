@@ -16,12 +16,12 @@ namespace QDLIB {
    {
       if (_wfbuf != NULL){
          for(lint i=0; i < GridSystem::Dim(); i++){
-            if (_wfbuf[i] != NULL) delete _wfbuf[i];
+	    DELETE_WF(_wfbuf[i]);
          }
          delete[] _wfbuf;
       }
       if (_kspace != NULL) delete[] _kspace;
-      if (buf != NULL) delete buf;
+      DELETE_WF(buf);
       
       if (_Gmat != NULL){
 	 for (int i=0; i < _size; i++){
@@ -73,7 +73,7 @@ namespace QDLIB {
 	 delete view;
 	 delete kspace1;
       }
-      delete Psi;
+      DELETE_WF(Psi);
    }
    
    void OGridGMat::Init(WaveFunction *Psi)
@@ -183,7 +183,7 @@ namespace QDLIB {
       opKet = PsiKet->NewInstance();
       Apply(opKet, PsiKet);
       d = *PsiBra * opKet;
-      delete opKet;
+      DELETE_WF(opKet);
       
       return d;
    }
@@ -294,7 +294,7 @@ namespace QDLIB {
       
       *Psi = ket;
 
-      delete ket;
+      DELETE_WF(ket);
    }
    
    Operator * OGridGMat::operator =( Operator * O )

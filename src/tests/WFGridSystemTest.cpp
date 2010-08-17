@@ -28,7 +28,7 @@ void WFGridSystemTest::setUp()
 
 void WFGridSystemTest::tearDown()
 {
-   delete wf;
+   DELETE_WF(wf);
 }
 
 void WFGridSystemTest::API_Test()
@@ -75,7 +75,7 @@ void WFGridSystemTest::API_Test()
    FFT.Backward(wf2);
    CPPUNIT_ASSERT(! wf2->IsKspace() );
    
-   delete wf2;
+   DELETE_WF(wf2);
 }
 
 void WFGridSystemTest::NUMERIC_Test()

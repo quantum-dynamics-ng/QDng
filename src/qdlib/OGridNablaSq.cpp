@@ -85,7 +85,7 @@ namespace QDLIB
       opPsi = PsiBra->NewInstance();
       Apply(opPsi, PsiKet);
       c = *PsiBra * opPsi;
-      delete opPsi;
+      DELETE_WF(opPsi);
 
       return c;
    }

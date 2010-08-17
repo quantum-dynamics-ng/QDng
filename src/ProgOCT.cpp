@@ -23,19 +23,8 @@ namespace QDLIB {
    
    ProgOCT::~ProgOCT()
    {
-      QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
-      for(int i=0; i < _ntargets; i++){
-	 if (PsiI[i] != NULL) delete PsiI[i];
-	 if (PsiT[i] != NULL) delete PsiT[i];
-      }
-      if (_opwf != NULL) delete _opwf;
-      
-      if (_membuf && _membuf_init){
-         for (int s=0; s < clock->Steps(); s++)
-            for (int t=0; t < _ntargets; t++)
-               delete _memwfbuf[s][t];
-      }
       DELETE_ALL_OP();
+      DELETE_ALL_WF();
    }
 
    /**
@@ -1138,8 +1127,8 @@ namespace QDLIB {
       /* Remove tmp WFs */
       for (int i=0; i < _ntargets; i++){
          
-	 delete phii[i];
-	 delete phit[i];
+	 DELETE_WF(phii[i]);
+	 DELETE_WF(phit[i]);
       }
 
    }

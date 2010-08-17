@@ -237,7 +237,7 @@ namespace QDLIB
 	    }
 	    
 	    *WF += wfadd;
-	    delete wfadd;
+	    DELETE_WF(wfadd);
 	    child->NextNode();
 	 }
 	 pm.GetValue( "normalize", onoff);

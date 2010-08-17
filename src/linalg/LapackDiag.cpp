@@ -1,6 +1,8 @@
 #include "LapackDiag.h"
 #include <stdlib.h>
 
+#include "tools/Collector.h"
+
 using namespace QDLIB;
 
 namespace LAPACK {
@@ -29,8 +31,11 @@ namespace LAPACK {
 	    }
 	 }
 	 WsList(WsList &cp){}
-	 ~WsList(){}
       public:
+	 ~WsList()
+	 {
+	 }
+	 
 	 static WsList* Instance()
 	 {
 	    if (ref == NULL) ref = new WsList();
@@ -57,8 +62,9 @@ namespace LAPACK {
 	       }
                i++;
 	    }
-	    if (sized[min_idx] > 0) delete dbuf[min_idx];
+	    if (sized[min_idx] > 0) QDLIB::Collector<double>::Instance()->Delete(dbuf[min_idx]);
 	    i=posix_memalign((void**) &dbuf[min_idx], 2*sizeof(double), size*sizeof(double));
+	    QDLIB::Collector<double>::Instance()->Register(dbuf[min_idx], true);
 	    return dbuf[min_idx];
 	 }
 	 
@@ -105,7 +111,7 @@ namespace LAPACK {
    {
       int ws_size;
       int size;
-      int info;
+      int info=0;
       WsList *ws = WsList::Instance();
       
       if (mat->rows() != mat->cols()) return -1;

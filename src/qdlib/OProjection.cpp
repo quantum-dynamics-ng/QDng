@@ -21,10 +21,10 @@ namespace QDLIB {
    void OProjection::_destroy()
    {
       for (int i=0; i < _size; i++){
-         if (_wfbuf[i] != NULL) delete _wfbuf[i];
+	 DELETE_WF(_wfbuf[i]);
       }
       
-      if (_buf != NULL) delete _buf;
+      DELETE_WF(_buf);
       
       _buf = NULL;
       _size = 0;
@@ -87,7 +87,7 @@ namespace QDLIB {
       if (_size == 0){
          WFMultistate* wfm;
          wfm = dynamic_cast<WFMultistate*>(Psi);
-         if (_buf != NULL) delete _buf;
+	 DELETE_WF(_buf);
          if (wfm == NULL)
             _buf = Psi->NewInstance();
          else
@@ -170,7 +170,7 @@ namespace QDLIB {
       
       Apply(OpPsi, PsiKet);
       c = *PsiBra * OpPsi;
-      delete OpPsi;
+      DELETE_WF(OpPsi);
       return c;
    }
    

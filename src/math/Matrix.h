@@ -88,10 +88,9 @@ namespace QDLIB {
       _col = new T*[_n];
       
       /* init col pointers */
-      T *p = _v;
       for(int i=0; i < _n; i++){
-	 _col[i] = p;
-	 p += m;
+	 _col[i] = &(_v[i*_m]);
+	 
       }
    }
 

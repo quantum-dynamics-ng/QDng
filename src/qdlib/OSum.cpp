@@ -8,7 +8,7 @@ namespace QDLIB {
    {
       for(int i=0; i < _size; i++){
 	 DELETE_OP(_O[i]);
-	 delete _WFbuf[i];
+	 DELETE_WF(_WFbuf[i]);
       }
    }
    
@@ -122,7 +122,7 @@ namespace QDLIB {
       out = PsiKet->NewInstance();
       Apply(out, PsiKet);
       d = *PsiBra * out;
-      delete out;
+      DELETE_WF(out);
       
       return d;
    }

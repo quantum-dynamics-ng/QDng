@@ -23,7 +23,9 @@ namespace QDLIB {
 	    public:
 	       T *p;
 	       int refcount;
-	       reflist(T* pointer) : p(pointer), refcount(1){}
+	       bool aligned; /* inidicate thtat memory was allocated with posix_memalign */
+	       reflist(T* pointer) : p(pointer), refcount(1), aligned(false) {}
+	       reflist(T* pointer, bool pmemalign) : p(pointer), refcount(1), aligned(pmemalign) {}
 	 };
 	 
          vector<reflist> _RefCount;
@@ -34,7 +36,7 @@ namespace QDLIB {
       public:
 	 ~Collector();
          static Collector<T>* Instance();
-         void Register(T* obj);
+         void Register(T* obj, bool aligned = false);
 	 bool IsAllocated(T* obj);
          void Delete(T* obj);
          void Delete();
@@ -78,7 +80,7 @@ namespace QDLIB {
     *
     */
    template<typename T>
-   void Collector<T>::Register(T* obj)
+   void Collector<T>::Register(T* obj, bool aligned)
    {
       if (obj == NULL) return;
       int ind;
@@ -87,7 +89,7 @@ namespace QDLIB {
       if (ind != -1)
          _RefCount[ind].refcount++;
       else
-	 _RefCount.push_back(reflist(obj));
+	 _RefCount.push_back(reflist(obj, aligned));
    }
 
    /**
@@ -115,8 +117,10 @@ namespace QDLIB {
       if (ind > -1){
 	 _RefCount[ind].refcount--;
 	 if (_RefCount[ind].refcount == 0){
-	    delete _RefCount[ind].p;
+	    T* p;
+	    p = _RefCount[ind].p;
 	    _RefCount.erase (_RefCount.begin()+ind);
+	    delete p;
 	 }
       }
    }
@@ -128,8 +132,20 @@ namespace QDLIB {
    template<typename T>
    void Collector<T>::Delete()
    {
-      for (unsigned int i= 0; i < _RefCount.size(); i++){
-	 delete _RefCount[i].p;
+      /* Loop over whole list */
+      while (! _RefCount.empty() ) {
+	 T* p;
+	 bool aligned;
+	 p = _RefCount.back().p; /* retrive pointer & remove from list */
+	 aligned = _RefCount.back().aligned;
+	 _RefCount.pop_back();
+	 
+	 /* delete object after list is clear => avoid problems if the destructor calls Delete(T*) */
+	 if (aligned)
+	    free(p);
+	 else
+	    delete p; 
+	 
       }
       _RefCount.clear();
    }

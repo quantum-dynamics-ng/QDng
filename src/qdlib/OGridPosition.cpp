@@ -89,7 +89,7 @@ namespace QDLIB {
       
       c = *PsiBra * OpPsi;
       
-      delete OpPsi;
+      DELETE_WF(OpPsi);
       
       return c;
    }
