@@ -1,12 +1,11 @@
+/**
+ * This is a simple example how to turn an Operator into a dynamic module
+ */
+#include "Module.h"
 #include "qdlib/OGridNablaSq.h"
 
 using namespace QDLIB;
 
-extern "C" {
-   Operator* InstanceOP()
-   {
-      Operator *p;
-      p = new OGridNablaSq();
-      return p;
-   }
-}
+
+QDNG_MODULE_OPERATOR_INSTANCE(OGridNablaSq)
+

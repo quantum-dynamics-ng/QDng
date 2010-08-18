@@ -98,6 +98,13 @@ int main(int argc, char **argv)
       if ( cmdline.GetOption('h') ) exit(retval);
       
 #ifdef USE_DYNMODS
+      /* First check if a path is given in the global options */
+      if (gp.isPresent("modpath")) {
+         string path;
+         gp.GetValue("modpath", path);
+         mods->UserPath( path );
+      }
+
       /* Provide a user path for module loading */
       if (cmdline.GetOption('m')){
 	 cmdline.GetOption('m', fname);
