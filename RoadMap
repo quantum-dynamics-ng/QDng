@@ -1,16 +1,19 @@
 * Coding issues
- * Collector (non-singleton) to handle Operators and wavefunction buffers more easy
+ * Collector (non-singleton) to handle Operators and wavefunction buffers more easy (DONE)
  * Allow Complex ranges in operators. [planed for alpha-0.6] (DONE)
  * Add Output to operators Init functions. [planed for alpha-0.6]
- * Replace fixed operator scaling with dynamic scaling => save memory [planed for alpha-0.6]
+ * Replace fixed operator scaling with dynamic scaling => save memory [planed for alpha-0.6] (DONE)
  * Optimize core routines for SSE2 (DONE, Mostly not needed newer gcc can optimize)
  * Cleanup optimization flags => configure should decide
+
+* Testing
+ * Define test inputs + evaluating script.
 
 * QDng input
  * xsl scheme for input definition [planed for alpha-0.6]
  * Loops (see Program types) 
  * "macros" for shorter defs., eg. Tkin on a multistate operator [planed for alpha-0.6]
- * References on operators (close conn. to macros) [planed for alpha-0.6]
+ * References on operators (close conn. to macros) [planed for alpha-0.6] (DONE)
  * Setup/tearDown Filters => Before beginning, after end of propgation (DONE)
  * Add Momentum to WF (DONE, OGridKick)
 

@@ -7,9 +7,9 @@ namespace QDLIB
    QDClock::QDClock(int steps, double dt) : _dt(dt), _nsteps(steps), _step(0) {}
 	 
    /**
-    * \return lenght of time step.
+    * Lenght of time step.
     */
-   double QDClock::Dt()
+   double QDClock::Dt() const
    {
       return _dt;
    }
@@ -23,25 +23,33 @@ namespace QDLIB
    }
 	 
    /**
-    * \return The actual system time.
+    * The actual system time.
     */
-   double QDClock::Time()
+   double QDClock::Time() const
    {
       return _step * _dt;
    }
    
    /**
-    * \return number of actual time step.
+    * Number of actual time step.
     */
-   int QDClock::TimeStep()
+   int QDClock::TimeStep() const
    {
       return _step;
    }
    
    /**
-    * \return number of time steps.
+    * Set the actual time step.
     */
-   int QDClock::Steps()
+   void QDClock::TimeStep(int step)
+   {
+      _step = step;
+   }
+   
+   /**
+    * Number of time steps.
+    */
+   int QDClock::Steps() const
    {
       return _nsteps;
    }

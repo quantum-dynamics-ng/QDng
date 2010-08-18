@@ -17,13 +17,14 @@ namespace QDLIB
 	 QDClock();
 	 QDClock(int steps, double dt);
 	 
-	 double Dt();
+	 double Dt() const;
 	 void Dt(double dt);
 	 
-	 double Time();
+	 double Time() const;
 	 
-	 int TimeStep();
-	 int Steps();
+	 int TimeStep() const;
+	 void TimeStep(int step);
+	 int Steps() const;
 	 
 	 void Steps(int Steps); 
 	 

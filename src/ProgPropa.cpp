@@ -93,6 +93,7 @@ namespace QDLIB {
       log.cout() << "Write cycles: " << _wcycle << endl;
       log.cout() << "Overall time: " << fixed << clock->Steps() * clock->Dt() << endl;
       log.cout() << "Basename for wave function output: " << _fname << endl;
+      log.cout() << "Directory for output: " << _dir << endl;
       log.flush();
       
       log.IndentDec();
@@ -119,6 +120,7 @@ namespace QDLIB {
 	 _reporter.Spectrum( _dir+s );
       }
 
+      /* Optional normfile */
       if (attr.isPresent("nfile")){
 	 attr.GetValue("nfile",s);
 	 if (! s.empty() ){
@@ -270,6 +272,8 @@ namespace QDLIB {
 	 start=1;
       else
 	 start = _start;
+      
+      clock->TimeStep(_start);
       
       for (lint i=start; i <= clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
