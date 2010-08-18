@@ -6,6 +6,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OSPO)
+   
    OSPO::OSPO() : OPropagator(), _name("OSPO"), _needs(NULL),
                   _Tkin(NULL), _Tkin_kspace(NULL), _Vcoup(NULL),
                         _expT(NULL), _expV(NULL), _V1(NULL), _expVcoup(NULL), _expVcoupI(NULL),_buf(NULL),
@@ -26,14 +28,7 @@ namespace QDLIB {
       DELETE_WF(_buf);
       DELETE_WF(_buf2);
    }
-   
-   
-   Operator * OSPO::NewInstance( )
-   {
-      OSPO *O = new OSPO();
-      return O;
-   }
-   
+
 
    /** Init expT. */
    void OSPO::_InitT( )

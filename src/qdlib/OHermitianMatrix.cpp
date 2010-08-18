@@ -24,6 +24,7 @@ namespace QDLIB {
    {
       OHermitianMatrix *r =  new OHermitianMatrix();
       r->newsize(rows(), rows());
+      CollectorOp::Instance()->Register(r);
       return r;
    }
 

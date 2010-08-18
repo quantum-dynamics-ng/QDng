@@ -5,7 +5,8 @@
 
 namespace QDLIB
 {
-
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OMultistate)
+	 
    OMultistate::OMultistate() : _name("OMultistate"), _hermitian(true),
                             _nstates(0), _unity(false), _buf1(NULL), _buf2(NULL)
    {
@@ -23,9 +24,6 @@ namespace QDLIB
       DELETE_WF(_buf2);
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j< _nstates; j++){
-	    if (_matrix[i][j] != NULL && i <= j)
-	       DELETE_OP(_matrix[i][j]);
-	    if (_matrix[i][j] != NULL && i > j && !_hermitian)
 	       DELETE_OP(_matrix[i][j]);
 	 }
       }
@@ -74,13 +72,6 @@ namespace QDLIB
 	 }
       }
    } 
-   
-   Operator * OMultistate::NewInstance( )
-   {
-      OMultistate *r = new OMultistate();
-   
-      return r;
-   }
 
    void OMultistate::Init( ParamContainer & params )
    {

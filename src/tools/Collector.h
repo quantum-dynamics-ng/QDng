@@ -51,6 +51,7 @@ namespace QDLIB {
    template<typename T>
    Collector<T>::~Collector()
    {
+      Delete();
    }
 
    
@@ -90,13 +91,11 @@ namespace QDLIB {
       int ind;
 
       ind = find(obj);
-      if (ind != -1){
+      if (ind > -1){
          _RefCount[ind].refcount++;
       }else {
 	 _RefCount.push_back(reflist(obj, aligned));
       }
-      
-      
    }
 
    /**
@@ -145,23 +144,18 @@ namespace QDLIB {
    template<typename T>
    void Collector<T>::Delete(T* obj)
    {
-      if (obj == NULL) return;
-      if (_BigClean) return;
+      if (obj == NULL || _BigClean) return;
       
-      int ind;
-      
-      ind = find(obj);
+      int ind = find(obj);
       if (ind > -1){
 	 _RefCount[ind].refcount--;
 	 if (_RefCount[ind].refcount == 0){
-	    T* p;
-	    p = _RefCount[ind].p;
 	    bool aligned = _RefCount[ind].aligned;
 	    _RefCount.erase (_RefCount.begin()+ind);
 	    if (aligned)
-	       free(p);
+	       free(obj);
 	    else
-	       delete p;
+	       delete obj;
 	 }
       }
    }

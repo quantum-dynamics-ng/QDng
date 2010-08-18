@@ -3,7 +3,8 @@
 
 namespace QDLIB
 {
-
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridNablaSq)
+   
    OGridNablaSq::OGridNablaSq() :
       ODSpace(), _name("OGridNablaSq")
    {
@@ -16,15 +17,6 @@ namespace QDLIB
    {
       if (_dspace != NULL)
          delete _dspace;
-   }
-
-   Operator * OGridNablaSq::NewInstance()
-   {
-      OGridNablaSq *r;
-
-      r = new OGridNablaSq();
-
-      return r;
    }
 
    void OGridNablaSq::Init(ParamContainer & params)

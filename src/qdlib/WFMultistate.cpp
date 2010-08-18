@@ -73,7 +73,7 @@ namespace QDLIB
 	 r->_states[i] =  _states[i]->NewInstance();
 	 r->StrideRef(*(r->_states[i]), 0, i);
       }
-
+      CollectorWF::Instance()->Register(r);
       r->_params = _params;
       return r;
    }

@@ -6,6 +6,8 @@
 
 namespace QDLIB
 {
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridPotential)
+	 
    OGridPotential::OGridPotential()
       : OGridSystem(), _name("OGridPotential"), _init(false)
       {}
@@ -16,14 +18,6 @@ namespace QDLIB
    
    
    /* Interface implementation */
-   Operator* OGridPotential::NewInstance()
-   {
-      OGridPotential *O;
-      
-      O = new OGridPotential();
-      
-      return O;
-   }
 	 	 
    void OGridPotential::Init(ParamContainer &params)
    {

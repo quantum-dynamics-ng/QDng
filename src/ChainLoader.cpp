@@ -56,6 +56,7 @@ namespace QDLIB
 	 
          Operator *osub;
 	 OSum *sum = new OSum();
+	 CollectorOp::Instance()->Register(sum);
          
 	 while (child->EndNode()){
 	    osub = LoadOperatorChain( child );
@@ -75,6 +76,7 @@ namespace QDLIB
 	 Operator *osub;
 	 OGridSystem *gsub;
 	 OGridSum *sum = new OGridSum;
+	 CollectorOp::Instance()->Register(sum);
 	 while (child->EndNode()){
 	    osub = LoadOperatorChain( child );
 	    if (osub == NULL)
@@ -98,6 +100,7 @@ namespace QDLIB
 	 OMultistate *matrix = NULL;
          if (name == "Multistate") matrix = new OMultistate();
          if (name == "DMultistate") matrix = new ODMultistate();
+	 CollectorOp::Instance()->Register(matrix);
 	 
 	 matrix->Init(pm);
 	 while (child->EndNode()){
@@ -177,6 +180,7 @@ namespace QDLIB
          
          /* Read single WF definitions into Multistate */
          WFMultistate *multi = new WFMultistate();
+	 CollectorWF::Instance()->Register(multi);
          while (child->EndNode()){
             string name;
             stringstream ss;

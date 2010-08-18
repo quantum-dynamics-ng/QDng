@@ -7,6 +7,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridGMat)
+   
    OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _kspace(NULL), _wfbuf(NULL), buf(NULL), _KinCoup(true)
    {
    }
@@ -91,12 +93,6 @@ namespace QDLIB {
       }
       
       _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
-   }
-   
-   Operator* OGridGMat::NewInstance()
-   {
-      OGridGMat* r = new OGridGMat();
-      return r;
    }
    
    /**

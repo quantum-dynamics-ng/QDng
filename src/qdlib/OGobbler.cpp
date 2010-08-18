@@ -5,6 +5,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGobbler)
+   
    OGobbler::OGobbler()
       : OGridSystem(), _name("OGobbler"), _order(0), _gain(1),_nip(false)
    {
@@ -143,13 +145,6 @@ namespace QDLIB {
       _Init();
    }
    
-   Operator * OGobbler::NewInstance()
-   {
-      OGobbler *r;
-      
-      r = new OGobbler();
-      return r;
-   }
    
    const string & OGobbler::Name()
    {

@@ -3,6 +3,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridPosition)
+   
    OGridPosition::OGridPosition()
    : OGridSystem(), _name("OGridPosition"), _dim(-1)
    {
@@ -11,16 +13,6 @@ namespace QDLIB {
    
    OGridPosition::~OGridPosition()
    {
-   }
-
-
-   Operator * OGridPosition::NewInstance()
-   {
-      OGridPosition *r;
-      
-      r = new OGridPosition();
-      
-      return r;
    }
 
    void OGridPosition::Init(ParamContainer & params)

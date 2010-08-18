@@ -13,7 +13,8 @@
 
 namespace QDLIB
 {
-
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OCheby)
+	 
    OCheby::OCheby()
       : OPropagator(), _name("OCheby"),
       _order(0), _coeff(0), _scaling(1.), _offset(0), ket0(NULL), ket1(NULL), ket2(NULL), buf(NULL)
@@ -45,13 +46,6 @@ namespace QDLIB
    void OCheby::Hamiltonian(Operator *Op)
    {
       H = Op;
-   }
-   
-   Operator * OCheby::NewInstance( )
-   {
-      OCheby *r;
-      r = new OCheby();
-      return r;
    }
    
    void OCheby::Init( ParamContainer & params )

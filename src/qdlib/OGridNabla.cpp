@@ -5,6 +5,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridNabla)
+   
    OGridNabla::OGridNabla() : ODSpaceCplx(), GridSystem(), _name("OGridNabla"), _fac(1), _kspace(NULL),  _momentum(false), _dim(-1)
    {
    }
@@ -19,15 +21,6 @@ namespace QDLIB {
    {
       if (_kspace != NULL) delete _kspace;
       if (_dspace != NULL) delete _dspace;
-   }
-
-   Operator * OGridNabla::NewInstance()
-   {
-      OGridNabla *r;
-
-      r = new OGridNabla();
-
-      return r;
    }
 
    void OGridNabla::Init(ParamContainer & params)

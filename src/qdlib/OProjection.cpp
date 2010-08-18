@@ -3,7 +3,8 @@
 #include "FileWF.h"
 
 namespace QDLIB {
-
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OProjection)
+	 
    OProjection::OProjection() : _name("OProjection"), _sign(1), _size(0),  _buf(NULL)
    {
       for (int i=0; i < MAX_WFSPACE; i++){
@@ -71,12 +72,6 @@ namespace QDLIB {
    {
       return _name;
    }
-      
-   Operator * QDLIB::OProjection::NewInstance( )
-   {
-      return new OProjection();
-   }
-   
    
    void QDLIB::OProjection::Init( WaveFunction * Psi )
    {

@@ -3,6 +3,9 @@
 
 namespace QDLIB {
 
+   
+   QDNG_WAVEFUNCTION_NEW_INSTANCE_FUNCTION(WFGridCartesian)
+	 
    WFGridCartesian::WFGridCartesian()
       : WFGridSystem(), _name("WFGridCartesian")
    {
@@ -11,14 +14,6 @@ namespace QDLIB {
    
    WFGridCartesian::~WFGridCartesian()
    {
-      
-   }
-
-   WaveFunction * WFGridCartesian::NewInstance()
-   {
-      WFGridCartesian *r =  new WFGridCartesian();
-      r->Init(_params);
-      return r;
    }
 
    void WFGridCartesian::Init(ParamContainer &params)

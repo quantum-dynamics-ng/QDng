@@ -4,7 +4,7 @@
 #include "math/math_functions.h"
 
 namespace QDLIB {
-
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridDipole)
 
    OGridDipole::OGridDipole() : OGridPotential(), _name("OGridDipole"), _init(false)
    {
@@ -25,12 +25,6 @@ namespace QDLIB {
    Laser* OGridDipole::GetLaser()
    {
       return &_laser;
-   }
-
-   Operator* OGridDipole::NewInstance()
-   {
-      OGridDipole *r = new OGridDipole();
-      return r;
    }
 
    void OGridDipole::Init(ParamContainer &params)

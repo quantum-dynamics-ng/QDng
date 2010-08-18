@@ -9,6 +9,15 @@
 #define DELETE_OP(OP) Collector<Operator>::Instance()->Delete(OP)
 #define DELETE_ALL_OP() Collector<Operator>::Instance()->Delete()
 
+#define QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(CLASSNAME) \
+   Operator* CLASSNAME::NewInstance() \
+{ \
+      CLASSNAME *p; \
+      p = new CLASSNAME (); \
+      CollectorOp::Instance()->Register(p); \
+      return p; \
+}
+
 namespace QDLIB {
 
 
@@ -60,8 +69,6 @@ namespace QDLIB {
 	  */
 	 Operator() :  _isTimedependent(false), clock(NULL)
 	 {
-	    if (! Collector<Operator>::Instance()->IsAllocated(this) )
-               Collector<Operator>::Instance()->Register(this);
          }
 	  
 	 /**
@@ -69,8 +76,6 @@ namespace QDLIB {
 	  */
 	 Operator(ParamContainer &params):  _params(params), _isTimedependent(false)
 	 {
-	    if (! Collector<Operator>::Instance()->IsAllocated(this) )
-               Collector<Operator>::Instance()->Register(this);
          }
          
 	 /**

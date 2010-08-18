@@ -1,7 +1,9 @@
 #include "OGridSum.h"
 
 namespace QDLIB {
-
+   
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridSum)
+   
    OGridSum::OGridSum()
    : OGridSystem(), _name("OGridSum"), _size(0), _isUpTodate(false)
    {
@@ -36,13 +38,6 @@ namespace QDLIB {
       }
       _isUpTodate = true;
       
-   }
-
-   Operator * OGridSum::NewInstance( )
-   {
-      OGridSum *r;
-      r = new OGridSum();
-      return r;
    }
 
    void OGridSum::Init( ParamContainer & params )

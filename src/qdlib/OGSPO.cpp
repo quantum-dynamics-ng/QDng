@@ -3,6 +3,8 @@
 namespace QDLIB
 {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGSPO)
+   
    OGSPO::OGSPO() :
       _name("OGSPO"), _spoLen(0), _laststep(-1)
    {
@@ -57,12 +59,6 @@ namespace QDLIB
       for (int i = 0; i < _spoLen; i++) {
          _ops[i]->UpdateTime();
       }
-   }
-
-   Operator* OGSPO::NewInstance()
-   {
-      OGSPO *r = new OGSPO();
-      return r;
    }
 
    void OGSPO::Init(ParamContainer &params)

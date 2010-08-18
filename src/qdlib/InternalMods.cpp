@@ -33,6 +33,7 @@
    { \
       CLASSNAME *p; \
       p = new CLASSNAME (); \
+      CollectorOp::Instance()->Register(p); \
       return p; \
    }
 
@@ -41,6 +42,7 @@
    { \
       CLASSNAME* p; \
       p = new CLASSNAME(); \
+      CollectorWF::Instance()->Register(p); \
       return p; \
    }
 

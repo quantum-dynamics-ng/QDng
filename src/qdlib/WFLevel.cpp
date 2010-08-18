@@ -4,17 +4,11 @@
 
 namespace QDLIB {
    
+   QDNG_WAVEFUNCTION_NEW_INSTANCE_FUNCTION(WFLevel)
+   
    WFLevel::WFLevel(): _name("WFLevel")   {}
    
    WFLevel::~WFLevel() {}
-   
-   
-   WaveFunction* WFLevel::NewInstance()
-   {
-      WFLevel *r =  new WFLevel();
-      r->Init(_params);
-      return r;
-   }
    
    /**
     * \see constructor.

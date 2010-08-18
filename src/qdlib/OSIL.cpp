@@ -4,6 +4,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OSIL)
+	 
     OSIL::OSIL()
             : OPropagator(), _name("OSIL"), _order(0), _Lzb(NULL), buf0(NULL), buf1(NULL), buf2(NULL)
     {
@@ -22,14 +24,6 @@ namespace QDLIB {
 	DELETE_WF(buf1);
 	DELETE_WF(buf2);
     }
-
-
-    Operator * OSIL::NewInstance()
-    {
-        OSIL* r = new OSIL();
-        return r;
-    }
-
     
     /**
      * Initialize vectors etc. with right size.

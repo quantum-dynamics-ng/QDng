@@ -2,6 +2,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OScalar)
+   
    OScalar::OScalar()
    : Operator(), _name("Scalar"), _buf(NULL), _value(1)
    {
@@ -11,14 +13,6 @@ namespace QDLIB {
    OScalar::~OScalar()
    {
       DELETE_WF(_buf);
-   }
-   
-   
-   Operator * OScalar::NewInstance()
-   {
-      OScalar* r;
-      r = new OScalar();
-      return r;
    }
 
    void OScalar::Init(ParamContainer & params)

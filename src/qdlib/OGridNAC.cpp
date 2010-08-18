@@ -2,6 +2,8 @@
 
 namespace QDLIB {
 
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridNAC)
+   
    OGridNAC::OGridNAC(): OGridNabla(), _name("GridNAC"), _sign(1), _mass(1), _buf(NULL)
    {
       _pNAMCE = (dVec*) &_NACME;
@@ -11,13 +13,6 @@ namespace QDLIB {
    OGridNAC::~OGridNAC()
    {
       DELETE_WF(_buf);
-   }
-   
-   
-   Operator * OGridNAC::NewInstance()
-   {
-      OGridNAC *r = new OGridNAC();
-      return r;
    }
 
    void OGridNAC::Init(ParamContainer & params)
