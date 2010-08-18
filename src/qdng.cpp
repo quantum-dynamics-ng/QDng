@@ -70,10 +70,6 @@ int main(int argc, char **argv)
    XmlNode   rnodes;
    XmlNode   *prognodes;
    string progname;
-
-#ifdef USE_DYNMODS  
-   ModuleLoader *mods = ModuleLoader::Instance();
-#endif
    
    cmdline.SetDescription("QD next generation");
    

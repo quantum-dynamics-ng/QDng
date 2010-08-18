@@ -1,3 +1,4 @@
+#include "config.h"
 
 #ifdef USE_DYNMODS
  #include <dlfcn.h>
