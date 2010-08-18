@@ -60,7 +60,8 @@ namespace QDLIB {
 	  */
 	 Operator() :  _isTimedependent(false), clock(NULL)
 	 {
-            Collector<Operator>::Instance()->Register(this);
+	    if (! Collector<Operator>::Instance()->IsAllocated(this) )
+               Collector<Operator>::Instance()->Register(this);
          }
 	  
 	 /**
@@ -68,7 +69,8 @@ namespace QDLIB {
 	  */
 	 Operator(ParamContainer &params):  _params(params), _isTimedependent(false)
 	 {
-            Collector<Operator>::Instance()->Register(this);
+	    if (! Collector<Operator>::Instance()->IsAllocated(this) )
+               Collector<Operator>::Instance()->Register(this);
          }
          
 	 /**
@@ -223,6 +225,7 @@ namespace QDLIB {
    }; /* class Operator */
 
    
+   typedef Collector<Operator> CollectorOp;
 
    /**
     * C++ operator for application to WFs.

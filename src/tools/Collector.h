@@ -2,6 +2,7 @@
 #define COLLECTOR_H
 
 #include <vector>
+#include <cstdlib>
 
 using namespace std;
 
@@ -29,15 +30,19 @@ namespace QDLIB {
 	 };
 	 
          vector<reflist> _RefCount;
-
+         
+	 bool _BigClean;
+	       
          int find(T* p);
-         Collector(){}
+         Collector() : _BigClean(false) {}
          Collector(const Collector&){}
       public:
 	 ~Collector();
          static Collector<T>* Instance();
          void Register(T* obj, bool aligned = false);
 	 bool IsAllocated(T* obj);
+	 size_t Elements();
+	 void ShowElements();
          void Delete(T* obj);
          void Delete();
          
@@ -46,7 +51,6 @@ namespace QDLIB {
    template<typename T>
    Collector<T>::~Collector()
    {
-      Delete();
    }
 
    
@@ -86,10 +90,13 @@ namespace QDLIB {
       int ind;
 
       ind = find(obj);
-      if (ind != -1)
+      if (ind != -1){
          _RefCount[ind].refcount++;
-      else
+      }else {
 	 _RefCount.push_back(reflist(obj, aligned));
+      }
+      
+      
    }
 
    /**
@@ -103,6 +110,35 @@ namespace QDLIB {
    }
 
    /**
+    * Ask for the number collected objects in the Collector
+    */
+   template<typename T>
+   size_t Collector<T>::Elements()
+   {
+      return _RefCount.size();
+
+   }
+
+   /**
+    * Print overview over the collectors content
+    *
+    */
+   template<typename T>
+   void Collector<T>::ShowElements()
+   {
+   
+      /* Loop over whole list */
+      int size=_RefCount.size();
+      for (int i=0; i < size; i++) {
+	    cout << _RefCount[i].p; /* retrive pointer & remove from list */
+	    cout << "\t" << _RefCount[i].refcount;
+	    if(  _RefCount[i].aligned)
+	       cout << "\taligned";
+	    cout << endl;
+	 
+      }
+   }
+   /**
     * Delete the pointer to an object.
     *
     */
@@ -110,6 +146,7 @@ namespace QDLIB {
    void Collector<T>::Delete(T* obj)
    {
       if (obj == NULL) return;
+      if (_BigClean) return;
       
       int ind;
       
@@ -119,8 +156,12 @@ namespace QDLIB {
 	 if (_RefCount[ind].refcount == 0){
 	    T* p;
 	    p = _RefCount[ind].p;
+	    bool aligned = _RefCount[ind].aligned;
 	    _RefCount.erase (_RefCount.begin()+ind);
-	    delete p;
+	    if (aligned)
+	       free(p);
+	    else
+	       delete p;
 	 }
       }
    }
@@ -131,23 +172,27 @@ namespace QDLIB {
     */
    template<typename T>
    void Collector<T>::Delete()
-   {
+   {   
+      _BigClean = true;
       /* Loop over whole list */
-      while (! _RefCount.empty() ) {
-	 T* p;
-	 bool aligned;
-	 p = _RefCount.back().p; /* retrive pointer & remove from list */
-	 aligned = _RefCount.back().aligned;
-	 _RefCount.pop_back();
-	 
-	 /* delete object after list is clear => avoid problems if the destructor calls Delete(T*) */
-	 if (aligned)
-	    free(p);
-	 else
-	    delete p; 
+      int size=_RefCount.size();
+      for (int i=0; i < size; i++) {
+	 if (_RefCount[i].refcount > 0){
+	    T* p;
+	    bool aligned;
+	    p = _RefCount[i].p; /* retrive pointer & remove from list */
+	    aligned = _RefCount[i].aligned;
+	    
+	    /* delete object after list is clear => avoid problems if the destructor calls Delete(T*) */
+	    if (aligned)
+	       free(p);
+	    else
+	       delete p;
+	 } 
 	 
       }
       _RefCount.clear();
+      _BigClean = false;
    }
    
 }

@@ -4,10 +4,9 @@
 namespace QDLIB
 {
 
-   ODMultistate::ODMultistate() :
+   ODMultistate::ODMultistate() :  OMultistate(), ODSpace(),
          _name("ODMultistate"), _X(NULL), _T(NULL),  _state_size(0), _IsFullDiag(true)
    {
-
    }
 
    ODMultistate::~ODMultistate()

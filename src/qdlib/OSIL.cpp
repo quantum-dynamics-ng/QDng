@@ -15,12 +15,12 @@ namespace QDLIB {
     {
         if (_Lzb != NULL) {
            for (int i=0; i < _order; i++)
-              if (_Lzb[i] != NULL) delete _Lzb[i];
+	      DELETE_WF(_Lzb[i]);
            delete[] _Lzb;
         }
-        if (buf0 != NULL) delete buf0;
-        if (buf1 != NULL) delete buf1;
-        if (buf2 != NULL) delete buf2;
+        DELETE_WF(buf0);
+	DELETE_WF(buf1);
+	DELETE_WF(buf2);
     }
 
 

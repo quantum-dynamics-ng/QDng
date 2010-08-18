@@ -223,6 +223,8 @@ namespace QDLIB {
 
    }; /* class WaveFunction */
 
+   typedef Collector<WaveFunction> CollectorWF;
+   
    /** Pointwise multiplication. */
    WaveFunction* DirectProduct(WaveFunction* PsiA, WaveFunction* PsiB);
 

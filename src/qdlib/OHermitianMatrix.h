@@ -21,7 +21,7 @@ namespace QDLIB
     *
     * \todo modify matrix classes to provide real, efficient hermitian matrices.
     */
-   class OHermitianMatrix: public dMat, public ODSpaceT<double>
+   class OHermitianMatrix: public dMat, public ODSpace
    {
       public:
          typedef FileSingle<OHermitianMatrix> FileMatrix;
