@@ -1,9 +1,9 @@
 #ifndef OHERMAT_H
 #define OHERMAT_H
 
-#include "ODSpace.h"
+#include "qdlib/ODSpace.h"
 #include "tools/FileSingle.h"
-#include "TransformMat.h"
+#include "qdlib/TransformMat.h"
 
 namespace QDLIB
 {

@@ -5,7 +5,7 @@
 #endif 
 
 #include "ModuleLoader.h"
-#include "qdlib/InternalMods.h"
+#include "InternalMods.h"
 
 namespace QDLIB {
 

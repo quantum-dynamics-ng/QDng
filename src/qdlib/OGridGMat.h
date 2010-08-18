@@ -1,9 +1,9 @@
 #ifndef QDLIBOGRIDGMAT_H
 #define QDLIBOGRIDGMAT_H
 
-#include "OGridPotential.h"
-#include "WFGridSystem.h"
-#include "TransformFFT.h"
+#include "qdlib/OGridPotential.h"
+#include "qdlib/WFGridSystem.h"
+#include "qdlib/TransformFFT.h"
 
 namespace QDLIB {
 

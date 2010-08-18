@@ -1,7 +1,7 @@
 #ifndef QDLIBINTERNALMODS_H
 #define QDLIBINTERNALMODS_H
 
-#include "Operator.h"
+#include "qdlib/Operator.h"
 
 namespace QDLIB
 {

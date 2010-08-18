@@ -28,7 +28,7 @@ bin_PROGRAMS = qdng qdz
 qdng_SOURCES = GlobalOpList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
 	ProgOCT.cpp ProgPropa.cpp Reporter.cpp qdng.cpp
 qdng_LDADD =  $(top_builddir)/src/lib/libqdng.la 
-qdng_LDFLAGS = -Wl,-export-dynamic 
+qdng_LDFLAGS = -Wl,-export-dynamic
 
 qdz_SOURCES = qdz.cpp
 qdz_LDADD = $(top_builddir)/src/lib/libqdng.la

@@ -15,6 +15,6 @@ AM_CXXFLAGS = -O3 -g -fPIC
 #	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la \
 #	$(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS)
 noinst_LTLIBRARIES = libModuleLoader.la
-libModuleLoader_la_SOURCES = ModuleLoader.cpp
+libModuleLoader_la_SOURCES = ModuleLoader.cpp InternalMods.cpp
 
-noinst_HEADERS = ModuleLoader.h Module.h
+noinst_HEADERS = ModuleLoader.h Module.h InternalMods.h

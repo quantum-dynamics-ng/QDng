@@ -1,7 +1,7 @@
 #ifndef QDLIBOSCALAR_H
 #define QDLIBOSCALAR_H
 
-#include <Operator.h>
+#include "qdlib/Operator.h"
 
 namespace QDLIB {
 

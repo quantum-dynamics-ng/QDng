@@ -1,8 +1,8 @@
 #ifndef WFGRIDSYSTEM_H
 #define WFGRIDSYSTEM_H
 
-#include "WaveFunction.h"
-#include "GridSystem.h"
+#include "qdlib/WaveFunction.h"
+#include "qdlib/GridSystem.h"
 #include "fft/fft.h"
 
 namespace QDLIB {

@@ -1,7 +1,7 @@
 #ifndef QDLIBOPROPAGATOR_H
 #define QDLIBOPROPAGATOR_H
 
-#include "Operator.h"
+#include "qdlib/Operator.h"
 #include "tools/QDClock.h"
 #include "math/dcomplex.h"
 

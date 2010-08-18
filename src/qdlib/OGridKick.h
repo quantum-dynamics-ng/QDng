@@ -1,8 +1,8 @@
 #ifndef QDLIBOGRIDKICK_H
 #define QDLIBOGRIDKICK_H
 
-#include <Operator.h>
-#include <GridSystem.h>
+#include "qdlib/Operator.h"
+#include "qdlib/GridSystem.h"
 
 namespace QDLIB {
 

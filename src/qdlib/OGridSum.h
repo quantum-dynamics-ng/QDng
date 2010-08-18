@@ -1,7 +1,7 @@
 #ifndef QDLIBOGRIDSUM_H
 #define QDLIBOGRIDSUM_H
 
-#include "OGridsystem.h"
+#include "qdlib/OGridsystem.h"
 
 #define MAX_OPS 16
 

@@ -1,7 +1,7 @@
 #ifndef OGRIDPOTENTIAL_H
 #define OGRIDPOTENTIAL_H
 
-#include "OGridsystem.h"
+#include "qdlib/OGridsystem.h"
 
 namespace QDLIB
 {

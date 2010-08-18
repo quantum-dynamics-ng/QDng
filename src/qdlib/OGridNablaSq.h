@@ -1,10 +1,10 @@
 #ifndef QDLIBOGRIDNABLASQ_H
 #define QDLIBOGRIDNABLASQ_H
 
-#include "ODSpace.h"
-#include "Kspace.h"
-#include "GridSystem.h"
-#include "TransformFFT.h"
+#include "qdlib/ODSpace.h"
+#include "qdlib/Kspace.h"
+#include "qdlib/GridSystem.h"
+#include "qdlib/TransformFFT.h"
 
 namespace QDLIB
 {

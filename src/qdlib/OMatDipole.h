@@ -1,8 +1,8 @@
 #ifndef OMATDIPOLE_H_
 #define OMATDIPOLE_H_
 
-#include "OHermitianMatrix.h"
-#include "Laser.h"
+#include "qdlib/OHermitianMatrix.h"
+#include "qdlib/Laser.h"
 
 namespace QDLIB
 {

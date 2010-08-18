@@ -1,7 +1,7 @@
 #ifndef OSUM_H
 #define OSUM_H
 
-#include "Operator.h"
+#include "qdlib/Operator.h"
 
 #define MAX_OPS 16
 

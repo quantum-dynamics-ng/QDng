@@ -1,8 +1,8 @@
 #ifndef ODSPACE_H
 #define ODSPACE_H
 
-#include "Operator.h"
-#include "Transform.h"
+#include "qdlib/Operator.h"
+#include "qdlib/Transform.h"
 
 namespace QDLIB
 {

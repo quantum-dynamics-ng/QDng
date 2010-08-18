@@ -8,7 +8,7 @@
 #ifndef TRANSFORMMSD_H_
 #define TRANSFORMMSD_H_
 
-#include "Transform.h"
+#include "qdlib/Transform.h"
 
 namespace QDLIB
 {

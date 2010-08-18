@@ -1,8 +1,8 @@
 #ifndef QDLIBOMULTISTATE_H
 #define QDLIBOMULTISTATE_H
 
-#include "Operator.h"
-#include "WFMultistate.h"
+#include "qdlib/Operator.h"
+#include "qdlib/WFMultistate.h"
 
 namespace QDLIB
 {
