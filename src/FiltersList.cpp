@@ -79,9 +79,28 @@ namespace QDLIB {
       
       /* Load the operator list */
       string faction;
+      string value;
       
       while (filters->EndNode()){
 	 faction = filters->Name();
+	 ParamContainer& attr = filters->Attributes();
+	 
+	 /* Check which kind of value we want to see */
+	 if (attr.isPresent("value")){
+	    attr.GetValue("value", value);
+	    if (value == "real")
+	       _value[_size] = real;
+	    else if (value == "imag")
+	       _value[_size] = imag;
+	    else if (value == "complex")
+	       _value[_size] = complex;
+	    else
+	       throw EParamProblem ("Value type not known: ", value);
+	    
+	 } else
+	    _value[_size] = real;
+	 
+	 /* Check wchich filter action should be taken */
 	 if (faction == "normalize"){
 	    _action[_size] = normalize;
 	 }
@@ -145,7 +164,16 @@ namespace QDLIB {
       /* Apply filters */
       for(int i=0; i < _size; i++){
 	 if (_action[i] == expec || _action[i] == expeconly){
-	    _ofile << _olist[i]->Expec(Psi) << "\t";
+	    switch (_value[i]) {
+	       case imag:
+		  _ofile << _olist[i]->MatrixElement(Psi,Psi).imag() << "\t";
+		  break;
+	       case complex:
+		  _ofile << _olist[i]->MatrixElement(Psi,Psi) << "\t";
+		  break;
+	       default:
+	          _ofile << _olist[i]->Expec(Psi) << "\t";
+	    }
 	 }	 
 	 if (_action[i] == apply || _action[i] == expec){
 	    _olist[i]->Apply(Psi);

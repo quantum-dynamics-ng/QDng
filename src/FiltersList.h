@@ -22,12 +22,14 @@ namespace QDLIB {
    class FiltersList{
       private:
 	 typedef enum {expec, apply, expeconly, normalize} _FilterAction;
+	 typedef enum {real, imag, complex} _FilterValue;
 	 
 	 lint _size;
 	 bool _initalized;
 	 
 	 Operator* _olist[MAX_FILTERS];          /* Operator list */
 	 _FilterAction _action[MAX_FILTERS];     /* action for corresponding operator */
+	 _FilterValue _value[MAX_FILTERS];     /* action for corresponding operator */
          string _labels[MAX_FILTERS];            /* user defined labels for expec table  */
 	 
 	 string _fname;
