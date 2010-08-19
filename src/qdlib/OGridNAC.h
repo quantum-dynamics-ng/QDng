@@ -1,8 +1,8 @@
 #ifndef QDLIBOGRIDNAC_H
 #define QDLIBOGRIDNAC_H
 
-#include <OGridNabla.h>
-#include "OGridPotential.h"
+#include "qdlib/OGridNabla.h"
+#include "qdlib/OGridPotential.h"
 
 namespace QDLIB {
 

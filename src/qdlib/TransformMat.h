@@ -1,7 +1,7 @@
 #ifndef QDLIBTRANSFORMMAT_H
 #define QDLIBTRANSFORMMAT_H
 
-#include "Transform.h"
+#include "qdlib/Transform.h"
 
 namespace QDLIB {
 

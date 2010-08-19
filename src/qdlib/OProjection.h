@@ -1,7 +1,7 @@
 #ifndef QDLIBOPROJECTION_H
 #define QDLIBOPROJECTION_H
 
-#include "Operator.h"
+#include "qdlib/Operator.h"
 
 #define MAX_WFSPACE 1024 /* Maximum number of storable WFs */
 

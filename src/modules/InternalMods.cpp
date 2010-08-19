@@ -1,29 +1,29 @@
 #include "InternalMods.h"
 
 /* Operator list */
-#include "OCheby.h"
-#include "OSPO.h"
-#include "OGSPO.h"
-#include "OSIL.h"
+#include "qdlib/OCheby.h"
+#include "qdlib/OSPO.h"
+#include "qdlib/OGSPO.h"
+#include "qdlib/OSIL.h"
 
-#include "OGridNablaSq.h"
-#include "OGridGMat.h"
-#include "OGridPotential.h"
-#include "OGridDipole.h"
-#include "OGridPosition.h"
-#include "OGridNAC.h"
-#include "OGridKick.h"
+#include "qdlib/OGridNablaSq.h"
+#include "qdlib/OGridGMat.h"
+#include "qdlib/OGridPotential.h"
+#include "qdlib/OGridDipole.h"
+#include "qdlib/OGridPosition.h"
+#include "qdlib/OGridNAC.h"
+#include "qdlib/OGridKick.h"
 
-#include "OHermitianMatrix.h"
-#include "OMatDipole.h"
+#include "qdlib/OHermitianMatrix.h"
+#include "qdlib/OMatDipole.h"
 
-#include "OGobbler.h"
-#include "OProjection.h"
-#include "OScalar.h"
+#include "qdlib/OGobbler.h"
+#include "qdlib/OProjection.h"
+#include "qdlib/OScalar.h"
 
 /* Wavefunction list */
-#include "WFGridCartesian.h"
-#include "WFLevel.h"
+#include "qdlib/WFGridCartesian.h"
+#include "qdlib/WFLevel.h"
 
 /**
  * Macro for creating functions which generates an instance of the class.

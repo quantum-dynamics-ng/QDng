@@ -1,8 +1,8 @@
 #ifndef OGRIDDIPOLE_H
 #define OGRIDDIPOLE_H
 
-#include "OGridPotential.h"
-#include "Laser.h"
+#include "qdlib/OGridPotential.h"
+#include "qdlib/Laser.h"
 
 namespace QDLIB
 {

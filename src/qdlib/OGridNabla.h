@@ -1,9 +1,9 @@
 #ifndef QDLIBOGRIDNABLA_H
 #define QDLIBOGRIDNABLA_H
 
-#include "ODSpace.h"
-#include "GridSystem.h"
-#include "TransformFFT.h"
+#include "qdlib/ODSpace.h"
+#include "qdlib/GridSystem.h"
+#include "qdlib/TransformFFT.h"
 
 namespace QDLIB {
 

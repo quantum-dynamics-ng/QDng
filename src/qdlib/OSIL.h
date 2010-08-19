@@ -1,7 +1,7 @@
 #ifndef QDLIBOSIL_H
 #define QDLIBOSIL_H
 
-#include "OPropagator.h"
+#include "qdlib/OPropagator.h"
 
 #define SIL_DEF_ORDER 20
 

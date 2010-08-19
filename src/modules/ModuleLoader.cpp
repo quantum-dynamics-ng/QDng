@@ -1,10 +1,11 @@
+#include "config.h"
 
 #ifdef USE_DYNMODS
  #include <dlfcn.h>
 #endif 
 
 #include "ModuleLoader.h"
-#include "qdlib/InternalMods.h"
+#include "InternalMods.h"
 
 namespace QDLIB {
 
@@ -193,7 +194,7 @@ namespace QDLIB {
       /* try user path */
       s = _user_path + MOD_BASENAME_WF + name;
    
-      handle = dlopen(s.c_str(), RTLD_NOW );
+      handle = dlopen(s.c_str(), RTLD_NOW | RTLD_LOCAL);
       if ( handle != NULL )
       {
 	 _RegisterWF(handle, s);
@@ -202,7 +203,7 @@ namespace QDLIB {
       
       /* try system path */
       s = MOD_BASENAME_WF + name;
-      handle = dlopen(s.c_str(), RTLD_NOW );
+      handle = dlopen(s.c_str(), RTLD_NOW | RTLD_LOCAL);
       if ( handle != NULL )
       {
 	 _RegisterWF(handle, name);
@@ -245,7 +246,7 @@ namespace QDLIB {
 #ifdef USE_DYNMODS
       /* try user path */
       s = _user_path + MOD_BASENAME_OP + name + ".so";
-      handle = dlopen(s.c_str(), RTLD_NOW);
+      handle = dlopen(s.c_str(), RTLD_NOW | RTLD_LOCAL);
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);
@@ -254,7 +255,7 @@ namespace QDLIB {
       
       /* try system path */
       s = MOD_BASENAME_OP + name + ".so";
-      handle = dlopen(s.c_str(), RTLD_NOW );
+      handle = dlopen(s.c_str(), RTLD_NOW | RTLD_LOCAL);
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);

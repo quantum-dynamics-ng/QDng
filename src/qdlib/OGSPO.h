@@ -8,9 +8,9 @@
 #ifndef GSPO_H_
 #define GSPO_H_
 
-#include "OPropagator.h"
-#include "ODSpace.h"
-#include "OSum.h"
+#include "qdlib/OPropagator.h"
+#include "qdlib/ODSpace.h"
+#include "qdlib/OSum.h"
 
 #define GSPO_MAX_LEN 4
 

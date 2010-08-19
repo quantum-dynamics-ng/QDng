@@ -1,7 +1,7 @@
 #ifndef QDLIBWFGRIDCARTESIAN_H
 #define QDLIBWFGRIDCARTESIAN_H
 
-#include "WFGridSystem.h"
+#include "qdlib/WFGridSystem.h"
 
 namespace QDLIB {
 

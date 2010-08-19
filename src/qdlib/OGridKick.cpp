@@ -1,5 +1,6 @@
 #include "OGridKick.h"
 #include "WFGridSystem.h"
+
 namespace QDLIB {
 
    OGridKick::OGridKick()

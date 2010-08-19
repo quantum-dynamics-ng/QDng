@@ -9,8 +9,8 @@
 #define INTERNAL_BASENAME_WF "INT_WF"
 #define INTERNAL_BASENAME_OP "INT_O"
 
-#define MOD_BASENAME_WF "libqd-WF"
-#define MOD_BASENAME_OP "libqd-O"
+#define MOD_BASENAME_WF "qdWF"
+#define MOD_BASENAME_OP "qdO"
 
 namespace QDLIB {
 

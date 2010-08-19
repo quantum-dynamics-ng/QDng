@@ -1,7 +1,7 @@
 #ifndef OPERATOR_H
 #define OPERATOR_H
 
-#include "WaveFunction.h"
+#include "qdlib/WaveFunction.h"
 #include "tools/Exception.h"
 #include "tools/QDClock.h"
 #include "tools/Collector.h"

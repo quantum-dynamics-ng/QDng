@@ -1,8 +1,8 @@
 #ifndef OGRIDSYSTEM_H
 #define OGRIDSYSTEM_H
 
-#include "ODSpace.h"
-#include "GridSystem.h"
+#include "qdlib/ODSpace.h"
+#include "qdlib/GridSystem.h"
 #include "tools/FileSingle.h"
 
 namespace QDLIB

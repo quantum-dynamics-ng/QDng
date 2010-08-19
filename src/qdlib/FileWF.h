@@ -2,6 +2,7 @@
 #define QDLIBFILEWF_H
 
 #include "tools/FileSingle.h"
+#include "qdlib/WaveFunction.h"
 
 #define FILEWF_COMPRESSION false
 #define FILEWF_COMPRESSION_TOLERANCE 1e-4

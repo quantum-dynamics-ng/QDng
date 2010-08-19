@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include "WaveFunction.h"
+#include "qdlib/WaveFunction.h"
 
 namespace QDLIB {
    /**

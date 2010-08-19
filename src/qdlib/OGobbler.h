@@ -1,7 +1,7 @@
 #ifndef QDLIBOGOBBLER_H
 #define QDLIBOGOBBLER_H
 
-#include "OGridsystem.h"
+#include "qdlib/OGridsystem.h"
 
 namespace QDLIB {
 

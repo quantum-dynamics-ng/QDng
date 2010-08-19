@@ -1,10 +1,10 @@
 #ifndef QDLIBOSPO_H
 #define QDLIBOSPO_H
 
-#include "ODSpace.h"
-#include "OPropagator.h"
-#include "OGridSum.h"
-#include "OSum.h"
+#include "qdlib/ODSpace.h"
+#include "qdlib/OPropagator.h"
+#include "qdlib/OGridSum.h"
+#include "qdlib/OSum.h"
 #include "tools/Exception.h"
 
 
