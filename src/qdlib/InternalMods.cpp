@@ -71,6 +71,7 @@ namespace QDLIB
    {
       OGridNabla *p;
       p = new OGridNabla(true);
+      CollectorOp::Instance()->Register(p);
       return p;
    }
 
