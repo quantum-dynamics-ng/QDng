@@ -50,6 +50,7 @@ class WaveFunctionTest : public CppUnit::TestFixture
       ~WaveFunctionTest();
 
       virtual void setUp();
+      virtual void tearDown();
    protected:
       void NUMERIC_Test();
    private:

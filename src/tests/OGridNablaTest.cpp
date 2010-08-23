@@ -37,13 +37,20 @@ void OGridNablaTest::setUp()
    wf2->Init(p);
 
    p.clear();
+   
+   CollectorOp *Cop = CollectorOp::Instance();
+   Cop->Register(O);
+   
+   CollectorWF *Cwf = CollectorWF::Instance();   
+   Cwf->Register(wf);
+   Cwf->Register(wf2);
 }
 
 void OGridNablaTest::tearDown()
 {
    p.clear();
-   DELETE_WF(wf);
-   DELETE_WF(wf2);
+   DELETE_ALL_OP();
+   DELETE_ALL_WF();
 }
 
 void OGridNablaTest::API_Test()

@@ -122,7 +122,6 @@ namespace QDLIB {
       if (_fd == -1)
          throw (EIOError(errno, _fname));
    
-      cout << _fname<< endl;
       _open = true;
       
       /* Re-size the file */
@@ -152,16 +151,6 @@ namespace QDLIB {
       
       if (_size == size || !_open) return (T*) _mapbase;
 
-/*      if (_mmap) {
-        int res = munmap(_mapbase, _size * sizeof (T));
-        if (res != 0){
-           close(_fd);
-           _open = false;
-           Remove(_fname);           
-           throw (EIOError(errno, _fname));
-        }
-      }*/
-
       /* Resize */
       int res = ftruncate(_fd, size*sizeof(T));
       if (res != 0){
@@ -174,8 +163,6 @@ namespace QDLIB {
        
       /* Remap memory */
       if (_mmap) {        
-        //lseek(_fd, 0, SEEK_SET);
-        //_mapbase = mmap(NULL, size*sizeof(T), PROT_WRITE|PROT_READ, MAP_SHARED, _fd, 0);
         _mapbase = mremap(_mapbase, oldsize*sizeof(T), size*sizeof(T), MREMAP_MAYMOVE);
         
         if (_mapbase == MAP_FAILED){

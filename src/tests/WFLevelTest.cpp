@@ -20,6 +20,7 @@ void WFLevelTest::API_Test()
 {
    ParamContainer pm;
    WFLevel *wf = new WFLevel();
+   CollectorWF::Instance()->Register(wf);
    WaveFunction *wf2 = NULL;
    
    /* The name */
@@ -44,13 +45,14 @@ void WFLevelTest::API_Test()
    *wf2 = wf;
    CPPUNIT_ASSERT( (*wf2)[0].real() == 1 &&  (*wf2)[1].real() == 2);
    
-   
+   DELETE_ALL_WF();
 }
 
 void WFLevelTest::NUMERIC_Test()
 {
    ParamContainer pm;
    WFLevel *wf = new WFLevel();
+   CollectorWF::Instance()->Register(wf);
    
    pm.SetValue("size", 2);
    wf->Init(pm);
@@ -62,6 +64,8 @@ void WFLevelTest::NUMERIC_Test()
    
    wf->Normalize();
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Normalized", 1, wf->Norm(), LOOSE_EPS);
+   
+   DELETE_ALL_WF();
 }
 
 

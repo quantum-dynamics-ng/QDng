@@ -23,7 +23,11 @@ OMatDipoleTest::~OMatDipoleTest()
 
 void OMatDipoleTest::API_Test()
 {
+   CollectorOp *Cop = CollectorOp::Instance();
+   
    OMatDipole *M = new OMatDipole();
+   Cop->Register(M);
+   
    Laser* laser;
    ParamContainer pm;
    QDClock clock;
@@ -67,15 +71,23 @@ void OMatDipoleTest::API_Test()
 
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emin", -0.5, M->Emin().real(), LOOSE_EPS);
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emax", 6, M->Emax().real(), LOOSE_EPS);
+   
+   DELETE_ALL_OP();
 }
 
 
 void OMatDipoleTest::NUMERIC_Test()
 {
+   CollectorOp *Cop = CollectorOp::Instance();
+   CollectorWF *Cwf = CollectorWF::Instance();
+
+   
    OMatDipole *M = new OMatDipole();
+   Cop->Register(M);
    WaveFunction *wf = new WFLevel();
    WaveFunction *wf2;
-
+   Cwf->Register(wf);
+   
    Laser* laser;
    ParamContainer pm;
    QDClock clock;
@@ -132,6 +144,9 @@ void OMatDipoleTest::NUMERIC_Test()
 
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM",  -0.416146836547142, exp[1].real(), LOOSE_EPS);
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM",  -0.909297426825682, exp[1].imag(), LOOSE_EPS);
+   
+   DELETE_ALL_OP();
+   DELETE_ALL_WF();
 
 }
 

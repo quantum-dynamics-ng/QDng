@@ -55,10 +55,15 @@ void FileWFTest::IO_Test_Single()
    WaveFunction *psi, *psi_in;
    string s;
    int n;
+   CollectorOp *Cop = CollectorOp::Instance();
+   CollectorWF *Cwf = CollectorWF::Instance();
    
    /* Init Test WF */
    psi = new WFGridCartesian();
+   Cwf->Register(psi);
    psi_in = new WFGridCartesian();
+   Cwf->Register(psi_in);
+   
    p.SetValue("dims",1);
    p.SetValue("N0", WF_TEST_SIZE);
    p.SetValue("xmin0", -5);
@@ -100,7 +105,7 @@ void FileWFTest::IO_Test_Single()
       CPPUNIT_ASSERT( (*psi)[i].real() == (*psi_in)[i].real() );
       CPPUNIT_ASSERT( (*psi)[i].imag() == (*psi_in)[i].imag() );
    }
-   delete psi_in;
+   DELETE_WF(psi_in);
    
  
    /* Check class initialization by meta file */
@@ -135,9 +140,8 @@ void FileWFTest::IO_Test_Single()
 
    CPPUNIT_ASSERT_NO_THROW(Remove("TEST.wftest"));
    CPPUNIT_ASSERT_NO_THROW(Remove("TEST.meta"));
-   
-   delete psi;
-   if (psi_in != NULL) delete psi_in;
+
+   DELETE_ALL_WF();
 }
 
 /**
@@ -153,11 +157,15 @@ void FileWFTest::IO_Test_Multistate()
    WFMultistate *wfm, *wfm_in;
    string s;
    int n;
+   CollectorWF *Cwf = CollectorWF::Instance();
    
    /* Init Test WF */
    wfm = new WFMultistate();
+   Cwf->Register(wfm);
    psi0 = new WFGridCartesian();
+   Cwf->Register(psi0);
    psi1 = new WFGridCartesian();
+   Cwf->Register(psi1);
    p.SetValue("dims",1);
    p.SetValue("N0", WF_TEST_SIZE);
    p.SetValue("xmin0", -5);
@@ -187,8 +195,11 @@ void FileWFTest::IO_Test_Multistate()
    
    /* Re-read & check */
    wfm_in = new WFMultistate();
+   Cwf->Register(wfm_in);
    psi0_in = new WFGridCartesian();
+   Cwf->Register(psi0_in);
    psi1_in = new WFGridCartesian();
+   Cwf->Register(psi1_in);
    
    
    psi0_in->Init(p);  /* At least one vector must be initialzed */
@@ -259,7 +270,7 @@ void FileWFTest::IO_Test_Multistate()
       CPPUNIT_ASSERT( (*psi0_in)[i].imag() == (*psi1)[i].imag() );
    }
 
-   delete wfm_in;
+   DELETE_WF(wfm_in);
    wfm_in = NULL;
   
    /* Check load-by-meta style */
@@ -323,7 +334,7 @@ void FileWFTest::IO_Test_Multistate()
       CPPUNIT_ASSERT_NO_THROW(file >> wfm);
    }
    
-   delete wfm;
+   DELETE_ALL_WF();
    
 }
 

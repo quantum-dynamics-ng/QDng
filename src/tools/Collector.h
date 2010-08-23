@@ -182,6 +182,8 @@ namespace QDLIB {
 	       free(p);
 	    else
 	       delete p;
+            
+            _RefCount[i].refcount = 0;
 	 } 
 	 
       }

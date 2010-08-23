@@ -9,21 +9,24 @@ using namespace QDLIB;
 WaveFunctionTest::WaveFunctionTest()
  : CppUnit::TestFixture()
 {
-   wfr = new WFT();
-   wfc = new WFT();
-   wfbuf = new WFT();
 }
 
 
 WaveFunctionTest::~WaveFunctionTest()
 {
-   DELETE_WF(wfr);
-   DELETE_WF(wfc);
-   DELETE_WF(wfbuf);
 }
 
 void WaveFunctionTest::setUp()
 {
+   CollectorWF *Cwf = CollectorWF::Instance();
+   wfr = new WFT();
+   wfc = new WFT();
+   wfbuf = new WFT();
+
+   Cwf->Register(wfr);
+   Cwf->Register(wfc);
+   Cwf->Register(wfbuf);
+   
    wfr->newsize(WF_TEST_SIZE);
    wfc->newsize(WF_TEST_SIZE);
    
@@ -42,6 +45,12 @@ void WaveFunctionTest::setUp()
       
    }
 }
+
+void WaveFunctionTest::tearDown()
+{
+   DELETE_ALL_WF();
+}
+
 
 /** \todo Indepently test (const x) and (non const x) methods */
 void WaveFunctionTest::NUMERIC_Test()

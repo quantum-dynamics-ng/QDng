@@ -148,7 +148,7 @@ namespace QDLIB {
       Apply(ket, PsiKet);
       c = *PsiBra * ket;
       
-      delete ket;
+      DELETE_WF(ket);
       return c;
    }
 
@@ -199,7 +199,7 @@ namespace QDLIB {
       result = Psi->NewInstance();
       MatVecMult((cVec*) result, (dMat*) this, (cVec*) Psi);
       *Psi = result;
-      delete result;
+      DELETE_WF (result);
    }
 
    /**

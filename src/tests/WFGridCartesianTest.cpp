@@ -22,6 +22,8 @@ WFGridCartesianTest::~WFGridCartesianTest()
 void WFGridCartesianTest::setUp()
 {
    wf = new WFGridCartesian();
+   CollectorWF::Instance()->Register(wf);
+   
    p.SetValue("dims",1);
    p.SetValue("N0", WF_TEST_SIZE);
    p.SetValue("xmin0", -5);
@@ -32,7 +34,7 @@ void WFGridCartesianTest::setUp()
 void WFGridCartesianTest::tearDown()
 {
    p.clear();
-   DELETE_WF(wf);
+   DELETE_ALL_WF();
 }
 
 

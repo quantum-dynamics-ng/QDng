@@ -23,6 +23,7 @@ void WFGridSystemTest::setUp()
 {
    wf = new WFG;
    wf->newsize(WF_TEST_SIZE);
+   CollectorWF::Instance()->Register(wf);
    fgen_sin(*wf, -5, 5);
 }
 
@@ -58,6 +59,8 @@ void WFGridSystemTest::API_Test()
    /* Check copy */
    wf2 = dynamic_cast<WFG*>(wf->NewInstance());
    *((WFGridSystem*) wf2)  = (WFGridSystem*) wf;
+   
+   CollectorWF::Instance()->Register(wf2);
    
    CPPUNIT_ASSERT_NO_THROW( wf2->Init(p));
    
