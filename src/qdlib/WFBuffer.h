@@ -1,15 +1,21 @@
 #ifndef QDLIBWFBUFFER_H
 #define QDLIBWFBUFFER_H
 
-#include <queue>
+#include <map>
 #include <vector>
+#include <deque>
+
+#include <limits.h>
 
 #include "qdlib/WaveFunction.h"
 #include "tools/TmpFile.h"
 
 
-#define WFBUFFER_LOCK_LAST 8
-#define WFBUFFER_DEFAULT_MEM 3
+#define WFBUFFER_LOCK_LAST 2
+
+#ifndef SIZE_MAX
+#define SIZE_MAX LONG_MAX
+#endif
 
 namespace QDLIB {
 
@@ -26,6 +32,9 @@ namespace QDLIB {
          };
          
          size_t _size;
+         size_t _wfsize;
+         size_t _LastLocks;      /* How much of the last access to keep valid */
+         size_t _Locked;        /* */
          
          size_t _inmem;         /* Actual num elements in memory */
          size_t _maxmem;        /* Maximum number of elements allowed to keep in mem */
@@ -35,10 +44,15 @@ namespace QDLIB {
          dcomplex* _diskbuf;
          TmpFile<dcomplex> _File;
          
-         queue<size_t> _LastAccess; /* Lately accessed positions */
+         deque<size_t> _LastAccess; /* Lately accessed positions */
          
          vector<BufMap>  _buf;
-         vector<size_t> _diskmap;
+         vector<size_t> _diskmap;   /* key = diskpos, value = bufferpos */
+         
+         size_t _FreeDiskPos();
+         bool _IsLocked(size_t mempos);
+         void _MoveToDisk(size_t lpos);
+         void _MoveToMem(size_t pos);
       public:
          WFBuffer();
          ~WFBuffer();
@@ -48,10 +62,11 @@ namespace QDLIB {
          
          void Init(WaveFunction* Psi);
          
-         WaveFunction* GetBuf(size_t pos);
-         void Release(size_t pos);
+         WaveFunction* Get(size_t pos);
+         void Set(size_t pos, WaveFunction *Psi);
          
-         void SetBuf(size_t pos, WaveFunction *Psi);
+         void Lock(size_t pos);
+         void UnLock(size_t pos);
          //void Add(WaveFunction *Psi);
          
          void Clear();
