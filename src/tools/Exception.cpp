@@ -46,6 +46,15 @@ namespace QDLIB{
          case EIO:
                s = "I/O read error";
             break;
+         case EEXIST:
+               s = "File exists";
+            break;
+         case ENOTDIR:
+               s = "Path does not exist";
+            break;
+         case ENOSPC:
+               s = "No space left on device";
+            break;
          default:
             s = "Error in accessing file";
       }

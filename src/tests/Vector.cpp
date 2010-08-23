@@ -169,16 +169,17 @@ void VectorTest::API_Test_MultiStride()
    /* Stride Refs */
    class dVecStrides : public dVec {
       public:
-	 void SRef (dVec &vec, lint source, lint dest)
+         dVecStrides(lint n, lint s) : dVec(n,s) {}
+	 bool SRef (dVec &vec, lint source, lint dest)
 	 {
-	    StrideRef(vec, source, dest);
+	    return StrideRef(vec, source, dest);
 	 }
    };
    
-   dVecStrides ds;
+   dVecStrides ds(0,VEC_TEST_STRIDES);
    
    for (lint s=0; s < VEC_TEST_STRIDES; s++){
-      ds.SRef(da[s], 0, s);
+      CPPUNIT_ASSERT (ds.SRef(da[s], 0, s));
    }
 
    v = ds.begin();

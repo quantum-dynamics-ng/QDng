@@ -203,6 +203,8 @@ class Vector
 	     if (dest >= nstrides_) return false;
 	     if (stride_size_ > 0) destroy();
 	     
+             initialize(0, nstrides_);
+             
 	     stride_size_ = vec.stride_size_;
 	     isRef_ = true;
 	     align_ = false;
@@ -314,6 +316,12 @@ class Vector
     {
        initialize(N, nstrides_);
     }
+    
+    Vector(lint N, lint strides) : n_(0), nstrides_(0), stride_size_(0), isRef_(false), align_(true)
+    {
+       initialize(N, strides);
+    }
+
     
     Vector(lint N, const bool align) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(align)
     {

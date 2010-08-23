@@ -66,7 +66,7 @@ void OGSPOTest::setUp()
 void OGSPOTest::tearDown()
 {
    delete psi0;
-   delete psi1;
+   DELETE_WF(psi1);
 }
 
 void OGSPOTest::API_Test()
