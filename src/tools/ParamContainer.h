@@ -45,6 +45,7 @@ typedef map<string,string> string_map;
 	 bool GetValue(const string name, string &value);
 	 bool GetValue(const string name, int &value);
 	 bool GetValue(const string name, long int &value);
+         bool GetValue(const string name, size_t &value);
 	 bool GetValue(const string name, double &value);
 	 bool GetValue(const string name, bool &value, bool def = false);
          
@@ -61,6 +62,7 @@ typedef map<string,string> string_map;
 	 void SetValue(const string name, const string &value);
 	 void SetValue(const string name, const int &value);
 	 void SetValue(const string name, const long int &value);
+         void SetValue(const string name, const size_t &value);
 	 void SetValue(const string name, const double &value);
 	 void SetValue(const string name, const bool &value);
          

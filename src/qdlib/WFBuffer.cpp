@@ -10,7 +10,7 @@
 namespace QDLIB {
 
    WFBuffer::WFBuffer() : _size(0), _wfsize(0), _LastLocks(WFBUFFER_LOCK_LAST),
-                          _inmem(0), _maxmem(SIZE_MAX), _MaxBuf(0) ,_ondisk(0), _diskbuf(NULL)
+                          _inmem(0), _locked(0), _maxmem(SIZE_MAX), _MaxBuf(0) ,_ondisk(0), _diskbuf(NULL)
    {
       ParamContainer& gp = GlobalParams::Instance();
             
@@ -42,11 +42,20 @@ namespace QDLIB {
       
       return _diskmap.size()-1;
    }
+
+   /**
+    * Search for a valid buffer entry.
+    */
+   WaveFunction* WFBuffer::_ValidEntry()
+   {
+      for (int i=0; i < _buf.size(); i++)
+         if (_buf[i].Psi != NULL) return _buf[i].Psi;
+   }   
    
    bool WFBuffer::_IsLocked(size_t mempos)
    {
       for (int i=0; i < _LastAccess.size(); i++){
-         if ( _LastAccess[i] == mempos || _Locked == mempos ) return true;
+         if ( _LastAccess[i] == mempos || _buf[i].Locked ) return true;
       }
       return false;
    }
@@ -55,14 +64,18 @@ namespace QDLIB {
     * Copy a membuf element into the disk buffer.
     * \param lpos Don't move this buffer.
     */
-   void WFBuffer::_MoveToDisk(size_t lpos)
+   void WFBuffer::_MoveToDisk()
    {
       for (size_t i = _buf.size()-1; i > 0; i--){ /* walk through membuf - backwards */
-         if (i != lpos && _buf[i].BufPos == -1 && _buf[i].Psi != NULL && !_IsLocked(i)){ /* This is an Element in memory */
+         if (_buf[i].BufPos == -1 && _buf[i].Psi != NULL && !_IsLocked(i)){ /* This is an Element in memory */
             size_t dpos = _FreeDiskPos();
             _diskmap[dpos] = i;
-            memcpy(reinterpret_cast<void*>( & (_diskbuf[_wfsize*dpos])), 
-                   reinterpret_cast<void*>(_buf[i].Psi->begin(0)), _buf[i].Psi->sizeBytes());
+            
+            /* Be sure to move all strides */
+            for (int s=0; s < _buf[i].Psi->strides(); s++)
+               memcpy(reinterpret_cast<void*>( & (_diskbuf[_wfsize*dpos + s * _buf[i].Psi->lsize()])), 
+                      reinterpret_cast<void*>(_buf[i].Psi->begin(s)), _buf[i].Psi->sizeBytes());
+                   
             _ondisk++;
             _inmem--;
             _buf[i].BufPos = dpos;
@@ -79,11 +92,18 @@ namespace QDLIB {
     */
    void WFBuffer::_MoveToMem(size_t pos)
    {
-      memcpy(reinterpret_cast<void*>(_buf[pos].Psi->begin(0)),
-             reinterpret_cast<void*>(&(_diskbuf[_wfsize*_buf[pos].BufPos])), _buf[pos].Psi->sizeBytes());
+      /* Initialize buffer position */
+      if (_buf[pos].Psi == NULL)
+         _buf[pos].Psi = _ValidEntry()->NewInstance();
+      
+      for (int s=0; s < _buf[pos].Psi->strides(); s++)
+         memcpy(reinterpret_cast<void*>(_buf[pos].Psi->begin(s)),
+                reinterpret_cast<void*>(&(_diskbuf[_wfsize*_buf[pos].BufPos + s * _buf[pos].Psi->lsize()])), _buf[pos].Psi->sizeBytes());
+      
       /* Invalidate disk buffer element */ 
       _diskmap[_buf[pos].BufPos] = -1;
       _buf[pos].BufPos = -1;
+      
       _ondisk--;
       _inmem++;
    }
@@ -93,8 +113,10 @@ namespace QDLIB {
     */
    void WFBuffer::Size(size_t size)
    {
-      if (_size == 0) _size = size;
-      else if (size < 0) Clear();
+      if (size > 0) {
+         _size = size;
+         _buf.resize(_size);
+      } else if (size <= 0) Clear();
    }
 
    /**
@@ -104,26 +126,38 @@ namespace QDLIB {
    {
       if (_MaxBuf > 0){
          _maxmem = _MaxBuf / Psi->sizeBytes();
+      
+         _wfsize = Psi->size();
          
-         if (_maxmem < 1) _maxmem = 0;
+         if (_maxmem < 1)
             throw (EParamProblem("Not enough memory for buffer available"));
             
-         if (_maxmem < _size)
-            _diskbuf = _File.Open(_diskmap.size()*_wfsize,true);
+         if (_maxmem < _size){
+            _diskbuf = _File.Open((_size-_maxmem)*_wfsize,true);
+            _diskmap.assign(_size-_maxmem, -1);
+         }
          
       }
-      _wfsize = Psi->size();
    }
    
    /**
     * Set an element.
     */
    void WFBuffer::Set(size_t pos, WaveFunction *Psi)
-   {           
-      if (_inmem >= _maxmem)/* Move an element to disk storage */
-         _MoveToDisk(pos);
-        
-      
+   {
+      /* Check for right map size */
+      if (pos >= _buf.size()){
+         _buf.resize(pos+1);
+         _size = pos+1;
+      }
+
+      if (_inmem >= _maxmem){/* Move an element to disk storage */
+         bool lock = _buf[pos].Locked;
+         _buf[pos].Locked = true;
+         _MoveToDisk();
+         _buf[pos].Locked = lock;
+      }
+            
       if (_buf[pos].Psi == NULL) {
          _buf[pos].Psi = Psi->NewInstance();
          _inmem++;
@@ -143,8 +177,11 @@ namespace QDLIB {
          throw (EIncompatible("Invalid WFBuffer Element"));
       
       if (_buf[pos].Psi == NULL){
-         if (_inmem >= _maxmem)/* Move an element to disk storage */
-            _MoveToDisk(pos);
+         if (_inmem >= _maxmem) {/* Move an element to disk storage */
+            _buf[pos].Locked = true;
+            _MoveToDisk();
+            _buf[pos].Locked = false;
+         }
 
          _MoveToMem(pos);
       }
@@ -157,11 +194,15 @@ namespace QDLIB {
   
    /**
     * Lock a buffer element explictly to mem.
-    * Note that only one postion can be excplitly locked.
+    * 
     */
    void WFBuffer::Lock(size_t pos)
    {
-      _Locked = pos;
+      if (_LastLocks + _locked + 1 > _maxmem )
+         throw (EParamProblem("Can't lock another wave function to memory. Increase MaxBufferSize"));
+         
+      _buf[pos].Locked = true;
+      _locked++;
    }
 
    /**
@@ -169,7 +210,16 @@ namespace QDLIB {
     */
    void WFBuffer::UnLock(size_t pos)
    {
-      _Locked = pos;
+      _buf[pos].Locked = false;
+      _locked--;
+   }
+   
+   void WFBuffer::AutoLock(size_t LastLocks)
+   {
+      if ( LastLocks > _maxmem)
+         throw (EParamProblem("Can't lock enough wave functions to memory. Increase MaxBufferSize"));
+         
+      _LastLocks = LastLocks;
    }
    
    void WFBuffer::Clear()
@@ -186,7 +236,6 @@ namespace QDLIB {
       
       _diskmap.clear();
       
-      _Locked = -1;
       _size = 0;
       _inmem = 0;
       _maxmem = 0;

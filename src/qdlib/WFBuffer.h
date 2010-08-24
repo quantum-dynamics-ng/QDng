@@ -24,19 +24,21 @@ namespace QDLIB {
     *   @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
    class WFBuffer : private cVec {
+      friend class WFBufferTest;
       private:
          struct BufMap {
             WaveFunction* Psi;
+            bool Locked;
             int BufPos;         /* Position in  disk buffer */
-            BufMap() : Psi(NULL), BufPos(-1){}
+            BufMap() : Psi(NULL), Locked(false), BufPos(-1){}
          };
          
          size_t _size;
          size_t _wfsize;
          size_t _LastLocks;      /* How much of the last access to keep valid */
-         size_t _Locked;        /* */
          
          size_t _inmem;         /* Actual num elements in memory */
+         size_t _locked;        /* Actual number of explicit locks */
          size_t _maxmem;        /* Maximum number of elements allowed to keep in mem */
          size_t _ondisk;        /* Actual number of wfs on disk */
          size_t _MaxBuf;        /* Maximum mem size in bytes */
@@ -50,15 +52,16 @@ namespace QDLIB {
          vector<size_t> _diskmap;   /* key = diskpos, value = bufferpos */
          
          size_t _FreeDiskPos();
+         WaveFunction* _ValidEntry();
          bool _IsLocked(size_t mempos);
-         void _MoveToDisk(size_t lpos);
+         void _MoveToDisk();
          void _MoveToMem(size_t pos);
       public:
          WFBuffer();
          ~WFBuffer();
           
          void Size(size_t size);
-         size_t Size() const;
+         size_t Size() const {return _size;}
          
          void Init(WaveFunction* Psi);
          
@@ -67,7 +70,9 @@ namespace QDLIB {
          
          void Lock(size_t pos);
          void UnLock(size_t pos);
-         //void Add(WaveFunction *Psi);
+         
+         void AutoLock(size_t LastLocks);
+         size_t AutoLock() {return _LastLocks; }
          
          void Clear();
    };

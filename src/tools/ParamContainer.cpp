@@ -122,6 +122,25 @@ namespace QDLIB {
          return false;
       }
    }	
+
+   /** 
+    * Get an size_t value.
+    * 
+    * \param name  Name of parameter
+    * \param value Referenze to value
+    */
+   bool ParamContainer::GetValue(const string name, size_t &value)
+   {
+      if ( _param_map.find(name) != _param_map.end()){
+         sscanf( _param_map[name].c_str(), "%lu", &value);
+         return true;
+      }
+      else {
+         value = 0;
+         return false;
+      }
+   }    
+
    
    /** 
    * Get an long int value.
@@ -297,6 +316,24 @@ namespace QDLIB {
      ss >> _param_map[name];
 
    }
+
+   /**
+    * Set a size_t  value.
+    * 
+    * If the the name exists, the value is simply replaced,
+    * if not a new entry will be added.
+    * 
+    * \param name Name of parameter
+    * \param value Referenze to value
+    */
+   void ParamContainer::SetValue(const string name, const size_t &value)
+   {
+     stringstream ss;
+     
+     ss << value;
+     ss >> _param_map[name];
+   }
+
    
    /**
     * Set a double value.
