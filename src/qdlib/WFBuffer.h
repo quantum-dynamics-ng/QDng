@@ -67,6 +67,8 @@ namespace QDLIB {
          
          WaveFunction* Get(size_t pos);
          void Set(size_t pos, WaveFunction *Psi);
+         WaveFunction* operator[](size_t pos) { return Get(pos) ; }
+         
          
          void Lock(size_t pos);
          void UnLock(size_t pos);

@@ -183,7 +183,10 @@ namespace QDLIB {
             _buf[pos].Locked = false;
          }
 
-         _MoveToMem(pos);
+         if (_buf[pos].BufPos = -1) /* This might happen if we request a postion which haven't been written before */
+            _buf[pos].Psi = _ValidEntry()->NewInstance();
+         else
+            _MoveToMem(pos);
       }
       
       _LastAccess.push_front(pos);

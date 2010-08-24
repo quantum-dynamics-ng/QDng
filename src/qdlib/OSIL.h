@@ -2,6 +2,7 @@
 #define QDLIBOSIL_H
 
 #include "qdlib/OPropagator.h"
+#include "qdlib/WFBuffer.h"
 
 #define SIL_DEF_ORDER 20
 
@@ -21,7 +22,7 @@ namespace QDLIB {
             string _name;
             ParamContainer _needs;
             int _order;       /* Recursion depth, size of basis */
-            WaveFunction** _Lzb;  /* Buffer for Lanczos basis */
+            WFBuffer _Lzb;  /* Buffer for Lanczos basis */
             WaveFunction *buf0, *buf1, *buf2;   /* Buffers */ 
             dVec _alpha;      /* Store alpha coeffs */
             dVec _beta;       /* Store beta coeffs */

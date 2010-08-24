@@ -7,7 +7,7 @@ namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OSIL)
 	 
     OSIL::OSIL()
-            : OPropagator(), _name("OSIL"), _order(0), _Lzb(NULL), buf0(NULL), buf1(NULL), buf2(NULL)
+            : OPropagator(), _name("OSIL"), _order(0), buf0(NULL), buf1(NULL), buf2(NULL)
     {
         _needs.SetValue("hamiltonian", 0);
     }
@@ -15,11 +15,6 @@ namespace QDLIB {
 
     OSIL::~OSIL()
     {
-        if (_Lzb != NULL) {
-           for (int i=0; i < _order; i++)
-	      DELETE_WF(_Lzb[i]);
-           delete[] _Lzb;
-        }
         DELETE_WF(buf0);
 	DELETE_WF(buf1);
 	DELETE_WF(buf2);
@@ -34,13 +29,7 @@ namespace QDLIB {
        _beta.newsize(_order);
        _vect.newsize(_order);
        _vec0.newsize(_order);
-       _expHD.newsize(_order);
-       
-       _Lzb = new WaveFunction*[_order];
-
-       for (int i=0; i<_order; i++){
-	  _Lzb[i] = NULL;
-       }
+       _expHD.newsize(_order);       
     }
     
     void OSIL::Init(ParamContainer & params)
@@ -65,12 +54,13 @@ namespace QDLIB {
         if (Psi == NULL)
             throw(EParamProblem("SIL: Invalid WaveFunction"));
 
-        for (int i = 0; i < _order; i++)
-            _Lzb[i] = Psi->NewInstance();
-
         buf0 = Psi->NewInstance();
         buf1 = Psi->NewInstance();
         buf2 = Psi->NewInstance();
+        
+        _Lzb.Size(_order);
+        _Lzb.Init(Psi);
+        _Lzb.AutoLock(3);
     }
 
 
@@ -92,11 +82,11 @@ namespace QDLIB {
     {
         int it;
 
-        *(_Lzb[0]) = Psi;
+        _Lzb.Set(0, Psi);
         H->Apply(buf0,  _Lzb[0]);           /* H*q_0 */
         _alpha[0] = (*(_Lzb[0]) * buf0).real();     /* a_0 = <q_0 | H | _q0 > */
         
-        *(_Lzb[1]) = buf0;
+        _Lzb.Set(1, buf0);
         MultElementsCopy((cVec*) buf1, (cVec*) _Lzb[0], _alpha[0]);
         *(_Lzb[1]) -= buf1;
 
