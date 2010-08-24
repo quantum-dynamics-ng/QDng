@@ -26,14 +26,15 @@
 * I/O
  * MPI-IO
  * HDF5
- * Mem-chached file buffer (in FileSingle)
- * Disk-cached wf-buffer  [planed for alpha-0.6 ?]
+ * Mem-chached file buffer (in FileSingle, really needed?)
+ * Disk-cached wf-buffer  [planed for alpha-0.6 ?] (DONE)
  * Compressed storage => k-space, set zero, gzip/bzip2 compression (DONE)
  * Seperate FileSingle class into specialized parts (WaveFunction->Multistate, other types of data)
    => Special fileWF class (DONE)
 
 * Propgramm types
  * Eigen (=> SPO,Cheby with real exponents) (DONE)
+ * Eigen by Correlation functions
  * OCT (Krotov, freq-shape) (DONE)
  * Pump Probe Spectroscopy simulation
  * Loops in input with formatable loop variable in xml input

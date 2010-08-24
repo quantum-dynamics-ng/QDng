@@ -27,6 +27,7 @@ namespace QDLIB
                                       _start(0)
    {
       _P = new OProjection();
+      CollectorOp::Instance()->Register(_P);
    }
 
 
@@ -35,6 +36,7 @@ namespace QDLIB
       /* remove the clock */
       QDGlobalClock::Destroy();
       DELETE_ALL_OP();
+      DELETE_ALL_WF();
    }
 
    /**
