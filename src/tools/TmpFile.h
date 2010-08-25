@@ -8,18 +8,23 @@
 #include <sys/mman.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
 
-#define QDNG_TMPFILE_BASE "QDng_tmp_XXXXXX"
+#define QDNG_TMPFILE_BASE "QDng_tmp_XXXXXX"  /* File name template. Must be exactly 6 X's a the end ! */
 
 namespace QDLIB {
 
    /**
     * Temporary file.
+    * This class works like an array which is transparantly buffer on disk.
+    * If used with memory maped IO the temporary file is projected into memory.
+    *
+    * In none mmaped mode, simple read, write, seek methods are provided for IO.
     */
    template<typename T>
    class TmpFile {
@@ -52,7 +57,9 @@ namespace QDLIB {
          size_t Size() { return _size; }
    };
 
-   
+   /**
+    * If the file is still open at destruction, it will be deleted.
+    */
    template<typename T>
    TmpFile<T>::~TmpFile()
    {
@@ -111,14 +118,12 @@ namespace QDLIB {
       }
       
       /* Create a unique name and open the file */
-      char templ[] = QDNG_TMPFILE_BASE;
-      char* name = mktemp(templ);
-      if (name == NULL)
-         throw (EIOError("Can't create tmp file name", name));
+      _fname = tmpdir + QDNG_TMPFILE_BASE;
+      char *name = (char*) malloc(_fname.size()+1);
+      strcpy(name, _fname.c_str());
+      _fd = mkstemp(name); /* Open the file and replace X's in the file name template */
+      _fname = name;
       
-      _fname = tmpdir + name;
-      
-      _fd = open(_fname.c_str(), O_CREAT|O_RDWR, 0600);
       if (_fd == -1)
          throw (EIOError(errno, _fname));
    
@@ -144,6 +149,10 @@ namespace QDLIB {
       return NULL;
    }
    
+   /**
+    * Resize the file and the mmaped range if used.
+    * \return a new pointer to mmaped range. The old one might be invalid
+    */
    template<typename T>
    T* TmpFile<T>::Resize(size_t size)
    {
@@ -179,7 +188,7 @@ namespace QDLIB {
    }
    
    /**
-    * Close and remove the tmp file when requeseted.
+    * Close and remove the tmp file when requested.
     */
    template<typename T>
    void TmpFile<T>::Close(bool remove)

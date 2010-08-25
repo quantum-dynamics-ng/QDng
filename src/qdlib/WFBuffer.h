@@ -67,6 +67,11 @@ namespace QDLIB {
          
          WaveFunction* Get(size_t pos);
          void Set(size_t pos, WaveFunction *Psi);
+         void Add(WaveFunction *Psi);
+         
+         /**
+          * This is a synoyme for Get.
+          */
          WaveFunction* operator[](size_t pos) { return Get(pos) ; }
          
          

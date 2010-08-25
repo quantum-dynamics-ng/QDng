@@ -121,6 +121,7 @@ namespace QDLIB {
 
    /**
     * Init with a WF.
+    * This has to be done once.
     */
    void WFBuffer::Init(WaveFunction* Psi)
    {
@@ -171,6 +172,11 @@ namespace QDLIB {
       *(_buf[pos].Psi) = Psi;
    }
    
+   void WFBuffer::Add(WaveFunction *Psi)
+   {
+      Set(_buf.size(), Psi);
+   }
+   
    WaveFunction* WFBuffer::Get(size_t pos)
    {
       if (pos >= _buf.size())
@@ -183,7 +189,7 @@ namespace QDLIB {
             _buf[pos].Locked = false;
          }
 
-         if (_buf[pos].BufPos = -1) /* This might happen if we request a postion which haven't been written before */
+         if (_buf[pos].BufPos == -1) /* This might happen if we request a postion which haven't been written before */
             _buf[pos].Psi = _ValidEntry()->NewInstance();
          else
             _MoveToMem(pos);
@@ -217,6 +223,11 @@ namespace QDLIB {
       _locked--;
    }
    
+   /**
+    * A buffer element is automatically locked to memory when accessed.
+    * This determines how many of the last accessed are locked into memory.
+    * 
+    */
    void WFBuffer::AutoLock(size_t LastLocks)
    {
       if ( LastLocks > _maxmem)
@@ -225,6 +236,9 @@ namespace QDLIB {
       _LastLocks = LastLocks;
    }
    
+   /**
+    * Clear all Content of the buffer and remove the tmp file.
+    */
    void WFBuffer::Clear()
    {
       _File.Close();
