@@ -1,6 +1,7 @@
-Version 4.8 aus ../../../../src/fftw/doc/fftw3.texi.
+This is ../../../../src/fftw/doc/fftw3.info, produced by makeinfo
+version 4.11 from ../../../../src/fftw/doc/fftw3.texi.
 
-   This manual is for FFTW (version 3.2.2, 27 January 2010).
+This manual is for FFTW (version 3.2.2, 27 January 2010).
 
    Copyright (C) 2003 Matteo Frigo.
 
@@ -275,20 +276,20 @@ referred to the cited papers for the appropriate references.
 
    The rest of this manual is organized as follows.  We first discuss
 the sequential (single-processor) implementation.  We start by
-describing the basic interface/features of FFTW in *Note Tutorial::.
-The following chapter discusses *Note Other Important Topics::,
-including *Note Data Alignment::, the storage scheme of
+describing the basic interface/features of FFTW in *note Tutorial::.
+The following chapter discusses *note Other Important Topics::,
+including *note Data Alignment::, the storage scheme of
 multi-dimensional arrays (*note Multi-dimensional Array Format::), and
 FFTW's mechanism for storing plans on disk (*note Words of
-Wisdom-Saving Plans::).  Next, *Note FFTW Reference:: provides
+Wisdom-Saving Plans::).  Next, *note FFTW Reference:: provides
 comprehensive documentation of all FFTW's features.  Parallel
-transforms are discussed in their own chapters: *Note Multi-threaded
-FFTW::.  Fortran programmers can also use FFTW, as described in *Note
-Calling FFTW from Fortran::.  *Note Installation and Customization::
+transforms are discussed in their own chapters: *note Multi-threaded
+FFTW::.  Fortran programmers can also use FFTW, as described in *note
+Calling FFTW from Fortran::.  *note Installation and Customization::
 explains how to install FFTW in your computer system and how to adapt
 FFTW to your needs.  License and copyright information is given in
-*Note License and Copyright::.  Finally, we thank all the people who
-helped us in *Note Acknowledgments::.
+*note License and Copyright::.  Finally, we thank all the people who
+helped us in *note Acknowledgments::.
 
 
 File: fftw3.info,  Node: Tutorial,  Next: Other Important Topics,  Prev: Introduction,  Up: Top
@@ -309,9 +310,9 @@ Fourier transform of a single array.  This chapter tells the truth, but
 not the _whole_ truth. Specifically, FFTW implements additional
 routines and flags that are not documented here, although in many cases
 we try to indicate where added capabilities exist.  For more complete
-information, see *Note FFTW Reference::.  (Note that you need to
+information, see *note FFTW Reference::.  (Note that you need to
 compile and install FFTW before you can use it in a program.  For the
-details of the installation, see *Note Installation and
+details of the installation, see *note Installation and
 Customization::.)
 
    We recommend that you read this tutorial in order.(1)  At the least,
@@ -319,7 +320,7 @@ read the first section (*note Complex One-Dimensional DFTs::) before
 reading any of the others, even if your main interest lies in one of
 the other transform types.
 
-   Users of FFTW version 2 and earlier may also want to read *Note
+   Users of FFTW version 2 and earlier may also want to read *note
 Upgrading from FFTW version 2::.
 
    ---------- Footnotes ----------
@@ -429,7 +430,7 @@ Otherwise, the input array is overwritten with the transform.
    Users should note that FFTW computes an _unnormalized_ DFT.  Thus,
 computing a forward followed by a backward transform (or vice versa)
 results in the original array scaled by `n'.  For the definition of the
-DFT, see *Note What FFTW Really Computes::.  
+DFT, see *note What FFTW Really Computes::.  
 
    If you have a C compiler, such as `gcc', that supports the recent
 C99 standard, and you `#include <complex.h>' _before_ `<fftw3.h>', then
@@ -447,7 +448,7 @@ header file.
    Many more flags exist besides `FFTW_MEASURE' and `FFTW_ESTIMATE'.
 For example, use `FFTW_PATIENT' if you're willing to wait even longer
 for a possibly even faster plan (*note FFTW Reference::).  You can also
-save plans for future use, as described by *Note Words of Wisdom-Saving
+save plans for future use, as described by *note Words of Wisdom-Saving
 Plans::.
 
 
@@ -480,7 +481,7 @@ a pointer to an array `n[rank]' denoting an `n[0]' by `n[1]' by ... by
 `n[rank-1]' transform.  All of these transforms operate on contiguous
 arrays in the C-standard "row-major" order, so that the last dimension
 has the fastest-varying index in the array.  This layout is described
-further in *Note Multi-dimensional Array Format::.
+further in *note Multi-dimensional Array Format::.
 
    You may have noticed that all the planner routines described so far
 have overlapping functionality.  For example, you can plan a 1d or 2d
@@ -496,7 +497,7 @@ describe in this tutorial, but there are also the advanced and guru
 interfaces, which allow one to efficiently combine multiple/strided
 transforms into a single FFTW plan, transform a subset of a larger
 multi-dimensional array, and/or to handle more general complex-number
-formats.  For more information, see *Note FFTW Reference::.
+formats.  For more information, see *note FFTW Reference::.
 
 
 File: fftw3.info,  Node: One-Dimensional DFTs of Real Data,  Next: Multi-Dimensional DFTs of Real Data,  Prev: Complex Multi-Dimensional DFTs,  Up: Tutorial
@@ -839,7 +840,7 @@ correspond to N=0, and so are _not defined_ (the planner will return
 `NULL').  Otherwise, any positive `n' is supported.
 
    For the precise mathematical definitions of these transforms as used
-by FFTW, see *Note What FFTW Really Computes::.  (For people accustomed
+by FFTW, see *note What FFTW Really Computes::.  (For people accustomed
 to the DCT/DST, FFTW's definitions have a coefficient of 2 in front of
 the cos/sin functions so that they correspond precisely to an even/odd
 DFT of size N.  Some authors also include additional multiplicative
@@ -934,7 +935,7 @@ necessary, with at most `rank-1' post-processing passes [see e.g. H.
 Hao and R. N. Bracewell, Proc. IEEE 75, 264-266 (1987)].
 
    For the precise mathematical definition of the DHT as used by FFTW,
-see *Note What FFTW Really Computes::.
+see *note What FFTW Really Computes::.
 
    ---------- Footnotes ----------
 
@@ -1265,7 +1266,7 @@ be forgotten and its associated memory freed by calling:
      void fftw_forget_wisdom(void);
    
    Wisdom can be exported to a file, a string, or any other medium.
-For details, see *Note Wisdom::.
+For details, see *note Wisdom::.
 
 
 File: fftw3.info,  Node: Caveats in Using Wisdom,  Prev: Words of Wisdom-Saving Plans,  Up: Other Important Topics
@@ -1468,7 +1469,7 @@ desired.
 new-array execute interface.  *Note New-array Execute Functions::.
 
    `fftw_execute' (and equivalents) is the only function in FFTW
-guaranteed to be thread-safe; see *Note Thread safety::.
+guaranteed to be thread-safe; see *note Thread safety::.
 
    This function:
      void fftw_destroy_plan(fftw_plan plan);
@@ -1590,7 +1591,7 @@ Arguments
           n)
 
           performance even for prime sizes).  It is possible to
-          customize FFTW for different array sizes; see *Note
+          customize FFTW for different array sizes; see *note
           Installation and Customization::.  Transforms whose sizes are
           powers of 2 are especially fast.
 
@@ -1609,13 +1610,13 @@ Arguments
      `FFTW_BACKWARD').
 
    * `flags' is a bitwise OR (`|') of zero or more planner flags, as
-     defined in *Note Planner Flags::.
+     defined in *note Planner Flags::.
 
 
    FFTW computes an unnormalized transform: computing a forward
 followed by a backward transform (or vice versa) will result in the
 original data multiplied by the size of the transform (the product of
-the dimensions).  For more information, see *Note What FFTW Really
+the dimensions).  For more information, see *note What FFTW Really
 Computes::.
 
 
@@ -1772,7 +1773,7 @@ Arguments
    * `n', or `n0'/`n1'/`n2', or `n[rank]', respectively, gives the size
      of the _logical_ transform dimensions.  They can be any positive
      integer.  This is different in general from the _physical_ array
-     dimensions, which are described in *Note Real-data DFT Array
+     dimensions, which are described in *note Real-data DFT Array
      Format::.
 
         - FFTW is best at handling sizes of the form 2^a 3^b 5^c 7^d
@@ -1782,7 +1783,7 @@ Arguments
           n)
 
           performance even for prime sizes).  (It is possible to
-          customize FFTW for different array sizes; see *Note
+          customize FFTW for different array sizes; see *note
           Installation and Customization::.)  Transforms whose sizes
           are powers of 2 are especially fast, and it is generally
           beneficial for the _last_ dimension of an r2c/c2r transform
@@ -1794,10 +1795,10 @@ Arguments
      used in the flags.  (The arrays need not be initialized, but they
      must be allocated.)  For an in-place transform, it is important to
      remember that the real array will require padding, described in
-     *Note Real-data DFT Array Format::.  
+     *note Real-data DFT Array Format::.  
 
    * `flags' is a bitwise OR (`|') of zero or more planner flags, as
-     defined in *Note Planner Flags::.
+     defined in *note Planner Flags::.
 
 
    The inverse transforms, taking complex input (storing the
@@ -1826,7 +1827,7 @@ multiplied by the size of the transform (the product of the logical
 dimensions).  An r2c transform produces the same output as a
 `FFTW_FORWARD' complex DFT of the same input, and a c2r transform is
 correspondingly equivalent to `FFTW_BACKWARD'.  For more information,
-see *Note What FFTW Really Computes::.
+see *note What FFTW Really Computes::.
 
 
 File: fftw3.info,  Node: Real-data DFT Array Format,  Next: Real-to-Real Transforms,  Prev: Real-data DFTs,  Up: Basic Interface
@@ -1929,7 +1930,7 @@ Arguments
           retains O(n log n)
 
           performance even for prime sizes).  (It is possible to
-          customize FFTW for different array sizes; see *Note
+          customize FFTW for different array sizes; see *note
           Installation and Customization::.)  Transforms whose sizes
           are powers of 2 are especially fast.
 
@@ -1945,13 +1946,13 @@ Arguments
 
    * `kind', or `kind0'/`kind1'/`kind2', or `kind[rank]', is the kind
      of r2r transform used for the corresponding dimension.  The valid
-     kind constants are described in *Note Real-to-Real Transform
+     kind constants are described in *note Real-to-Real Transform
      Kinds::.  In a multi-dimensional transform, what is computed is
      the separable product formed by taking each transform kind along
      the corresponding dimension, one dimension after another.
 
    * `flags' is a bitwise OR (`|') of zero or more planner flags, as
-     defined in *Note Planner Flags::.
+     defined in *note Planner Flags::.
 
 
 
@@ -1962,8 +1963,8 @@ File: fftw3.info,  Node: Real-to-Real Transform Kinds,  Prev: Real-to-Real Trans
 
 FFTW currently supports 11 different r2r transform kinds, specified by
 one of the constants below.  For the precise definitions of these
-transforms, see *Note What FFTW Really Computes::.  For a more
-colloquial introduction to these transform kinds, see *Note More DFTs
+transforms, see *note What FFTW Really Computes::.  For a more
+colloquial introduction to these transform kinds, see *note More DFTs
 of Real Data::.
 
    For dimension of size `n', there is a corresponding "logical"
@@ -2116,7 +2117,7 @@ for the real array are in units of `double', and for the complex array
 are in units of `fftw_complex'.
 
    If an `nembed' parameter is `NULL', it is interpreted as what it
-would be in the basic interface, as described in *Note Real-data DFT
+would be in the basic interface, as described in *note Real-data DFT
 Array Format::.  That is, for the complex array the size is assumed to
 be the same as `n', but with the last dimension cut roughly in half.
 For the real array, the size is assumed to be `n' if the transform is
@@ -2191,7 +2192,7 @@ The guru interface supports two representations of complex numbers,
 which we call the interleaved and the split format.
 
    The "interleaved" format is the same one used by the basic and
-advanced interfaces, and it is documented in *Note Complex numbers::.
+advanced interfaces, and it is documented in *note Complex numbers::.
 In the interleaved format, you provide pointers to the real part of a
 complex number, and the imaginary part understood to be stored in the
 next memory location.  
@@ -2286,7 +2287,7 @@ should point to `fftw_iodim' arrays of length `rank' and
 `howmany_rank', respectively.
 
    `flags' is a bitwise OR (`|') of zero or more planner flags, as
-defined in *Note Planner Flags::.
+defined in *note Planner Flags::.
 
    In the `fftw_plan_guru_dft' function, the pointers `in' and `out'
 point to the interleaved input and output arrays, respectively.  The
@@ -2309,7 +2310,7 @@ are:
 expressed in units of `double'.  For a contiguous `fftw_complex' array,
 the overall stride of the transform should be 2, the distance between
 consecutive real parts or between consecutive imaginary parts; see
-*Note Guru vector and transform sizes::.  Note that the dimension
+*note Guru vector and transform sizes::.  Note that the dimension
 strides are applied equally to the real and imaginary parts; real and
 imaginary arrays with different strides are not supported.
 
@@ -2370,8 +2371,8 @@ rounded down).  The strides, on the other hand, are taken to be exactly
 as specified.  It is up to the user to specify the strides
 appropriately for the peculiar dimensions of the data, and we do not
 guarantee that the planner will succeed (return non-`NULL') for any
-dimensions other than those described in *Note Real-data DFT Array
-Format:: and generalized in *Note Advanced Real-data DFTs::.  (That is,
+dimensions other than those described in *note Real-data DFT Array
+Format:: and generalized in *note Advanced Real-data DFTs::.  (That is,
 for an in-place transform, each individual dimension should be able to
 operate in place.)  
 
@@ -2384,7 +2385,7 @@ transform.   (In-place transforms where `in' and `io' or `ii' and `out'
 are the same are not currently supported.)
 
    `flags' is a bitwise OR (`|') of zero or more planner flags, as
-defined in *Note Planner Flags::.
+defined in *note Planner Flags::.
 
    In-place transforms of rank greater than 1 are currently only
 supported for interleaved arrays.  For split arrays, the planner will
@@ -2411,14 +2412,14 @@ multi-dimensional vector (loop) of dimensions (`howmany_rank',
 
    The transform kind of each dimension is given by the `kind'
 parameter, which should point to an array of length `rank'.  Valid
-`fftw_r2r_kind' constants are given in *Note Real-to-Real Transform
+`fftw_r2r_kind' constants are given in *note Real-to-Real Transform
 Kinds::.
 
    `in' and `out' point to the real input and output arrays; they may
 be the same, indicating an in-place transform.
 
    `flags' is a bitwise OR (`|') of zero or more planner flags, as
-defined in *Note Planner Flags::.
+defined in *note Planner Flags::.
 
 
 File: fftw3.info,  Node: 64-bit Guru Interface,  Prev: Guru Real-to-real Transforms,  Up: Guru Interface
@@ -2478,7 +2479,7 @@ File: fftw3.info,  Node: New-array Execute Functions,  Next: Wisdom,  Prev: Guru
 ===============================
 
 Normally, one executes a plan for the arrays with which the plan was
-created, by calling `fftw_execute(plan)' as described in *Note Using
+created, by calling `fftw_execute(plan)' as described in *note Using
 Plans::.  However, it is possible for sophisticated users to apply a
 given plan to a _different_ array using the "new-array execute"
 functions detailed below, provided that the following conditions are
@@ -2797,7 +2798,7 @@ where N = 2(n-1).
    The proper definition of even symmetry for `REDFT10', `REDFT01', and
 `REDFT11' transforms is somewhat more intricate because of the shifts
 by 1/2 of the input and/or output, although the corresponding boundary
-conditions are given in *Note Real even/odd DFTs (cosine/sine
+conditions are given in *note Real even/odd DFTs (cosine/sine
 transforms)::.  Because of the even symmetry, however, the sine terms
 in the DFT all cancel and the remaining cosine terms are written
 explicitly below.  This formulation often leads people to call such a
@@ -2873,7 +2874,7 @@ actually stored (the j=0 element is zero), where N = 2(n+1).
    The proper definition of odd symmetry for `RODFT10', `RODFT01', and
 `RODFT11' transforms is somewhat more intricate because of the shifts
 by 1/2 of the input and/or output, although the corresponding boundary
-conditions are given in *Note Real even/odd DFTs (cosine/sine
+conditions are given in *note Real even/odd DFTs (cosine/sine
 transforms)::.  Because of the odd symmetry, however, the cosine terms
 in the DFT all cancel and the remaining sine terms are written
 explicitly below.  This formulation often leads people to call such a
@@ -2965,7 +2966,7 @@ symmetry, we only store the k[d-1] = 0...n[d-1]/2 elements of the
 _last_ dimension (division by 2 is rounded down).  (We could instead
 have cut any other dimension in half, but the last dimension proved
 computationally convenient.)  This results in the peculiar array format
-described in more detail by *Note Real-data DFT Array Format::.
+described in more detail by *note Real-data DFT Array Format::.
 
    The multi-dimensional c2r transform is simply the unnormalized
 inverse of the r2c transform.  i.e. it is the same as FFTW's complex
@@ -2978,10 +2979,10 @@ along each dimension, as computed by FFTW, is not always the same thing
 as the usual multi-dimensional transform.  A multi-dimensional `R2HC'
 (or `HC2R') transform is not identical to the multi-dimensional DFT,
 requiring some post-processing to combine the requisite real and
-imaginary parts, as was described in *Note The Halfcomplex-format
+imaginary parts, as was described in *note The Halfcomplex-format
 DFT::.  Likewise, FFTW's multidimensional `FFTW_DHT' r2r transform is
 not the same thing as the logical multi-dimensional discrete Hartley
-transform defined in the literature, as discussed in *Note The Discrete
+transform defined in the literature, as discussed in *note The Discrete
 Hartley Transform::.
 
 
@@ -3326,7 +3327,7 @@ same, with the following exceptions:
      for multi-dimensional real-complex transforms, discussed below.
 
    * Wisdom import and export is somewhat more tricky because one cannot
-     easily pass files or strings between C and Fortran; see *Note
+     easily pass files or strings between C and Fortran; see *note
      Wisdom of Fortran?::.
 
    * Fortran cannot use the `fftw_malloc' dynamic-allocation routine.
@@ -3417,7 +3418,7 @@ that it does nothing.
 
    There are various workarounds to this, but the safest and simplest
 thing is to not use `dfftw_execute' in Fortran.  Instead, use the
-functions described in *Note New-array Execute Functions::, which take
+functions described in *note New-array Execute Functions::, which take
 the input/output arrays as explicit arguments.  For example, if the
 plan is for a complex-data DFT and was created for the arrays `in' and
 `out', you would do:
@@ -3552,7 +3553,7 @@ File: fftw3.info,  Node: Wisdom of Fortran?,  Prev: Fortran Examples,  Up: Calli
 
 In this section, we discuss how one can import/export FFTW wisdom
 (saved plans) to/from a Fortran program; we assume that the reader is
-already familiar with wisdom, as described in *Note Words of
+already familiar with wisdom, as described in *note Words of
 Wisdom-Saving Plans::.
 
    The basic problem is that is difficult to (portably) pass files and
@@ -4875,97 +4876,97 @@ File: fftw3.info,  Node: Library Index,  Prev: Concept Index,  Up: Top
 
 
 Tag Table:
-Node: Top1131
-Node: Introduction4106
-Node: Tutorial10393
-Ref: Tutorial-Footnote-111637
-Node: Complex One-Dimensional DFTs11731
-Node: Complex Multi-Dimensional DFTs17351
-Node: One-Dimensional DFTs of Real Data19920
-Node: Multi-Dimensional DFTs of Real Data24161
-Node: More DFTs of Real Data27733
-Node: The Halfcomplex-format DFT31235
-Node: Real even/odd DFTs (cosine/sine transforms)33844
-Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-139454
-Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-239643
-Node: The Discrete Hartley Transform40578
-Ref: The Discrete Hartley Transform-Footnote-142922
-Node: Other Important Topics43171
-Node: Data Alignment43448
-Node: SIMD alignment and fftw_malloc43949
-Node: Stack alignment on x8645807
-Node: Multi-dimensional Array Format47451
-Node: Row-major Format48068
-Node: Column-major Format49761
-Node: Fixed-size Arrays in C50731
-Node: Dynamic Arrays in C52167
-Node: Dynamic Arrays in C-The Wrong Way53805
-Node: Words of Wisdom-Saving Plans55552
-Node: Caveats in Using Wisdom58159
-Node: FFTW Reference60247
-Node: Data Types and Files60735
-Node: Complex numbers61167
-Node: Precision62904
-Node: Memory Allocation64087
-Node: Using Plans65097
-Node: Basic Interface68034
-Node: Complex DFTs68533
-Node: Planner Flags72332
-Node: Real-data DFTs77664
-Node: Real-data DFT Array Format82566
-Node: Real-to-Real Transforms84821
-Node: Real-to-Real Transform Kinds88801
-Node: Advanced Interface91269
-Node: Advanced Complex DFTs92009
-Node: Advanced Real-data DFTs94756
-Node: Advanced Real-to-real Transforms97083
-Node: Guru Interface98189
-Node: Interleaved and split arrays99112
-Node: Guru vector and transform sizes100155
-Node: Guru Complex DFTs102720
-Node: Guru Real-data DFTs105556
-Node: Guru Real-to-real Transforms108479
-Node: 64-bit Guru Interface109798
-Node: New-array Execute Functions112121
-Node: Wisdom116119
-Node: Wisdom Export116478
-Node: Wisdom Import118078
-Node: Forgetting Wisdom119856
-Node: Wisdom Utilities120228
-Node: What FFTW Really Computes121595
-Node: The 1d Discrete Fourier Transform (DFT)122420
-Node: The 1d Real-data DFT123779
-Node: 1d Real-even DFTs (DCTs)125433
-Node: 1d Real-odd DFTs (DSTs)128642
-Node: 1d Discrete Hartley Transforms (DHTs)131584
-Node: Multi-dimensional Transforms132260
-Node: Multi-threaded FFTW134863
-Node: Installation and Supported Hardware/Software136326
-Node: Usage of Multi-threaded FFTW137763
-Node: How Many Threads to Use?140403
-Node: Thread safety141427
-Node: FFTW on the Cell Processor143168
-Node: Cell Installation144316
-Node: Cell Caveats145331
-Node: FFTW Accuracy on Cell147030
-Node: Calling FFTW from Fortran148062
-Node: Fortran-interface routines148884
-Ref: Fortran-interface routines-Footnote-1152281
-Ref: Fortran-interface routines-Footnote-2152484
-Node: FFTW Constants in Fortran152617
-Node: FFTW Execution in Fortran153680
-Node: Fortran Examples156415
-Node: Wisdom of Fortran?159827
-Node: Upgrading from FFTW version 2161500
-Ref: Upgrading from FFTW version 2-Footnote-1171116
-Node: Installation and Customization171299
-Node: Installation on Unix172941
-Node: Installation on non-Unix systems181677
-Node: Cycle Counters183899
-Node: Generating your own code185649
-Node: Acknowledgments187727
-Node: License and Copyright191384
-Node: Concept Index193228
-Node: Library Index219505
+Node: Top1125
+Node: Introduction4100
+Node: Tutorial10387
+Ref: Tutorial-Footnote-111631
+Node: Complex One-Dimensional DFTs11725
+Node: Complex Multi-Dimensional DFTs17345
+Node: One-Dimensional DFTs of Real Data19914
+Node: Multi-Dimensional DFTs of Real Data24155
+Node: More DFTs of Real Data27727
+Node: The Halfcomplex-format DFT31229
+Node: Real even/odd DFTs (cosine/sine transforms)33838
+Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-139448
+Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-239637
+Node: The Discrete Hartley Transform40572
+Ref: The Discrete Hartley Transform-Footnote-142916
+Node: Other Important Topics43165
+Node: Data Alignment43442
+Node: SIMD alignment and fftw_malloc43943
+Node: Stack alignment on x8645801
+Node: Multi-dimensional Array Format47445
+Node: Row-major Format48062
+Node: Column-major Format49755
+Node: Fixed-size Arrays in C50725
+Node: Dynamic Arrays in C52161
+Node: Dynamic Arrays in C-The Wrong Way53799
+Node: Words of Wisdom-Saving Plans55546
+Node: Caveats in Using Wisdom58153
+Node: FFTW Reference60241
+Node: Data Types and Files60729
+Node: Complex numbers61161
+Node: Precision62898
+Node: Memory Allocation64081
+Node: Using Plans65091
+Node: Basic Interface68028
+Node: Complex DFTs68527
+Node: Planner Flags72326
+Node: Real-data DFTs77658
+Node: Real-data DFT Array Format82560
+Node: Real-to-Real Transforms84815
+Node: Real-to-Real Transform Kinds88795
+Node: Advanced Interface91263
+Node: Advanced Complex DFTs92003
+Node: Advanced Real-data DFTs94750
+Node: Advanced Real-to-real Transforms97077
+Node: Guru Interface98183
+Node: Interleaved and split arrays99106
+Node: Guru vector and transform sizes100149
+Node: Guru Complex DFTs102714
+Node: Guru Real-data DFTs105550
+Node: Guru Real-to-real Transforms108473
+Node: 64-bit Guru Interface109792
+Node: New-array Execute Functions112115
+Node: Wisdom116113
+Node: Wisdom Export116472
+Node: Wisdom Import118072
+Node: Forgetting Wisdom119850
+Node: Wisdom Utilities120222
+Node: What FFTW Really Computes121589
+Node: The 1d Discrete Fourier Transform (DFT)122414
+Node: The 1d Real-data DFT123773
+Node: 1d Real-even DFTs (DCTs)125427
+Node: 1d Real-odd DFTs (DSTs)128636
+Node: 1d Discrete Hartley Transforms (DHTs)131578
+Node: Multi-dimensional Transforms132254
+Node: Multi-threaded FFTW134857
+Node: Installation and Supported Hardware/Software136320
+Node: Usage of Multi-threaded FFTW137757
+Node: How Many Threads to Use?140397
+Node: Thread safety141421
+Node: FFTW on the Cell Processor143162
+Node: Cell Installation144310
+Node: Cell Caveats145325
+Node: FFTW Accuracy on Cell147024
+Node: Calling FFTW from Fortran148056
+Node: Fortran-interface routines148878
+Ref: Fortran-interface routines-Footnote-1152275
+Ref: Fortran-interface routines-Footnote-2152478
+Node: FFTW Constants in Fortran152611
+Node: FFTW Execution in Fortran153674
+Node: Fortran Examples156409
+Node: Wisdom of Fortran?159821
+Node: Upgrading from FFTW version 2161494
+Ref: Upgrading from FFTW version 2-Footnote-1171110
+Node: Installation and Customization171293
+Node: Installation on Unix172935
+Node: Installation on non-Unix systems181671
+Node: Cycle Counters183893
+Node: Generating your own code185643
+Node: Acknowledgments187721
+Node: License and Copyright191378
+Node: Concept Index193222
+Node: Library Index219499
 
 End Tag Table
