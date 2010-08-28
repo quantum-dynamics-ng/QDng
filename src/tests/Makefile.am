@@ -10,6 +10,7 @@ endif
 
 
 noinst_HEADERS = ComplexNumbers.h TmpFileTest.h MatrixTest.h LapackTest.h GridSystem.h FileWFTest.h MultElementsTest.h \
+        PeakFinderTest.h \
 	OGridHarmonic.h OGridNablaSqTest.h OGridNablaTest.h QDClock.h TestCheby.h \
 	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
 	Vector.h WFGridCartesian.h WFGridHarmonic.h WFGridSystemTest.h \
@@ -18,7 +19,7 @@ noinst_HEADERS = ComplexNumbers.h TmpFileTest.h MatrixTest.h LapackTest.h GridSy
 
 noinst_PROGRAMS = runtest
 runtest_SOURCES = ComplexNumbers.cpp TmpFileTest.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
-	dVecMinMax.cpp dVecMinMax.h MatrixTest.cpp LapackTest.cpp GridSystem.cpp FileWFTest.cpp QDClock.cpp \
+	dVecMinMax.cpp dVecMinMax.h PeakFinderTest.cpp MatrixTest.cpp LapackTest.cpp GridSystem.cpp FileWFTest.cpp QDClock.cpp \
 	WFLevelTest.cpp WFBufferTest.cpp OHermitianMatrixTest.cpp OMatDipoleTest.cpp OGridNablaSqTest.cpp OGridNablaTest.cpp \
 	WaveFunctionTest.cpp WFGridCartesianTest.cpp WFGridSystemTest.cpp OGSPOTest.cpp \
 	function_gens.cpp main.cpp
