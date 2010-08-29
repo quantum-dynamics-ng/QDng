@@ -203,7 +203,7 @@ int main(int argc, char **argv)
 	 } else if (progname == "eigen") {
 	    ProgEigen eigen(*prognodes);
 	    eigen.SetDirectory(dir);
-	    log.Header("Imaginary Time Eigenfunctions", Logger::Chapter);
+	    log.Header("Eigenfunctions calculation", Logger::Chapter);
 	    eigen.Run();
 	 } else if (progname == "oct") {
 	    ProgOCT oct(*prognodes);

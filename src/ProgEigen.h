@@ -6,8 +6,7 @@
 #include "qdlib/OProjection.h"
 #include "qdlib/OPropagator.h"
 
-#include "tools/XmlNode.h"
-
+#include "qdlib/FileWF.h"
 
 #define DEFAULT_NUMBER_EFS      20
 #define DEFAULT_CONVERGENCE_EF_RAW  1e-8
@@ -27,23 +26,27 @@ namespace QDLIB
     *  The calculation is done via imaginary time propagation.
     * 
     * Options:
+    *  \li method [imag,ac] Eigenfunction either via imaginary time propgation or auto correlation.
     *  \li dt
-    *  \li conv   Convergence
     *  \li steps  Maximum number of steps
-    *  \li Nef    Number of eigenfunctions
     *  \li dir    Output directory
     *  \li fname  Base name for ef output
     *  \li ename  Name for energy.dat
-    *  \li diag   true/false diagonalize the eigen basis
+    *  \li diag   true/false diagonalize the Hamiltonian in the basis of the calc. eigenfunctions
+    * Only for method imag:
+    *  \li Nef    Number of eigenfunctions
+    *  \li conv   Convergence
     *  \li start  Do not start with zeroeth EF but read already calculated
+    * Only for method ac:
+    *  \li tol    Tolerance factor for peak finder (in units of sigma)
     * 
-    *  \todo diagonalization
     *  @author Markus Kowalewski
     */
    class ProgEigen
    {
 
       private:
+         typedef enum {imag, ac} _method_t;
 	 /* Input */
 	 XmlNode &_EigenNode;
 	 XmlNode *_ContentNodes;
@@ -54,6 +57,7 @@ namespace QDLIB
 	 OProjection *_P;
 	 
 	 /* Parameters */
+         _method_t _method;
 	 string _dir;
 	 lint _Nef;
 	 double _convergence;
@@ -63,6 +67,11 @@ namespace QDLIB
 	 double _dt;
 	 bool _diag; /* Diagonalize Basis */
          int _start;
+         double _tol;
+         
+         WaveFunction *_PsiInitial;
+         
+         FileWF _efile;
          
 	 dVec _Energies_raw;
 	 dVec _Energies_diag;
@@ -72,6 +81,8 @@ namespace QDLIB
 	 
       protected:
 	 void WriteEnergyFile();
+         void ImagTimeEF();
+         void AutoCorrEF();
       public:
 	 ProgEigen(XmlNode &EigenNode);
 	 

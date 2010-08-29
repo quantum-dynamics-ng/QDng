@@ -11,8 +11,10 @@
 #include "tools/QDGlobalClock.h"
 
 #include "ChainLoader.h"
-#include "qdlib/FileWF.h"
 #include "qdlib/Conversion.h"
+#include "qdlib/WFBuffer.h"
+#include "tools/PeakFinder.h"
+#include "fft/fft.h"
 
 #include "linalg/LapackDiag.h"
 
@@ -20,11 +22,11 @@ namespace QDLIB
 {
 
    ProgEigen::ProgEigen(XmlNode &EigenNode) : _EigenNode(EigenNode),
-                            _U(NULL), _H(NULL), _Nef(DEFAULT_NUMBER_EFS),
+                            _U(NULL), _H(NULL), _method(imag), _Nef(DEFAULT_NUMBER_EFS),
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS),
                                       _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true),
-                                      _start(0)
+                                      _start(0), _tol(1)
    {
       _P = new OProjection();
       CollectorOp::Instance()->Register(_P);
@@ -94,43 +96,62 @@ namespace QDLIB
    
       attr = _EigenNode.Attributes();
       
+      /* check method */
+      if ( attr.isPresent("method")) {
+         string s;
+         attr.GetValue("method", s);
+         if (s == "imag") _method = imag;
+         else if (s == "ac") _method = ac;
+         else throw (EParamProblem("Unknown method for EF calculation given: ", s));
+      }
+      
       /* Init the clock */
       if ( !attr.isPresent("dt") ) 
 	 throw ( EParamProblem ("No Delta t given") );
       
       attr.GetValue("dt", _dt);
-      
-      /* Number of eigenfunctions */
-      if ( attr.isPresent("Nef") ) {
-	 attr.GetValue("Nef", _Nef);
-	 if ( _Nef < 1)
-	    throw ( EParamProblem ("Less than one eigenfunction given requested") );
-      }
-      
-      if ( attr.isPresent("start") ){
-         attr.GetValue("start", _start);
-         if (_start < 0)
-            throw ( EParamProblem ("Can't start with negative ef") );
-         if (_start > _Nef) 
-            throw ( EParamProblem ("Can't start above number of desired EFs") );
-      }
-         
+               
       /* Filter diagonalization */
       if ( attr.isPresent("diag"))
          attr.GetValue("diag", _diag);
       
-      /* Default convergence */
-      if (_diag)
-         _convergence = DEFAULT_CONVERGENCE_EF_DIAG;
-      else
-         _convergence = DEFAULT_CONVERGENCE_EF_RAW;
+      /* Specific parameters for imag solver */
+      if (_method == imag) {
+         /* Number of eigenfunctions */
+         if ( attr.isPresent("Nef") ) {
+            attr.GetValue("Nef", _Nef);
+            if ( _Nef < 1)
+               throw ( EParamProblem ("Less than one eigenfunction given requested") );
+         }
          
-      
-      /* Convergence */
-      if ( attr.isPresent("conv") ) {
-	 attr.GetValue("conv", _convergence);
-	 if ( _convergence > 1)
-	    throw ( EParamProblem ("Convergence critera larger than one doesn't make sense") );
+         if ( attr.isPresent("start") ){
+            attr.GetValue("start", _start);
+            if (_start < 0)
+               throw ( EParamProblem ("Can't start with negative ef") );
+            if (_start > _Nef) 
+               throw ( EParamProblem ("Can't start above number of desired EFs") );
+         }
+   
+         
+         /* Default convergence */
+         if (_diag)
+            _convergence = DEFAULT_CONVERGENCE_EF_DIAG;
+         else
+            _convergence = DEFAULT_CONVERGENCE_EF_RAW;
+            
+         
+         /* Convergence */
+         if ( attr.isPresent("conv") ) {
+            attr.GetValue("conv", _convergence);
+            if ( _convergence > 1)
+               throw ( EParamProblem ("Convergence critera larger than one doesn't make sense") );
+         }
+      } else { /* specific for ac */
+         if ( attr.isPresent("tol")){
+            attr.GetValue("tol", _tol);
+            if (_tol < 0)
+               throw (EParamProblem("Tolerance factor for peak finder is non-sense. Must >= 0"));
+         }
       }
       
       /* Maximum number of steps */
@@ -172,15 +193,24 @@ namespace QDLIB
       
       log.Header("Eigenfunction calculation parameters", Logger::Section);
       
+      log.cout() << "Method: ";
+      if (_method == imag)
+         log.cout() << "Relaxation in imaginary time\n";
+      else
+         log.cout() << "EF extraction from auto correlation\n";
+      
       log.cout() << "Number of steps: " <<  clock->Steps() << endl;
       log.cout().precision(2);
       log.cout() << "Time step: " << fixed << clock->Dt() << endl;
-      if (_start > 0){
-         log.cout() << "Restart Calculation at EF " << _start << endl;
+      /* This is specific */
+      if (_method == imag)
+         if (_start > 0){
+            log.cout() << "Restart Calculation at EF " << _start << endl;
+
+         log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
+         log.cout() <<  "Requested convergence: " << scientific << _convergence << endl;
       }
-      log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
-      log.cout() <<  "Requested convergence: " << scientific << _convergence << endl;
       if (_diag)
          log.cout() <<  "Diagonalize basis" << endl;
       log.cout() << "Name for eigenenergy file: " << _ename << endl;
@@ -190,17 +220,199 @@ namespace QDLIB
    }
 
    
+   /**
+    * Calculate eigenfunctions in imaginary time.
+    */
+   void ProgEigen::ImagTimeEF()
+   {
+      Logger& log = Logger::InstanceRef();
+      QDClock *clock = QDGlobalClock::Instance();
+      
+      WaveFunction *Psi_old, *Psi, *buf;
+      
+      /* Force backward imaginary time */
+      _U->ImaginaryTime();
+      _U->Backward();
+      GlobalOpList::Instance().Init(_U, _PsiInitial);
+      
+      /* Report what the propagator has chosen */
+      ParamContainer Upm;
+    
+      Upm = _U->Params();
+      
+      log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
+            
+      _Energies_raw.newsize(_Nef);
+      
+      Psi_old = _PsiInitial->NewInstance();
+      Psi = _PsiInitial->NewInstance();
+      buf = _PsiInitial->NewInstance();
+            
+      /* Prepare Restart */
+      if (_start > 0) {
+         ParamContainer pres;
+         pres.SetValue("start", 0);
+         pres.SetValue("num", _start);
+         pres.SetValue("step", 1);
+         pres.SetValue("files", _dir+_fname);
+         _P->Init(pres);
+         log.cout() << "Re-read eigenfunctions 0-" << _start-1 << endl<<endl;
+      }
+            
+      /* Recalc Energies */
+      if (_start > 0) {
+         for (int i=0; i < _start; i++){
+            _Energies_raw[i] = _H->Expec(_P->Get(i) );
+         }
+      }
+      
+      log.Header("EF - Relaxation", Logger::SubSection);
+      log.cout() << "EF\tNt\tEnergy\t\tDelta <psi|psi_last>\n";
+      
+      /* EF loop */
+      for (int i=_start; i < _Nef; i++){
+         *Psi = _PsiInitial;
+         /* propagation loop */
+         int s=0;
+         double diff=1;
+         while (s < _MaxSteps && diff > _convergence){
+            *Psi_old = Psi;
+            _U->Apply(Psi);
+            /* Remove lower states */
+            if ( i>0 ){
+               _P->Apply(buf, Psi);
+               *Psi -= buf;
+            }
+            /* normalization and convergence check */
+            Psi->Normalize();
+            diff = cabs(1-*Psi_old * Psi);
+
+            ++(*clock);                     /* Step the clock */
+            s++;
+         }
+         _P->Add(Psi);
+         _efile << Psi;
+         
+         _Energies_raw[i] = _H->Expec(Psi);
+         
+         if ( fpclassify(_Energies_raw[i]) == FP_NAN)
+            throw ( EOverflow("Energy is not a number") );
+        
+
+         log.cout().precision(8);
+         log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] <<"\t";
+         log.cout().precision(2);
+         log.cout() << scientific << diff << endl;
+         /* Check for bad convergence behavior */
+         if ( i > 0 )
+            if ( _Energies_raw[i] < _Energies_raw[i-1] )
+               log.cout() << "Warning: Energy decreases. You should tighten the convergence criteria!\n";
+
+         log.flush();
+      }
+      log.cout() << "\n\n";
+      
+      DELETE_WF(Psi_old);
+      DELETE_WF(Psi);
+      DELETE_WF(buf);
+   }
+
+   /**
+    * Calculate eigenfunctions from a autocorrelation.
+    */
+   void ProgEigen::AutoCorrEF()
+   {
+      Logger& log = Logger::InstanceRef();
+      QDClock *clock = QDGlobalClock::Instance();
+      WaveFunction *Psi;
+      cVec autocorr(_MaxSteps);
+      cVec spectrum(_MaxSteps);
+      
+      /* Propagator intialization */
+      GlobalOpList::Instance().Init(_U, _PsiInitial);
+      
+      /* Report what the propagator has chosen */
+      ParamContainer Upm;
+      Upm = _U->Params();
+      log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
+
+      /* Propagation loop */
+      WFBuffer tbuf;
+      tbuf.Size(_MaxSteps);
+      tbuf.Init(_PsiInitial);
+      Psi = _PsiInitial->NewInstance();
+      *Psi = _PsiInitial;
+      
+      autocorr[0] = *_PsiInitial * Psi;
+      
+      log.coutdbg() << "Step\tTime\tNorm\n";
+      for (int i=1; i < _MaxSteps; i++){
+         _U->Apply(Psi);
+         tbuf.Add(Psi);
+         autocorr[i] = *_PsiInitial * Psi;
+         log.coutdbg() << clock->TimeStep() << "\t" << clock->Time() << "\t" << Psi->Norm() << endl;
+      }
+      
+      /* Make FFT and find eigenvalues */
+      FFT AcFFT(autocorr, spectrum, true);
+      PeakFinder PFind;
+      dVec PowerSpectrum(_MaxSteps);
+      
+      AcFFT.forward();
+      
+      for (int i=0; i < _MaxSteps; i++)
+         PowerSpectrum[i] = cabs(spectrum[i]);
+      
+      PFind.Find(PowerSpectrum);
+      
+      _Nef = PFind.NumPeaks();
+      _Energies_raw.newsize(_Nef);
+      
+      log.cout() << "\nFound " << _Nef << " eigenvalues in spectrum\n";
+      log.cout() << "\nIntegrating to obtain eigenfunctions\n";
+      log.cout() << "\nEF#\tEnergy\n";
+      log.flush();
+      
+      /* Integrate eigenfunctions out */
+      for (int i=0; i < _Nef; i++){
+         double energy;
+         int index;
+         index = PFind.NextPeak();
+         
+         /* Calculate energy */
+         double dw = 2*M_PI / (clock->Dt() * clock->Steps());
+         if (index < _MaxSteps/2)
+            energy = index * dw;
+         else
+            energy -(_MaxSteps-index) * dw;
+         
+         /* Run time integration */
+         *Psi = _PsiInitial;
+         for (int s=0; s < _MaxSteps-1; s++){
+            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s)+1)*_dt));
+         }
+         *Psi *= _dt;
+         
+         _Energies_raw[i] = _H->Expec(Psi);
+         log.cout() << i << "\t" << _Energies_raw[i] << endl;
+         _efile << Psi;
+         if (_diag) /* the diag proc. takes the basis from the Projector */
+            _P->Add(Psi);
+      }
+      
+      DELETE_WF(Psi);
+   }
+
+   
    void ProgEigen::Run()
    {
       
       XmlNode *section;
-      
-      WaveFunction *Psi_old, *Psi, *Psi_initial, *_buf;
-      
-      FileWF efile;
-      
+
       QDClock *clock = QDGlobalClock::Instance();
       Logger& log = Logger::InstanceRef();
+      
+      WaveFunction *Psi, *buf;
       
       _InitParams();
       
@@ -224,109 +436,33 @@ namespace QDLIB
 	 throw ( EParamProblem ("No inital wave function found") );
       log.Header( "Wavefunction: ", Logger::SubSection);
       log.IndentInc();
-      Psi_initial = ChainLoader::LoadWaveFunctionChain( section );
+      _PsiInitial = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
       log.IndentDec();
       
       /* Make sure our hamiltonian is initalized */
-      GlobalOpList::Instance().Init(_H, Psi_initial);
-      log.cout() << "Initial Norm & energy: " << Psi_initial->Norm() << "\t" << _H->Expec(Psi_initial) << endl;
-            
+      GlobalOpList::Instance().Init(_H, _PsiInitial);
+      _P->Init(_PsiInitial);
+      log.cout() << "Initial Norm & energy: " << _PsiInitial->Norm() << "\t" << _H->Expec(_PsiInitial) << endl;
+      
+      _PsiInitial->Normalize();
+      
       /* Let the Propagator do it's initalisation */
       clock->Begin();
       _U->Clock( clock );
       _H->UpdateTime();
-      /* Force backward imaginary time */
-      _U->ImaginaryTime();
-      _U->Backward();
-      GlobalOpList::Instance().Init(_U, Psi_initial);
-      
-      /* Report what the propagator has chosen */
-      ParamContainer Upm;
-    
-      Upm = _U->Params();
-      
-      log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
       
       /* Init file writer for wf output */
-      efile.Name(_dir+_fname);
-      efile.Suffix(BINARY_WF_SUFFIX);
-      efile.ActivateSequence();
-      
-      _Energies_raw.newsize(_Nef);
-         
-      Psi_initial->Normalize();
-      
-      Psi_old = Psi_initial->NewInstance();
-      Psi = Psi_initial->NewInstance();
-      _buf = Psi_initial->NewInstance();
-	    
-      /* Prepare Restart */
-      if (_start > 0) {
-         ParamContainer pres;
-         pres.SetValue("start", 0);
-         pres.SetValue("num", _start);
-         pres.SetValue("step", 1);
-         pres.SetValue("files", _dir+_fname);
-         _P->Init(pres);
-         log.cout() << "Re-read eigenfunctions 0-" << _start-1 << endl<<endl;
-      }
-      
-      _P->Init(Psi_initial);
-	    
-      /* Recalc Energies */
-      if (_start > 0) {
-         for (int i=0; i < _start; i++){
-            _Energies_raw[i] = _H->Expec(_P->Get(i) );
-         }
-      }
-      
-      log.Header("EF - Relaxation", Logger::SubSection);
-      log.cout() << "EF\tNt\tEnergy\t\tDelta <psi|psi_last>\n";
-      
-      /* EF loop */
-      for (int i=_start; i < _Nef; i++){
-	 *Psi = Psi_initial;
-	 /* propagation loop */
-	 int s=0;
-	 double diff=1;
- 	 while (s < _MaxSteps && diff > _convergence){
-	    *Psi_old = Psi;
-	    _U->Apply(Psi);
-	    /* Remove lower states */
-	    if ( i>0 ){
-	       _P->Apply(_buf, Psi);
-	       *Psi -= _buf;
-	    }
-	    /* normalization and convergence check */
-            Psi->Normalize();
-            diff = cabs(1-*Psi_old * Psi);
+      _efile.Name(_dir+_fname);
+      _efile.Suffix(BINARY_WF_SUFFIX);
+      _efile.ActivateSequence();
 
-	    ++(*clock);                     /* Step the clock */
-	    s++;
-	 }
-	 _P->Add(Psi);
-	 efile << Psi;
-	 
-	 _Energies_raw[i] = _H->Expec(Psi);
-         
-         if ( fpclassify(_Energies_raw[i]) == FP_NAN)
-            throw ( EOverflow("Energy is not a number") );
-        
-
-	 log.cout().precision(8);
-         log.cout() << i << "\t" << s << fixed <<"\t" << _Energies_raw[i] <<"\t";
-         log.cout().precision(2);
-         log.cout() << scientific << diff << endl;
-	 /* Check for bad convergence behavior */
-	 if ( i > 0 )
-	    if ( _Energies_raw[i] < _Energies_raw[i-1] )
-	       log.cout() << "Warning: Energy decreases. You should tighten the convergence criteria!\n";
-
-	 log.flush();
-      }
-      log.cout() << "\n\n";
       
+      /* Jump to specific method */
+      if (_method == imag)
+         ImagTimeEF();
+      else
+         AutoCorrEF();
       
       /* Optional basis diagonalization */
       if (_diag){
@@ -350,22 +486,22 @@ namespace QDLIB
             throw (EOverflow("Problem with diagonlization routine"));
          
          /* Build EFs in diag basis & write to file */
-         efile.ResetCounter();
+         _efile.ResetCounter();
          log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
          for (int i=0; i < _Nef; i++){
             *Psi = _P->Get(0);
             *Psi *= S(0,i);
             for (int j=1; j < _Nef; j++){ /* make linear combination */
-               *_buf = _P->Get(j);
-               *_buf *= S(j,i);
-               *Psi += _buf;
+               *buf = _P->Get(j);
+               *buf *= S(j,i);
+               *Psi += buf;
             }
             log.cout().precision(8);
             log.cout() << i << "\t" <<fixed<< _Energies_diag[i] - _Energies_raw[i];
             log.cout().precision(3);
             log.cout() << "\t" <<fixed<< (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
             log.flush();
-            efile << Psi;
+            _efile << Psi;
          }
       }
       log.cout() << endl;
@@ -373,10 +509,7 @@ namespace QDLIB
       WriteEnergyFile();
       
       /* Cleanup */
-      DELETE_WF(Psi_old);
-      DELETE_WF(Psi);
-      DELETE_WF(_buf);
-      DELETE_WF(Psi_initial);
+      DELETE_WF(_PsiInitial);
    }
 
 
