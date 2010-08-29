@@ -268,6 +268,7 @@ namespace QDLIB
       
       log.Header("EF - Relaxation", Logger::SubSection);
       log.cout() << "EF\tNt\tEnergy\t\tDelta <psi|psi_last>\n";
+      log.flush();
       
       /* EF loop */
       for (int i=_start; i < _Nef; i++){
@@ -372,7 +373,7 @@ namespace QDLIB
       log.cout() << "\nIntegrating to obtain eigenfunctions\n";
       log.cout() << "\nEF#\tEnergy\n";
       log.flush();
-      
+      cout << PowerSpectrum<<endl;
       /* Integrate eigenfunctions out */
       for (int i=0; i < _Nef; i++){
          double energy;
@@ -389,7 +390,7 @@ namespace QDLIB
          /* Run time integration */
          *Psi = _PsiInitial;
          for (int s=0; s < _MaxSteps-1; s++){
-            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s)+1)*_dt));
+            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(energy*(double(s)+1)*_dt));
          }
          *Psi *= _dt;
          
@@ -400,6 +401,8 @@ namespace QDLIB
             _P->Add(Psi);
       }
       
+      log.cout()<< endl;
+      log.flush();
       DELETE_WF(Psi);
    }
 
@@ -488,6 +491,8 @@ namespace QDLIB
          /* Build EFs in diag basis & write to file */
          _efile.ResetCounter();
          log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
+         Psi = _P->Get(0)->NewInstance();
+         buf = _P->Get(0)->NewInstance();
          for (int i=0; i < _Nef; i++){
             *Psi = _P->Get(0);
             *Psi *= S(0,i);
