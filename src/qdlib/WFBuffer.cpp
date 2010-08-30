@@ -1,5 +1,6 @@
 #include "WFBuffer.h"
 #include "tools/GlobalParams.h"
+#include "qdlib/FileWF.h"
 
 #include <unistd.h>
 #include <sys/mman.h>
@@ -144,7 +145,7 @@ namespace QDLIB {
    /**
     * Set an element.
     */
-   void WFBuffer::Set(size_t pos, WaveFunction *Psi)
+   void WFBuffer::Set(const size_t pos, WaveFunction *Psi)
    {
       /* Check for right map size */
       if (pos >= _buf.size()){
@@ -177,7 +178,7 @@ namespace QDLIB {
       Set(_buf.size(), Psi);
    }
    
-   WaveFunction* WFBuffer::Get(size_t pos)
+   WaveFunction* WFBuffer::Get(const size_t pos)
    {
       if (pos >= _buf.size())
          throw (EIncompatible("Invalid WFBuffer Element"));
@@ -200,6 +201,53 @@ namespace QDLIB {
 
       return _buf[pos].Psi;
    }
+  
+   /**
+    * Saves the temporary buffer to a series of files.
+    */
+   void WFBuffer::SaveToFiles(const string&  name)
+   {
+      FileWF wfile;
+      
+      /* Init file writer for wf output */
+      wfile.Name(name);
+      wfile.Suffix(BINARY_WF_SUFFIX);
+      wfile.ActivateSequence();
+      wfile.ResetCounter();
+      
+      for (int i=0; i < _size; i++) /* Write down files */
+         wfile << Get(i);
+            
+   }
+   
+   /**
+    * Fill the buffer with a wf series from disk.
+    * The buffer is cleared prior to reading.
+    */
+   void WFBuffer::ReadFromFiles(const string&  name)
+   {
+      FileWF wfile;
+      WaveFunction* psi;
+      
+      Clear();
+      /* Init file writer for wf output */
+      wfile.Name(name);
+      wfile.Suffix(BINARY_WF_SUFFIX);
+      wfile.ActivateSequence();
+      wfile.ResetCounter();
+      
+      psi = wfile.LoadWaveFunctionByMeta();
+      Add(psi);
+      
+      try {
+         while (true){ /* Run loop until something fails => must be the end of the wf-series (this is dirty) */
+            wfile >> psi;
+            Add(psi);
+         }
+      } catch (EIOError) {
+      }
+   }
+  
   
    /**
     * Lock a buffer element explictly to mem.

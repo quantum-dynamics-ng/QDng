@@ -65,15 +65,17 @@ namespace QDLIB {
          
          void Init(WaveFunction* Psi);
          
-         WaveFunction* Get(size_t pos);
-         void Set(size_t pos, WaveFunction *Psi);
+         WaveFunction* Get(const size_t pos);
+         void Set(const size_t pos, WaveFunction *Psi);
          void Add(WaveFunction *Psi);
+         
+         void SaveToFiles(const string&  name);
+         void ReadFromFiles(const string&  name);
          
          /**
           * This is a synoyme for Get.
           */
          WaveFunction* operator[](size_t pos) { return Get(pos) ; }
-         
          
          void Lock(size_t pos);
          void UnLock(size_t pos);

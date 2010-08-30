@@ -11,6 +11,7 @@
 #include "tools/QDGlobalClock.h"
 
 #include "ChainLoader.h"
+#include "Reporter.h"
 #include "qdlib/Conversion.h"
 #include "qdlib/WFBuffer.h"
 #include "tools/PeakFinder.h"
@@ -25,8 +26,8 @@ namespace QDLIB
                             _U(NULL), _H(NULL), _method(imag), _Nef(DEFAULT_NUMBER_EFS),
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS),
-                                      _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _diag(true),
-                                      _start(0), _tol(1)
+                                      _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _spectrum(DEFAULT_EF_SPECTRUM_NAME),
+                                      _diag(true), _start(0), _tol(1)
    {
       _P = new OProjection();
       CollectorOp::Instance()->Register(_P);
@@ -347,6 +348,7 @@ namespace QDLIB
       
       autocorr[0] = *_PsiInitial * Psi;
       
+      log.cout() << "Run propagation\n\n";
       log.coutdbg() << "Step\tTime\tNorm\n";
       for (int i=1; i < _MaxSteps; i++){/* Propagation loop */
          _U->Apply(Psi);
@@ -354,6 +356,8 @@ namespace QDLIB
          autocorr[i] = *_PsiInitial * Psi;
          log.coutdbg() << clock->TimeStep() << "\t" << clock->Time() << "\t" << Psi->Norm() << endl;
       }
+      
+      Reporter::WriteSpectrum(autocorr, clock->Dt(), _dir+_spectrum);
       
       /* Make FFT and find eigenvalues */
       FFT AcFFT(autocorr, spectrum, true);
@@ -373,7 +377,7 @@ namespace QDLIB
       log.cout() << "\nFound " << _Nef << " eigenvalues in spectrum\n";
       log.cout() << "\nIntegrating to obtain eigenfunctions\n";
       log.cout() << "\nEF#";
-      log.coutdbg() << "\tindex";
+      log.coutdbg() << "\tindex\tenergy_est";
       log.cout() << "\tEnergy\n";
       log.flush();
      
@@ -385,24 +389,26 @@ namespace QDLIB
 
          /* Calculate energy */
          double dw = 2*M_PI / (clock->Dt() * double(clock->Steps()));
+         
          if (index < _MaxSteps/2)
             energy = double(index) * dw;
          else
             energy = double(index-_MaxSteps) * dw;
 
-         cout << energy << endl;
          /* Run time integration */
          *Psi = _PsiInitial;
          for (int s=0; s < _MaxSteps-1; s++){
-            //cout <<"s "<< s <<"\t"<< cexpI(energy*(double(s)+1)*_dt) << "\t" <<_H->Expec(Psi) << "\t" <<_H->Expec(tbuf[s])  << endl;
+            
             AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s)+1)*_dt));
          }
-         *Psi *= 1/double(_MaxSteps);
+         
+         *Psi *= 1/sqrt(double(_MaxSteps));
          cout << Psi->Norm()<< "\t";
          Psi->Normalize();
          _Energies_raw[i] = _H->Expec(Psi);
+         
          log.cout() << i;
-         log.coutdbg() << "\t" << index;
+         log.coutdbg() << "\t" << index << "\t" << energy;
          log.cout() << "\t" << _Energies_raw[i] << endl;
          log.flush();
          _efile << Psi;

@@ -42,6 +42,8 @@ namespace QDLIB
          Reporter();
          ~Reporter();
 	 
+         static void WriteSpectrum(cVec &correllation, double dt, const string& name);
+         
 	 void PsiInitial(WaveFunction* Psi);
 	 void Hamilton(Operator *H);
 	       

@@ -147,6 +147,43 @@ namespace QDLIB
       log.flush();
    }
 
+
+   /**
+    * Write the spectrum of correllation to file including frequency axis.
+    */
+   void Reporter::WriteSpectrum(cVec &correllation, double dt, const string& name)
+   {      
+      Logger& log = Logger::InstanceRef();
+      cVec spec(correllation.size());
+      FFT fftw(correllation, spec,true);
+      ofstream ofile;
+      
+      /* Autocorellation power spectrum */
+      try {
+       ofile.open(name.c_str());
+       if (!ofile.is_open()) throw;
+       
+       fftw.forward();
+       
+       int N = correllation.size();
+       double dw = 2*M_PI / (dt * N);
+                
+       for (lint i=0; i < N; i++){
+          /* Frequency axis in angualar frequency */
+          if (i < N/2)
+             ofile << i * dw;
+          else
+             ofile << -(N-i) * dw;
+          
+          ofile << "\t"<< cabs(spec[i]) / (N/2) << endl;
+       }
+       ofile.close();
+       log.cout() << "Autocorellation power spectrum written to file: " << name.c_str() << endl << endl;
+      }  catch (...)
+      {log.cout() << "!!! Can't write auto correlation spectrum\n\n";}
+   }
+   
+
    /**
     * Finish the report at the end of a propagation.
     * 
@@ -161,33 +198,7 @@ namespace QDLIB
       log.cout() << "\n\n" << clock->Steps() << " step done (" << clock->Steps() *  clock->Dt() << " au)\n\n";
       
       if (_spectrum){
-         cVec spec(_specbuf.size());
-	 FFT fftw(_specbuf, spec,true);
-	 ofstream ofile;
-	 
-	 /* Autocorellation power spectrum */
-	 try {
-	  ofile.open(_specname.c_str());
-	  if (!ofile.is_open()) throw;
-	  
-	  fftw.forward();
-	  
-	  int N = _specbuf.size();
-	  double dw = 2*M_PI / (clock->Dt() * clock->Steps());
-		   
-	  for (lint i=0; i < N; i++){
-	     /* Frequency axis in angualar frequency */
-	     if (i < N/2)
-	        ofile << i * dw;
-	     else
-		ofile << -(N-i) * dw;
-	     
-	     ofile << "\t"<< cabs(spec[i]) / (clock->Steps()/2) << endl;
-	  }
-	  ofile.close();
-	  log.cout() << "Autocorellation power spectrum written to file: " << _specname.c_str() << endl << endl;
-	 }  catch (...)
-	 {log.cout() << "!!! Can't write auto correlation spectrum\n\n";}
+         WriteSpectrum(_specbuf, clock->Dt(), _specname);
       }
       log.flush();
    }

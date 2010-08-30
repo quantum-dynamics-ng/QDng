@@ -14,6 +14,7 @@
 #define DEFAULT_MAXSTEPS        10000
 #define DEFAULT_EF_BASE_NAME    "ef"
 #define DEFAULT_EF_ENERGY_NAME  "energy.dat"
+#define DEFAULT_EF_SPECTRUM_NAME  "spectrum.dat"
 
 
 
@@ -39,6 +40,7 @@ namespace QDLIB
     *  \li start  Do not start with zeroeth EF but read already calculated
     * Only for method ac:
     *  \li tol    Tolerance factor for peak finder (in units of sigma)
+    *  \li spectrum Write eigenvalue spectrum to file name given.
     * 
     *  @author Markus Kowalewski
     */
@@ -64,6 +66,7 @@ namespace QDLIB
 	 int _MaxSteps;
 	 string _fname;
 	 string _ename;
+         string _spectrum;
 	 double _dt;
 	 bool _diag; /* Diagonalize Basis */
          int _start;
