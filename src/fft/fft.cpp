@@ -21,11 +21,13 @@ namespace QDLIB {
    */
    FFT::FFT(cVec &in, cVec &out, bool oneway) : _dims(NULL)
    {
-//       cerr << "FFTW 1D init" << endl;
+      cVec inbuf = in;
+      
       _planf = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);
       if (!(_oneway = oneway)){
-	 _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_FORWARD, FFTW_MEASURE);
+	 _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_MEASURE);
       }
+      in = inbuf;
       
    }
    

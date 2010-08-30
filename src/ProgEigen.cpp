@@ -337,9 +337,10 @@ namespace QDLIB
       Upm = _U->Params();
       log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
 
-      /* Propagation loop */
+      /* Propagation */
       WFBuffer tbuf;
       tbuf.Size(_MaxSteps);
+      tbuf.AutoLock(1);
       tbuf.Init(_PsiInitial);
       Psi = _PsiInitial->NewInstance();
       *Psi = _PsiInitial;
@@ -347,9 +348,9 @@ namespace QDLIB
       autocorr[0] = *_PsiInitial * Psi;
       
       log.coutdbg() << "Step\tTime\tNorm\n";
-      for (int i=1; i < _MaxSteps; i++){
+      for (int i=1; i < _MaxSteps; i++){/* Propagation loop */
          _U->Apply(Psi);
-         tbuf.Add(Psi);
+         tbuf.Set(i-1,Psi);
          autocorr[i] = *_PsiInitial * Psi;
          log.coutdbg() << clock->TimeStep() << "\t" << clock->Time() << "\t" << Psi->Norm() << endl;
       }
@@ -371,31 +372,39 @@ namespace QDLIB
       
       log.cout() << "\nFound " << _Nef << " eigenvalues in spectrum\n";
       log.cout() << "\nIntegrating to obtain eigenfunctions\n";
-      log.cout() << "\nEF#\tEnergy\n";
+      log.cout() << "\nEF#";
+      log.coutdbg() << "\tindex";
+      log.cout() << "\tEnergy\n";
       log.flush();
-      cout << PowerSpectrum<<endl;
+     
       /* Integrate eigenfunctions out */
       for (int i=0; i < _Nef; i++){
          double energy;
          int index;
          index = PFind.NextPeak();
-         
+
          /* Calculate energy */
-         double dw = 2*M_PI / (clock->Dt() * clock->Steps());
+         double dw = 2*M_PI / (clock->Dt() * double(clock->Steps()));
          if (index < _MaxSteps/2)
-            energy = index * dw;
+            energy = double(index) * dw;
          else
-            energy -(_MaxSteps-index) * dw;
-         
+            energy = double(index-_MaxSteps) * dw;
+
+         cout << energy << endl;
          /* Run time integration */
          *Psi = _PsiInitial;
          for (int s=0; s < _MaxSteps-1; s++){
-            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(energy*(double(s)+1)*_dt));
+            //cout <<"s "<< s <<"\t"<< cexpI(energy*(double(s)+1)*_dt) << "\t" <<_H->Expec(Psi) << "\t" <<_H->Expec(tbuf[s])  << endl;
+            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s)+1)*_dt));
          }
-         *Psi *= _dt;
-         
+         *Psi *= 1/double(_MaxSteps);
+         cout << Psi->Norm()<< "\t";
+         Psi->Normalize();
          _Energies_raw[i] = _H->Expec(Psi);
-         log.cout() << i << "\t" << _Energies_raw[i] << endl;
+         log.cout() << i;
+         log.coutdbg() << "\t" << index;
+         log.cout() << "\t" << _Energies_raw[i] << endl;
+         log.flush();
          _efile << Psi;
          if (_diag) /* the diag proc. takes the basis from the Projector */
             _P->Add(Psi);
