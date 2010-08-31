@@ -81,6 +81,8 @@ int main(int argc, char **argv)
    
    cmdline.SetHelp( 'd', "output directory path", false,
 		    "All output files are saved in this directory", "");
+   
+   cmdline.SetHelp( 'g', "Turn debug output on. Some extra informations will be printed");
 
 #ifdef _OPENMP
    int procs=1;
@@ -160,19 +162,31 @@ int main(int argc, char **argv)
       } else 
 	 prognodes = &rnodes;
       
-      /* overide path from command line */
-      if ( ! dir.empty() )
-         gp.SetValue("dir", dir);
-      
-      if ( gp.isPresent("dir") ) {
-         gp.GetValue("dir", dir);
-         if (dir[dir.length()-1] != '/' && ! dir.empty())
-            dir += "/";
-         gp.SetValue("dir", dir);
+	 /* Check if debug output is requested */
+	 if (!gp.isPresent("debug")){
+	    bool dbg;
+	    gp.GetValue("debug", dbg);
+	    log.Debug(dbg);
+	 }
+	 
+	 if (cmdline.GetOption('g'))
+	    log.Debug(true);
+	 
+	 /* overide path from command line */
+	 if ( ! dir.empty() )
+	    gp.SetValue("dir", dir);
+	 
+	 if ( gp.isPresent("dir") ) {
+	    gp.GetValue("dir", dir);
+	    if (dir[dir.length()-1] != '/' && ! dir.empty())
+	       dir += "/";
+	    gp.SetValue("dir", dir);
       }
       
       log.cout() <<  endl;
       log.Header("Global Parameters", Logger::SubSection);
+      if (log.Debug())
+	 log.cout() << "Debug output on\n";
 #ifdef _OPENMP
       log.cout() << "Running with " << omp_get_max_threads() << " threads.\n";
 #endif

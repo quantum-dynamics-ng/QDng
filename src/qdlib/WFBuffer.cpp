@@ -11,7 +11,7 @@
 namespace QDLIB {
 
    WFBuffer::WFBuffer() : _size(0), _wfsize(0), _LastLocks(WFBUFFER_LOCK_LAST),
-                          _inmem(0), _locked(0), _maxmem(SIZE_MAX), _MaxBuf(0) ,_ondisk(0), _diskbuf(NULL)
+		      _inmem(0), _locked(0), _maxmem(SIZE_MAX), _ondisk(0), _MaxBuf(0), _diskbuf(NULL)
    {
       ParamContainer& gp = GlobalParams::Instance();
             
@@ -31,8 +31,8 @@ namespace QDLIB {
     */
    size_t WFBuffer::_FreeDiskPos()
    {
-      for (int i=0; i < _diskmap.size(); i++){
-         if (_diskmap[i] == -1) return i;
+      for (size_t i=0; i < _diskmap.size(); i++){
+         if (_diskmap[i] == (size_t) -1) return i;
       }
       
       _diskmap.push_back(-1);
@@ -49,13 +49,15 @@ namespace QDLIB {
     */
    WaveFunction* WFBuffer::_ValidEntry()
    {
-      for (int i=0; i < _buf.size(); i++)
+      for (size_t i=0; i < _buf.size(); i++)
          if (_buf[i].Psi != NULL) return _buf[i].Psi;
+      
+      return NULL;
    }   
    
    bool WFBuffer::_IsLocked(size_t mempos)
    {
-      for (int i=0; i < _LastAccess.size(); i++){
+      for (size_t i=0; i < _LastAccess.size(); i++){
          if ( _LastAccess[i] == mempos || _buf[i].Locked ) return true;
       }
       return false;
@@ -215,7 +217,7 @@ namespace QDLIB {
       wfile.ActivateSequence();
       wfile.ResetCounter();
       
-      for (int i=0; i < _size; i++) /* Write down files */
+      for (size_t i=0; i < _size; i++) /* Write down files */
          wfile << Get(i);
             
    }

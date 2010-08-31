@@ -354,8 +354,15 @@ namespace QDLIB
          _U->Apply(Psi);
          tbuf.Set(i-1,Psi);
          autocorr[i] = *_PsiInitial * Psi;
-         log.coutdbg() << clock->TimeStep() << "\t" << clock->Time() << "\t" << Psi->Norm() << endl;
+	 ++(*clock);
+	 log.coutdbg().precision(2);
+         log.coutdbg() << clock->TimeStep() << "\t" << clock->Time() << "\t";
+	 log.coutdbg().precision(8);
+	 log.coutdbg() << fixed << Psi->Norm() << endl;
+	 log.flush();
       }
+      log.coutdbg() << endl;
+      log.flush();
       
       Reporter::WriteSpectrum(autocorr, clock->Dt(), _dir+_spectrum);
       
@@ -402,9 +409,7 @@ namespace QDLIB
             AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s)+1)*_dt));
          }
          
-         *Psi *= 1/sqrt(double(_MaxSteps));
-         cout << Psi->Norm()<< "\t";
-         Psi->Normalize();
+         Psi->Normalize(); /* Just normalize. We don't some factors, so we also drop  dt, 1/T */
          _Energies_raw[i] = _H->Expec(Psi);
          
          log.cout() << i;

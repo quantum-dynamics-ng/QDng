@@ -16,7 +16,7 @@ namespace QDLIB
    /**
     * Find the peaks in data.
     * 
-    * The peaks are save internally and can be accessed laster on.
+    * The peaks are saved internally and can be accessed laster on.
     */
    void PeakFinder::Find(dVec &data)
    {
@@ -58,6 +58,11 @@ namespace QDLIB
                indmax = i;
             }
          }
+      }
+      /* Close region - at the end of the array if the last value is not the maximum in  the region */
+      if (start &&  indmax != -1 && data[size-1] < dmax) {
+	 start=false;
+	 _peaks.push_back(indmax);
       }
       
       _mean = mean;

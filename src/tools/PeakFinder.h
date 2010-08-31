@@ -48,6 +48,9 @@ namespace QDLIB
          int NextPeak();
          bool End();
          void Reset();
+	 
+	 /** Get a peak by index */
+	 int operator[] (size_t n) { return _peaks[n]; }
    };
 
 }

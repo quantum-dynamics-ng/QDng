@@ -55,7 +55,7 @@ void FileWFTest::IO_Test_Single()
    WaveFunction *psi, *psi_in;
    string s;
    int n;
-   CollectorOp *Cop = CollectorOp::Instance();
+
    CollectorWF *Cwf = CollectorWF::Instance();
    
    /* Init Test WF */
