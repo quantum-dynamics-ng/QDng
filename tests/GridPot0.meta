@@ -1,0 +1,6 @@
+# MATLAB Generated file
+CLASS = GridPotential 
+dims = 1 
+N0 = 128
+xmin0 = 1.8897
+xmax0 = 6.1104
