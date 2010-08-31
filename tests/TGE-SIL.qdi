@@ -1,0 +1,27 @@
+<qdng>
+<eigen dt="5" steps="1000" Nef="10" dir="TGE-SIL-im" method="imag">
+	<propagator name="SIL" order="25">
+	  <hamiltonian name="Sum">
+	      <A name="GridNablaSq" dims="1" mass0="1763.2"/>
+	      <B name="GridPotential" file="GridPot0"/>
+	  </hamiltonian>
+	</propagator>
+        <wf file="GridGauss" normalize="true"/>
+</eigen>
+<eigen dt="5" steps="2048" dir="TGE-SIL-ac" method="ac">
+	<propagator name="SIL" order="25">
+	  <hamiltonian name="Sum">
+	      <A name="GridNablaSq" dims="1" mass0="1763.2"/>
+	      <B name="GridPotential" file="GridPot0"/>
+	  </hamiltonian>
+	</propagator>
+        <wf name="LC" normalize="true">
+           <wf0 file="TGE-GSPO-im/ef_0"/>
+           <wf1 file="TGE-GSPO-im/ef_1"/>
+           <wf2 file="TGE-GSPO-im/ef_2"/>
+           <wf3 file="TGE-GSPO-im/ef_3"/>
+           <wf4 file="TGE-GSPO-im/ef_4"/>
+           <wf5 file="TGE-GSPO-im/ef_5"/>
+	</wf>
+</eigen>
+</qdng>

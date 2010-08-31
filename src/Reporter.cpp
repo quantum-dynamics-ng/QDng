@@ -2,13 +2,14 @@
 #include "tools/QDGlobalClock.h"
 #include "fft/fft.h"
 #include "tools/Logger.h"
+#include "qdlib/WindowFuncs.h"
 
 namespace QDLIB
 {
 
    Reporter::Reporter() :
 	 _wcycle(10), _norm(true), _scinorm(false), _energy(false), _proj0(false), _proj0Sq(false),
-		 _spectrum(false), _multistate(false),
+		 _spectrum(false), _window(true), _multistate(false),
 	         _psi0(NULL), _H(NULL), _specname(), _rfile(), _specbuf(), _step(0)
    {}
 
@@ -198,6 +199,9 @@ namespace QDLIB
       log.cout() << "\n\n" << clock->Steps() << " step done (" << clock->Steps() *  clock->Dt() << " au)\n\n";
       
       if (_spectrum){
+         if (_window)
+            WindowFuncs<cVec>::Hann(_specbuf);
+            
          WriteSpectrum(_specbuf, clock->Dt(), _specname);
       }
       log.flush();

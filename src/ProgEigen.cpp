@@ -15,6 +15,7 @@
 #include "qdlib/Conversion.h"
 #include "qdlib/WFBuffer.h"
 #include "tools/PeakFinder.h"
+#include "qdlib/WindowFuncs.h"
 #include "fft/fft.h"
 
 #include "linalg/LapackDiag.h"
@@ -27,7 +28,7 @@ namespace QDLIB
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS),
                                       _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _spectrum(DEFAULT_EF_SPECTRUM_NAME),
-                                      _diag(true), _start(0), _tol(1)
+                                      _diag(true), _start(0), _tol(1), _win(true)
    {
       _P = new OProjection();
       CollectorOp::Instance()->Register(_P);
@@ -156,6 +157,9 @@ namespace QDLIB
          }
 	 if ( attr.isPresent("read"))
 	    attr.GetValue("read", _read);
+         
+         /* window function */
+         attr.GetValue("win", _win, true);
       }
       
       /* Maximum number of steps */
@@ -447,6 +451,10 @@ namespace QDLIB
 	   autocorr[i] = *_PsiInitial * tbuf[i];
 	}
       }
+     
+      /* Apply a window function and do FFT */
+      if (_win)
+         WindowFuncs<cVec>::Hann(autocorr);
           
       Reporter::WriteSpectrum(autocorr, clock->Dt(), _dir+_spectrum);
       
@@ -454,7 +462,7 @@ namespace QDLIB
       FFT AcFFT(autocorr, spectrum, true);
       PeakFinder PFind;
       dVec PowerSpectrum(_MaxSteps);
-      
+           
       AcFFT.forward();
       
       for (int i=0; i < _MaxSteps; i++)

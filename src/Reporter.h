@@ -25,6 +25,7 @@ namespace QDLIB
 	 bool _proj0;
 	 bool _proj0Sq;
 	 bool _spectrum;
+         bool _window;
 	 bool _multistate;
 	 
 	 
@@ -86,6 +87,11 @@ namespace QDLIB
 	 bool Spectrum() const { return _spectrum; }
 	 /** File name of auto correllation spectrum. Turns it on automatically */
 	 void Spectrum(const string &name);
+         
+         /** Apply a window function to autocorrelation */
+         bool Window() const { return _window; }
+         /** Apply a window function to autocorrelation */
+         void Window(const bool on) { _window = on; }
    };
 
 }

@@ -118,6 +118,9 @@ namespace QDLIB {
       if ( attr.isPresent("spectrum") ) {
 	 attr.GetValue("spectrum", s);
 	 _reporter.Spectrum( _dir+s );
+         
+         attr.GetValue("win", onoff, true);
+         _reporter.Window(onoff);
       }
 
       /* Optional normfile */

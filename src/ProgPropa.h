@@ -36,6 +36,7 @@ namespace QDLIB {
     * \li proj0Abs  true/false  print the absolute square of the projection against in the initial wave function.
     * \li spectrum   filename  if given a the projection against the inital wavefunction is turned on.
     *                          The power spectrum of the propagagation will be written.
+    * \li win   true/false   Apply a window function to the autocorrelation.
     * \li nfile   Write Norm to extra file.
     * \li scinorm   Print norm in scientific format instead of fixed point values
     * 

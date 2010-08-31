@@ -42,6 +42,7 @@ namespace QDLIB
     *  \li tol    Tolerance factor for peak finder (in units of sigma)
     *  \li spectrum Write eigenvalue spectrum to given file name.
     *  \li read   Read propagation from the given location.
+    *  \li win    Apply a window function.
     *  S. MAHAPATRA , N. CHAKRABARTI and N. SATHYAMURTHY, Int. Rev. Phys. Chem. 18, 235 (1999).
     *
     * 
@@ -75,6 +76,7 @@ namespace QDLIB
 	 bool _diag; /* Diagonalize Basis */
          int _start;
          double _tol;
+         bool _win;
          
          WaveFunction *_PsiInitial;
          
