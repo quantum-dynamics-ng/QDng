@@ -67,8 +67,8 @@ void OHermitianMatrixTest::API_Test()
    Cop->Register(R);
    CPPUNIT_ASSERT_NO_THROW( *(M->File()) >> R);
 
-   CPPUNIT_ASSERT_NO_THROW(Remove("mat.test"));
-   CPPUNIT_ASSERT_NO_THROW(Remove("mat.meta"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("mat.test"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("mat.meta"));
 
 
    /* Try Init with WF */

@@ -61,7 +61,7 @@ namespace QDLIB {
 	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
 	    _dir += "/";
       }
-      CreateDir(_dir);
+      FS::CreateDir(_dir);
       
       /* Init propagation file basename */
       if ( attr.isPresent("fname") ) {

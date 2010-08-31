@@ -40,7 +40,10 @@ namespace QDLIB
     *  \li start  Do not start with zeroeth EF but read already calculated
     * Only for method ac:
     *  \li tol    Tolerance factor for peak finder (in units of sigma)
-    *  \li spectrum Write eigenvalue spectrum to file name given.
+    *  \li spectrum Write eigenvalue spectrum to given file name.
+    *  \li read   Read propagation from the given location.
+    *  S. MAHAPATRA , N. CHAKRABARTI and N. SATHYAMURTHY, Int. Rev. Phys. Chem. 18, 235 (1999).
+    *
     * 
     *  @author Markus Kowalewski
     */
@@ -67,6 +70,7 @@ namespace QDLIB
 	 string _fname;
 	 string _ename;
          string _spectrum;
+	 string _read;
 	 double _dt;
 	 bool _diag; /* Diagonalize Basis */
          int _start;

@@ -138,8 +138,8 @@ void FileWFTest::IO_Test_Single()
       CPPUNIT_ASSERT( (*psi)[i].imag() == (*psi_in)[i].imag() );
    }
 
-   CPPUNIT_ASSERT_NO_THROW(Remove("TEST.wftest"));
-   CPPUNIT_ASSERT_NO_THROW(Remove("TEST.meta"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TEST.wftest"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TEST.meta"));
 
    DELETE_ALL_WF();
 }
@@ -292,11 +292,11 @@ void FileWFTest::IO_Test_Multistate()
    CPPUNIT_ASSERT(s == "WFGridCartesian");
 
    /* Cleanup */
-   CPPUNIT_ASSERT_NO_THROW(Remove("TESTMS.meta"));
-   CPPUNIT_ASSERT_NO_THROW(Remove("TESTMS-0.meta"));
-   CPPUNIT_ASSERT_NO_THROW(Remove("TESTMS-0.wftest"));
-   CPPUNIT_ASSERT_NO_THROW(Remove("TESTMS-1.meta"));
-   CPPUNIT_ASSERT_NO_THROW(Remove("TESTMS-1.wftest"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS.meta"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-0.meta"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-0.wftest"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-1.meta"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-1.wftest"));
    
    
    /* Check if sequence Naming works correct */

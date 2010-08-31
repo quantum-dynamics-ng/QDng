@@ -11,7 +11,7 @@ namespace QDLIB {
     * 
     * Doesn't matter if it is a file or directory.
     */
-   void StripLast(string& dir)
+   void FS::StripLast(string& dir)
    {
       size_t pos;
       
@@ -35,7 +35,7 @@ namespace QDLIB {
     * the full path will be created.
     * 
     */
-   void CreateDir(const string & dir)
+   void FS::CreateDir(const string & dir)
    {
       struct stat statbuf;
       int ret;
@@ -79,7 +79,7 @@ namespace QDLIB {
    }
 
    /** Remove file or empty directory. */
-   void Remove(const string& name)
+   void FS::Remove(const string& name)
    {
       if ( remove(name.c_str()) != 0 ){
          switch (errno) {
@@ -94,7 +94,42 @@ namespace QDLIB {
          }
       }
    }
-}
+   
+   
+   bool FS::IsDir(const string & name)
+   {
+      struct stat statbuf;
+      int ret;
+      
+      ret =  stat(name.c_str(), &statbuf);
+      
+      if (ret != 0)
+	 throw ( EIOError(errno, name) );
+      
+      if (S_ISDIR(statbuf.st_mode)) return true;
+      
+      return false;
+   }
+
+   bool FS::IsFile(const string & name)
+   {
+      struct stat statbuf;
+      int ret;
+      
+      ret =  stat(name.c_str(), &statbuf);
+      
+      if (ret != 0)
+	 throw ( EIOError(errno, name) );
+      
+      if (S_ISREG(statbuf.st_mode)) return true;
+      
+      return false;
+   }
+   
+   
+} /* namespace QDLIB */
+
+
 
 
 

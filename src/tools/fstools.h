@@ -8,8 +8,16 @@
 namespace QDLIB {
    
 
-   extern void CreateDir(const string& dir);
-   extern void Remove(const string& name);
+   /** Filesystem helper class. */
+   class FS {
+      public:
+	 static void StripLast(string& dir);
+	 static void CreateDir(const string& dir);
+	 static void Remove(const string& name);
+	 static bool IsDir(const string& name);
+	 static bool IsFile(const string& name);
+   };
+   
 }
 
 

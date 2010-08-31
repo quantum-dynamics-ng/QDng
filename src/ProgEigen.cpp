@@ -38,6 +38,7 @@ namespace QDLIB
    {
       /* remove the clock */
       QDGlobalClock::Destroy();
+      GlobalOpList::Instance().Destroy();
       DELETE_ALL_OP();
       DELETE_ALL_WF();
    }
@@ -153,6 +154,8 @@ namespace QDLIB
             if (_tol < 0)
                throw (EParamProblem("Tolerance factor for peak finder is non-sense. Must >= 0"));
          }
+	 if ( attr.isPresent("read"))
+	    attr.GetValue("read", _read);
       }
       
       /* Maximum number of steps */
@@ -186,7 +189,7 @@ namespace QDLIB
 	 if (_dir[_dir.length()-1] != '/' && ! _dir.empty())
 	    _dir += "/";
       }
-      CreateDir(_dir);
+      FS::CreateDir(_dir);
            
       
       clock->Dt(_dt);
@@ -204,12 +207,16 @@ namespace QDLIB
       log.cout().precision(2);
       log.cout() << "Time step: " << fixed << clock->Dt() << endl;
       /* This is specific */
-      if (_method == imag)
-         if (_start > 0){
+      if (_method == imag) {
+         if (_start > 0)
             log.cout() << "Restart Calculation at EF " << _start << endl;
 
          log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
          log.cout() <<  "Requested convergence: " << scientific << _convergence << endl;
+      } else {
+	 if (!_read.empty()){
+	    log.cout() << "Read Propagation from files: " << _read << endl;
+	 }
       }
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
       if (_diag)
@@ -327,8 +334,8 @@ namespace QDLIB
       Logger& log = Logger::InstanceRef();
       QDClock *clock = QDGlobalClock::Instance();
       WaveFunction *Psi;
-      cVec autocorr(_MaxSteps);
-      cVec spectrum(_MaxSteps);
+      cVec autocorr;
+      cVec spectrum;
       
       /* Propagator intialization */
       GlobalOpList::Instance().Init(_U, _PsiInitial);
@@ -340,30 +347,107 @@ namespace QDLIB
 
       /* Propagation */
       WFBuffer tbuf;
-      tbuf.Size(_MaxSteps);
       tbuf.AutoLock(1);
       tbuf.Init(_PsiInitial);
-      Psi = _PsiInitial->NewInstance();
-      *Psi = _PsiInitial;
       
-      autocorr[0] = *_PsiInitial * Psi;
-      
-      log.cout() << "Run propagation\n\n";
-      log.coutdbg() << "Step\tTime\tNorm\n";
-      for (int i=1; i < _MaxSteps; i++){/* Propagation loop */
-         _U->Apply(Psi);
-         tbuf.Set(i-1,Psi);
-         autocorr[i] = *_PsiInitial * Psi;
-	 ++(*clock);
-	 log.coutdbg().precision(2);
-         log.coutdbg() << clock->TimeStep() << "\t" << clock->Time() << "\t";
-	 log.coutdbg().precision(8);
-	 log.coutdbg() << fixed << Psi->Norm() << endl;
+      if ( _read.empty() ){ /* Need to run Propagation */
+	 autocorr.newsize(_MaxSteps);
+	 spectrum.newsize(_MaxSteps);
+	 
+	 tbuf.Size(_MaxSteps);
+	 
+	 Psi = _PsiInitial->NewInstance();
+	 *Psi = _PsiInitial;
+	 tbuf.Set(0,_PsiInitial);
+	 
+	 autocorr[0] = 1;
+	 
+	 log.cout() << "Run propagation\n\n";
+	 log.coutdbg() << "Step\tTime\tNorm\n";
+	 for (int i=1; i < _MaxSteps; i++){/* Propagation loop */
+	    _U->Apply(Psi);
+	    tbuf.Set(i,Psi);
+	    autocorr[i] = *_PsiInitial * Psi;
+	    
+	    if ( fpclassify(autocorr[i].real()) == FP_NAN)
+	       throw ( EOverflow("Correlation is not a number") );
+	    
+	    ++(*clock);
+	    log.coutdbg().precision(2);
+	    log.coutdbg() << clock->TimeStep() << "\t" << clock->Time() << "\t";
+	    log.coutdbg().precision(8);
+	    log.coutdbg() << fixed << Psi->Norm() << endl;
+	    log.flush();
+	 }
+	 log.coutdbg() << endl;
 	 log.flush();
+      } else { /* Read propagation from disk */
+	log.cout() << "Read Propagation from disk\n\n"; log.flush();
+	
+	if (FS::IsDir(_read)) { /* Look for Propagation meta */
+	   KeyValFile MetaFile(_read+"Propagation.meta");
+	   ParamContainer meta;
+	   string s;
+	   int wcycle;
+	   
+	   MetaFile.Parse(meta);
+	   
+	   meta.GetValue("CLASS", s);
+	   if (s != "Propagation")
+	      throw (EParamProblem("Invalid Propagation meta file", _read+"Propagation.meta"));
+	   
+	   meta.GetValue("dt", _dt);
+	   if (_dt <= 0)
+	      throw (EParamProblem("Invalid dt"));
+	   
+	   meta.GetValue("Wcycle", wcycle);
+	   if (wcycle <= 0)
+	      throw (EParamProblem("Invalid write cycle"));
+	   
+	   meta.GetValue("Nt", _MaxSteps);
+	   if (_MaxSteps < 2)
+	      throw (EParamProblem("Invalid number of time steps"));
+
+	   if (!meta.isPresent("WFBaseName"))
+	      throw (EParamProblem("No WF base name given"));
+	   
+	   meta.GetValue("WFBaseName", s);
+	   _read += s;
+	   
+	   _dt *= double(wcycle);
+	   
+	   log.cout() << "Found Propgation meta:\n";
+	   log.IndentInc();
+	   log.cout() << "Nt: " << _MaxSteps <<endl;
+	   log.cout().precision(2);
+	   log.cout() << "dt: " << fixed <<_dt <<endl;
+	   log.cout() << "Base name: " << s <<endl<<endl;
+	   log.IndentDec();
+	   log.flush();
+	}
+	
+	tbuf.ReadFromFiles(_read);
+	   
+	_MaxSteps = tbuf.Size();
+	if (_MaxSteps < 2)
+	   throw (EIOError("Not enough files for autocorrelation found"));
+	
+	autocorr.newsize(_MaxSteps);
+	spectrum.newsize(_MaxSteps);
+	
+	Psi = tbuf[0]->NewInstance();
+	
+	if (! _H->Valid(Psi) )
+	   throw (EIncompatible("The WFs from the propagation are incompatible with the guess"));
+	
+	*_PsiInitial =  tbuf[0];
+	autocorr[0] = 1;
+	log.cout() << "Rebuild autocorrelation\n\n"; log.flush();
+	for (int i=1; i < _MaxSteps; i++) { /* Rebuild the autocorrelation */
+	   autocorr[i] = *_PsiInitial * tbuf[i];
+	}
       }
-      log.coutdbg() << endl;
-      log.flush();
-      
+          
       Reporter::WriteSpectrum(autocorr, clock->Dt(), _dir+_spectrum);
       
       /* Make FFT and find eigenvalues */
@@ -404,9 +488,9 @@ namespace QDLIB
 
          /* Run time integration */
          *Psi = _PsiInitial;
-         for (int s=0; s < _MaxSteps-1; s++){
+         for (int s=1; s < _MaxSteps; s++){
             
-            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s)+1)*_dt));
+            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s))*_dt));
          }
          
          Psi->Normalize(); /* Just normalize. We don't some factors, so we also drop  dt, 1/T */

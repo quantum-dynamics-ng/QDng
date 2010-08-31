@@ -80,7 +80,7 @@ namespace QDLIB {
       if (res == -1){
          close(_fd);
          _open = false;
-         Remove(_fname);
+         FS::Remove(_fname);
          throw(EIOError(errno, _fname));
       }         
             
@@ -139,7 +139,7 @@ namespace QDLIB {
          if (_mapbase == NULL){
             close(_fd);
             _open = false;
-            Remove(_fname);
+	    FS::Remove(_fname);
             throw(EIOError(errno, _fname));
          }
          _mmap = true;
@@ -165,7 +165,7 @@ namespace QDLIB {
       if (res != 0){
          close(_fd);
          _open = false;
-         Remove(_fname);           
+	 FS::Remove(_fname);
          throw (EIOError(errno, _fname));
       }
 
@@ -177,7 +177,7 @@ namespace QDLIB {
         if (_mapbase == MAP_FAILED){
            close(_fd);
            _open = false;
-           Remove(_fname);
+	   FS::Remove(_fname);
            throw(EIOError(errno, _fname));
         }
         _mmap = true;
@@ -212,7 +212,7 @@ namespace QDLIB {
       _size = 0;
       _open = false;
       
-      if (remove) Remove(_fname);
+      if (remove) FS::Remove(_fname);
       
       _fname.clear();
    }
