@@ -12,12 +12,12 @@
 	      <Vpot name="GridPotential" file="GridPot0"/>
 	</propagator>
         <wf name="LC" normalize="true">
-           <wf0 file="TGE-GSPO-im/ef_0"/>
-           <wf1 file="TGE-GSPO-im/ef_1"/>
-           <wf2 file="TGE-GSPO-im/ef_2"/>
-           <wf3 file="TGE-GSPO-im/ef_3"/>
-           <wf4 file="TGE-GSPO-im/ef_4"/>
-           <wf5 file="TGE-GSPO-im/ef_5"/>
+           <wf0 file="TGE-SPO-im/ef_0"/>
+           <wf1 file="TGE-SPO-im/ef_1"/>
+           <wf2 file="TGE-SPO-im/ef_2"/>
+           <wf3 file="TGE-SPO-im/ef_3"/>
+           <wf4 file="TGE-SPO-im/ef_4"/>
+           <wf5 file="TGE-SPO-im/ef_5"/>
 	</wf>
 </eigen>
 </qdng>

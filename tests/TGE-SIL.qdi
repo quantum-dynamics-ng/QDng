@@ -16,12 +16,12 @@
 	  </hamiltonian>
 	</propagator>
         <wf name="LC" normalize="true">
-           <wf0 file="TGE-GSPO-im/ef_0"/>
-           <wf1 file="TGE-GSPO-im/ef_1"/>
-           <wf2 file="TGE-GSPO-im/ef_2"/>
-           <wf3 file="TGE-GSPO-im/ef_3"/>
-           <wf4 file="TGE-GSPO-im/ef_4"/>
-           <wf5 file="TGE-GSPO-im/ef_5"/>
+           <wf0 file="TGE-SIL-im/ef_0"/>
+           <wf1 file="TGE-SIL-im/ef_1"/>
+           <wf2 file="TGE-SIL-im/ef_2"/>
+           <wf3 file="TGE-SIL-im/ef_3"/>
+           <wf4 file="TGE-SIL-im/ef_4"/>
+           <wf5 file="TGE-SIL-im/ef_5"/>
 	</wf>
 </eigen>
 </qdng>
