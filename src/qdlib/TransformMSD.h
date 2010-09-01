@@ -29,7 +29,7 @@ namespace QDLIB
 
          virtual void Forward(WaveFunction *Psi);
          virtual void Backward(WaveFunction *Psi);
-         virtual double Normalization(){ return _norm; }
+         virtual double Normalization();
          
          /**
           * Set an external tranformer.

@@ -15,6 +15,12 @@ namespace QDLIB
 
    }
 
+   double TransformMSD::Normalization()
+   {
+      if (_T != NULL) return _T[0]->Normalization();
+      else return _norm;
+   }
+   
 }
 
 /** \bug Result is not saved in k-space (stays in real-space buffer) */
@@ -24,7 +30,6 @@ void QDLIB::TransformMSD::Forward(WaveFunction * Psi)
    int states;
    
    states = wfm->States();
-   _norm = 1;
    
    if (_T != NULL) { /* Use external transform */
       for (int i=0; i < states; i++){
@@ -61,7 +66,6 @@ void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
    int states;
    
    states = wfm->States();
-   _norm = 1;
    
    if (_T != NULL) { /* Use external transform */
       for (int i=0; i < states; i++){
@@ -90,4 +94,5 @@ void QDLIB::TransformMSD::Backward(WaveFunction * Psi)
       }
    }
 }
+
 
