@@ -371,7 +371,7 @@ namespace QDLIB
 	 for (int i=1; i < _MaxSteps; i++){/* Propagation loop */
 	    _U->Apply(Psi);
 	    tbuf.Set(i,Psi);
-	    autocorr[i] = *_PsiInitial * Psi;
+	    autocorr[i] = *Psi * _PsiInitial;
 	    
 	    if ( fpclassify(autocorr[i].real()) == FP_NAN)
 	       throw ( EOverflow("Correlation is not a number") );
@@ -448,7 +448,7 @@ namespace QDLIB
 	autocorr[0] = 1;
 	log.cout() << "Rebuild autocorrelation\n\n"; log.flush();
 	for (int i=1; i < _MaxSteps; i++) { /* Rebuild the autocorrelation */
-	   autocorr[i] = *_PsiInitial * tbuf[i];
+	   autocorr[i] = *(tbuf[i]) * _PsiInitial;
 	}
       }
      
@@ -498,7 +498,7 @@ namespace QDLIB
          *Psi = _PsiInitial;
          for (int s=1; s < _MaxSteps; s++){
             
-            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(-energy*(double(s))*_dt));
+            AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(energy*(double(s))*_dt));
          }
          
          Psi->Normalize(); /* Just normalize. We don't some factors, so we also drop  dt, 1/T */

@@ -129,7 +129,7 @@ namespace QDLIB
 
       /* projection and spectrum */
       if (_proj0){
-	 proj = *_psi0 * Psi;
+	 proj = *Psi * _psi0;
 	 if (_proj0Sq) /* Squared - Normal*/
 	    log.cout() << "\t" << cabs(proj)*cabs(proj);
 	 else

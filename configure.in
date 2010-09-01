@@ -11,9 +11,20 @@ AC_PROG_F77
 AM_PROG_LIBTOOL
 
 dnl Check for standard functions
+AC_CHECK_HEADERS([fcntl.h],,AC_MSG_ERROR(fcntl.h not found))
+AC_CHECK_HEADERS([limits.h],,AC_MSG_ERROR(limits.h not found))
+
 AC_CHECK_FUNCS([pow],,AC_MSG_ERROR(power function not found))
 AC_CHECK_FUNCS([sqrt],,AC_MSG_ERROR(sqrt function not found))
 AC_CHECK_FUNCS([mkdir],,AC_MSG_ERROR(mkdir function not found))
+AC_CHECK_FUNCS([ftruncate],,AC_MSG_ERROR(ftruncate function not found))
+AC_CHECK_FUNCS([munmap],,AC_MSG_ERROR(munmap function not found))
+AC_CHECK_FUNCS([mmap],,AC_MSG_ERROR(mmap function not found))
+AC_CHECK_FUNCS([malloc],,AC_MSG_ERROR(malloc function not found))
+
+AC_TYPE_SIZE_T
+AC_TYPE_MODE_T
+
 AC_C_INLINE
 AC_HEADER_STDBOOL
 AC_PROG_CPP
@@ -22,8 +33,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-AC_TYPE_SIZE_T
-AC_TYPE_MODE_T
 
 
 dnl
