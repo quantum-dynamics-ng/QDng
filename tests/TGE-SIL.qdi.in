@@ -3,16 +3,16 @@
 	<propagator name="SIL" order="25">
 	  <hamiltonian name="Sum">
 	      <A name="GridNablaSq" dims="1" mass0="1763.2"/>
-	      <B name="GridPotential" file="GridPot0"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0"/>
 	  </hamiltonian>
 	</propagator>
-        <wf file="GridGauss" normalize="true"/>
+        <wf file="@srcdir@/GridGauss" normalize="true"/>
 </eigen>
 <eigen dt="5" steps="2048" dir="TGE-SIL-ac" method="ac">
 	<propagator name="SIL" order="25">
 	  <hamiltonian name="Sum">
 	      <A name="GridNablaSq" dims="1" mass0="1763.2"/>
-	      <B name="GridPotential" file="GridPot0"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0"/>
 	  </hamiltonian>
 	</propagator>
         <wf name="LC" normalize="true">

@@ -2,14 +2,14 @@
 <eigen dt="5" steps="1000" Nef="10" dir="TGE-GSPO-im" method="imag">
 	<propagator name="GSPO">
 	      <A name="GridNablaSq" dims="1" mass0="1763.2"/>
-	      <B name="GridPotential" file="GridPot0"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0"/>
 	</propagator>
-        <wf file="GridGauss" normalize="true"/>
+        <wf file="@srcdir@/GridGauss" normalize="true"/>
 </eigen>
 <eigen dt="5" steps="2048" dir="TGE-GSPO-ac" method="ac">
 	<propagator name="GSPO">
 	      <A name="GridNablaSq" dims="1" mass0="1763.2"/>
-	      <B name="GridPotential" file="GridPot0"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0"/>
 	</propagator>
         <wf name="LC" normalize="true">
            <wf0 file="TGE-GSPO-im/ef_0"/>

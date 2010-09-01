@@ -6,13 +6,13 @@
 	     <m1.1 name="GridNablaSq" dims="1" mass0="1763.2" key="T1"/>
 	  </A>
  	  <B name="DMultistate">
-	     <m0.0 name="GridPotential" file="GridPot0" key="V0"/>
-	     <m1.1 name="GridPotential" file="GridPot1" key="V1"/>
+	     <m0.0 name="GridPotential" file="@srcdir@/GridPot0" key="V0"/>
+	     <m1.1 name="GridPotential" file="@srcdir@/GridPot1" key="V1"/>
 	  </B>
 	</propagator>
         <wf name="Multistate" normalize="true">
-         <wf0 file="GridPot0_ef_0"/>
-         <wf1 file="GridPot0_ef_0"/>
+         <wf0 file="@srcdir@/GridPot0_ef_0"/>
+         <wf1 file="@srcdir@/GridPot0_ef_0"/>
         </wf>
         <filterpost>
             <expeconly name="Multistate" unity="false" states="2">

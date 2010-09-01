@@ -99,7 +99,14 @@ dnl	    [],with_mpi-prefix=no)
 AC_CONFIG_SUBDIRS([src/fftw/])
 
 
-AC_CONFIG_FILES([Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile src/fft/Makefile src/math/Makefile src/modules/Makefile src/tests/Makefile src/slatec/Makefile src/linalg/Makefile src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile tests/Makefile])
+AC_CONFIG_FILES(
+		[Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
+		 src/fft/Makefile src/math/Makefile src/modules/Makefile
+		 src/tests/Makefile src/slatec/Makefile src/linalg/Makefile
+		 src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile tests/Makefile
+		 tests/TGE-GSPO.qdi tests/TGE-SPO.qdi tests/TGE-Cheby.qdi tests/TGE-SIL.qdi
+		 tests/TGP-Expec.qdi tests/TGP-Expec-SP.qdi tests/TGP-NIP-Cheby.qdi
+		 tests/TGPMS-Cheby.qdi tests/TGPMS-GSPO.qdi])
 
 AC_ARG_WITH([cppunit], 
       [AS_HELP_STRING([--with-cppunit], [Enable CppUnit tests])],

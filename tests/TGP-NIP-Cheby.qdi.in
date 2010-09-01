@@ -1,16 +1,16 @@
 <qdng>
-<propa dt="20" steps="1000" wcycle="1000" dir="TGP-Expec" spectrum="spectrum.dat">
+<propa dt="10" steps="1000" wcycle="1000" dir="TGP-NIP-Cheby" spectrum="spectrum.dat">
 	<propagator name="Cheby">
 	  <hamiltonian name="Sum">
 	      <A name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
-	      <B name="GridPotential" file="GridPot0" key="V"/>
+	      <Vpot name="Gobbler" dims="1" rp0="5.5" order="5" gain="0.02" nip="true"/>
+              <Vpot name="Gobbler" dims="1" lp0="2" order="20" gain="0.3" nip="false" key="V"/>
 	  </hamiltonian>
 	</propagator>
-        <wf file="GridPot0_ef_0" normalize="true"/>
+        <wf file="@srcdir@/GridPot0_ef_0" normalize="true"/>
         <filterpost>
             <expeconly name="GridMomentum"/>
             <expeconly name="GridPosition"/>
-            <expeconly name="Projection" files="GridPot0_ef" num="4"/>
             <expeconly ref="T"/>
             <expeconly ref="V"/>
         </filterpost>
