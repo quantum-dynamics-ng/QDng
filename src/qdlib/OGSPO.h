@@ -39,6 +39,7 @@ namespace QDLIB
          ODSpace* _ops[GSPO_MAX_LEN];  /* operator list */
          cVec _exp[GSPO_MAX_LEN];     /* storage for exponentials */
          int _laststep;                 /* Remember last time step for update */
+         dcomplex _lastexp;                /* Last exponential factor used */
 
          void InitExp();
       public:

@@ -6,7 +6,7 @@ namespace QDLIB
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGSPO)
    
    OGSPO::OGSPO() :
-      _name("OGSPO"), _spoLen(0), _laststep(-1)
+      _name("OGSPO"), _spoLen(0), _laststep(-1), _lastexp(0)
    {
       _needs.SetValue("A", "");
       _needs.SetValue("B", "opt");
@@ -37,7 +37,8 @@ namespace QDLIB
       double sf = 1; /* First Element is middle => factor 1 */
 
       for (int i = 0; i < _spoLen; i++) {
-         if ((_ops[i]->isTimeDep() && _laststep != clock->TimeStep()) || _laststep == -1) {
+         if ((_ops[i]->isTimeDep() && _laststep != clock->TimeStep()) || _laststep == -1
+                  || _lastexp.real() != Exponent().real() || _lastexp.imag() != Exponent().imag()) {
             _ops[i]->InitExponential(&(_exp[i]), Exponent() * sf);
             /* Include transform normalization here */
             if (_ops[i]->Transformation() != NULL){
@@ -46,6 +47,7 @@ namespace QDLIB
          }
          sf = 0.5; /* All other elements are outer ones => factor 1/2 */
       }
+      _lastexp = Exponent();
       _laststep = clock->TimeStep();
    }
 

@@ -90,6 +90,8 @@ namespace QDLIB
       if (ket2 == NULL) ket2 = Psi->NewInstance();
       if (buf == NULL) buf =  Psi->NewInstance();
       
+      _exp  = OPropagator::Exponent()/clock->Dt();
+
       ket0->FastCopy(*Psi);   /* phi_0 */
       
       ket1->FastCopy(*Psi);
@@ -98,8 +100,8 @@ namespace QDLIB
       AddElements((cVec*) ket1, (cVec*) Psi, -1*_offset ); /* Offset*/
       MultElements( (cVec*) ket1, _exp / _scaling);
       
-      MultElements( (cVec*) Psi, _coeff[0]);
-      MultElementsCopy( (cVec*) buf, (cVec*) ket1, _coeff[1]);
+      MultElements( (cVec*) Psi, _coeff[0] * cexp(OPropagator::Exponent()*_offset));
+      MultElementsCopy( (cVec*) buf, (cVec*) ket1, _coeff[1] * cexp(OPropagator::Exponent()*_offset));
       
       *Psi += buf;
       
@@ -111,6 +113,7 @@ namespace QDLIB
       dcomplex exp2 = 2*_exp;
 	    
       for (int i=2; i < _order; i++){
+         dcomplex coeff = _coeff[i] * cexp(OPropagator::Exponent()*_offset);
  	 H->Apply( buf, ket1);
          int s,j;
 
@@ -126,7 +129,7 @@ namespace QDLIB
        __m128d r1, r2, mscaling;
 
        LoadPacked(cexp2, exp2, exp2);
-       LoadPacked(ccoeff, _coeff[i], _coeff[i]);
+       LoadPacked(ccoeff, coeff, coeff);
        LoadPacked(coffset, _offset, _offset);
        mscaling = _mm_set_pd(1/_scaling, 1/_scaling);
 #ifdef _OPENMP    
@@ -173,7 +176,7 @@ namespace QDLIB
 	       k2[j] = k0[j];
 	       k2[j] += bf[j];
 	       k0[j] = k2[j];
-	       psi[j] += k2[j] * _coeff[i];
+	       psi[j] += k2[j] * coeff;
 	    }
 	 }
 #endif
@@ -308,12 +311,13 @@ namespace QDLIB
       
       /* Setup coefficients */
       _coeff.newsize(_order);
-      _coeff[0] = cexp(OPropagator::Exponent()*_offset) * bessel[0];
+      _coeff[0] = bessel[0];
       for (int i=1; i < _coeff.size(); i++){
-	 _coeff[i] = 2.0 * cexp(OPropagator::Exponent()*_offset) * bessel[i];
+         _coeff[i] = 2.0 * bessel[i];
       }
       
       _exp  = OPropagator::Exponent()/clock->Dt();
+
       _params.SetValue("exponent Re", _exp.real());
       _params.SetValue("exponent Im", _exp.imag());
       
