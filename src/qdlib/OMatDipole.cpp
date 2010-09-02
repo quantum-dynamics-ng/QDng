@@ -84,7 +84,7 @@ namespace QDLIB
       if (o == NULL)
          throw(EIncompatible("Error in assignment", Name(), O->Name()));
 
-      SetLaser(*GetLaser());
+      SetLaser(*o->GetLaser());
       Operator::clock = o->clock;
 
       /* Copy parents */

@@ -38,7 +38,6 @@ namespace QDLIB {
    * \li writel   Write laser in every iteration
    * \li writey   Write Norm and Yild to seperate file
    * \li yfile    Name of the Yield file
-   * \li membuf   Buffer back propagated targets in memory (default true)
    * 
    * rabitzfb = Rabitz feedback iterative scheme (W. Zhu and H. Rabitz, J. Chem. Phys 109, 385 (1998))
    * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>

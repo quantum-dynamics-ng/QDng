@@ -2,7 +2,7 @@
 #define OGRIDDIPOLE_H
 
 #include "qdlib/OGridPotential.h"
-#include "qdlib/Laser.h"
+#include "qdlib/OLaser.h"
 
 namespace QDLIB
 {
@@ -14,15 +14,12 @@ namespace QDLIB
     * \li laser   the file containing the laser field.
     * \li All other parameters are inherited from GridPotential
     */
-   class OGridDipole: public OGridPotential
+   class OGridDipole: public OGridPotential, public OLaser
    {
       private:
          string _name;
-         Laser _laser;
          bool _init;
       public:
-         void SetLaser(Laser &laser);
-         Laser* GetLaser();
 
          OGridDipole();
 

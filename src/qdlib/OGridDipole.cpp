@@ -14,17 +14,7 @@ namespace QDLIB {
    void QDLIB::OGridDipole::Clock( QDClock * cl )
    {
       clock = cl;
-      _laser.Clock(cl);
-   }
-
-   void OGridDipole::SetLaser(Laser & laser)
-   {
-      _laser = laser;
-   }
-
-   Laser* OGridDipole::GetLaser()
-   {
-      return &_laser;
+      GetLaser()->Clock(cl);
    }
 
    void OGridDipole::Init(ParamContainer &params)
@@ -33,14 +23,14 @@ namespace QDLIB {
       if (!_init){
 	 /* Read the laser field */
 	 string name;
-	 Laser::FileLaser file = _laser.File();
+	 Laser::FileLaser file = GetLaser()->File();
 
 	 if (!params.isPresent("laser"))
 	    throw (EParamProblem("No laser file name given"));
 	 params.GetValue("laser", name);
 	 file.Suffix(BINARY_O_SUFFIX);
 	 file.Name(name);
-	 file >> &_laser;
+	 file >> GetLaser();
       }
       _init = true;
 
@@ -57,7 +47,7 @@ namespace QDLIB {
    dcomplex OGridDipole::Emax()
    {
 
-      return dcomplex(VecMax( *((dVec*) this) ) * VecMax( (dVec&) _laser ));
+      return dcomplex(VecMax( *((dVec*) this) ) * VecMax( (dVec&) *GetLaser() ));
    }
 
    dcomplex OGridDipole::Emin()
@@ -67,12 +57,12 @@ namespace QDLIB {
 
    void OGridDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, (-1) * _laser.Get());
+      MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, (-1) * GetLaser()->Get());
    }
 
    void OGridDipole::Apply(WaveFunction *Psi)
    {
-      MultElements((cVec*) Psi, (dVec*) this, (-1) * _laser.Get());
+      MultElements((cVec*) Psi, (dVec*) this, (-1) * GetLaser()->Get());
    }
 
    Operator * OGridDipole::operator =(Operator * O)
@@ -87,7 +77,7 @@ namespace QDLIB {
       if (o == NULL)
 	 throw (EIncompatible("Error in assignment", Name(), O->Name() ));
 
-      _laser = o->_laser;
+      SetLaser(*o->GetLaser());
       clock = o->clock;
 
       /* Copy parents */
@@ -99,7 +89,7 @@ namespace QDLIB {
    void OGridDipole::InitExponential (cVec *exp, dcomplex c)
    {
       if (_dspace == NULL) InitDspace();
-      ExpElements(exp, _dspace, c * _laser.Get());
+      ExpElements(exp, _dspace, c * GetLaser()->Get());
    }
 
 }
