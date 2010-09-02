@@ -47,11 +47,11 @@ namespace QDLIB {
          throw (EIncompatible("Operator not initalized"));
       
        if (strlen(key.c_str()) < 1) { /* If no key is given, we produce an internal key with a serial number */
-	 stringstream ss;
-	 ss << OP_LIST_ANONYMOUS_PREFIX << Op->Name() << "#" << OpListAnonKey;
-	 key = ss.rdbuf()->str();
-	 OpListAnonKey++;
-      }
+          stringstream ss;
+          ss << OP_LIST_ANONYMOUS_PREFIX << Op->Name() << "#" << OpListAnonKey;
+          key = ss.rdbuf()->str();
+          OpListAnonKey++;
+       }
       
       _OpStore[key].Op = Op;
       _OpStore[key].initialized = false;
@@ -65,21 +65,21 @@ namespace QDLIB {
    {
       map<string, _OpEntry>::iterator it;
       bool found = false;
-      
-      for ( it=_OpStore.begin() ; it != _OpStore.end(); it++ ){
-	 if ( ((*it).second).Op == Op && ! ((*it).second).initialized) {
+
+      for (it = _OpStore.begin(); it != _OpStore.end(); it++) {
+         if (((*it).second).Op == Op && !((*it).second).initialized) {
             ((*it).second).Op->Init(Psi);
             ((*it).second).initialized = true;
-	    found = true;
+            found = true;
          }
       }
-      
+
       /* If the operator was not found, we register it and do the initialization */
-      if ( ! found ) {
-	 string key;
-	 Add(key ,Op);
-	 _OpStore[key].Op->Init(Psi);
-	 _OpStore[key].initialized = true;
+      if (!found) {
+         string key;
+         Add(key, Op);
+         _OpStore[key].Op->Init(Psi);
+         _OpStore[key].initialized = true;
       }
    }
    
@@ -119,16 +119,17 @@ namespace QDLIB {
    {
       Logger& log = Logger::InstanceRef();
       map<string, _OpEntry>::iterator it;
-      
-      for ( it=_OpStore.begin() ; it != _OpStore.end(); it++ ){
-         log.cout() << (*it).first;log.flush();
-	 log.cout() << "\t\t\t" << ((*it).second).Op->Name();
+
+      for (it = _OpStore.begin(); it != _OpStore.end(); it++) {
+         log.cout() << (*it).first;
+         log.flush();
+         log.cout() << "\t\t\t" << ((*it).second).Op->Name();
          log.cout() << "\t\t";
          if (((*it).second).initialized)
             log.cout() << "initialized\t";
-	 log.cout() << endl;
+         log.cout() << endl;
       }
-      
+
    }
 
    /* Singleton Initializer */

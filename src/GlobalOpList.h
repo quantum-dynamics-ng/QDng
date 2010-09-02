@@ -15,17 +15,17 @@ namespace QDLIB {
    class GlobalOpList
    {
      private:
-        struct _OpEntry {
-           Operator* Op;
-           bool initialized;
-        };
+         struct _OpEntry {
+            Operator* Op;
+            bool initialized;
+         };
         
          static GlobalOpList *_ref;
-	 int OpListAnonKey; /* Counter for anonymous key names */ 
+         int OpListAnonKey; /* Counter for anonymous key names */
 
          map<string,_OpEntry> _OpStore;
          
-	 GlobalOpList() : OpListAnonKey(0) {};
+         GlobalOpList() : OpListAnonKey(0) {};
          GlobalOpList(const GlobalOpList &p){};
       public:
          ~GlobalOpList();
@@ -34,7 +34,7 @@ namespace QDLIB {
          
          void Add(string &key, Operator* op);
          
-	 void Init(Operator* Op, WaveFunction* Psi);
+         void Init(Operator* Op, WaveFunction* Psi);
          
          void Init(const string &key, WaveFunction* Psi);
          
