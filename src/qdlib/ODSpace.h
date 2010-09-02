@@ -14,7 +14,7 @@ namespace QDLIB
     *
     */
    template<typename T>
-   class ODSpaceT: public Operator
+   class ODSpaceT: public virtual Operator
    {
       protected:
          /** k-Space representation is stored here */

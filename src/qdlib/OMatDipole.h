@@ -2,7 +2,7 @@
 #define OMATDIPOLE_H_
 
 #include "qdlib/OHermitianMatrix.h"
-#include "qdlib/Laser.h"
+#include "qdlib/OLaser.h"
 
 namespace QDLIB
 {
@@ -13,17 +13,13 @@ namespace QDLIB
     * params:
     * \li laser file name of laser
     */
-   class OMatDipole: public QDLIB::OHermitianMatrix
+   class OMatDipole: public virtual OHermitianMatrix, public OLaser
    {
       private:
          string _name;
-         Laser _laser;
          bool _init;
       public:
          OMatDipole();
-
-         void SetLaser(Laser &laser);
-         Laser* GetLaser();
 
          virtual string& Name(){ return _name; }
 
@@ -32,7 +28,7 @@ namespace QDLIB
          virtual Operator* NewInstance();
 
          virtual void Init(ParamContainer &params);
-
+	 
 	 virtual dcomplex Emax();
 
 	 virtual dcomplex Emin();
@@ -47,6 +43,17 @@ namespace QDLIB
 
          /* DSpace features */
          virtual void InitExponential (cVec *exp, dcomplex c);
+	 
+	 /* Redifine Operator methods to avoid ambigous base class */
+	 virtual void Init(WaveFunction *Psi) { OHermitianMatrix::Init(Psi); }
+	 virtual void UpdateTime() { OHermitianMatrix::UpdateTime();}
+	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
+	 {
+	    return OHermitianMatrix::MatrixElement(PsiBra, PsiKet);
+	 }
+	 virtual double Expec(WaveFunction *Psi) { return OHermitianMatrix::Expec(Psi); }
+	 bool Valid(WaveFunction *Psi) { return OHermitianMatrix::Valid(Psi); }
+	 
    };
 
 }

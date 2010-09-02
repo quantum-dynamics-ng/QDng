@@ -10,33 +10,17 @@
 
 namespace QDLIB
 {
-
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OMatDipole)
+	 
    OMatDipole::OMatDipole() :
       OHermitianMatrix(), _name("OMatDipole"), _init(false)
    {
-      _isTimedependent = true;
-   }
-
-   void OMatDipole::SetLaser(Laser & laser)
-   {
-      _laser = laser;
-   }
-
-   Laser* OMatDipole::GetLaser()
-   {
-      return &_laser;
-   }
-
-   Operator* OMatDipole::NewInstance()
-   {
-      OMatDipole *r = new OMatDipole();
-      return r;
    }
 
    void OMatDipole::Clock(QDClock * cl)
    {
-      clock = cl;
-      _laser.Clock(cl);
+      Operator::clock = cl;
+      GetLaser()->Clock(cl);
    }
 
    void OMatDipole::Init(ParamContainer &params)
@@ -49,14 +33,14 @@ namespace QDLIB
       if (!_init && !leave_empty) {
          /* Read the laser field */
          string name;
-         Laser::FileLaser file = _laser.File();
+         Laser::FileLaser file = GetLaser()->File();
 
          if (!params.isPresent("laser"))
             throw(EParamProblem("No laser file name given"));
          params.GetValue("laser", name);
          file.Suffix(BINARY_O_SUFFIX);
          file.Name(name);
-         file >> &_laser;
+	 file >> GetLaser();
       }
       _init = true;
 
@@ -67,24 +51,24 @@ namespace QDLIB
 
    dcomplex OMatDipole::Emax()
    {
-      return dcomplex(OHermitianMatrix::Emax() * VecMax((dVec&) _laser));
+      return dcomplex(OHermitianMatrix::Emax() * VecMax((dVec&) *GetLaser()));
    }
 
    dcomplex OMatDipole::Emin()
    {
-      return dcomplex(OHermitianMatrix::Emin() * VecMin((dVec&) _laser));
+      return dcomplex(OHermitianMatrix::Emin() * VecMin((dVec&) *GetLaser()));
    }
 
    void OMatDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       OHermitianMatrix::Apply(destPsi, sourcePsi);
-      *destPsi *= _laser.Get();
+      *destPsi *= GetLaser()->Get();
    }
 
    void OMatDipole::Apply(WaveFunction *Psi)
    {
       OHermitianMatrix::Apply(Psi);
-      *Psi *= _laser.Get();
+      *Psi *= GetLaser()->Get();
    }
 
    Operator * OMatDipole::operator =(Operator * O)
@@ -100,8 +84,8 @@ namespace QDLIB
       if (o == NULL)
          throw(EIncompatible("Error in assignment", Name(), O->Name()));
 
-      _laser = o->_laser;
-      clock = o->clock;
+      SetLaser(*GetLaser());
+      Operator::clock = o->clock;
 
       /* Copy parents */
       OHermitianMatrix::Copy(O);
@@ -114,6 +98,6 @@ namespace QDLIB
       if (_dspace == NULL)
          InitDspace();
 
-      ExpElements(exp, _dspace, c * _laser.Get());
+      ExpElements(exp, _dspace, c * GetLaser()->Get());
    }
 }

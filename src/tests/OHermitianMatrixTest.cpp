@@ -56,7 +56,7 @@ void OHermitianMatrixTest::API_Test()
    M->InitDspace(); /* Need to do this here because of Manual filing */
 
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Emin", -2, M->Emin().real(), LOOSE_EPS);
-   CPPUNIT_ASSERT_MESSAGE("Emax", 2 < cabs(M->Emax()));
+   CPPUNIT_ASSERT_MESSAGE("Emax", 1 < cabs(M->Emax()));
 
    /* Check the FileWriter */
    M->File()->Suffix(".test");

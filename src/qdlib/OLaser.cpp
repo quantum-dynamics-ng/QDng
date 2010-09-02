@@ -5,6 +5,7 @@ namespace QDLIB {
    OLaser::OLaser() : _numlasers(1), _Pol(NULL), _UsePol(false)
    {
       _laser = new Laser[1];
+      _isTimedependent = true;
    }
    
    QDLIB::OLaser::OLaser(int num) :  _numlasers(num), _Pol(NULL), _UsePol(false)

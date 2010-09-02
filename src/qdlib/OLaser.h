@@ -14,7 +14,7 @@ namespace QDLIB {
     * 
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
-   class OLaser: public Operator
+   class OLaser : private virtual Operator
    {
       private:
 	 int _numlasers;
