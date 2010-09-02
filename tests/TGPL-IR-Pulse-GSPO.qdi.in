@@ -1,0 +1,19 @@
+<qdng>
+<propa dt="10" steps="6750" wcycle="6750" dir="TGPL-IR-Pulse-GSPO" spectrum="spectrum.dat">
+	<propagator name="GSPO">
+	      <A name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0" key="V"/>
+	      <C name="GridDipole" file="@srcdir@/GridDip0" laser="@srcdir@/GridLaser_w0.00713"/>
+	</propagator>
+        <wf file="@srcdir@/GridPot0_ef_0" normalize="true"/>
+        <filterpost>
+            <expeconly name="GridMomentum"/>
+            <expeconly name="GridPosition"/>
+            <expeconly name="Projection" files="@srcdir@/GridPot0_ef" start="0"/>
+            <expeconly name="Projection" files="@srcdir@/GridPot0_ef" start="1"/>
+            <expeconly name="Projection" files="@srcdir@/GridPot0_ef" start="2"/>
+            <expeconly ref="T"/>
+            <expeconly ref="V"/>
+        </filterpost>
+</propa>
+</qdng>

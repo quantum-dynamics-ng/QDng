@@ -107,6 +107,7 @@ AC_CONFIG_FILES(
 		 tests/TGE-GSPO.qdi tests/TGE-SPO.qdi tests/TGE-Cheby.qdi tests/TGE-SIL.qdi
 		 tests/TGP-Expec.qdi tests/TGP-Expec-SP.qdi tests/TGP-NIP-Cheby.qdi
 		 tests/TGPMS-Cheby.qdi tests/TGPMS-GSPO.qdi tests/TGP-Kick.qdi
+		 tests/TGPL-IR-Pulse-Cheby.qdi tests/TGPL-IR-Pulse-GSPO.qdi
                  tests/TLP-H-GSPO.qdi tests/TLP-H-Cheby.qdi
                  tests/TLP-C-GSPO.qdi tests/TLP-C-Cheby.qdi
                  tests/TLPL-GSPO.qdi tests/TLPL-Cheby.qdi])

@@ -1,0 +1,7 @@
+# MATLAB Generated file
+# Simple Dipole moment for state X with slope 1  (mu = r)
+CLASS = GridPotential 
+dims = 1 
+N0 = 128
+xmin0 = 1.8897
+xmax0 = 6.1104
