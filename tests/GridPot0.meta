@@ -1,4 +1,5 @@
 # MATLAB Generated file
+# MgH+ X-Potential
 CLASS = GridPotential 
 dims = 1 
 N0 = 128

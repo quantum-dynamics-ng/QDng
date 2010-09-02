@@ -1,0 +1,9 @@
+<qdng>
+<propa dt="0.5" steps="4096" wcycle="4096" dir="TLP-C-GSPO" spectrum="spectrum.dat" proj0="true">
+        <propagator name="GSPO">
+         <A name="HermitianMatrix" file="@srcdir@/LevelHmat"/>
+         <B name="HermitianMatrix" file="@srcdir@/LevelCmat"/>
+        </propagator>
+        <wf name="Level" file="@srcdir@/Level_ef_1"/>
+</propa>
+</qdng>

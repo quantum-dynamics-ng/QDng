@@ -1,0 +1,8 @@
+<qdng>
+<propa dt="4" steps="256" wcycle="256" dir="TLP-H-Cheby" spectrum="spectrum.dat" proj0="true">
+        <propagator name="Cheby">
+         <hamiltonian name="HermitianMatrix" file="@srcdir@/LevelHmat"/>
+        </propagator>
+        <wf name="Level" file="@srcdir@/Level_ef_0"/>
+</propa>
+</qdng>

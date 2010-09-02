@@ -164,8 +164,8 @@ namespace QDLIB {
    dcomplex OHermitianMatrix::Emax()
    {
       if (!_valid) InitDspace();
-      /* Overestimate Emax to avoid conflicts due to incorrect diagonalization in sums */
-      return dcomplex(3 * (*_dspace)[_dspace->size()-1]);
+     
+      return dcomplex((*_dspace)[_dspace->size()-1]);
    }
 
    /** Return the smallest diagonal */

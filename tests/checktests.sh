@@ -46,55 +46,112 @@ CheckTGE-ac-Energy()
 CheckTGE()
 {
    echo -n "Checking TGE-$1-im"
+   if [ ! -f "TGE-$1.log" ]; then
+      echo -e "  [skiped]"
+      return 0
+   fi
 
    a=`grep -r 'Initial Norm & energy: 1.000000e+00.*1.216324e-02' TGE-$1.log`
-   test -n "$a" || echo "!!!TGE-$1 Initial Norm & energy failed"
+   if [ -z "$a" ]; then 
+      echo -e "  [FAILED]"
+      return 0
+   fi
 
    a=`grep -r 'Initial Norm & energy: 1.000000e+00.*2.124845e-02' TGE-$1.log`
-   test -n "$a" || echo "!!!TGE-$1 Initial Norm & energy failed"
+   if [ -z "$a" ]; then 
+      echo -e "  [FAILED]"
+      return 0
+   fi
 
    CheckTGE-im-Energy TGE-$1 || echo "!!!TGE-$1 Im Energy test failed"
    CheckTGE-ac-Energy TGE-$1 || echo "!!!TGE-$1 AC Energy test failed"
 
-   echo -e "\t\t\t\t[OK]"
+   echo -e "  [OK]"
 }
 
 CheckTGP()
 {
    echo -n "Checking TGP-$1"
+   if [ ! -f "TGP-$1.log" ]; then
+      echo -e "  [skiped]"
+      return 0
+   fi
    
    a=`grep -r "$2" TGP-$1.log`
-   test -n "$a" || echo "!!!TGP-$1 Final Norm, Energy and Phase test failed"
+   if [ -z "$a" ]; then 
+      echo "  [FAILED]"
+      return 0
+   fi
    
-   echo -e "\t\t\t\t[OK]"
+   echo -e "  [OK]"
+}
+
+CheckTLP()
+{
+   echo -n "Checking TLP-$1"
+   if [ ! -f "TLP-$1.log" ]; then
+      echo -e "  [skiped]"
+      return 0
+   fi
+   
+   a=`grep -r "$2" TLP-$1.log`
+   if [ -z "$a" ]; then 
+      echo -e "  [FAILED]"
+      return 0
+   fi
+   
+   echo -e "  [OK]"
 }
 
 CheckTGP-Expec()
 {
    echo -n "Checking TGP-$1 expectation values"
-   a=`grep -r "$2" TGP-$1/expec_post.dat`
-   test -n "$a" || echo "!!!TGP-$1 Expec Test failed"
+   if [ ! -f "TGP-$1/expec_post.dat" ]; then
+      echo -e "  [skiped]"
+      return 0
+   fi
    
-   echo -e "\t\t\t\t[OK]"
+   a=`grep -r "$2" TGP-$1/expec_post.dat`
+   if [ -z "$a" ]; then 
+      echo -e "  [FAILED]"
+      return 0
+   fi
+   
+   echo -e "  [OK]"
 }
 
 CheckTGPMS()
 {
    echo -n "Checking TGPMS-$1"
+   if [ ! -f "TGPMS-$1.log" ]; then
+      echo -e "  [skiped]"
+      return 0
+   fi
    
    a=`grep -r "$2" TGPMS-$1.log`
-   test -n "$a" || echo "!!!TGPMS-$1 Final Norm, Energy and Phase test failed"
+   if [ -z "$a" ]; then 
+      echo -e "  [FAILED]"
+      return 0
+   fi
    
-   echo -e "\t\t\t\t[OK]"
+   echo -e "  [OK]"
 }
 
 CheckTGPMS-Expec()
 {
    echo -n "Checking TGPMS-$1 expectation values"
-   a=`grep -r "$2" TGPMS-$1/expec_post.dat`
-   test -n "$a" || echo "!!!TGP-$1 Expec Test failed"
+   if [ ! -f "TGPMS-$1/expec_post.dat" ]; then
+      echo -e "  [skiped]"
+      return 0
+   fi
    
-   echo -e "\t\t\t\t[OK]"
+   a=`grep -r "$2" TGPMS-$1/expec_post.dat`
+   if [ -z "$a" ]; then 
+      echo -e "  [FAILED]"
+      return 0
+   fi
+   
+   echo -e "  [OK]"
 }
 
 
@@ -107,9 +164,11 @@ CheckTGE SIL
 
 CheckTGP Expec "999	19980.0		1.000000	0.00373956	0.77637501,-0.63027125i"
 CheckTGP Expec-SP "999	19980.0		1.000000	0.01456307	0.15255984,-0.17686907i"
+CheckTGP Kick "999	19980.0		1.000000	0.00402761	0.71221627,-0.59726333i"
 
-CheckTGP-Expec Expec "19980	5.373[0-9]*e-10	3.195884335	0.9999999999	0.001889422012	0.001850133601"
+CheckTGP-Expec Expec "19980	5.37[0-9]*e-10	3.195884335	0.9999999999	0.001889422012	0.001850133601"
 CheckTGP-Expec Expec-SP "19980	4.654250747	3.110790591	0.9999999999	0.009802138725	0.004760929388"
+CheckTGP-Expec Kick "19980	-0.8690168821	3.158794699	0.9999973668	0.002232932204	0.001794682062"
 
 CheckTGP NIP-Cheby "999	9990.0		0.093011	0.00003355	-0.18644212,-0.13025716i"
 CheckTGP-Expec NIP-Cheby "9990	0.03862894299	0.3229754163	3.318259189e-05	2.824626741e-07"
@@ -120,4 +179,8 @@ CheckTGPMS-Expec Cheby "9990	5.268[0-9]*e-10	-0.8930488947	1.597942168	2.0659192
 CheckTGPMS GSPO "2999	5998.0		1.000000	0.500000	0.500000	0.08958381	-0.51881914,-0.20949660i"
 CheckTGPMS-Expec GSPO "5998	6.859536[0-9]*e-06	-0.7190485243	1.597942183	2.254396369	0.0009446907332	0.003212836957	0.0009250870758	0.08450119799"
 
+CheckTLP H-GSPO "255	1020.0		1.000000	0.10000000	0.10158570,0.99482679i"
+CheckTLP H-Cheby "255	1020.0		1.000000	0.10000000	0.10158570,0.99482679i"
 
+CheckTLP C-GSPO "4095	2047.5		1.000000	0.2500[0-9]*	0.74667743,-0.48847656i"
+CheckTLP C-Cheby "511	1022.0		1.000000	0.25000000	0.71945570,-0.67057075i"
