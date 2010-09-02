@@ -45,4 +45,5 @@ clean-local:
 	-rm -rf TGP-*/
 	-rm -rf TGPMS-*/
 	-rm -rf TLP-*/
+	-rm -rf TLPL-*/
 

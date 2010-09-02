@@ -1,6 +1,7 @@
 #include "OProjection.h"
 #include "WFMultistate.h"
 #include "FileWF.h"
+#include "tools/Logger.h"
 
 namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OProjection)
@@ -91,21 +92,27 @@ namespace QDLIB {
             
       /* Read a WF sequence from disk (Has to be here because we need to know the WF type) */
       if (_params.isPresent("files")){
+// 	 Logger& log = Logger::InstanceRef();
          string files;
          FileWF wfs;
-         int num;
-         int start;
+         int num=1;
+         int start=0;
          int step=1;
          
          _params.GetValue("files", files);
-         _params.GetValue("num", num);
-         _params.GetValue("start", start);
+	 if(_params.isPresent("num")) _params.GetValue("num", num);
+	 _params.GetValue("start", start);
          if (_params.isPresent("step")){
             _params.GetValue("step", step);
          }
-         if (num < 1)
-            throw(EParamProblem("No file count specified for Projector"));
          
+// 	 log.cout() << "Projector:\n";
+// 	 log.cout() << "Reading from files: " << files << endl;
+// 	 log.cout() << "from " << start;
+// 	 if (num > 1)
+// 	    log.cout() << " to " << num-start-1;
+// 	 log.cout() << endl << endl;
+	 
          wfs.Suffix(BINARY_WF_SUFFIX);
          wfs.Name(files);
          wfs.ActivateSequence(step);
@@ -113,6 +120,7 @@ namespace QDLIB {
          for (int i=0; i < num; i+=step){ /* Read the sequence */
             if (_size == MAX_WFSPACE)
                throw( EOverflow("Projector has reached max capaticity: MAX_WFSPACE"));
+// 	    log.coutdbg() << "Read " << i << endl;
             wfs >> _buf;
             _wfbuf[_size] = _buf->NewInstance();
             *(_wfbuf[_size]) = _buf;

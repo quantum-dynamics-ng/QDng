@@ -1,0 +1,13 @@
+<qdng>
+<propa dt="0.5" steps="629" wcycle="4096" dir="TLPL-GSPO" spectrum="spectrum.dat" proj0="true">
+        <propagator name="GSPO">
+         <A name="HermitianMatrix" file="@srcdir@/LevelH2mat"/>
+         <B name="MatDipole" file="@srcdir@/LevelDIPmat" laser="@srcdir@/LevelLaser_w0.15"/>
+        </propagator>
+        <wf name="Level" file="@srcdir@/Level_ef_0"/>
+        <filterpost>
+          <expeconly name="Projection" files="@srcdir@/Level_ef" start="0"/>
+          <expeconly name="Projection" files="@srcdir@/Level_ef" start="1"/>
+        </filterpost>
+</propa>
+</qdng>
