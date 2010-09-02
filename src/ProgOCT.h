@@ -6,6 +6,7 @@
 #include "tools/QDGlobalClock.h"
 #include "qdlib/OPropagator.h"
 #include "qdlib/OGridDipole.h"
+#include "qdlib/WFBuffer.h"
 
 #define DEFAULT_BASENAME_LASER "laser"
 #define DEFAULT_ITERATIONS 50
@@ -70,7 +71,6 @@ namespace QDLIB
          int _iterations; /* Maximum number of iterations */
          double _convergence; /* Convergence ctriteria */
          bool _writel; /* Write laser in every iteration */
-         bool _membuf; /* Use mebuffer, don't do the same propagation twice */
 
          _method_t _method;
          _coupling_t _coupling;
@@ -100,7 +100,7 @@ namespace QDLIB
          WaveFunction* PsiI[MAX_TARGETS];
          WaveFunction* PsiT[MAX_TARGETS];
          WaveFunction* _opwf; /* Buffer for mu*psi */
-         WaveFunction*** _memwfbuf; /* memory buffer for backpropagation */
+         WFBuffer _memwfbuf[MAX_TARGETS]; /* memory buffer for backpropagation */
          bool _membuf_init; /* indicate initailized membuf */
 
          void _InitParams();
@@ -114,8 +114,8 @@ namespace QDLIB
          double CalcCorr(WaveFunction** wfi, WaveFunction** wft);
          double CalcLaserField(WaveFunction** wfi, WaveFunction** wft);
          double Report(WaveFunction **wfi, WaveFunction** wft, int iteration);
-         void PropagateForward(WaveFunction **wf, bool membuf);
-         void PropagateBackward(WaveFunction **wf, bool membuf);
+         void PropagateForward(WaveFunction **wf);
+         void PropagateBackward(WaveFunction **wf);
          void SyncTargetOverlap(WaveFunction** phii, WaveFunction** phit, int step);
          void SyncTargetOperator(WaveFunction** phii, WaveFunction** phit, int step);
          void Iterate(WaveFunction** phii, WaveFunction** phit, int step);
