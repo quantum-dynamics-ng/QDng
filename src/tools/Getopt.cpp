@@ -129,12 +129,6 @@ namespace QDLIB {
    void Getopt::ShowHelp()
    {
       /* Header */
-      #ifdef PACKAGE_NAME
-	 cerr << endl << PACKAGE;
-      #ifdef PACKAGE_VERSION
-	 cerr << " - " << VERSION << endl;
-      #endif
-      #endif
       cerr << endl;
       cerr << _description  << endl;
       cerr << endl;

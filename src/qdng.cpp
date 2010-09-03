@@ -8,6 +8,8 @@
 #include <time.h>
 #include <sys/times.h>
 #include <unistd.h>
+#include <sys/utsname.h>
+
 
 #ifdef _OPENMP
  #include <omp.h>
@@ -38,14 +40,25 @@ void show_version()
    
    /* Version Info */
    log.cout() << endl;
-   log.cout() << "QDng " << VERSION;
+   log.cout() << PACKAGE_STRING;
    log.cout() << " (build " << QDNG_BUILD_DATE;
    log.cout() << ", " << QDNG_BUILD_HOST;
    log.cout() << ", " << QDNG_BUILD_MACH;
 #ifdef QDNG_REV
-   log.cout() << ", " << QDNG_REV;
+   if (strlen(QDNG_REV) > 0)
+      log.cout() << ", " << QDNG_REV;
 #endif
-   log.cout() << ")" << endl; log.flush();
+   log.cout() << ")" << endl;
+   
+   /* Get machine info */
+   struct utsname ubuf;
+   uname(&ubuf);
+   
+   log.cout() << "Running on " << ubuf.nodename;
+   log.cout() << " (" << ubuf.sysname<< ", " <<ubuf.machine << ")";
+   log.cout()<<endl;
+   log.flush();
+   
 }
 
 /**
