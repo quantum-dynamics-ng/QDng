@@ -431,7 +431,7 @@ namespace QDLIB
    /**
     * Propagate Forward from t= 0 => T all targets.
     * 
-    * Using the _Uf and the corresponding Laserfield _laserf
+    * Using the _U and the corresponding Laserfield _laserf
     * membuf[0] => t=0 , membuf[Steps] => t=T
     */
    void ProgOCT::PropagateForward(WaveFunction ** wf)
@@ -444,7 +444,7 @@ namespace QDLIB
       clock->Begin();
       for (int s = 0; s < clock->Steps(); s++) { /* Save t=1..T */
          for (int t = 0; t < _ntargets; t++) {
-            _Uf->Apply(wf[t]);
+            _U->Apply(wf[t]);
             if (_Gobbler) {
                _Gobbler->Apply(wf[t]);
                wf[t]->Normalize();
@@ -458,7 +458,7 @@ namespace QDLIB
    /**
     * Propagate Backward from t= T => 0 all targets.
     *
-    * Using the _Ub and the corresponding Laserfield _laserb
+    * Using the _U and the corresponding Laserfield _laserb
     * membuf[0] => t=0 , membuf[Steps] => t=T
     */
    void ProgOCT::PropagateBackward(WaveFunction **wf)
@@ -467,12 +467,18 @@ namespace QDLIB
 
       clock->End();
 
+      /* Exchange laserfields => Switch to backward propagation */
+      for (int l = 0; l < _nlaser; l++)
+	 _laserb[l]->swap(*(_laserf[l]));
+      
+      _U->Backward();
+      
       for (int t = 0; t < _ntargets; t++) /* Save t=T */
          _memwfbuf[t].Set(clock->TimeStep() + 1, wf[t]);
 
       for (int s = clock->TimeStep(); s >= 0; s--) {
          for (int t = 0; t < _ntargets; t++) {
-            _Ub->Apply(wf[t]);
+            _U->Apply(wf[t]);
             if (_Gobbler) {
                _Gobbler->Apply(wf[t]);
                wf[t]->Normalize();
@@ -481,6 +487,7 @@ namespace QDLIB
          }
          --(*clock);
       }
+      _U->Forward();
    }
 
    /**
@@ -553,7 +560,7 @@ namespace QDLIB
 
          /* Propagate initial with new field */
          for (int t = 0; t < _ntargets; t++) {
-            _Uf->Apply(phii[t]);
+            _U->Apply(phii[t]);
             if (_Gobbler) {
                _Gobbler->Apply(phii[t]);
                phii[t]->Normalize();
@@ -606,7 +613,7 @@ namespace QDLIB
 
          /* Do one step back */
          for (int t = 0; t < _ntargets; t++) {
-            _Ub->Apply(phit[t]);
+            //_Ub->Apply(phit[t]);
             if (_Gobbler) {
                _Gobbler->Apply(phit[t]);
                phit[t]->Normalize();
@@ -640,7 +647,7 @@ namespace QDLIB
 
          /* Do one step forward */
          for (int t = 0; t < _ntargets; t++) {
-            _Uf->Apply(phii[t]);
+            _U->Apply(phii[t]);
             if (_Gobbler) {
                _Gobbler->Apply(phii[t]);
                phii[t]->Normalize();
@@ -701,9 +708,9 @@ namespace QDLIB
             _gamma[0].Set(CalcCorr(phii, bT));
          }
          for (int t = 0; t < _ntargets; t++) {
-            _Uf->Apply(phii[t]);
+            _U->Apply(phii[t]);
             if (!_mv)
-               _Uf->Apply(phit[t]);
+               _U->Apply(phit[t]);
 
             if (_Gobbler) {
                _Gobbler->Apply(phit[t]);
@@ -741,7 +748,7 @@ namespace QDLIB
 
          /* Propagate initial with new field */
          for (int t = 0; t < _ntargets; t++) {
-            _Uf->Apply(phii[t]);
+            _U->Apply(phii[t]);
             if (_Gobbler) {
                _Gobbler->Apply(phii[t]);
                phii[t]->Normalize();
@@ -756,10 +763,11 @@ namespace QDLIB
     */
    void ProgOCT::Run()
    {
+      GlobalOpList& OpList = GlobalOpList::Instance();
       Logger& log = Logger::InstanceRef();
       QDClock *clock = QDGlobalClock::Instance(); /* use the global clock */
       XmlNode *section;
-      Operator *_hf, *_hb;
+      Operator *_H;
 
       _InitParams();
 
@@ -774,10 +782,8 @@ namespace QDLIB
       if (section == NULL)
          throw(EParamProblem("No propagator found"));
 
-      _Uf = ChainLoader::LoadPropagator(section);
-      _hf = _Uf->Hamiltonian();
-      _Ub = ChainLoader::LoadPropagator(section);
-      _hb = _Ub->Hamiltonian();
+      _U = ChainLoader::LoadPropagator(section);
+      _H = _U->Hamiltonian();
       delete section;
 
       /* Load Initial Wavefunctions */
@@ -843,7 +849,7 @@ namespace QDLIB
                throw(EParamProblem("Missing target operator", t));
             _Otarget[t] = ChainLoader::LoadOperatorChain(section);
             _Otarget[t]->Clock(clock);
-            GlobalOpList::Instance().Init(_Otarget[t], PsiI[0]);
+            OpList.Init(_Otarget[t], PsiI[0]);
             delete section;
          }
       }
@@ -851,13 +857,11 @@ namespace QDLIB
       log.IndentDec();
 
       /* Make sure our hamiltonian is initalized */
-      _hf->Clock(clock);
-      GlobalOpList::Instance().Init(_hf, PsiI[0]);
-      _hb->Clock(clock);
-      GlobalOpList::Instance().Init(_hb, PsiI[0]);
-      log.cout() << "Initial engergy: " << _hf->Expec(PsiI[0]) << endl;
+      _H->Clock(clock);
+      OpList.Init(_H, PsiI[0]);
+      log.cout() << "Initial engergy: " << _H->Expec(PsiI[0]) << endl;
       if (_ttype == ov) {
-         log.cout() << "Initial engergy: " << _hb->Expec(PsiT[0]) << endl;
+         log.cout() << "Initial engergy: " << _H->Expec(PsiT[0]) << endl;
          log.cout() << "Initial Overlapp: " << *(PsiI[0]) * (PsiT[0]) << endl;
       }
       log.flush();
@@ -867,17 +871,14 @@ namespace QDLIB
       int nlasers = MAX_LASERS;
       switch (_coupling) {
          case dipole:
-            OGridDipole *CoupOGridDipole[MAX_LASERS];
-            _Coup = FindOperatorType<OGridDipole> (_hf, CoupOGridDipole, nlasers);
+            OLaser *CoupOLaser[MAX_LASERS];
+            _Coup = FindOperatorType<OLaser> (_H, CoupOLaser, nlasers);
             _nlaser = nlasers;
-            if (CoupOGridDipole != NULL) {
-               for (int l = 0; l < _nlaser; l++)
-                  _laserf[l] = CoupOGridDipole[l]->GetLaser();
-               /* Get the backward laser */
-               nlasers = MAX_LASERS;
-               FindOperatorType<OGridDipole> (_hb, CoupOGridDipole, nlasers);
-               for (int l = 0; l < _nlaser; l++)
-                  _laserb[l] = CoupOGridDipole[l]->GetLaser();
+            if (CoupOLaser != NULL) {
+               for (int l = 0; l < _nlaser; l++){
+                  _laserf[l] = CoupOLaser[l]->GetLaser();
+	          _laserb[l] = _laserf[l];
+	       }
                coupling_ok = true;
             }
             break;
@@ -900,6 +901,7 @@ namespace QDLIB
 
       log.IndentDec();
 
+      /* Check the coupling operator */
       switch (_coupling) {
          case dipole:
             OGridPotential* test[MAX_LASERS];
@@ -923,7 +925,7 @@ namespace QDLIB
       _Coup->Clock(clock);
       delete section;
 
-      GlobalOpList::Instance().Init(_Coup, PsiI[0]);
+      OpList.Init(_Coup, PsiI[0]);
 
       /* Load the Gobbler */
       section = _ContentNodes->FindNode("gobbler");
@@ -933,27 +935,22 @@ namespace QDLIB
          log.IndentInc();
          _Gobbler = ChainLoader::LoadOperatorChain(section);
          log.IndentDec();
-         GlobalOpList::Instance().Init(_Gobbler, PsiI[0]);
+	 OpList.Init(_Gobbler, PsiI[0]);
          delete section;
       }
 
       /* Let the Propagator do it's initalisation */
-      _Uf->Clock(clock);
-      _Ub->Clock(clock);
-      _hf->UpdateTime();
-      GlobalOpList::Instance().Init(_Uf, PsiI[0]);
-
-      _Ub->Backward();
-      GlobalOpList::Instance().Init(_Ub, PsiI[0]);
+      _U->Clock(clock);
+      
+      _H->UpdateTime();
+      OpList.Init(_U, PsiI[0]);
 
       /* Report what the propagator has chosen */
       ParamContainer Upm;
 
-      Upm = _Uf->Params();
+      Upm = _U->Params();
       log.cout() << "Forward Propagators init parameters:\n\n" << Upm << endl;
-      log.cout() << _Uf->Exponent() << " " << _Ub->Exponent() << endl;
-      Upm = _Ub->Params();
-      log.cout() << "Backward Propagators init parameters:\n\n" << Upm << endl;
+      log.coutdbg() << _U->Exponent() << endl;
 
       /* Objects for propagation */
       WaveFunction* phii[MAX_TARGETS];

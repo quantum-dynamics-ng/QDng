@@ -81,8 +81,7 @@ namespace QDLIB
          bool _mv; /* Moving target */
          double _alpha;
 
-         OPropagator *_Uf; /* Forward Propagation */
-         OPropagator *_Ub; /* Backward Propagation */
+         OPropagator *_U; /* Forward Propagation */
          Operator *_Coup; /* The coupling to optimize */
 
          Operator *_Gobbler; /* Gobbler operator */
