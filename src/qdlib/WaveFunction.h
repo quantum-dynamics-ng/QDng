@@ -40,49 +40,49 @@ namespace QDLIB {
       protected:
          bool _IsKspace;      /* To remember in which basis we are */
          cVec *_spacebuffer;   /* transformation buffer for different basis */
-	 ParamContainer _params;
+         ParamContainer _params;
       public:
-	 WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) {}
-	 /**
-	  * Make the class pure virtual.
-	  */
+         WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) {}
+         /**
+          * Make the class pure virtual.
+          */
          virtual ~WaveFunction() {if (_spacebuffer != NULL) delete _spacebuffer;}
-	 
-	 /**
-	  * This method should create a new instance.
-	  * 
-	  * The parameters should be same, but the storage
-	  * will not be initialized.
-	  */
-	 virtual WaveFunction* NewInstance() = 0;
-	       
-	 /**
-	  * Initializer.
-	  * 
-	  * This should also be used for an updated or changed parameter set.
-	  */
-	 virtual void Init(ParamContainer &params) = 0;
-	 
-	 /**
-	  * Return the parameter set.
-	  */
-	 ParamContainer& Params() { return _params; }
-	 
-	 /**
-	  * Human readable identifier.
-	  * \return Name of the implementet wave function
-	  */
-	 virtual const string& Name() = 0;
-	 	    
-	 /**
-	  * Norm of the wave function.
-	  * 
-	  * \f$ N = \sqrt{ \langle \Psi | \Psi \rangle} \f$
-	  */
-	 virtual double Norm() = 0;
-	 
-	 
-	 virtual void Normalize() = 0;
+         
+         /**
+          * This method should create a new instance.
+          * 
+          * The parameters should be same, but the storage
+          * will not be initialized.
+          */
+         virtual WaveFunction* NewInstance() = 0;
+               
+         /**
+          * Initializer.
+          * 
+          * This should also be used for an updated or changed parameter set.
+          */
+         virtual void Init(ParamContainer &params) = 0;
+         
+         /**
+          * Return the parameter set.
+          */
+         ParamContainer& Params() { return _params; }
+         
+         /**
+          * Human readable identifier.
+          * \return Name of the implementet wave function
+          */
+         virtual const string& Name() = 0;
+                    
+         /**
+          * Norm of the wave function.
+          * 
+          * \f$ N = \sqrt{ \langle \Psi | \Psi \rangle} \f$
+          */
+         virtual double Norm() = 0;
+         
+         
+         virtual void Normalize() = 0;
       
          /**
           * Check if WF is in different representation/basis.
@@ -131,105 +131,120 @@ namespace QDLIB {
           */
          virtual void Restore() = 0;
          
-	 /** Copy. */
-	 virtual WaveFunction* operator=(WaveFunction* Psi) = 0;
-	 
-	 /** Scalar product. */
-	 virtual dcomplex operator*(WaveFunction* Psi) = 0;
+         /** Copy. */
+         virtual WaveFunction* operator=(WaveFunction* Psi) = 0;
+         
+         /** Scalar product. */
+         virtual dcomplex operator*(WaveFunction* Psi) = 0;
          
          /** Multiply with scalar */
          void operator*=(const double d)
          {
-	    MultElements((cVec*) this, d);
+            MultElements((cVec*) this, d);
          }
          
-	 /**
-	  * Assign scalar value.
-	  */
-	 WaveFunction* operator=(double d)
-	 {
-	    *((cVec*) this) = dcomplex(d,0);
-	    return this;
-	 }
-	 
-	 /**
-	  * Assign scalar value.
-	  */
-	 WaveFunction* operator=(dcomplex d)
-	 {
-	    *((cVec*) this) = d;
-	    return this;
-	 }
+         /**
+          * Assign scalar value.
+          */
+         WaveFunction* operator=(double d)
+         {
+            *((cVec*) this) = dcomplex(d,0);
+            return this;
+         }
+         
+         /**
+          * Assign scalar value.
+          */
+         WaveFunction* operator=(dcomplex d)
+         {
+            *((cVec*) this) = d;
+            return this;
+         }
 
-	 /** Multiply with complex number */
-	 WaveFunction* operator*=(const dcomplex c)
-	 {
+         /** Multiply with complex number */
+         WaveFunction* operator*=(const dcomplex c)
+         {
       
-/*	    int size = cVec::size();
-	    for (int i=0; i < size; i++){
-	       (*this)[i] *= d;
-	    }*/
-	    MultElements((cVec*) this, c);
-	    return this;
-	 }
-	 
-	 /** Sum */
-	 WaveFunction* operator+(WaveFunction* Psi)
-	 {
+/*          int size = cVec::size();
+            for (int i=0; i < size; i++){
+               (*this)[i] *= d;
+            }*/
+            MultElements((cVec*) this, c);
+            return this;
+         }
+         
+         /** Sum */
+         WaveFunction* operator+(WaveFunction* Psi)
+         {
             WaveFunction *wf;
       
             wf = this->NewInstance();
-	    
-	    AddElementsEq((cVec*) wf, (cVec*) this, (cVec*) Psi);
+            
+            AddElementsEq((cVec*) wf, (cVec*) this, (cVec*) Psi);
 
 /*            for (int i=0; i < cVec::size(); i++){
                (*(cVec*)wf)[i] = (*this)[i] + (*Psi)[i];
-	    }*/
-	    
-	    return wf;
-	 }
-	 
-	 /** Sum */
-	 WaveFunction* operator+=(WaveFunction* Psi)
-	 {
-	    if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
-	    
-	    AddElements((cVec*) this, (cVec*) Psi);
-	    return this;
-	    
-	 }
-	 
-	 /** Difference */
-	 WaveFunction* operator-=(WaveFunction* Psi)
-	 {
-	    if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
-	    
-	    AddElements((cVec*) this, (cVec*) Psi, -1);
-	    return this;
-	    
-	 }
-	 
+            }*/
+            
+            return wf;
+         }
+         
+         /** Sum */
+         WaveFunction* operator+=(WaveFunction* Psi)
+         {
+            if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
+            
+            AddElements((cVec*) this, (cVec*) Psi);
+            return this;
+            
+         }
+         
+         /** Difference */
+         WaveFunction* operator-=(WaveFunction* Psi)
+         {
+            if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
+            
+            AddElements((cVec*) this, (cVec*) Psi, -1);
+            return this;
+            
+         }
+         
          /** Pointwise multiplication.
           * In place method.
           */
          void DirectProduct(WaveFunction* Psi)
          {
             if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
-	    
+            
             MultElements((cVec*) this, (cVec*) Psi);
-	    
-         }
-	 
-	 /** Pointwise Complex multiplication. Psi* x Psi
-          * In place method.
-          */
-         void DirectProducConugatet(WaveFunction* Psi)
-         {
-            if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
-            MultElementsConugate((cVec*) this, (cVec*) Psi, (double) 1.0);
-	    
+            
          }
          
+         /** Pointwise Complex multiplication. Psi* x Psi
+          * In place method.
+          */
+         void DirectProductConjugate(WaveFunction* Psi)
+         {
+            if (cVec::size() != Psi->size()) throw ( EParamProblem("WFs differ in size") );
+            MultElementsConjugate((cVec*) this, (cVec*) Psi, (double) 1.0);
+            
+         }
+         
+         /**
+          * Keep only imaginary part.
+          */
+         void Imag()
+         {
+            Im((cVec*) this);
+         }
+         
+         /**
+          * Keep only real part.
+          */
+         void Real()
+         {
+            Re((cVec*) this);
+         }
 
    }; /* class WaveFunction */
 

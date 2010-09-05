@@ -43,6 +43,10 @@ namespace QDLIB {
       if (_cur_node->children != NULL) {
 	 XmlNode *child = new XmlNode();
 	 child->_cur_node = _cur_node->children;
+         while ( child->_cur_node != NULL ){
+            if ( child->_cur_node->type == XML_ELEMENT_NODE ) break;
+            child->_cur_node = child->_cur_node->next;
+         }
 	 _child_stack.push(child);
 	 return child;
       } else

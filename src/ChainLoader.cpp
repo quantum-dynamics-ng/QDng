@@ -198,6 +198,14 @@ namespace QDLIB
          }
          
 	 multi->Init(pm);
+         
+         /* Print norm */
+         if (log.Debug()){
+            log.coutdbg().precision(8);
+            log.coutdbg() << fixed;
+            log.coutdbg() << "Norm : " << WF->Norm() <<endl;
+         }
+         
 	 pm.GetValue( "normalize", onoff);
 	 if ( onoff) {
 	    log.cout() << "Normalized\n";
@@ -244,6 +252,14 @@ namespace QDLIB
 	    DELETE_WF(wfadd);
 	    child->NextNode();
 	 }
+         /* Print norm */
+         if (log.Debug()){
+            log.coutdbg().precision(8);
+            log.coutdbg() << fixed;
+            log.coutdbg() << "Norm : " << WF->Norm() <<endl;
+         }
+
+
 	 pm.GetValue( "normalize", onoff);
 	 if ( onoff) {
 	    log.cout() << "Normalized\n";
@@ -279,6 +295,13 @@ namespace QDLIB
 	 else                      /* Load by meta */
 	    file >> &WF;
 	 
+         /* Print norm */
+         if (log.Debug()){
+            log.coutdbg().precision(8);
+            log.coutdbg() << fixed;
+            log.coutdbg() << "Norm : " << WF->Norm() <<endl;
+         }
+         
          pm.GetValue( "normalize", onoff);
          if ( onoff) {
             log.cout() << "Normalizing...\n";
