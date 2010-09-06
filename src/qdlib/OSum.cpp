@@ -2,7 +2,7 @@
 
 
 namespace QDLIB {
-   
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OSum)
 
    OSum::~OSum()
    {
@@ -23,17 +23,6 @@ namespace QDLIB {
    
    
    /* Interface implementation, Operator */
-   Operator* OSum::NewInstance()
-   {
-      Operator *r;
-      r = new OSum();
-      return r;
-   }
-   
-   const string& OSum::Name()
-   {
-      return _name;
-   }
 		  
    dcomplex OSum::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
    {
@@ -102,7 +91,18 @@ namespace QDLIB {
       }
    }
    
-   Operator * QDLIB::OSum::Copy(Operator * O)
+   void OSum::Apply(Operator * destOp, Operator * sourceOp)
+   {
+      throw ("Not implementet YET");
+   }
+
+   void OSum::Apply(Operator * Op)
+   {
+      throw ("Not implementet YET");
+   }
+
+   
+   Operator * OSum::Copy(Operator * O)
    {
       OSum *r;
       
@@ -115,9 +115,8 @@ namespace QDLIB {
       return r;
    }
    
-   
-}
- /* namespace QDLIB */
+} /* namespace QDLIB */
+
 
 
 

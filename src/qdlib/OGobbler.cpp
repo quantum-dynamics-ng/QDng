@@ -145,12 +145,6 @@ namespace QDLIB {
       _Init();
    }
    
-   
-   const string & OGobbler::Name()
-   {
-      return _name;
-   }
-   
    dcomplex OGobbler::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
       WaveFunction *ket;

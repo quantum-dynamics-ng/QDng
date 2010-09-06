@@ -1,6 +1,9 @@
 #include "InternalMods.h"
 
 /* Operator list */
+#include "qdlib/OSum.h"
+#include "qdlib/OProduct.h"
+
 #include "qdlib/OCheby.h"
 #include "qdlib/OSPO.h"
 #include "qdlib/OGSPO.h"
@@ -53,6 +56,8 @@ namespace QDLIB
 {
 
    /* Instance functions  */
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OSum)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OProduct)
 
    QDNG_OPERATOR_INSTANCE_FUNCTION(OCheby)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGSPO)
@@ -96,6 +101,8 @@ namespace QDLIB
 
    instOP* InternalOP(const string &name)
    {
+      QDNG_STRING_TO_INSTANCE_PTR(OSum)
+
       QDNG_STRING_TO_INSTANCE_PTR(OCheby)
       QDNG_STRING_TO_INSTANCE_PTR(OSPO)
       QDNG_STRING_TO_INSTANCE_PTR(OGSPO)

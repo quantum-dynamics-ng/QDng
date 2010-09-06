@@ -48,29 +48,7 @@ namespace QDLIB
 
       pm.GetValue("key", key);
 
-      if (name == "Sum"){ /* Sum operator */
-	 log.cout() << "Sum of operators:\n";
-	 log.IndentInc();
-	 child = Onode->NextChild();
-	 child->AdjustElementNode();
-	 
-         Operator *osub;
-	 OSum *sum = new OSum();
-	 CollectorOp::Instance()->Register(sum);
-         
-	 while (child->EndNode()){
-	    osub = LoadOperatorChain( child );
-	    if (osub == NULL)
-	       throw ( EParamProblem("Can't load operator") );
-	    sum->Add( osub );
-	    child->NextNode();
-	 }
-	 
-	 log.flush();
-	 log.IndentDec();
-	 
-	 O = sum;
-      } else if (name == "GridSum") { /* Grid sum operator */
+      if (name == "GridSum") { /* Grid sum operator */
 	 child = Onode->NextChild();
 	 child->AdjustElementNode();
 	 Operator *osub;
@@ -130,8 +108,32 @@ namespace QDLIB
 	 log.IndentDec();
       } else { 
 	 O = mods->LoadOp( name );
-	 log.cout() << pm << "---------------\n";
-	 O->Init(pm);
+         
+         if (dynamic_cast<OList*>(O) != NULL){ /* Sum/Product operator */
+            log.cout() << O->Name() <<" of operators:\n";
+            log.IndentInc();
+            child = Onode->NextChild();
+            child->AdjustElementNode();
+         
+            Operator *osub;
+            OList *list = dynamic_cast<OList*>(O);
+         
+         
+            while (child->EndNode()){
+               osub = LoadOperatorChain( child );
+               if (osub == NULL)
+                  throw ( EParamProblem("Can't load operator") );
+               list->Add( osub );
+               child->NextNode();
+            }
+         
+            log.flush();
+            log.IndentDec();
+         } else {
+         
+            log.cout() << pm << "---------------\n";
+            O->Init(pm);
+         }
       }
       
       /* Register & prepare to exit */

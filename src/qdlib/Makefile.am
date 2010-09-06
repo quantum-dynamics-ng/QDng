@@ -5,7 +5,7 @@ libqd_la_SOURCES = GridSystem.cpp Kspace.cpp Laser.cpp \
 	OCheby.cpp OGobbler.cpp OGridDipole.cpp OGridGMat.cpp OGridNAC.cpp OGridNablaSq.cpp \
 	OGridPosition.cpp OGridPotential.cpp OGridSum.cpp OGridsystem.cpp OHermitianMatrix.cpp \
 	OMultistate.cpp OProjection.cpp OSPO.cpp OGridNabla.cpp\
-	OScalar.cpp OSum.cpp WFGridCartesian.cpp WFGridSystem.cpp WFLevel.cpp OSIL.cpp\
+	OScalar.cpp OSum.cpp OProduct.cpp WFGridCartesian.cpp WFGridSystem.cpp WFLevel.cpp OSIL.cpp\
 	WFMultistate.cpp FileWF.cpp TransformFFT.cpp TransformMat.cpp TransformMSD.cpp \
 	OGSPO.cpp ODMultistate.cpp OMatDipole.cpp OGridKick.cpp WaveFunction.cpp WFBuffer.cpp OLaser.cpp OList.cpp
 noinst_HEADERS = Butterworth.h WindowFuncs.h Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
@@ -14,7 +14,7 @@ noinst_HEADERS = Butterworth.h WindowFuncs.h Conversion.h FileWF.h GridSystem.h 
 	OGSPO.h OHermitianMatrix.h OMatDipole.h OMultistate.h Operator.h OProjection.h \
 	OPropagator.h OScalar.h OSPO.h OSIL.h OSum.h  TransformFFT.h Transform.h TransformMat.h \
 	TransformMSD.h 	WaveFunction.h WFGridCartesian.h WFGridSystem.h WFLevel.h WFMultistate.h \
-	WFBuffer.h OLaser.h OList.h
+	WFBuffer.h OLaser.h OList.h OProduct.h
 
 
 

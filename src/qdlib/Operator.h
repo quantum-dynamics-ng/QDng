@@ -16,6 +16,21 @@
       p = new CLASSNAME (); \
       CollectorOp::Instance()->Register(p); \
       return p; \
+} \
+   const string& CLASSNAME::Name() \
+{ \
+      return _name; \
+}
+
+
+
+#define QDNG_OPERATOR_NAME_FUNCTION(CLASSNAME) \
+   Operator* CLASSNAME::NewInstance() \
+{ \
+      CLASSNAME *p; \
+      p = new CLASSNAME (); \
+      CollectorOp::Instance()->Register(p); \
+      return p; \
 }
 
 namespace QDLIB {

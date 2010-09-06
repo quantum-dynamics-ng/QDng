@@ -51,11 +51,6 @@ namespace QDLIB
       _laststep = clock->TimeStep();
    }
 
-   const string& OGSPO::Name()
-   {
-      return _name;
-   }
-
    void OGSPO::UpdateTime()
    {
       for (int i = 0; i < _spoLen; i++) {

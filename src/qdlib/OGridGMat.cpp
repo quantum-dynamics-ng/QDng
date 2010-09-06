@@ -166,11 +166,6 @@ namespace QDLIB {
       }
       *((GridSystem*) this) = *((GridSystem*) _Gmat[0][0]);
    }
-   
-   const string & OGridGMat::Name( )
-   {
-      return _name;
-   }
 
    dcomplex OGridGMat::MatrixElement( WaveFunction * PsiBra, WaveFunction * PsiKet )
    {

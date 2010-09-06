@@ -56,12 +56,6 @@ namespace QDLIB {
       _InitDspaceReal(); /* Setup internal kspace */
    }
 
-   const string& OGridNabla::Name()
-   {
-      return _name;
-   }
-
-
    dcomplex OGridNabla::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
       dcomplex c;

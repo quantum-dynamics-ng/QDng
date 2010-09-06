@@ -131,11 +131,6 @@ namespace QDLIB
 	    }
 	 }
       }
-   } 
-   
-   const string & OMultistate::Name( )
-   {
-      return _name;
    }
 
    dcomplex OMultistate::MatrixElement( WaveFunction * PsiBra, WaveFunction * PsiKet )

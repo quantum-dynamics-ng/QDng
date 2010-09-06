@@ -1,10 +1,10 @@
 noinst_DATA = TGE-Cheby.qdi  TGE-GSPO.qdi  TGE-SIL.qdi  TGE-SPO.qdi \
 	      TGP-Expec.qdi  TGP-Expec-SP.qdi  TGPMS-Cheby.qdi  TGPMS-GSPO.qdi
 
-check_SCRIPTS = eigen propaG propaL OCTG check.sh
+check_SCRIPTS = TGE TGP TLP TGO check.sh
 
 
-eigen:
+TGE:
 	for n in `ls TGE*.qdi`;\
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
@@ -14,7 +14,7 @@ eigen:
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
 
-propaG:
+TGP:
 	for n in `ls TGP*.qdi`;\
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
@@ -24,7 +24,7 @@ propaG:
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
 
-propaL:
+TLP:
 	for n in `ls TLP*.qdi`;\
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
@@ -34,7 +34,7 @@ propaL:
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
 
-OCTG:
+TGO:
 	for n in `ls TGO*.qdi`;\
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
@@ -56,5 +56,6 @@ clean-local:
 	-rm -rf TGPMS-*/
 	-rm -rf TLP-*/
 	-rm -rf TLPL-*/
+	-rm -rf TGPL-*/
 	-rm -rf TGO-*/
 

@@ -48,11 +48,6 @@ namespace QDLIB {
       _buf = Psi->NewInstance();
    }
 
-   const string & OGridNAC::Name()
-   {
-      return _name;
-   }
-
    dcomplex OGridNAC::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
       dcomplex c(0,0);

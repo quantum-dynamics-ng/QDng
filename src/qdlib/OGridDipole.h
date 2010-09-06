@@ -24,8 +24,8 @@ namespace QDLIB
          OGridDipole();
 
          ~OGridDipole(){}
-
-         virtual string& Name(){ return _name; }
+         
+         virtual const string& Name();
 
          virtual void Clock(QDClock *cl);
 

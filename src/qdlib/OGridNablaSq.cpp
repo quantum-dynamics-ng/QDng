@@ -60,11 +60,6 @@ namespace QDLIB
 
    }
 
-   const string & OGridNablaSq::Name()
-   {
-      return _name;
-   }
-
    void OGridNablaSq::UpdateTime()
    {/* No need for */
    }

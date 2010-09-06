@@ -96,7 +96,8 @@ int main(int argc, char **argv)
 		    "All output files are saved in this directory", "");
    
    cmdline.SetHelp( 'g', "Turn debug output on. Some extra informations will be printed");
-
+   cmdline.SetHelp( 'v', "Show version information and exit.");
+   
 #ifdef _OPENMP
    int procs=1;
    cmdline.SetHelp( 'p', "num threads", false, "Specify the number of threads to use", "1");
@@ -111,6 +112,13 @@ int main(int argc, char **argv)
    try {
       /*Show the help ?*/
       if ( cmdline.GetOption('h') ) exit(retval);
+      
+      if ( cmdline.GetOption('v') ) {
+         show_version();
+         log.cout() << endl;
+         log.flush();
+         exit(retval);
+      }
       
 #ifdef USE_DYNMODS
       /* First check if a path is given in the global options */

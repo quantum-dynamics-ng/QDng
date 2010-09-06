@@ -11,11 +11,11 @@
         <wfi0 name="GridCartesian" file="@srcdir@/GridPot0_ef_0" normalize="true"/>
         <wft0 name="GridCartesian" file="@srcdir@/GridPot0_ef_1" normalize="true"/>
 </oct>
-<propa dt="10" steps="6750" wcycle="6750" dir="TGO-IR-GSPO" nfile="norm" spectrum="spectrum.dat">
+<propa dt="10" steps="6750" wcycle="6750" dir="TGO-IR-Freq" nfile="norm" spectrum="spectrum.dat">
 	<propagator name="GSPO">
 	      <A name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
 	      <B name="GridPotential" file="@srcdir@/GridPot0" key="V"/>
-	      <C name="GridDipole" file="@srcdir@/GridDip0" laser="TGO-IR-GSPO/laser"/>
+	      <C name="GridDipole" file="@srcdir@/GridDip0" laser="TGO-IR-Freq/laser"/>
 	</propagator>
         <wf file="@srcdir@/GridPot0_ef_0" normalize="true"/>
         <filterpost>

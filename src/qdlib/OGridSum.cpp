@@ -52,11 +52,6 @@ namespace QDLIB {
       if (dVec::size() != Psi->size())
 	 throw ( EIncompatible("Operator and WF differ in size") );
    }
-   
-   const string & OGridSum::Name( )
-   {
-      return _name;
-   }
 
    void OGridSum::UpdateTime( )
    {

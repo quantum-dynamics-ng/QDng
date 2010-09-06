@@ -68,12 +68,6 @@ namespace QDLIB {
       return NULL;
    }
    
-
-   string & QDLIB::OProjection::Name( )
-   {
-      return _name;
-   }
-   
    void QDLIB::OProjection::Init( WaveFunction * Psi )
    {
       if (Psi == NULL)

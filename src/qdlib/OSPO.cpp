@@ -158,13 +158,6 @@ namespace QDLIB {
    void QDLIB::OSPO::Init( ParamContainer & params )
    {
    }
- 
-   
-   const string& OSPO::Name( )
-   {
-      return _name;
-   }
-   
    
    void OSPO::UpdateTime( )
    {

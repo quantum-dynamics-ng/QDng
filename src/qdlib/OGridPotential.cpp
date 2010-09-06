@@ -92,11 +92,6 @@ namespace QDLIB
       if ( *((GridSystem*) this) != *((GridSystem*) psi) )
          throw ( EIncompatible ("GridPotential parameters are not compatible with wave function") );
    }
-   
-   const string& OGridPotential::Name()
-   {
-      return _name;
-   }
 
    void OGridPotential::UpdateTime(){/* We are not time dependend*/}
    
