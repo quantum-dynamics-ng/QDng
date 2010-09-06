@@ -185,7 +185,7 @@ namespace QDLIB
    /** \todo Diagonalize Matrix => allow large couplings with Cheby */
    dcomplex OMultistate::Emax()
    {
-      dMat Mmax;
+      cMat Mmax;
       dVec Evals;
       
       Mmax.newsize(_nstates,_nstates);
@@ -193,7 +193,7 @@ namespace QDLIB
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j<= i; j++){
 	    if (_matrix[i][j] != NULL)
-	       Mmax(i,j) = cabs(_matrix[i][j]->Emax());
+	       Mmax(i,j) = (_matrix[i][j]->Emax());
 	 }
       }
       
@@ -204,7 +204,7 @@ namespace QDLIB
 	 
    dcomplex OMultistate::Emin()
    {
-      dMat Mmin;
+      cMat Mmin;
       dVec Evals;
       
       Mmin.newsize(_nstates,_nstates);
@@ -212,7 +212,7 @@ namespace QDLIB
       for(int i=0; i< _nstates; i++){
 	 for(int j=0; j<= i; j++){
 	    if (_matrix[i][j] != NULL)
-	       Mmin(i,j) = cabs(_matrix[i][j]->Emin());
+	       Mmin(i,j) = (_matrix[i][j]->Emin());
 	 }
       }
       

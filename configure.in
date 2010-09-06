@@ -106,7 +106,9 @@ AC_CONFIG_FILES(
 		 src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile tests/Makefile
 		 tests/TGE-GSPO.qdi tests/TGE-SPO.qdi tests/TGE-Cheby.qdi tests/TGE-SIL.qdi
 		 tests/TGP-Expec.qdi tests/TGP-Expec-SP.qdi tests/TGP-NIP-Cheby.qdi
-		 tests/TGPMS-Cheby.qdi tests/TGPMS-GSPO.qdi tests/TGP-Kick.qdi
+		 tests/TGP-Kick.qdi
+		 tests/TGPMS-Cheby.qdi tests/TGPMS-GSPO.qdi
+		 tests/TGPLMS-Cheby.qdi tests/TGPLMS-SIL.qdi
 		 tests/TGPL-IR-Pulse-Cheby.qdi tests/TGPL-IR-Pulse-GSPO.qdi
                  tests/TLP-H-GSPO.qdi tests/TLP-H-Cheby.qdi
                  tests/TLP-C-GSPO.qdi tests/TLP-C-Cheby.qdi

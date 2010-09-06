@@ -1,0 +1,5 @@
+# pi/2 pulse with omega = 0.00713
+CLASS=Laser
+Nt=6750
+dt=10
+
