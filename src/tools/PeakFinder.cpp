@@ -40,7 +40,7 @@ namespace QDLIB
       
       /* Find regions above mean+toll*simga */
       bool start=false;
-      double dmax;
+      double dmax=0;
       int indmax;
       for (int i=0; i < size; i++){
          if (!start &&  data[i] > mean+_tol*sigma ) { /* indicate start of region */

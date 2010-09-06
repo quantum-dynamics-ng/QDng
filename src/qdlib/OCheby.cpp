@@ -127,10 +127,10 @@ namespace QDLIB
        LoadPacked(ccoeff, coeff, coeff);
        LoadPacked(coffset, _offset, _offset);
        mscaling = _mm_set_pd(1/_scaling, 1/_scaling);
+       int size2 = size - size % 2;  /* multiples of two */
 #ifdef _OPENMP    
 #pragma omp parallel for default(shared) private(j, cbf, ck2, cpsi, r1, r2)
 #endif
-            int size2 = size - size % 2;  /* multiples of two */
 	    for (j = 0; j < size2; j += 2){
 	        QDSSE::LoadPacked(cbf, bf[j], bf[j+1]);
 		QDSSE::LoadPacked(ck1, k1[j], k1[j+1]);
