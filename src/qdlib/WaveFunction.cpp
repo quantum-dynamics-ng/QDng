@@ -22,7 +22,7 @@ namespace QDLIB {
                
       if (PsiB->size() != PsiA->size()) throw ( EParamProblem("WFs differ in size") );
                
-       MultElementsConugate((cVec*) wf, (cVec*) PsiA, (cVec*) PsiB, (double) 1.0);
+       MultElementsConjugate((cVec*) wf, (cVec*) PsiA, (cVec*) PsiB, (double) 1.0);
       return wf;
    }
 

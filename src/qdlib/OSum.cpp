@@ -6,8 +6,7 @@ namespace QDLIB {
 
    OSum::~OSum()
    {
-      for(int i=0; i < _size; i++){
-	 DELETE_OP(_O[i]);
+      for(int i=0; i < Size(); i++){
 	 DELETE_WF(_WFbuf[i]);
       }
    }
@@ -15,69 +14,13 @@ namespace QDLIB {
    /**
     * Default constructor
     */
-   OSum::OSum() : _name("OSum"), _size(0), _offset(0)
+   OSum::OSum() : _name("OSum")
    {
       for(int i=0; i < MAX_OPS; i++){
-	 _O[i] = NULL;
 	 _WFbuf[i] = NULL;
       }
    }
    
-   /**
-    * Access elements.
-    * 
-    * Note this is read only. For assingning use Add()
-    */
-   Operator* OSum::operator[](int i)
-   {
-      return Get(i);
-   }
-   
-   /**
-    * Access elements.
-    */
-   Operator * OSum::Get(int index)
-   {
-      if (index >= _size)
-         throw( EIncompatible("Access to empty element") );
-      return _O[index];
-   }
-   
-   /**
-    * Number of operators.
-    */
-   int OSum::Size()
-   {
-      return _size;
-   }
-   
-   /**
-    * Add a new operator.
-    */
-   void OSum::Add(Operator *O)
-   {
-      if (_size >= MAX_OPS) {
-	 throw ( EOverflow("Maximum numbers of operators reached") );
-      }
-      if (O == NULL){
-	 throw ( EIncompatible("Operator not initialized") );
-      }
-      
-      if (O->isTimeDep()) _isTimedependent = true;
-     
-      _O[_size] = O;
-      _size++;
-      
-      
-   }
-   
-   void OSum::Clock( QDClock * cl )
-   {
-      clock = cl;
-      for(int i=0; i < _size; i++){
-	 _O[i]->Clock(clock);
-      }
-   }
    
    /* Interface implementation, Operator */
    Operator* OSum::NewInstance()
@@ -85,28 +28,6 @@ namespace QDLIB {
       Operator *r;
       r = new OSum();
       return r;
-   }
-	   
-   void OSum::UpdateTime()
-   {
-      for(int i=0; i < _size; i++){
-	 _O[i]->UpdateTime();
-      }     
-   }
-   
-   
-   /**
-    * We can't take parameters.
-    */
-   void OSum::Init(ParamContainer &params)
-   {
-   }
-  
-   void OSum::Init( WaveFunction *Psi)
-   {
-      for(int i=0; i < _size; i++){
-	 _O[i]->Init(Psi);
-      }
    }
    
    const string& OSum::Name()
@@ -127,23 +48,14 @@ namespace QDLIB {
       return d;
    }
    
-   double OSum::Expec(WaveFunction *Psi)
-   {
-      dcomplex d;
-      
-      d = MatrixElement(Psi,Psi);
-      
-      return d.real();
-   }
-   
    dcomplex OSum::Emax()
    {
-      if (_size == 0)
+      if (Size() == 0)
 	 throw ( EParamProblem("Sum Operator is empty") );
       
       dcomplex d(0);
-      for (int i=0; i < _size; i++){
-	 d += _O[i]->Emax();
+      for (int i=0; i < Size(); i++){
+	 d += Get(i)->Emax();
       }
       
       return d;
@@ -151,12 +63,12 @@ namespace QDLIB {
 	 
    dcomplex OSum::Emin()
    {
-      if (_size == 0)
+      if (Size() == 0)
 	 throw ( EParamProblem("Sum Operator is empty") );
       
       dcomplex d(0);
-      for (int i=0; i < _size; i++)
-	 d += _O[i]->Emin();
+      for (int i=0; i < Size(); i++)
+	 d += Get(i)->Emin();
       
       return d;
    }
@@ -165,11 +77,11 @@ namespace QDLIB {
    {
       if (_WFbuf[0] == NULL) _WFbuf[0] = sourcePsi->NewInstance();
 
-      _O[0]->Apply(destPsi, sourcePsi);
+      Get(0)->Apply(destPsi, sourcePsi);
       
-      for (int i=1; i < _size; i++)
+      for (int i=1; i < Size(); i++)
       {
-	 _O[i]->Apply(_WFbuf[0], sourcePsi);
+	 Get(i)->Apply(_WFbuf[0], sourcePsi);
 	 AddElements(destPsi, _WFbuf[0]);
       }
    }
@@ -181,20 +93,13 @@ namespace QDLIB {
       if (_WFbuf[1] == NULL) _WFbuf[1] = Psi->NewInstance();
       
       _WFbuf[0]->FastCopy(*Psi);
-      _O[0]->Apply(Psi);
+      Get(0)->Apply(Psi);
             
-      for (int i=1; i < _size; i++)
+      for (int i=1; i < Size(); i++)
       {
-	 _O[i]->Apply(_WFbuf[1], _WFbuf[0]);
+	 Get(i)->Apply(_WFbuf[1], _WFbuf[0]);
 	 AddElements(Psi, _WFbuf[1]);
       }
-   }
-      
-   
-   Operator* OSum::operator=(Operator* O)
-   {
-      Copy(O);
-      return this;
    }
    
    Operator * QDLIB::OSum::Copy(Operator * O)
@@ -205,29 +110,11 @@ namespace QDLIB {
       if (r == NULL)
 	 throw( EIncompatible ("Incompatible in Assignment", this->Name(), O->Name() ) );
       
-      _offset = r->_offset;
-      _size = r->_size;
+      OList::Copy(O);
       
-      for (int i=0; i < _size; i++){
-	 _O[i] = r->_O[i]->NewInstance();
-	 *(_O[i]) = r->_O[i];
-      }
-
       return r;
    }
    
-   bool OSum::Valid(WaveFunction * Psi)
-   {
-      bool valid = true;
-      
-      if ( Psi == NULL ) return false;
-      
-      for (int i=0; i < _size; i++){
-         valid = valid & _O[i]->Valid(Psi);
-         if ( !valid ) return false;
-      }
-      return valid;
-   }
    
 }
  /* namespace QDLIB */
