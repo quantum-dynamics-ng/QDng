@@ -1,21 +1,14 @@
 * Coding issues
- * Collector (non-singleton) to handle Operators and wavefunction buffers more easy (DONE)
- * Allow Complex ranges in operators. [planed for alpha-0.6] (DONE)
  * Add Output to operators Init functions. [planed for alpha-0.6]
- * Replace fixed operator scaling with dynamic scaling => save memory [planed for alpha-0.6] (DONE)
- * Optimize core routines for SSE2 (DONE, Mostly not needed newer gcc can optimize)
  * Cleanup optimization flags => configure should decide
 
 * Testing
- * Define test inputs + evaluating script.
+ * Define test inputs + evaluating script. (partly DONE)
 
 * QDng input
  * xsl scheme for input definition [planed for alpha-0.6]
  * Loops (see Program types) 
  * "macros" for shorter defs., eg. Tkin on a multistate operator [planed for alpha-0.6]
- * References on operators (close conn. to macros) [planed for alpha-0.6] (DONE)
- * Setup/tearDown Filters => Before beginning, after end of propgation (DONE)
- * Add Momentum to WF (DONE, OGridKick)
 
 * MPI [planed for alpha-0.7 ?]
  * Vector Classes
@@ -27,15 +20,10 @@
  * MPI-IO
  * HDF5
  * Mem-chached file buffer (in FileSingle, really needed?)
- * Disk-cached wf-buffer  [planed for alpha-0.6 ?] (DONE)
- * Compressed storage => k-space, set zero, gzip/bzip2 compression (DONE)
  * Seperate FileSingle class into specialized parts (WaveFunction->Multistate, other types of data)
    => Special fileWF class (DONE)
 
 * Propgramm types
- * Eigen (=> SPO,Cheby with real exponents) (DONE)
- * Eigen by Correlation functions
- * OCT (Krotov, freq-shape) (DONE)
  * Pump Probe Spectroscopy simulation
  * Loops in input with formatable loop variable in xml input
 
@@ -45,21 +33,11 @@
  * Band Matrix
 
 * Operators to implement
- * Dipole Operator (DONE)
- * SIL (DONE)
  * SOD (Worth implementing?)
- * Projection Operator (DONE)
  * Extend NAC Operator to N-Dimensions
- * Generalize Cheby to complex plane energy range [planed for alpha-0.6] (DONE)
 
-* Multistate System
- * efficient SPO Scheme (DONE)
- * SPO for N-States (DONE, GSPO)
- * matrix system (DONE)
 
 * FFT
- * Decouple Intialiazation (DONE)
- * Plan buffering (DONE)
  * MPI-FFT (how to combine with data distribution?)
 
 * Density Matrix operations
