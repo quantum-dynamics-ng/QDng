@@ -149,8 +149,8 @@ int main(int argc, char **argv)
       /* Get the number of openmp threads */
       if (cmdline.GetOption('p')){
          cmdline.GetOption( 'p', procs);
-         omp_set_num_threads(procs);
       }
+      omp_set_num_threads(procs);
 #endif
       
       if(! cmdline.GetNonOption(0, fname) )
