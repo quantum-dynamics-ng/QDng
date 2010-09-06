@@ -56,11 +56,6 @@ namespace QDLIB
 	 if (_order < 1) throw ( EParamProblem("Chebychev recursion order invalid") );
       } else _order = 0;
    }
-
-   const string & OCheby::Name( )
-   {
-      return _name;
-   }
    
    dcomplex OCheby::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
    {
@@ -135,7 +130,8 @@ namespace QDLIB
 #ifdef _OPENMP    
 #pragma omp parallel for default(shared) private(j, cbf, ck2, cpsi, r1, r2)
 #endif
-	    for (j = 0; j < size; j += 2){
+            int size2 = size - size % 2;  /* multiples of two */
+	    for (j = 0; j < size2; j += 2){
 	        QDSSE::LoadPacked(cbf, bf[j], bf[j+1]);
 		QDSSE::LoadPacked(ck1, k1[j], k1[j+1]);
 	        QDSSE::LoadPacked(ck2, k0[j], k0[j+1]);
@@ -164,6 +160,15 @@ namespace QDLIB
 	        QDSSE::UnPack(r1, r2, cpsi);
 	        QDSSE::Store(psi[j], psi[j+1], r1, r2);
 	    }
+            if (size % 2 == 1){  /* Non-vectorized version for single element */
+               j=size-1;
+               bf[j] = (bf[j] - _offset * k1[j]) / _scaling; /* Offset + Scaling */
+               bf[j] *= exp2;
+               k2[j] = k0[j];
+               k2[j] += bf[j];
+               k0[j] = k2[j];
+               psi[j] += k2[j] * coeff;
+            }
 	 }
 
 #else
