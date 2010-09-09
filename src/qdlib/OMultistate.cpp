@@ -191,7 +191,7 @@ namespace QDLIB
       Mmax.newsize(_nstates,_nstates);
       
       for(int i=0; i< _nstates; i++){
-	 for(int j=0; j<= i; j++){
+         for(int j=0; j < _nstates; j++){
 	    if (_matrix[i][j] != NULL)
 	       Mmax(i,j) = (_matrix[i][j]->Emax());
 	 }
@@ -210,7 +210,7 @@ namespace QDLIB
       Mmin.newsize(_nstates,_nstates);
       
       for(int i=0; i< _nstates; i++){
-	 for(int j=0; j<= i; j++){
+         for(int j=0; j < _nstates; j++){
 	    if (_matrix[i][j] != NULL)
 	       Mmin(i,j) = (_matrix[i][j]->Emin());
 	 }
