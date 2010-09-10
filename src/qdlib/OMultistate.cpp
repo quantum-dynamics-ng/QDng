@@ -190,6 +190,8 @@ namespace QDLIB
       
       Mmax.newsize(_nstates,_nstates);
       
+      Mmax=0;
+      
       for(int i=0; i< _nstates; i++){
          for(int j=0; j < _nstates; j++){
 	    if (_matrix[i][j] != NULL)
@@ -208,6 +210,8 @@ namespace QDLIB
       dVec Evals;
       
       Mmin.newsize(_nstates,_nstates);
+      
+      Mmin=0;
       
       for(int i=0; i< _nstates; i++){
          for(int j=0; j < _nstates; j++){
