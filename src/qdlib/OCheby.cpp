@@ -259,7 +259,7 @@ namespace QDLIB
       
       /* This is an estimate for the recursion depth */
       if (_order <= 0)
-	 _order =  abs(int(5 * _scaling * clock->Dt()));
+	 _order =  abs(int(20 * _scaling * clock->Dt()));
       
       if (_order < 10) _order=10;
 
@@ -302,6 +302,7 @@ namespace QDLIB
 	 }
 	 _order = i;
 	 _params.SetValue("prec", precission);
+         _params.SetValue("BesselDelta", abs(bessel[_order - 1] - bessel[_order - 2] ));
       }
 
 	

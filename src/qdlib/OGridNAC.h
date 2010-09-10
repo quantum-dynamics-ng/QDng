@@ -43,6 +43,10 @@ namespace QDLIB {
 	 
          virtual const string& Name();
 	 
+         virtual dcomplex Emax();
+
+         virtual dcomplex Emin();
+         
          virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	 
          virtual double Expec(WaveFunction *Psi);

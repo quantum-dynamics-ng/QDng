@@ -1,4 +1,5 @@
 #include "OGridNAC.h"
+#include "math/math_functions.h"
 
 namespace QDLIB {
 
@@ -48,6 +49,24 @@ namespace QDLIB {
       _buf = Psi->NewInstance();
    }
 
+   /** \todo extend to N-D */
+   dcomplex OGridNAC::Emax()
+   {
+      double max = VecMax(_NACME);
+      max *= M_PI/ _mass / GridSystem::Dx(0);
+      
+      return dcomplex(max);
+   }
+   
+   /** \todo extend to N-D */
+   dcomplex OGridNAC::Emin()
+   {
+      double min = VecMin(_NACME);
+      min *= M_PI/ _mass / GridSystem::Dx(0);
+      
+      return dcomplex(min);
+   }
+   
    dcomplex OGridNAC::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
       dcomplex c(0,0);
@@ -124,6 +143,7 @@ namespace QDLIB {
       return this;
    }
 }
+
 
 
 
