@@ -18,7 +18,7 @@ namespace QDLIB {
     * \li num     number of files to read
     * \li start   number to start with
     * \li step    step size trough the sequence
-    * 
+    * \li inv     sets the inverse Projection operator \f$ \sum_i |1-\Psi_i><\Psi_i| \f$
     * @author Markus Kowalewski
     */
    class OProjection : public Operator {
@@ -26,6 +26,7 @@ namespace QDLIB {
 	 string _name;
 	 
          double _sign;
+         bool _inv;        /* true: inverse projection 1-P */
 	 int _size;
 	 WaveFunction* _wfbuf[MAX_WFSPACE];
 	 WaveFunction* _buf;

@@ -6,7 +6,7 @@
 namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OProjection)
 	 
-   OProjection::OProjection() : _name("OProjection"), _sign(1), _size(0),  _buf(NULL)
+   OProjection::OProjection() : _name("OProjection"), _sign(1), _inv(false), _size(0),  _buf(NULL)
    {
       for (int i=0; i < MAX_WFSPACE; i++){
          _wfbuf[i] = NULL;
@@ -131,6 +131,7 @@ namespace QDLIB {
       _params.GetValue("positive", pos,true);
       Sign(pos);
 
+      _params.GetValue("inv", _inv, false);
    }
 
      
@@ -151,6 +152,8 @@ namespace QDLIB {
       if (_size>0) _destroy();
       
       _size = o->_size;
+      _inv = o->_inv;
+      _sign = o->_sign; 
       
       for (int i=0; i < _size; i++){
 	 *(_wfbuf[i]) = o->_wfbuf[i];
@@ -193,6 +196,11 @@ namespace QDLIB {
 #endif
       for (i=0; i < _size; i++){
 	 MultElementsAdd(destPsi, _wfbuf[i], *(_wfbuf[i]) * sourcePsi * _sign);
+      }
+      if (_inv){
+         *_buf = 1;
+         AddElements(_buf, destPsi, -1);
+         *destPsi = _buf;
       }
    }
 
