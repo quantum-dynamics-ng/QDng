@@ -20,6 +20,7 @@ namespace QDLIB
 
    OGSPO::~OGSPO()
    {
+      DELETE_OP(_H);
 //      for (int i = 0; i < GSPO_MAX_LEN; i++) {
 //         if (_ops[i] != NULL) {
 //            delete _ops[i];
@@ -194,6 +195,7 @@ namespace QDLIB
       
       if (H == NULL) {
          _H = new OSum();
+         CollectorOp::Instance()->Register(_H);
          H = _H;
       }   
       _H->Add(O);

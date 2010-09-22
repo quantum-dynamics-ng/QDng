@@ -23,6 +23,7 @@
 
 #include "modules/ModuleLoader.h"
 
+#include "ChainLoader.h"
 #include "ProgPropa.h"
 #include "ProgEigen.h"
 #include "ProgOCT.h"
@@ -220,6 +221,27 @@ int main(int argc, char **argv)
       if (prognodes == NULL)
 	 throw ( EParamProblem ("Empty parameter file provided") );
       
+      /* Look for global Operator definitions */
+      if ( prognodes->Name() == "opdefs" ){
+         XmlNode *opdefs = prognodes->NextChild();
+         if (opdefs != NULL) {
+            log.Header("Loading global operator definitions", Logger::Section);
+            while (opdefs->EndNode()) {
+               Operator *O;
+               
+               log.Header( opdefs->Name(), Logger::SubSection );
+               log.IndentInc();
+               O = ChainLoader::LoadOperatorChain( opdefs, true );
+               log.IndentDec();
+               opdefs->NextNode();
+            }
+         }
+         prognodes->NextNode();
+         
+         if ( log.Debug() )
+            GlobalOpList::Instance().PrintList();
+      }
+      
       /* Loop over program nodes */
       while (prognodes->EndNode()) {
 	 cpu_time = times(&proc_time);
@@ -230,11 +252,6 @@ int main(int argc, char **argv)
 	    propa.SetDirectory(dir);
 	    log.Header("Propagation", Logger::Chapter);
 	    propa.Run();
-	 } else if (progname == "auto"){
-/*	    ProgAuto autoc(rnodes);
-	    log.Header("Run Autocorrelation", Logger::Chapter);
-	    autoc.Run();*/
-	    throw ( EParamProblem ("Autocorrelation not implementet yet") );
 	 } else if (progname == "eigen") {
 	    ProgEigen eigen(*prognodes);
 	    eigen.SetDirectory(dir);
@@ -248,7 +265,7 @@ int main(int argc, char **argv)
 	 } else if (progname == "densmat") {
 	    throw ( EParamProblem ("Density matrix propagation not implementet yet") );
 	 } else {
-	    throw ( EParamProblem ("Programm type not known") );
+	    throw ( EParamProblem ("Programm type not known", progname) );
 	 }
 	 
 	 /* Show time consumption */

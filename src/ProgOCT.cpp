@@ -24,7 +24,6 @@ namespace QDLIB
 
    ProgOCT::~ProgOCT()
    {
-      DELETE_ALL_OP();
       DELETE_ALL_WF();
    }
 

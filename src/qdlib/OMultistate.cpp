@@ -22,11 +22,6 @@ namespace QDLIB
    {
       DELETE_WF(_buf1);
       DELETE_WF(_buf2);
-      for(int i=0; i< _nstates; i++){
-	 for(int j=0; j< _nstates; j++){
-	       DELETE_OP(_matrix[i][j]);
-	 }
-      }
    }
 
    /**

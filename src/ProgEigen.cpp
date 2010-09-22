@@ -39,9 +39,8 @@ namespace QDLIB
    {
       /* remove the clock */
       QDGlobalClock::Destroy();
-      GlobalOpList::Instance().Destroy();
-      DELETE_ALL_OP();
-      DELETE_ALL_WF();
+      DELETE_OP(_P);
+      GlobalOpList::Instance().Clear();
    }
 
    /**

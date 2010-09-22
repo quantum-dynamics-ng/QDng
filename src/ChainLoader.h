@@ -21,7 +21,7 @@ namespace QDLIB
       private:
          static int OpListAnonKey; /* Counter for anonymous key names */ 
       public:
-	 static Operator* LoadOperatorChain( XmlNode *Onode );
+	 static Operator* LoadOperatorChain( XmlNode *Onode, bool persist = false );
 	 static WaveFunction* LoadWaveFunctionChain( XmlNode *WFNode, int seqnum=-1);
 	 static OPropagator* LoadPropagator( XmlNode *Unode );
    };
