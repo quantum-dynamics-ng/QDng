@@ -71,7 +71,6 @@ namespace QDLIB
       r->newsize(0,_nstates);
       for (int i=0; i < _nstates; i++){
 	 r->_states[i] =  _states[i]->NewInstance();
-         CollectorWF::Instance()->Register(r->_states[i]);
 	 r->StrideRef(*(r->_states[i]), 0, i);
       }
       CollectorWF::Instance()->Register(r);
