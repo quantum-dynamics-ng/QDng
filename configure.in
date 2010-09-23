@@ -8,6 +8,19 @@ AC_LANG([C++])
 AC_PROG_CXX
 AC_PROG_F77
 
+AC_PROG_LEX
+echo "$LEX"
+if test "x$LEX" == x; then
+  AC_MSG_ERROR(lex is missing)
+fi
+
+AC_PROG_YACC
+echo "$YACC"
+if test "x$YACC" == x; then
+  AC_MSG_ERROR(Yacc or bison is missing)
+fi
+
+
 AM_PROG_LIBTOOL
 
 dnl Check for standard functions
@@ -103,7 +116,7 @@ AC_CONFIG_FILES(
 		[Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
 		 src/fft/Makefile src/math/Makefile src/modules/Makefile
 		 src/tests/Makefile src/slatec/Makefile src/linalg/Makefile
-		 src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile tests/Makefile
+		 src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile tests/Makefile src/simpleXml/Makefile
 		 tests/TGE-GSPO.qdi tests/TGE-SPO.qdi tests/TGE-Cheby.qdi tests/TGE-SIL.qdi
 		 tests/TGP-Expec.qdi tests/TGP-Expec-SP.qdi tests/TGP-NIP-Cheby.qdi
 		 tests/TGP-Kick.qdi

@@ -23,6 +23,8 @@
 
 #include "modules/ModuleLoader.h"
 
+#include "simpleXml/Simple2Xml.h"
+
 #include "ChainLoader.h"
 #include "ProgPropa.h"
 #include "ProgEigen.h"
@@ -60,6 +62,30 @@ void show_version()
    log.cout()<<endl;
    log.flush();
    
+}
+
+/**
+ * Check input format type & convert if needed.
+ */
+void CheckInput(string &name)
+{
+   Logger& log = Logger::InstanceRef();
+   QDSXML::FileType type;
+   
+   type = QDSXML::CheckType(name);
+   
+   if (type == QDSXML::SIMPLE) {
+      log.cout() << "SimpleXML-Input format"<< endl;
+      log.cout() << "Converting to XML file... " << name+".qdi"<<endl;
+      QDSXML::Convert(name, name+".qdi");
+      name = name +".qdi";
+   }
+   if (type == QDSXML::XML)
+      log.cout() << "XML-Input format" << endl;
+      
+   if (type == QDSXML::UNKNOWN) {
+         throw( EIncompatible("Undefined format of input file"));
+   }
 }
 
 /**
@@ -170,7 +196,10 @@ int main(int argc, char **argv)
    show_version();
    
    /* This is the global try-catch block */
-   try {    
+   try {
+      /* Check for input format */
+      CheckInput(fname);
+      
       /* Open input file and check programm nodes */
       XMLfile.Parse(fname);
       
