@@ -39,12 +39,12 @@ namespace QDLIB {
    {
       /* Im( Psi* T Psi )*/
       Get(_indT)->Apply(_buf, PsiKet);
-      //_buf->DirectProductConjugate(PsiBra);
+      _buf->DirectProductConjugate(PsiBra);
       _buf->Imag();
       
       /* Integrate over inner Volume */
       Get(_indG)->Apply(_buf);
-      return dcomplex(*PsiBra * _buf);
+      return dcomplex(-2 * (*PsiBra * _buf));
    }
 
    double OFlux::Expec(WaveFunction * Psi)
