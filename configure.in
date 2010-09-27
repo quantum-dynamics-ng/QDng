@@ -1,4 +1,4 @@
-AC_INIT([QDng], [alpha-0.5.3])
+AC_INIT([QDng], [alpha-0.6-pre1])
 AC_CONFIG_SRCDIR([configure.in])
 
 AM_CONFIG_HEADER(src/config.h)
@@ -9,13 +9,11 @@ AC_PROG_CXX
 AC_PROG_F77
 
 AC_PROG_LEX
-echo "$LEX"
 if test "x$LEX" == x; then
   AC_MSG_ERROR(lex is missing)
 fi
 
 AC_PROG_YACC
-echo "$YACC"
 if test "x$YACC" == x; then
   AC_MSG_ERROR(Yacc or bison is missing)
 fi
