@@ -37,7 +37,7 @@ int indent=0;
 	char* sval;
 }
 
-%token <sval> TOKID WORD BEGINSEC ENDSEC EQUAL QUOTE
+%token <sval> TOKID WORD BEGINSEC ENDSEC EQUAL QUOTE COMMENT
 
 
 %%
@@ -45,6 +45,11 @@ lines:
 	| lines line
 
 line:
+       COMMENT
+       {
+         fprintf(_yyout, "<!-- %s -->\n", $1);
+       }
+       |
        TOKID BEGINSEC 
 	{
 		if (openel) fprintf(_yyout, ">\n");
