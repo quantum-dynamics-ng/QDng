@@ -21,6 +21,7 @@
 #include "qdlib/OMatDipole.h"
 
 #include "qdlib/OGobbler.h"
+#include "qdlib/OFlux.h"
 #include "qdlib/OProjection.h"
 #include "qdlib/OScalar.h"
 
@@ -83,6 +84,7 @@ namespace QDLIB
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNAC)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridKick)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGobbler)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OFlux)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OProjection)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OScalar)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OHermitianMatrix)
@@ -124,6 +126,7 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(OHermitianMatrix)
       QDNG_STRING_TO_INSTANCE_PTR(OMatDipole)
       QDNG_STRING_TO_INSTANCE_PTR(OGobbler)
+      QDNG_STRING_TO_INSTANCE_PTR(OFlux)
       QDNG_STRING_TO_INSTANCE_PTR(OProjection)
       QDNG_STRING_TO_INSTANCE_PTR(OScalar)
 

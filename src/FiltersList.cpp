@@ -100,7 +100,15 @@ namespace QDLIB {
 	 } else
 	    _value[_size] = real;
 	 
-	 /* Check wchich filter action should be taken */
+         /* Check which kind of value we want to see */
+         if (attr.isPresent("int")){
+            _integrate[_size] = true;
+            _sum[_size] = 0;
+         } else {
+            _integrate[_size] = false;
+         }
+            
+	 /* Check which filter action should be taken */
 	 if (faction == "normalize"){
 	    _action[_size] = normalize;
 	 }
@@ -166,13 +174,28 @@ namespace QDLIB {
 	 if (_action[i] == expec || _action[i] == expeconly){
 	    switch (_value[i]) {
 	       case imag:
-		  _ofile << _olist[i]->MatrixElement(Psi,Psi).imag() << "\t";
+                  if (_integrate[i])
+                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi).imag();
+                  else
+                     _sum[i] = _olist[i]->MatrixElement(Psi,Psi).imag();
+                  
+		  _ofile << _sum[i].imag() << "\t";
 		  break;
 	       case complex:
-		  _ofile << _olist[i]->MatrixElement(Psi,Psi) << "\t";
+                  if (_integrate[i])
+                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi);
+                  else
+                     _sum[i] = _olist[i]->MatrixElement(Psi,Psi);
+                  
+                  _ofile << _sum[i] << "\t";
 		  break;
 	       default:
-	          _ofile << _olist[i]->Expec(Psi) << "\t";
+                  if (_integrate[i])
+                     _sum[i] += _olist[i]->Expec(Psi);
+                  else
+                     _sum[i] = _olist[i]->Expec(Psi);
+                  
+                  _ofile << _sum[i].real() << "\t";
 	    }
 	 }	 
 	 if (_action[i] == apply || _action[i] == expec){

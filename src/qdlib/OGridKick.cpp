@@ -63,6 +63,9 @@ namespace QDLIB {
       if (opPsi == NULL)
          throw(EIncompatible("Psi is not of type WFGridSystem", Psi->Name()));
       
+      if (opPsi->Dim() != Dim())
+         throw(EIncompatible("GridKick got wrong number of dimensions"));
+      
       /* re-Init exponential ?*/
       if (*this != *((GridSystem*) opPsi) || _exp== NULL) {
          *((GridSystem*) this) = *((GridSystem*) opPsi);

@@ -29,7 +29,9 @@ namespace QDLIB {
 	 
 	 Operator* _olist[MAX_FILTERS];          /* Operator list */
 	 _FilterAction _action[MAX_FILTERS];     /* action for corresponding operator */
-	 _FilterValue _value[MAX_FILTERS];     /* action for corresponding operator */
+	 _FilterValue _value[MAX_FILTERS];       /* action for corresponding operator */
+         dcomplex _sum[MAX_FILTERS];             /* Sum for integretion */
+         bool _integrate[MAX_FILTERS];           /* Turn on integration */
          string _labels[MAX_FILTERS];            /* user defined labels for expec table  */
 	 
 	 string _fname;
