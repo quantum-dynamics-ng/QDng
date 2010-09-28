@@ -24,6 +24,7 @@ class WFG : public WFGridSystem {
       virtual const string& Name() {return _name;}
       virtual double Norm() {return 0;}
       void Normalize() {}
+      dcomplex Integral(){return dcomplex(0);}
       virtual dcomplex operator*(WaveFunction* Psi){return dcomplex(0,9);}
 };
 

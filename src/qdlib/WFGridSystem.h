@@ -34,6 +34,11 @@ namespace QDLIB {
          
          virtual void Restore();
          
+         /**
+          * Integrates over the WaveFunction.
+          */
+         virtual dcomplex Integral() = 0;
+         
    }; /* class WFGridSystem */
    
 } /* namespace QDLIB */

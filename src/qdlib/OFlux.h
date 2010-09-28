@@ -2,6 +2,7 @@
 #define QDLIBOFLUX_H
 
 #include "qdlib/OList.h"
+#include "qdlib/WFGridSystem.h"
 
 
 namespace QDLIB {
@@ -19,7 +20,7 @@ namespace QDLIB {
    {
       private:
          string _name;
-         WaveFunction *_buf;
+         WFGridSystem *_buf;
          int _indT;           /* index of the kinetic energy operator */
          int _indG;           /* index of the Gobbler */
       public:

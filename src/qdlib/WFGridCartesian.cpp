@@ -135,5 +135,54 @@ namespace QDLIB {
    }
 
 
+   dcomplex QDLIB::WFGridCartesian::Integral()
+   {
+      dcomplex c(0,0);
+      dcomplex cglob(0,0);
+      
+   
+      /** \todo make mpi-save */
+      int s;
+      lint size = lsize();
+      dcomplex *a;
+      for (s=0; s < strides(); s++){
+         a = begin(s);
+         int i;
+#ifdef _OPENMP
+#pragma omp parallel shared(cglob) private(i) firstprivate(c)
+         {   
+#pragma omp  for nowait
+#endif
+            for(i=0; i < size; i++){
+               c += a[i];
+            }
+#ifdef _OPENMP
+#pragma omp critical
+            {
+               cglob += c;
+            }
+         }
+#else
+         cglob = c;
+#endif
+      }
+   
+      /* k-space has different Norm! */
+      if (IsKspace())
+      {
+         for(int i=0; i < GridSystem::Dim(); i++){
+            cglob *= 2*M_PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i)) ;
+         }
+
+      } else {
+         for(int i=0; i < GridSystem::Dim(); i++){
+            cglob *= GridSystem::Dx(i);
+         }
+         
+      }
+      
+      return cglob;
+   }
+
 }
 
