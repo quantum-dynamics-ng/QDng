@@ -31,6 +31,8 @@ namespace QDSXML {
       if (!file)
          throw (QDLIB::EIOError(errno, name) );
       
+      memset( (void*) buf, 0, CHUNK);
+      
       /* Read a test chunk */
       size = fread( (void*) buf, 1, CHUNK, file );
       

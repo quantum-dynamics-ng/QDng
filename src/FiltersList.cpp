@@ -175,7 +175,7 @@ namespace QDLIB {
 	    switch (_value[i]) {
 	       case imag:
                   if (_integrate[i])
-                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi).imag();
+                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi).imag() * _clock->Dt();
                   else
                      _sum[i] = _olist[i]->MatrixElement(Psi,Psi).imag();
                   
@@ -183,7 +183,7 @@ namespace QDLIB {
 		  break;
 	       case complex:
                   if (_integrate[i])
-                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi);
+                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi) * _clock->Dt();
                   else
                      _sum[i] = _olist[i]->MatrixElement(Psi,Psi);
                   
@@ -191,7 +191,7 @@ namespace QDLIB {
 		  break;
 	       default:
                   if (_integrate[i])
-                     _sum[i] += _olist[i]->Expec(Psi);
+                     _sum[i] += _olist[i]->Expec(Psi) * _clock->Dt();
                   else
                      _sum[i] = _olist[i]->Expec(Psi);
                   
