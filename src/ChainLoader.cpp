@@ -110,8 +110,9 @@ namespace QDLIB
 	 O = mods->LoadOp( name );
          
          if (dynamic_cast<OList*>(O) != NULL){ /* Sum/Product operator */
-            log.cout() << O->Name() <<" of operators:\n";
+            log.cout() << O->Name()<<endl;
             log.IndentInc();
+            log.flush();
             child = Onode->NextChild();
             child->AdjustElementNode();
          
@@ -133,6 +134,7 @@ namespace QDLIB
          
             log.cout() << pm << "---------------\n";
             O->Init(pm);
+            log.flush();
          }
       }
       
