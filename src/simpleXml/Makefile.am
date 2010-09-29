@@ -9,4 +9,6 @@ libsimplexml_la_SOURCES = grammar.yy simpleXml.ll Simple2Xml.cpp
 
 noinst_HEADERS = Simple2Xml.h
 
+clean-local:
+	-rm grammar.cc grammar.h simpleXml.cc
 
