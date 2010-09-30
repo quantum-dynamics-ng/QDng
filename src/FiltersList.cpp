@@ -101,13 +101,10 @@ namespace QDLIB {
 	    _value[_size] = real;
 	 
          /* Check which kind of value we want to see */
-         if (attr.isPresent("int")){
-            _integrate[_size] = true;
-            _sum[_size] = 0;
-         } else {
-            _integrate[_size] = false;
-         }
-            
+         
+         attr.GetValue("int", _integrate[_size], false);
+         _sum[_size] = 0;
+
 	 /* Check which filter action should be taken */
 	 if (faction == "normalize"){
 	    _action[_size] = normalize;

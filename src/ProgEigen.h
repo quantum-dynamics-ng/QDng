@@ -11,7 +11,7 @@
 #define DEFAULT_NUMBER_EFS      20
 #define DEFAULT_CONVERGENCE_EF_RAW  1e-8
 #define DEFAULT_CONVERGENCE_EF_DIAG  1e-5
-#define DEFAULT_MAXSTEPS        10000
+#define DEFAULT_MAXSTEPS        512
 #define DEFAULT_EF_BASE_NAME    "ef"
 #define DEFAULT_EF_ENERGY_NAME  "energy.dat"
 #define DEFAULT_EF_SPECTRUM_NAME  "spectrum.dat"

@@ -351,14 +351,13 @@ namespace QDLIB
       /* Propagation */
       WFBuffer tbuf;
       tbuf.AutoLock(1);
+      tbuf.Size(_MaxSteps);
       tbuf.Init(_PsiInitial);
       
       if ( _read.empty() ){ /* Need to run Propagation */
 	 autocorr.newsize(_MaxSteps);
 	 spectrum.newsize(_MaxSteps);
-	 
-	 tbuf.Size(_MaxSteps);
-	 
+         
 	 Psi = _PsiInitial->NewInstance();
 	 *Psi = _PsiInitial;
 	 tbuf.Set(0,_PsiInitial);
@@ -367,6 +366,7 @@ namespace QDLIB
 	 
 	 log.cout() << "Run propagation\n\n";
 	 log.coutdbg() << "Step\tTime\tNorm\n";
+         log.flush();
 	 for (int i=1; i < _MaxSteps; i++){/* Propagation loop */
 	    _U->Apply(Psi);
 	    tbuf.Set(i,Psi);
