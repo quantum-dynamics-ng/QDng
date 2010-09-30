@@ -23,16 +23,20 @@ namespace QDLIB {
    void OGridNAC::Init(ParamContainer & params)
    {
       
+      _params = params;
+      
       /* Check dimensions */
-      if (_params.isPresent("dim")){
+      if (_params.isPresent("dims")){
          int dim = 0;
-         _params.GetValue("dim", dim);
+         _params.GetValue("dims", dim);
          
          if (dim < 1)
             throw (EParamProblem("NAC got nonsense dims"));
          
          if (dim > MAX_DIMS)
             throw (EParamProblem("Dims for NAC exceedes MAX_DIMS"));
+         
+         Dim(dim);
       } else
          Dim(1); /* Default */
       
@@ -51,7 +55,11 @@ namespace QDLIB {
          snprintf(nd, 3, "%d", i);
          
          pNAC.SetValue("name", "OGridPotential");
-         pNAC.SetValue("file", s + string(nd));
+         
+         if (_params.isPresent("mass") && Dim() == 1)
+            pNAC.SetValue("file", s);
+         else
+            pNAC.SetValue("file", s + string(nd));
          
          _NACME[i].Init(pNAC);
          

@@ -484,7 +484,6 @@ namespace QDLIB {
             if ( !file.Parse(p) )
                throw( EIOError("Can not read meta file", name) );
          } else {
-            cout << "failed\n";
             throw( EIOError("Can not read meta file", name) );
          }
       }
