@@ -589,6 +589,34 @@ try {
 		mxSetFieldByNumber(mx_WF[0],0,field,text);/*Set the field*/
 	}
 	
+	/*Set the Dimension of the Wavefunction data*/
+	if (param.isPresent("dims")) {
+	    
+	    /*get Dims of the wavefunction*/
+	    int Dims;
+	    param.GetValue("dims", Dims );
+	    
+	    /*create array with the number of points in each dimension*/
+	    mwSize *new_dims;
+	    new_dims = (mwSize*) mxMalloc(Dims * sizeof(*new_dims));
+	    char c[256];
+	    int N=0;
+	    
+	    for (int d = 0; d<Dims;d++) {
+	      
+	      sprintf (c, "%d", d);
+	      param.GetValue( string("N") + string(c), N);
+	      new_dims[d] = N;
+	      
+	    }
+	    
+	    /*reshape the Matrix*/
+	    mxSetDimensions(WF_data,new_dims, (mwSize) Dims);
+	    
+	    /*clean up*/
+	    mxFree(new_dims);
+ 	}
+	
 	/*Set the field "data"*/
 	field = mxGetFieldNumber(mx_WF[0],"data");
 	mxSetFieldByNumber(mx_WF[0],0,field,WF_data);
