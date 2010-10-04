@@ -112,11 +112,7 @@ namespace QDLIB
 	 throw ( EParamProblem ("No Delta t given") );
       
       attr.GetValue("dt", _dt);
-               
-      /* Filter diagonalization */
-      if ( attr.isPresent("diag"))
-         attr.GetValue("diag", _diag);
-      
+                     
       /* Specific parameters for imag solver */
       if (_method == imag) {
          /* Number of eigenfunctions */
@@ -134,6 +130,9 @@ namespace QDLIB
                throw ( EParamProblem ("Can't start above number of desired EFs") );
          }
    
+         /* Basis Diagonalization */
+         attr.GetValue("diag", _diag, true); /* Default true here */
+
          
          /* Default convergence */
          if (_diag)
@@ -149,6 +148,11 @@ namespace QDLIB
                throw ( EParamProblem ("Convergence critera larger than one doesn't make sense") );
          }
       } else { /* specific for ac */
+         
+         /* Basis Diagonalization */
+         attr.GetValue("diag", _diag, false); /* Default false: diag may lead to ambigous result with ac method */
+
+         
          if ( attr.isPresent("tol")){
             attr.GetValue("tol", _tol);
             if (_tol < 0)
