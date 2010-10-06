@@ -26,7 +26,7 @@ namespace QDLIB
     *
     * Registering the operator means that the GlobalOpList takes responsibility for destruction.
     */
-   Operator* ChainLoader::LoadOperatorChain( XmlNode * Onode )
+   Operator* ChainLoader::LoadOperatorChain( XmlNode * Onode, bool persist )
    {
       ModuleLoader* mods = ModuleLoader::Instance();
       Logger& log = Logger::InstanceRef();
@@ -56,7 +56,7 @@ namespace QDLIB
 	 OGridSum *sum = new OGridSum;
 	 CollectorOp::Instance()->Register(sum);
 	 while (child->EndNode()){
-	    osub = LoadOperatorChain( child );
+	    osub = LoadOperatorChain( child, persist );
 	    if (osub == NULL)
 	       throw ( EParamProblem("Can't load operator") );
 	    if ( (gsub = dynamic_cast<OGridSystem*>(osub) ) == NULL )
@@ -94,7 +94,7 @@ namespace QDLIB
 	    
 	    log.cout() << "H(" << row << "," << col << ")\n";
 	    
-	    osub = LoadOperatorChain( child );
+	    osub = LoadOperatorChain( child, persist );
 	    if (osub == NULL)
 	       throw ( EParamProblem("Can't load operator") );
 	    
@@ -110,8 +110,9 @@ namespace QDLIB
 	 O = mods->LoadOp( name );
          
          if (dynamic_cast<OList*>(O) != NULL){ /* Sum/Product operator */
-            log.cout() << O->Name() <<" of operators:\n";
+            log.cout() << O->Name()<<endl;
             log.IndentInc();
+            log.flush();
             child = Onode->NextChild();
             child->AdjustElementNode();
          
@@ -120,7 +121,7 @@ namespace QDLIB
          
          
             while (child->EndNode()){
-               osub = LoadOperatorChain( child );
+               osub = LoadOperatorChain( child, persist );
                if (osub == NULL)
                   throw ( EParamProblem("Can't load operator") );
                list->Add( osub );
@@ -133,11 +134,12 @@ namespace QDLIB
          
             log.cout() << pm << "---------------\n";
             O->Init(pm);
+            log.flush();
          }
       }
       
       /* Register & prepare to exit */
-      OpList.Add(key, O);
+      OpList.Add(key, O, persist);
 
 
       return O;

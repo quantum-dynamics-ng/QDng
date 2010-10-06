@@ -9,6 +9,7 @@
  * xsl scheme for input definition [planed for alpha-0.6]
  * Loops (see Program types) 
  * "macros" for shorter defs., eg. Tkin on a multistate operator [planed for alpha-0.6]
+ * GUI Frontend to compose input. [planed for alpha-0.7]
 
 * MPI [planed for alpha-0.7 ?]
  * Vector Classes
@@ -34,7 +35,6 @@
 
 * Operators to implement
  * SOD (Worth implementing?)
- * Extend NAC Operator to N-Dimensions
 
 
 * FFT

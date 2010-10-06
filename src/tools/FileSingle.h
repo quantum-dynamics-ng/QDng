@@ -474,13 +474,18 @@ namespace QDLIB {
       
       name = _name + METAFILE_SUFFIX;
       KeyValFile file(name);
-
+      
       if ( !file.Parse(p) ) {
          /* try again, but remove trailing underscore + further chars */
-         name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
-         file.SetName( name );
-         if ( !file.Parse(p) ) 
+         if (_name.rfind('_') != string::npos) {
+            name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
+            file.SetName( name );
+            
+            if ( !file.Parse(p) )
+               throw( EIOError("Can not read meta file", name) );
+         } else {
             throw( EIOError("Can not read meta file", name) );
+         }
       }
    }
    

@@ -22,12 +22,13 @@ if HAVE_OPENMP
   AM_LDFLAGS = $(OPENMP_CXXFLAGS)
 endif
 
-SUBDIRS = fft linalg math modules qdlib slatec tools fftw lib $(OPT_DIRS)
+
+SUBDIRS = fft linalg math modules qdlib slatec tools fftw lib simpleXml $(OPT_DIRS)
 
 bin_PROGRAMS = qdng qdz
 qdng_SOURCES = GlobalOpList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
 	ProgOCT.cpp ProgPropa.cpp Reporter.cpp qdng.cpp
-qdng_LDADD =  $(top_builddir)/src/lib/libqdng.la 
+qdng_LDADD =  $(top_builddir)/src/lib/libqdng.la  $(top_builddir)/src/simpleXml/libsimplexml.la
 qdng_LDFLAGS = -Wl,-export-dynamic
 
 qdz_SOURCES = qdz.cpp

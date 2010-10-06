@@ -18,6 +18,8 @@ namespace QDLIB {
          struct _OpEntry {
             Operator* Op;
             bool initialized;
+            bool persist;
+            _OpEntry() : Op(NULL), initialized(false), persist(false) {}
          };
         
          static GlobalOpList *_ref;
@@ -32,7 +34,9 @@ namespace QDLIB {
          static GlobalOpList& Instance();
          static void Destroy();
          
-         void Add(string &key, Operator* op);
+         void Clear();
+         
+         void Add(string &key, Operator* op, bool persist = false);
          
          void Init(Operator* Op, WaveFunction* Psi);
          

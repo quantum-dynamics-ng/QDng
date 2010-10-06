@@ -23,6 +23,9 @@
 
 #include "modules/ModuleLoader.h"
 
+#include "simpleXml/Simple2Xml.h"
+
+#include "ChainLoader.h"
 #include "ProgPropa.h"
 #include "ProgEigen.h"
 #include "ProgOCT.h"
@@ -59,6 +62,30 @@ void show_version()
    log.cout()<<endl;
    log.flush();
    
+}
+
+/**
+ * Check input format type & convert if needed.
+ */
+void CheckInput(string &name)
+{
+   Logger& log = Logger::InstanceRef();
+   QDSXML::FileType type;
+   
+   type = QDSXML::CheckType(name);
+   
+   if (type == QDSXML::SIMPLE) {
+      log.cout() << "SimpleXML-Input format"<< endl;
+      log.cout() << "Converting to XML file... " << name+".qdi"<<endl;
+      QDSXML::Convert(name, name+".qdi");
+      name = name +".qdi";
+   }
+   if (type == QDSXML::XML)
+      log.cout() << "XML-Input format" << endl;
+      
+   if (type == QDSXML::UNKNOWN) {
+         throw( EIncompatible("Undefined format of input file"));
+   }
 }
 
 /**
@@ -169,7 +196,10 @@ int main(int argc, char **argv)
    show_version();
    
    /* This is the global try-catch block */
-   try {    
+   try {
+      /* Check for input format */
+      CheckInput(fname);
+      
       /* Open input file and check programm nodes */
       XMLfile.Parse(fname);
       
@@ -220,6 +250,27 @@ int main(int argc, char **argv)
       if (prognodes == NULL)
 	 throw ( EParamProblem ("Empty parameter file provided") );
       
+      /* Look for global Operator definitions */
+      if ( prognodes->Name() == "opdefs" ){
+         XmlNode *opdefs = prognodes->NextChild();
+         if (opdefs != NULL) {
+            log.Header("Loading global operator definitions", Logger::Section);
+            while (opdefs->EndNode()) {
+               Operator *O;
+               
+               log.Header( opdefs->Name(), Logger::SubSection );
+               log.IndentInc();
+               O = ChainLoader::LoadOperatorChain( opdefs, true );
+               log.IndentDec();
+               opdefs->NextNode();
+            }
+         }
+         prognodes->NextNode();
+         
+         if ( log.Debug() )
+            GlobalOpList::Instance().PrintList();
+      }
+      
       /* Loop over program nodes */
       while (prognodes->EndNode()) {
 	 cpu_time = times(&proc_time);
@@ -230,11 +281,6 @@ int main(int argc, char **argv)
 	    propa.SetDirectory(dir);
 	    log.Header("Propagation", Logger::Chapter);
 	    propa.Run();
-	 } else if (progname == "auto"){
-/*	    ProgAuto autoc(rnodes);
-	    log.Header("Run Autocorrelation", Logger::Chapter);
-	    autoc.Run();*/
-	    throw ( EParamProblem ("Autocorrelation not implementet yet") );
 	 } else if (progname == "eigen") {
 	    ProgEigen eigen(*prognodes);
 	    eigen.SetDirectory(dir);
@@ -248,7 +294,7 @@ int main(int argc, char **argv)
 	 } else if (progname == "densmat") {
 	    throw ( EParamProblem ("Density matrix propagation not implementet yet") );
 	 } else {
-	    throw ( EParamProblem ("Programm type not known") );
+	    throw ( EParamProblem ("Programm type not known", progname) );
 	 }
 	 
 	 /* Show time consumption */

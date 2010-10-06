@@ -30,9 +30,9 @@ namespace QDLIB{
    }
    
 
-   EIOError::EIOError( const char * message, const string &name ) : Exception()
+   EIOError::EIOError( const char * message, const string &fname ) : Exception()
    {
-      SetMessage(string(message) + ": " + name);
+      SetMessage(string(message) + ": " + fname);
    }
 
    EIOError::EIOError(int cerrno, const string & name)

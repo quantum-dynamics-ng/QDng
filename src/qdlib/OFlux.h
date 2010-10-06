@@ -1,23 +1,28 @@
 #ifndef QDLIBOFLUX_H
 #define QDLIBOFLUX_H
 
-#include <OGridNabla.h>
+#include "qdlib/OList.h"
+#include "qdlib/WFGridSystem.h"
+
 
 namespace QDLIB {
 
    /**
     * Flux Integration Operator.
     * 
+    * The operator two subsequent Operators (in order!):
+    * \li Kinetic energy operator
+    * \li Gobbler which encloses the inner Volume.
+    * 
     *	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
-   class OFlux : public OGridNabla
+   class OFlux : public OList
    {
       private:
          string _name;
-         double _mass;
-         WaveFunction *_buf;
-         bool _useGm;
-         OGridPotential* _Gm[MAX_DIMS];    /* Reciprocal, coordinate dependent mass elements. */
+         WFGridSystem *_buf;
+         int _indT;           /* index of the kinetic energy operator */
+         int _indG;           /* index of the Gobbler */
       public:
          OFlux();
          ~OFlux();
@@ -42,6 +47,10 @@ namespace QDLIB {
          virtual Operator* operator=(Operator* O);
          
          virtual Operator* Copy(Operator* O);
+         
+         /* dummies */
+         virtual dcomplex Emin() {return dcomplex(0);}
+         virtual dcomplex Emax() {return dcomplex(0);}
    
    };
 

@@ -202,7 +202,7 @@ namespace QDLIB {
 
       for (int i=0; i < GridSystem::Dim(); i++){
 	 for(int j=0; j <= i; j++) {
-	    if (i != j) {
+	    if (i != j && _KinCoup) {
 	       double max, min;
 	       max = VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
 	       min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
@@ -210,8 +210,9 @@ namespace QDLIB {
 		  T += 2 * fabs(min);
 	       else
 		  T += 2 * max;
-	    } else
+            } else if (i==j)
 	       T += VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
+
 	 }
       }
       
@@ -225,9 +226,11 @@ namespace QDLIB {
       for (int i=0; i < GridSystem::Dim(); i++){
 	 for(int j=0; j < i; j++) {
 	    double min;
-	    min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
-	    if (min < 0)
-	       Tmin += min;
+            if ( i == j || _KinCoup ) {
+               min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
+               if (min < 0)
+                  Tmin += min;
+            }
 	 }
       }
       return dcomplex(Tmin);

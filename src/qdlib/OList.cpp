@@ -14,9 +14,6 @@ namespace QDLIB {
    
    OList::~OList()
    {
-      for(int i=0; i < _size; i++){
-         DELETE_OP(_O[i]);
-      }
    }
 
    /**

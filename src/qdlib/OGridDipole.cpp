@@ -46,7 +46,6 @@ namespace QDLIB {
 
    dcomplex OGridDipole::Emax()
    {
-
       return dcomplex(VecMax( *((dVec*) this) ) * VecMax( (dVec&) *GetLaser() ));
    }
 

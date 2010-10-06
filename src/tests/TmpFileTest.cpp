@@ -24,7 +24,7 @@ void TmpFileTest::API_Test()
 {
    TmpFile<int> tfile;
    int vec[] = {1,2,3};
-   int *buf;
+   int *buf=NULL;
    
    CPPUNIT_ASSERT_NO_THROW( buf = tfile.Open(3, true) );
    

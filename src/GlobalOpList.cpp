@@ -36,7 +36,7 @@ namespace QDLIB {
     * \param op  A parameter initialized operator
     * \param maintain Register also for destruction
     */
-   void GlobalOpList::Add(string &key, Operator* Op)
+   void GlobalOpList::Add(string &key, Operator* Op, bool persist)
    {
       
       /* Check if key exists */
@@ -54,7 +54,7 @@ namespace QDLIB {
        }
       
       _OpStore[key].Op = Op;
-      _OpStore[key].initialized = false;
+      _OpStore[key].persist = persist;
    }
 
    /**
@@ -67,9 +67,12 @@ namespace QDLIB {
       bool found = false;
 
       for (it = _OpStore.begin(); it != _OpStore.end(); it++) {
-         if (((*it).second).Op == Op && !((*it).second).initialized) {
+         if (((*it).second).Op == Op && !((*it).second).initialized) { /* Operator exists but not initialized */
             ((*it).second).Op->Init(Psi);
             ((*it).second).initialized = true;
+            found = true;
+         } else if (((*it).second).Op == Op && ((*it).second).initialized) { /* Operator exists but already initialized */
+            ((*it).second).Op->Valid(Psi); /* Check if Initialzation is valid */
             found = true;
          }
       }
@@ -98,6 +101,8 @@ namespace QDLIB {
       if ( ! _OpStore[key].initialized ){
          _OpStore[key].Op->Init(Psi);
          _OpStore[key].initialized = true;
+      } else {
+         _OpStore[key].Op->Valid(Psi); /* Check if initialization is compatible */
       }
    }
    
@@ -132,6 +137,24 @@ namespace QDLIB {
 
    }
 
+   /**
+    * Clear the Operators in the storage, but leave persistent Ops untouched.
+    */
+   void QDLIB::GlobalOpList::Clear()
+   {
+      map<string, _OpEntry>::iterator it;
+
+      for (it = _OpStore.begin(); it != _OpStore.end(); it++) {
+         if ( ! ((*it).second).persist ) {
+            DELETE_OP(((*it).second).Op);
+            _OpStore.erase(it);
+            it = _OpStore.begin(); /* iterator is now invalid => start over */
+         }
+      }
+   }
+   
    /* Singleton Initializer */
    GlobalOpList* GlobalOpList::_ref = 0;
 }
+
+

@@ -18,17 +18,16 @@ namespace QDLIB {
     * \todo implement for N-dims
     *  @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
-   class OGridNAC : public OGridNabla
+   class OGridNAC : public Operator, public GridSystem
    {
       private:
          string _name;
-         OGridPotential _NACME; /* Holds the NAC Matrix elements*/
-         dVec* _pNAMCE;          /* Content pointer to _NACME */
+         OGridPotential _NACME[MAX_DIMS]; /* Holds the NAC Matrix elements*/
+         OGridNabla _Nabla[MAX_DIMS];     /* Holds the derivatives */
+         dVec* _pNACME[MAX_DIMS];         /* Content pointer to _NACME */
          double _sign;           /* Sign of the coupling */
          double _mass;            /* mass for 1D-NACs */
          WaveFunction *_buf;
-//          WaveFunction *_buf2;
-//          FFT _fft;
       public:
          OGridNAC();
       
@@ -43,6 +42,8 @@ namespace QDLIB {
 	 
          virtual const string& Name();
 	 
+         virtual void UpdateTime(){}
+         
          virtual dcomplex Emax();
 
          virtual dcomplex Emin();
@@ -58,6 +59,8 @@ namespace QDLIB {
          virtual Operator* operator=(Operator* O);
 	 
          virtual Operator* Copy(Operator* O);
+         
+         virtual bool Valid(WaveFunction *Psi);
    };
 
 }

@@ -176,9 +176,9 @@ void FileWFTest::IO_Test_Multistate()
    fgen_sin_norm(*psi0, -5, 5);
    *psi0 *= cexpI(M_PI);
    
-   fgen_sin_norm(*psi1, -5, 6);
    p.SetValue("xmax0", 6);
    psi1->Init(p);
+   fgen_sin_norm(*psi1, -5, 6);
    *psi1 *= cexpI(M_PI/3);
    
    CPPUNIT_ASSERT_NO_THROW( wfm->Add(psi0, 0) );

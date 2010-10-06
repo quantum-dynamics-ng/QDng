@@ -39,9 +39,8 @@ namespace QDLIB
    {
       /* remove the clock */
       QDGlobalClock::Destroy();
-      GlobalOpList::Instance().Destroy();
-      DELETE_ALL_OP();
-      DELETE_ALL_WF();
+      DELETE_OP(_P);
+      GlobalOpList::Instance().Clear();
    }
 
    /**
@@ -113,11 +112,7 @@ namespace QDLIB
 	 throw ( EParamProblem ("No Delta t given") );
       
       attr.GetValue("dt", _dt);
-               
-      /* Filter diagonalization */
-      if ( attr.isPresent("diag"))
-         attr.GetValue("diag", _diag);
-      
+                     
       /* Specific parameters for imag solver */
       if (_method == imag) {
          /* Number of eigenfunctions */
@@ -135,6 +130,9 @@ namespace QDLIB
                throw ( EParamProblem ("Can't start above number of desired EFs") );
          }
    
+         /* Basis Diagonalization */
+         attr.GetValue("diag", _diag, true); /* Default true here */
+
          
          /* Default convergence */
          if (_diag)
@@ -150,6 +148,11 @@ namespace QDLIB
                throw ( EParamProblem ("Convergence critera larger than one doesn't make sense") );
          }
       } else { /* specific for ac */
+         
+         /* Basis Diagonalization */
+         attr.GetValue("diag", _diag, false); /* Default false: diag may lead to ambigous result with ac method */
+
+         
          if ( attr.isPresent("tol")){
             attr.GetValue("tol", _tol);
             if (_tol < 0)
@@ -352,14 +355,13 @@ namespace QDLIB
       /* Propagation */
       WFBuffer tbuf;
       tbuf.AutoLock(1);
+      tbuf.Size(_MaxSteps);
       tbuf.Init(_PsiInitial);
       
       if ( _read.empty() ){ /* Need to run Propagation */
 	 autocorr.newsize(_MaxSteps);
 	 spectrum.newsize(_MaxSteps);
-	 
-	 tbuf.Size(_MaxSteps);
-	 
+         
 	 Psi = _PsiInitial->NewInstance();
 	 *Psi = _PsiInitial;
 	 tbuf.Set(0,_PsiInitial);
@@ -368,6 +370,7 @@ namespace QDLIB
 	 
 	 log.cout() << "Run propagation\n\n";
 	 log.coutdbg() << "Step\tTime\tNorm\n";
+         log.flush();
 	 for (int i=1; i < _MaxSteps; i++){/* Propagation loop */
 	    _U->Apply(Psi);
 	    tbuf.Set(i,Psi);

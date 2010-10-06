@@ -118,11 +118,16 @@ namespace QDLIB {
       }
       
       /* Create a unique name and open the file */
-      _fname = tmpdir + QDNG_TMPFILE_BASE;
+      if ( tmpdir.length() > 0 )
+         _fname = tmpdir + "/" + QDNG_TMPFILE_BASE;
+      else
+         _fname = QDNG_TMPFILE_BASE;
+      
       char *name = (char*) malloc(_fname.size()+1);
       strcpy(name, _fname.c_str());
       _fd = mkstemp(name); /* Open the file and replace X's in the file name template */
       _fname = name;
+      free(name);
       
       if (_fd == -1)
          throw (EIOError(errno, _fname));
@@ -156,7 +161,7 @@ namespace QDLIB {
    template<typename T>
    T* TmpFile<T>::Resize(size_t size)
    {
-      size_t oldsize = _size;
+     size_t oldsize = _size;
       
       if (_size == size || !_open) return (T*) _mapbase;
 
@@ -171,8 +176,9 @@ namespace QDLIB {
 
        
       /* Remap memory */
-      if (_mmap) {        
-        _mapbase = mremap(_mapbase, oldsize*sizeof(T), size*sizeof(T), MREMAP_MAYMOVE);
+      if (_mmap) {
+         msync(_mapbase, oldsize*sizeof(T), MS_SYNC);
+       _mapbase = mremap(_mapbase, oldsize*sizeof(T), size*sizeof(T), MREMAP_MAYMOVE);
         
         if (_mapbase == MAP_FAILED){
            close(_fd);
@@ -180,6 +186,7 @@ namespace QDLIB {
 	   FS::Remove(_fname);
            throw(EIOError(errno, _fname));
         }
+        
         _mmap = true;
         return (T*) _mapbase;
       }
