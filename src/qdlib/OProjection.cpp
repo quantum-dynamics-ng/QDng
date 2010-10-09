@@ -73,20 +73,10 @@ namespace QDLIB {
       if (Psi == NULL)
 	 throw ( EIncompatible("Projector got a void wave function") );
       
-      /** \todo dirty hack to handle Multistate WFs */
-      if (_size == 0){
-         WFMultistate* wfm;
-         wfm = dynamic_cast<WFMultistate*>(Psi);
-	 DELETE_WF(_buf);
-         if (wfm == NULL)
-            _buf = Psi->NewInstance();
-         else
-            _buf = wfm->State(0)->NewInstance();
-      }
+      _buf = Psi->NewInstance();
             
       /* Read a WF sequence from disk (Has to be here because we need to know the WF type) */
       if (_params.isPresent("files")){
-// 	 Logger& log = Logger::InstanceRef();
          string files;
          FileWF wfs;
          int num=1;
@@ -115,12 +105,14 @@ namespace QDLIB {
             if (_size == MAX_WFSPACE)
                throw( EOverflow("Projector has reached max capaticity: MAX_WFSPACE"));
 // 	    log.coutdbg() << "Read " << i << endl;
-            wfs >> _buf;
-            _wfbuf[_size] = _buf->NewInstance();
-            *(_wfbuf[_size]) = _buf;
+            wfs >> &(_wfbuf[_size]); /* Read wf by meta file */
+            if ( _wfbuf[_size]->size() != Psi->size() )
+               throw( EIncompatible("Projector wave functions incompatible"));
+            
             _size++;
          }
       }
+      
    }
    
    void QDLIB::OProjection::Init( ParamContainer & params )
