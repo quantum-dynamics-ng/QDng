@@ -4,42 +4,42 @@
 CheckTGE-im-Energy()
 {
    a=`grep '0	0.003739' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '1	0.011152' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '2	0.018277' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '3	0.025083' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '4	0.031550' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '5	0.037688' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '6	0.043463' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '7	0.048867' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
    a=`grep '8	0.05387' ${1}-im/energy.dat`
-   test -n "$a" || return -1   
+   test -n "$a" || return 1   
    a=`grep '9	0.058' ${1}-im/energy.dat`
-   test -n "$a" || return -1
+   test -n "$a" || return 1
 
 }
 
 CheckTGE-ac-Energy()
 {
-   a=`grep '0	0.00373' ${1}-ac/energy.dat`
-   test -n "$a" || return -1
-   a=`grep '1	0.0111' ${1}-ac/energy.dat`
-   test -n "$a" || return -1
-   a=`grep '2	0.0182' ${1}-ac/energy.dat`
-   test -n "$a" || return -1
-   a=`grep '3	0.0247' ${1}-ac/energy.dat`
-   test -n "$a" || return -1
-   a=`grep '4	0.0318' ${1}-ac/energy.dat`
-   test -n "$a" || return -1
-   a=`grep '5	0.0377' ${1}-ac/energy.dat`
-   test -n "$a" || return -1
+   a=`grep '0	0.003744' ${1}-ac/energy.dat`
+   test -n "$a" || return 1
+   a=`grep '1	0.01115' ${1}-ac/energy.dat`
+   test -n "$a" || return 1
+   a=`grep '2	0.01828' ${1}-ac/energy.dat`
+   test -n "$a" || return 1
+   a=`grep '3	0.02508' ${1}-ac/energy.dat`
+   test -n "$a" || return 1
+   a=`grep '4	0.03155' ${1}-ac/energy.dat`
+   test -n "$a" || return 1
+   a=`grep '5	0.03767' ${1}-ac/energy.dat`
+   test -n "$a" || return 1
 }
 
 
@@ -63,10 +63,25 @@ CheckTGE()
       return 0
    fi
 
-   CheckTGE-im-Energy TGE-$1 || echo "!!!TGE-$1 Im Energy test failed"
-   CheckTGE-ac-Energy TGE-$1 || echo "!!!TGE-$1 AC Energy test failed"
-
-   echo -e "\r\t\t\t\t\t\t\t\t\t[OK]"
+   success=0;
+   
+   CheckTGE-im-Energy TGE-$1
+   if [ $? == 1 ]; then
+	success=-1;
+	echo -ne "\r\t\t\t\t\t\t\t(Imag)"
+   fi
+   
+   CheckTGE-ac-Energy TGE-$1
+   if [ $? == 1 ]; then
+	success=-1;
+	echo -ne "\r\t\t\t\t\t\t\t(AC)"   
+   fi
+   
+   if [ $success == 0 ]; then
+   	echo -e "\r\t\t\t\t\t\t\t\t\t[OK]"
+   else
+   	echo -e "\r\t\t\t\t\t\t\t\t\t[FAILED]"
+   fi
 }
 
 
