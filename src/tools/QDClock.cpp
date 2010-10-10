@@ -1,4 +1,6 @@
 #include "QDClock.h"
+#include <math.h>
+#include "Exception.h"
 
 namespace QDLIB
 {
@@ -108,4 +110,16 @@ namespace QDLIB
       return *this;
    }
    
+   /**
+    * Synchronize time to given clock.
+    */
+   void QDClock::Sync(const QDClock &master)
+   {
+      double step = master.Time() / _dt;
+
+      if ( (step - round(step)) != 0)
+         throw (EParamProblem("Clock sync error: non integer step"));
+
+      _step = int(step);
+   }
 }
