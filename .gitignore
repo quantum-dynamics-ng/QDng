@@ -2,7 +2,7 @@
 *.o
 *.lo
 .*
-debug
+debug/
 doc/
 Makefile.in
 qdng.kde*
@@ -17,3 +17,7 @@ depcomp
 install-sh
 ltmain.sh
 missing
+ylwrap
+QDng.git.kdev4
+QDng.kdevelop.pcs
+QDng.kdevses
