@@ -310,8 +310,8 @@ int main(int argc, char **argv)
       log.cout() << "Normal termination\n\n";
    } catch (Exception e) {
       log.flush();
-      cerr << "\n\n\t!!!A problematic error occured:\n\t";
-      cerr << e.GetMessage() << "\n\n\n";
+      log.cout() << "\n\n\t!!!A problematic error occured:\n\t";
+      log.cout() << e.GetMessage() << "\n\n\n";
       log.cout() << "Error termination\n\n";
       retval = EXIT_FAILURE;
    }
