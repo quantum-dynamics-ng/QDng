@@ -25,27 +25,27 @@ namespace QDLIB {
       
 	 ~GridSystem();
 	 
-	 int Dim();
+	 int Dim() const;
 	       
 	 void Dim(int dims);
 	       
-	 int DimSizes(const int dim);
+         int DimSize(int dim) const;
 	       
-	 int* DimSizes();
+         const int* DimSizes();
 	 
 	 int Size() const;
 	 
-	 void DimSizes(const int dim, const int size);
+	 void DimSize(int dim, int size);
 	       
-	 double Xmin(const int dim);
+	 double Xmin(int dim) const;
 	       
-	 void Xmin(const int dim, const double xmin);
+	 void Xmin(int dim, double xmin);
 	       
-	 double Xmax(const int dim);
+         double Xmax(int dim) const;
 	       
-	 void Xmax(const int dim, const double xmax);
+	 void Xmax(int dim, double xmax);
       
-	 double Dx (const int dim);
+         double Dx (int dim) const;
    
 	 void operator=(GridSystem &G);
 	 

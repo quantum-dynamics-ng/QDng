@@ -26,7 +26,7 @@ namespace QDLIB {
    /**
     * Number of dimensions.
     */
-   int GridSystem::Dim()
+   int GridSystem::Dim() const
    {
       return _ndims;
    }
@@ -48,7 +48,7 @@ namespace QDLIB {
     * \param dim Number of dimension (take care of MAX_DIMS!)
     * \return Number of points in this direction
     */
-   int GridSystem::DimSizes(const int dim)
+   int GridSystem::DimSize(int dim) const
    {
       return _dims[dim];
    }
@@ -58,7 +58,7 @@ namespace QDLIB {
     * 
     * \return pointer to array with sizes.
     */
-   int* GridSystem::DimSizes( )
+   const int* GridSystem::DimSizes( )
    {
       return _dims;
    }
@@ -69,7 +69,7 @@ namespace QDLIB {
     * \param dim Number of dimension
     * \param size Number of points in this direction
     */
-   void GridSystem::DimSizes(const int dim, const int size)
+   void GridSystem::DimSize(int dim, int size)
    {
       _dims[dim] = size;
    }
@@ -92,7 +92,7 @@ namespace QDLIB {
     * \param dim Number of dimension
     * \return xmin value in this coordinate
     */
-   double GridSystem::Xmin(const int dim)
+   double GridSystem::Xmin(int dim) const
    {
       return _xmin[dim];
    }
@@ -102,7 +102,7 @@ namespace QDLIB {
     * \param dim Number of dimension
     * \return xmin value in this coordinate
     */
-   void GridSystem::Xmin(const int dim, const double xmin)
+   void GridSystem::Xmin(int dim, double xmin)
    {
       _xmin[dim] = xmin;
       _dx[dim] = (_xmax[dim] - _xmin[dim])/(double(_dims[dim]-1)); /* Update dx value */
@@ -113,7 +113,7 @@ namespace QDLIB {
     * \param dim Number of dimension
     * \return xmax value in this coordinate
     */
-   double GridSystem::Xmax(const int dim)
+   double GridSystem::Xmax(int dim) const
    {
       return _xmax[dim];
    }
@@ -123,7 +123,7 @@ namespace QDLIB {
     * \param dim Number of dimension
     * \return xmax value in this coordinate
     */
-   void GridSystem::Xmax(const int dim, const double xmax)
+   void GridSystem::Xmax(int dim, double xmax)
    {
       _xmax[dim] = xmax;
       _dx[dim] = (xmax - _xmin[dim])/(double(_dims[dim]-1));    /* Update dx value */
@@ -134,7 +134,7 @@ namespace QDLIB {
     * \param dim Number of dimension
     * \return dx value in this coordinate
     */
-   double GridSystem::Dx (const int dim)
+   double GridSystem::Dx (int dim) const
    {
       return _dx[dim];
    }

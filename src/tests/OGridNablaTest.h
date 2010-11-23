@@ -17,7 +17,8 @@ class OGridNablaTest : public CppUnit::TestFixture
 {
    CPPUNIT_TEST_SUITE( OGridNablaTest );
    CPPUNIT_TEST( API_Test );
-   CPPUNIT_TEST( NUMERIC_Test );
+   CPPUNIT_TEST( NUMERIC_Test_Even );
+   CPPUNIT_TEST( NUMERIC_Test_Odd );
    CPPUNIT_TEST_SUITE_END();
    public:
       OGridNablaTest();
@@ -28,12 +29,14 @@ class OGridNablaTest : public CppUnit::TestFixture
       
    protected:
       void API_Test();
-      void NUMERIC_Test();
+      void NUMERIC_Test_Even();
+      void NUMERIC_Test_Odd();
       
    private:
       ParamContainer p;
       WaveFunction *wf, *wf2;
-      OGridNabla *O;
+      WaveFunction *wfo, *wf2o; /* Odd sizes */
+      OGridNabla *O, *Oo;
 
 };
 

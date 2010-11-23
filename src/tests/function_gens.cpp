@@ -5,26 +5,37 @@ using namespace QDLIB;
 
 void fgen_sin(cVec &vec, double min, double max)
 {
-   double dx = (max - min)/(vec.size()-1);
+   double L = max-min;
+   double dx = L / (vec.size()-1);
    
    for (lint i=0; i < vec.size(); i++){
-      vec[i] = sin( (double(i) * dx + min)  * 2 / M_PI);
+      vec[i] = sin( (double(i) * dx + min-dx/2)  * 2 * M_PI/(L+dx)) ;
    }
 }
+
+void fgen_cos(cVec &vec, double min, double max)
+{
+   double L = max-min;
+   double dx = L / (vec.size()-1);
+   
+   for (lint i=0; i < vec.size(); i++){
+      vec[i] = cos( (double(i) * dx + min-dx/2)  * 2 * M_PI/(L+dx)) ;
+   }
+}
+
 
 /** 
  * Produces normalized, periodic sine
 */
 void fgen_sin_norm(cVec &vec, double min, double max)
 {
-   double dx2 = (max - min)/(vec.size());
-   double dx = (max - min)/(vec.size()-1);
    double L = max-min;
+   double dx = L / (vec.size()-1);
    dcomplex n(0,0);
    double norm;
    
    for (lint i=0; i < vec.size(); i++){
-      vec[i] = sin( (double(i) * dx2 + min)  * 2 * M_PI/L) ;
+      vec[i] = sin( (double(i) * dx + min-dx/2)  * 2 * M_PI/(L+dx)) ;
       n += vec[i].conj() * vec[i];
    }
    
@@ -42,14 +53,13 @@ void fgen_sin_norm(cVec &vec, double min, double max)
  */
 void fgen_cos_norm(cVec &vec, double min, double max)
 {
-   double dx2 = (max - min)/(vec.size());
-   double dx = (max - min)/(vec.size()-1);
    double L = max-min;
+   double dx = L / (vec.size()-1);
    dcomplex n(0,0);
    double norm;
    
    for (lint i=0; i < vec.size(); i++){
-      vec[i] = cos( (double(i) * dx2 + min)  * 2 * M_PI/L) ;
+      vec[i] = cos( (double(i) * dx + min-dx/2)  * 2 * M_PI/(L+dx)) ;
       n += vec[i].conj() * vec[i];
    }
    

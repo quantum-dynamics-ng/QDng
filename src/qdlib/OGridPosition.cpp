@@ -32,10 +32,10 @@ namespace QDLIB {
    {
       dVec xspace1;
       
-      xspace1.newsize(GridSystem::DimSizes(dim));
+      xspace1.newsize(GridSystem::DimSize(dim));
       
       /* setup x */
-      for (int n=0; n < GridSystem::DimSizes(dim); n++){
+      for (int n=0; n < GridSystem::DimSize(dim); n++){
          xspace1[n] = GridSystem::Xmin(dim) + GridSystem::Dx(dim) * n;
       }
          

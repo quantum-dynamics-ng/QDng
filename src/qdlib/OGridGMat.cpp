@@ -66,7 +66,7 @@ namespace QDLIB {
 	    _kspace[i].newsize(Psi->size());
 	 }
 	 
-	 kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(i) - GridSystem::Xmin(i), GridSystem::DimSizes(i));
+         kspace1 = Kspace::Init1Dddx(static_cast<GridSystem>(*this), i);
 	 view = new dVecView(_kspace[i], GridSystem::Dim(), GridSystem::DimSizes());
 	 
 	 view->ActiveDim(i);
