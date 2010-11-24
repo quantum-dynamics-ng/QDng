@@ -65,7 +65,7 @@ namespace QDLIB
 	 _params.GetValue( string("N") + string(c), n);
 	 if ( n < 1 )
 	    throw ( EParamProblem("Zero points grid defined") );
-	 GridSystem::DimSizes(i, n);
+	 GridSystem::DimSize(i, n);
 	 
 	 _params.GetValue( string("xmin") + string(c), d);
 	 GridSystem::Xmin(i, d);

@@ -45,10 +45,10 @@ namespace QDLIB {
       for (int i=0; i < GridSystem::Dim(); i++){
 	 if (_lp[i]){
 	    x = (_lpx[i] - GridSystem::Xmin(i)) / GridSystem::Dx(i);
-	    if (int(x) >  GridSystem::DimSizes(i) || int(x) < 0)
+	    if (int(x) >  GridSystem::DimSize(i) || int(x) < 0)
 	       throw ( EParamProblem ("Center of filter edge out of the grid") );
 	    
-	    filter.newsize(GridSystem::DimSizes(i));
+	    filter.newsize(GridSystem::DimSize(i));
 	    Butterworth<dVec>::Lowpass(filter, x, _order);
 	
 	    view.ActiveDim(i);
@@ -56,10 +56,10 @@ namespace QDLIB {
 	 }
 	 if (_rp[i]){
 	    x = (_rpx[i] - GridSystem::Xmin(i)) / GridSystem::Dx(i);
-	    if (int(x) >  GridSystem::DimSizes(i) || int(x) < 0)
+	    if (int(x) >  GridSystem::DimSize(i) || int(x) < 0)
 	       throw ( EParamProblem ("Center of filter edge out of the grid") );
 	    
-	    filter.newsize(GridSystem::DimSizes(i));
+	    filter.newsize(GridSystem::DimSize(i));
 	    Butterworth<dVec>::Highpass(filter, x, _order);
 	    
 	    view.ActiveDim(i);

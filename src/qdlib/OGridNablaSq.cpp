@@ -202,8 +202,7 @@ namespace QDLIB
       for (int i = 0; i < GridSystem::Dim(); i++) {
          if (_mass[i] > 0) {
 
-            kspace1 = Kspace::Init1Dd2dx2(_mass[i], GridSystem::Xmax(i) - GridSystem::Xmin(i),
-                  GridSystem::DimSizes(i));
+            kspace1 = Kspace::Init1Dd2dx2(_mass[i], static_cast<GridSystem>(*this), i);
 
             view.ActiveDim(i);
             view += *kspace1;

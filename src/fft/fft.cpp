@@ -95,33 +95,33 @@ namespace QDLIB {
       
       switch (grid.Dim()){
 	 case 1:  /* 1D */
-	    _planf = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) in.begin(0),
+	    _planf = fftw_plan_dft_1d(grid.DimSize(0), (fftw_complex*) in.begin(0),
 				      (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);
 	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_1d(grid.DimSizes(0), (fftw_complex*) out.begin(0),
+	       _planb = fftw_plan_dft_1d(grid.DimSize(0), (fftw_complex*) out.begin(0),
 					 (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
 	    }
 	    break;
 	 case 2: /* 2D */
-	    _planf = fftw_plan_dft_2d(grid.DimSizes(1) , grid.DimSizes(0), (fftw_complex*) in.begin(0),
+	    _planf = fftw_plan_dft_2d(grid.DimSize(1) , grid.DimSize(0), (fftw_complex*) in.begin(0),
 				      (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);
 	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_2d(grid.DimSizes(1) , grid.DimSizes(0), (fftw_complex*) out.begin(0),
+	       _planb = fftw_plan_dft_2d(grid.DimSize(1) , grid.DimSize(0), (fftw_complex*) out.begin(0),
 					 (fftw_complex*) in.begin(0),  FFTW_BACKWARD, fftwFlag);
 	    }
 	    break;
 	 case 3: /* 3D */
-	    _planf = fftw_plan_dft_3d(grid.DimSizes(2) , grid.DimSizes(1), grid.DimSizes(0),
+	    _planf = fftw_plan_dft_3d(grid.DimSize(2) , grid.DimSize(1), grid.DimSize(0),
 				      (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);	
 	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_3d(grid.DimSizes(2) , grid.DimSizes(1), grid.DimSizes(0),
+	       _planb = fftw_plan_dft_3d(grid.DimSize(2) , grid.DimSize(1), grid.DimSize(0),
 					 (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
 	    }
 	    break;
 	 default: /* arb. dims */
 	    _dims = new int[grid.Dim()];      /* reverse order of dimension array */
 	    for (int i=0; i < grid.Dim(); i++){
-	       _dims[grid.Dim() - i - 1] = grid.DimSizes(i);
+	       _dims[grid.Dim() - i - 1] = grid.DimSize(i);
 	    }
 	    _planf = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) in.begin(0),
 				   (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);	

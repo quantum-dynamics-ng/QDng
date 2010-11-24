@@ -43,7 +43,7 @@ void WFGridSystemTest::API_Test()
    
    /* Init with correst params */
    wf->Dim(1);
-   wf->DimSizes(0,WF_TEST_SIZE);
+   wf->DimSize(0,WF_TEST_SIZE);
    wf->Xmin(0,-5);
    wf->Xmax(0,5);
    
@@ -88,7 +88,7 @@ void WFGridSystemTest::NUMERIC_Test()
    
    /* Init with correst params */
    wf->Dim(1);
-   wf->DimSizes(0,WF_TEST_SIZE);
+   wf->DimSize(0,WF_TEST_SIZE);
    wf->Xmin(0,-5);
    wf->Xmax(0,5);
    

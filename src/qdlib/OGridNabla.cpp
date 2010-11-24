@@ -100,6 +100,7 @@ namespace QDLIB {
          MultElementsCopy((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
       else
          MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
+      
       ket->IsKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
       _FFT.Backward(opPsi);
    }
@@ -179,7 +180,7 @@ namespace QDLIB {
    {
       dVec *kspace1; /* Single dimension k-space */
 
-      kspace1 = Kspace::Init1Dddx(GridSystem::Xmax(dim) - GridSystem::Xmin(dim), GridSystem::DimSizes(dim));;
+      kspace1 = Kspace::Init1Dddx(static_cast<GridSystem>(*this), dim);;
 
       view.ActiveDim(dim);
       view += *kspace1;

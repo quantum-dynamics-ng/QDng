@@ -158,7 +158,7 @@ namespace QDLIB
             throw(EParamProblem("Invalid number of iterations", _iterations));
       }
 
-      /* Number of iterations */
+      /* Check Convergence */
       if (attr.isPresent("conv")) {
          attr.GetValue("conv", _convergence);
          if (_convergence < 0)

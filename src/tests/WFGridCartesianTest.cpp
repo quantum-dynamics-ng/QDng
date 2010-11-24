@@ -7,7 +7,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(WFGridCartesianTest);
 using namespace QDLIB;
 using namespace std;
 
-#define WF_TEST_SIZE 64
+#define WF_TEST_SIZE 32
 
 WFGridCartesianTest::WFGridCartesianTest()
  : CppUnit::TestFixture()
@@ -56,6 +56,10 @@ void WFGridCartesianTest::API_Test()
 
    CPPUNIT_ASSERT_NO_THROW(wf->Init(p));
   
+   /* Init with some numbers */
+   for (int i=0; i < WF_TEST_SIZE; i++)
+      (*wf)[i] = double(i);
+            
    /* Copy test */
    WaveFunction *wf2;
    

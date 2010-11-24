@@ -23,7 +23,7 @@ namespace QDLIB
 	 int _adim;     /* Active dimensions */
 	 int _nothers;  /* number of points for each x_i value in active dim */
       public:
-	 VectorView(Vector<T> &vec, int ndims, int *dims);
+	 VectorView(Vector<T> &vec, int ndims, const int *dims);
 	 ~VectorView();
 	 
 	 void ActiveDim(int dim);
@@ -44,7 +44,7 @@ namespace QDLIB
     * \param dims  array with number of points in each direction
     */
    template <class T>
-	 VectorView<T>::VectorView(Vector<T> &vec, int ndims, int *dims) : _adim(0)
+	 VectorView<T>::VectorView(Vector<T> &vec, int ndims, const int *dims) : _adim(0)
    {
       if (vec.strides() > 1){
 	 cout << "!!!WARNING: VectorView doesn't work with strided vectors!!!" << endl;
@@ -54,7 +54,9 @@ namespace QDLIB
       }
       _v = vec.begin(0);
       _ndims = ndims;
-      _dims = dims;
+      _dims = new int[ndims];
+      for(int i=0; i < ndims; i++)
+         _dims[i] = dims[i];
       
       
       _view = new T***[ndims];

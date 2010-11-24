@@ -23,11 +23,11 @@ WFBufferTest::~WFBufferTest()
 
 void WFBufferTest::API_Test_DiskBuf()
 {
-   WaveFunction *wf0, *wf1;
+   WaveFunction *wf0, *wf1=NULL;
    ParamContainer& gp = GlobalParams::Instance();
    ParamContainer pm;
    
-   WFBuffer *buf;
+   WFBuffer *buf = NULL;
    
    gp.clear();
    gp.SetValue("MaxBufferSize", sizeof(dcomplex)*2); /* Buffer size in bytes => 2 WFs*/
