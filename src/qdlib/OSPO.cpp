@@ -10,7 +10,7 @@ namespace QDLIB {
    
    OSPO::OSPO() : OPropagator(), _name("OSPO"), _needs(NULL),
                   _Tkin(NULL), _Tkin_kspace(NULL), _Vcoup(NULL),
-                        _expT(NULL), _expV(NULL), _V1(NULL), _expVcoup(NULL), _expVcoupI(NULL),_buf(NULL),
+                        _expT(NULL), _expV(NULL), _V1(NULL), _expVcoup(NULL), _expVcoupI(NULL),_buf(NULL), _buf2(NULL),
                         _coupling(false), _coupdiag(false),_cT(0,0), _cV(0,0), _last_time(0)
    {
       _Vpot[0] = NULL;
@@ -27,6 +27,7 @@ namespace QDLIB {
       if (_needs != NULL) delete _needs;
       DELETE_WF(_buf);
       DELETE_WF(_buf2);
+      DELETE_OP(_H);
    }
 
 
@@ -315,9 +316,9 @@ namespace QDLIB {
    void OSPO::AddNeeds( string &Key, Operator *O )
    {
       /* Generate sum for mother class */
-      if (H == NULL){   
+      if (H == NULL){
          _H = new OSum();
-         H = _H;         
+         H = _H;
       }
       
       _H->Add(O);

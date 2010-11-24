@@ -82,6 +82,9 @@ namespace QDLIB {
       string value;
       
       while (filters->EndNode()){
+         if (_size >= MAX_FILTERS)
+            throw EParamProblem ("Maximum numbers of filters reached.");
+            
 	 faction = filters->Name();
 	 ParamContainer& attr = filters->Attributes();
 	 
@@ -103,7 +106,7 @@ namespace QDLIB {
          /* Check which kind of value we want to see */
          
          attr.GetValue("int", _integrate[_size], false);
-         _sum[_size] = 0;
+         _sum[_size] = dcomplex(0);
 
 	 /* Check which filter action should be taken */
 	 if (faction == "normalize"){

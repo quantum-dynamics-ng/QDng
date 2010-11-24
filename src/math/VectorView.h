@@ -77,7 +77,7 @@ namespace QDLIB
 	 }
       }
       delete[] _view;
-      
+      delete[] _dims;
    }
    
    /**

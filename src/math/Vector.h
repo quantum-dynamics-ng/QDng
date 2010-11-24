@@ -30,7 +30,7 @@
 #include <string.h>
 
 
-#define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD */
+#define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
 
 using namespace std;
 
@@ -165,7 +165,7 @@ class Vector
     void destroy()
     {     
         /* do nothing, if no memory has been previously allocated */
-       if (v_ != NULL && !isRef_){
+       if (v_ != NULL && !isRef_){  /* Only destroy data if it's our own*/
          for (lint s=0; s < nstrides_; s++){
             if(v_[s] != NULL){
 	       if (align_)
@@ -176,8 +176,10 @@ class Vector
                v_[s] = NULL;
             }
          }
-         delete[] v_;
-         v_ = NULL;
+       }
+       if (v_ != NULL) { /* This pointer is always our own. */
+          delete[] v_;
+          v_ = NULL;
        }
     }
 
@@ -293,16 +295,14 @@ class Vector
     // destructor
     ~Vector() 
     {
-       if (!isRef_) destroy();   /* Only destroy data if it's our own*/
-       else delete[] v_;
+      destroy();
     }
 
     // constructors
 
     Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
     {
-       v_ = new T*[nstrides_];
-       v_[0] = NULL;
+       initialize(n_, nstrides_);
     }
 
     
