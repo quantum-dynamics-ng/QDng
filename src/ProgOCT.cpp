@@ -13,7 +13,7 @@ namespace QDLIB
       _octNode(OCTNode), _ContentNodes(NULL), _fname(DEFAULT_BASENAME_LASER), _dir(""),
                _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE), _writel(false),
                _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),
-               _ntargets(1), _alpha(1), _Gobbler(NULL), _opwf(NULL), _membuf_init(false)
+               _ntargets(1), _alpha(1), _Gobbler(NULL), _opwf(NULL), _membuf_init(false),_mv(false)
    {
       for (int i = 0; i < MAX_TARGETS; i++) {
          PsiI[i] = NULL;
@@ -188,10 +188,14 @@ namespace QDLIB
       }
 
       /* Moving target */
-      attr.GetValue("mv", _mv);
+      if (attr.isPresent("mv")) {
+	attr.GetValue("mv", _mv);
+      }
 
       /* Check for phase sensitive oct*/
-      attr.GetValue("phase", _phase);
+      if (attr.isPresent("phase")) {
+	attr.GetValue("phase", _phase);
+      }
 
       /* Target type to use */
       if (attr.isPresent("ntargets")) {
@@ -370,7 +374,8 @@ namespace QDLIB
             if (_phase && _ttype == ov)
                log.cout() << "Phase_" << t << "\t\t";
          }
-         log.cout() << "Objective\t\t";
+         log.cout() << "Laser Objective\t\t";
+	 log.cout() << "Objective\t\t";
          log.cout() << "Pulse Energy" << endl;
       }
 
@@ -396,6 +401,7 @@ namespace QDLIB
             log.cout() << d << "\t";
 
             overlap = *wfi[t] * wft[t];
+
             //ov_sum += cabs(overlap)*cabs(overlap);
             log.cout() << cabs(overlap) * cabs(overlap) << "\t";
             if (_phase) {
@@ -410,8 +416,11 @@ namespace QDLIB
 
       }
       if (iteration == 0)
-         log.cout() << "-\t" << "\t\t";
-      else log.cout() << ov_sum.real() - _laserobj[0] << "\t\t";
+         log.cout() << "-\t" << "\t\t" << "-\t" << "\t\t";
+      else {
+	  log.cout() << _laserobj[0] << "\t\t";
+	  log.cout() << ov_sum.real() - _laserobj[0] << "\t\t";
+      }
 
       log.cout() << _laserf[0]->PulseEnergy() << endl;
       log.flush();
@@ -552,9 +561,9 @@ namespace QDLIB
          }
          ++(*clock);
       }
-      if (_mv) {
+      if (!_mv) {
          for (int t=0; t < _ntargets; t++)
-            *(phit[t]) = _memwfbuf[t][clock->Steps() - 1];
+            *(phit[t]) = _memwfbuf[t][clock->Steps()];
       }
    }
 
