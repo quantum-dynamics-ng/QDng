@@ -51,8 +51,6 @@ namespace QDLIB {
       if (GridSystem::Dim() < _dim + 1)
          throw (EParamProblem ("Dimension for momentum operator exceeds dimensions of Wavefunction", _dim) );
 
-      _kspace = new dVec(GridSystem::Size(), true);
-
       _InitDspaceReal(); /* Setup internal kspace */
    }
 
@@ -195,7 +193,10 @@ namespace QDLIB {
     */
    void OGridNabla::_InitDspaceReal()
    {
-      *_kspace = 0; /* Init with zeros */
+      if (_kspace == NULL)
+         _kspace = new dVec(GridSystem::Size(), true);
+         
+      *_kspace = double(0); /* Init with zeros */
 
       dVecView view(*_kspace, GridSystem::Dim(), GridSystem::DimSizes());
 
