@@ -124,7 +124,8 @@ AC_CONFIG_FILES(
                  tests/TLP-H-GSPO.qdi tests/TLP-H-Cheby.qdi
                  tests/TLP-C-GSPO.qdi tests/TLP-C-Cheby.qdi
                  tests/TLPL-GSPO.qdi tests/TLPL-Cheby.qdi
-                 tests/TGO-IR-Freq.qdi])
+                 tests/TGO-IR-Freq.qdi tests/TGO-IR-Krotov.qdi
+                 tests/TGO-IR-Rabitz.qdi])
 
 AC_ARG_WITH([cppunit], 
       [AS_HELP_STRING([--with-cppunit], [Enable CppUnit tests])],
