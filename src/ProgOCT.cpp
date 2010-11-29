@@ -874,12 +874,20 @@ namespace QDLIB
       /* Check & reference the coupling operator */
       bool coupling_ok = false;
       int nlasers = MAX_LASERS;
+      string label("OptLaser");
       switch (_coupling) {
          case dipole:
             OLaser *CoupOLaser[MAX_LASERS];
-            _Coup = FindOperatorType<OLaser> (_H, CoupOLaser, nlasers);
-            _nlaser = nlasers; /** \todo get it right with ->NumLasers */
-            if (CoupOLaser != NULL) {
+            
+            _Coup = FindOperatorType<OLaser> (_H, CoupOLaser, nlasers, &label); /* Try first to find labeled Ops. */
+            if (nlasers == 0){
+               nlasers = MAX_LASERS;
+               _Coup = FindOperatorType<OLaser> (_H, CoupOLaser, nlasers); /* Otherwise use all unlabeled Ops. */
+            } else
+               log.cout() << "Found " << nlasers << " labeled laser field(s)\n";
+            
+            _nlaser = nlasers;
+            if (nlasers != 0) {
                for (int l = 0; l < _nlaser; l++){
                   _laserf[l] = CoupOLaser[l]->GetLaser();
                   _laserb[l] = new Laser();

@@ -32,12 +32,12 @@ namespace QDLIB
     * \param O       The Operator to inspect.
     * \param found   If type is found the naked operator will be placed here
     * \param n       [in] max. number to find, [out] actual number of operators found.
-    * \param label   An optional label can be specified to mark the desiered operators (and leave the rest untouched)
+    * \param label   An optional label can be specified to mark the desired operators (and leave the rest untouched)
     * 
     * \return The whole Operator with packaging (single state or multistate)
     */
    template <class C>
-   Operator* FindOperatorType(Operator *O, C **found, int &n, string *label = NULL, const int index=0)
+   Operator* FindOperatorType(Operator *O, C **found, int &n, const string *label = NULL, const int index=0)
    {
       C* t;
       Operator* res = NULL;
@@ -47,9 +47,15 @@ namespace QDLIB
       
       t = dynamic_cast<C*>(O);
       if (t != NULL){
+         /* Check for label */
+         if (label != NULL){
+               if (! GlobalOpList::Instance().CheckLabel(O, *label))
+                  return NULL;
+         }
+         /* return successful result */
          n=1;
-	 found[index] = t;
-	 return t;
+         found[index] = t;
+         return t;
       }
       
       /* Crawl trough Sum operator*/
@@ -114,6 +120,7 @@ namespace QDLIB
          return package;
       }
       
+      n = 0;
       return NULL;
    }
 

@@ -58,7 +58,67 @@ namespace QDLIB {
    }
 
    /**
-    * Initialize all registered operator with a wave function.
+    * Set a label to an operator.
+    * 
+    * Labels are not unique ids. They act as group identifiers.
+    * 
+    * \param key   Unique operator key
+    * \param label The desired label. An existing label will be overwritten.
+    */
+   void GlobalOpList::SetLabel(const string & key, const string & label)
+   {
+      /* Check if key exists */
+      if (_OpStore.find(key) == _OpStore.end())
+         throw (EIncompatible("Key doesn't exists in operator list: ", key));
+      
+      _OpStore[key].label = label;
+   }
+   
+   /**
+    * Retrive a list of all operators with a common label.
+    * 
+    * \param label The label.
+    * \param list  Array where found operator pointers are stored.
+    * \param max   The size of the array.
+    * \return number of found ops.
+    */
+   int GlobalOpList::GetLabels(const string& label, Operator** list, int max)
+   {
+      map<string, _OpEntry>::iterator it;
+      int n=0;
+
+      for (it = _OpStore.begin(); it != _OpStore.end(); it++) {
+         if ( ((*it).second).label == label ){
+            list[n] = ((*it).second).Op;
+            n++;
+         }
+         if (n == max) return n;  /* We simply exit here if capacity limit is reached */
+      }
+      
+      return n;
+   }
+   
+   /**
+    * Check if the given operator has a specific label.
+    */
+   bool GlobalOpList::CheckLabel(const Operator *Op, const string &label)
+   {
+      map<string, _OpEntry>::iterator it;
+
+      for (it = _OpStore.begin(); it != _OpStore.end(); it++) {
+         if (((*it).second).Op == Op){          /* Op found */
+            if (((*it).second).label == label)
+               return true; /* label is there */
+            else
+               return false; /* label is missing, exit here */
+         }
+      }
+      
+      return false;
+   }
+   
+   /**
+    * Initialize a registered operator with a wave function.
     *
     */
    void GlobalOpList::Init(Operator* Op, WaveFunction* Psi)
@@ -129,6 +189,7 @@ namespace QDLIB {
          log.cout() << (*it).first;
          log.flush();
          log.cout() << "\t\t\t" << ((*it).second).Op->Name();
+         log.cout() << "\t\t\t" << ((*it).second).label;
          log.cout() << "\t\t";
          if (((*it).second).initialized)
             log.cout() << "initialized\t";
@@ -156,5 +217,7 @@ namespace QDLIB {
    /* Singleton Initializer */
    GlobalOpList* GlobalOpList::_ref = 0;
 }
+
+
 
 

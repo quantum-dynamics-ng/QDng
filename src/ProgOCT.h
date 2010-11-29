@@ -89,7 +89,7 @@ namespace QDLIB
          double _laserobj[MAX_LASERS]; /* Buffer for the Laser fluence contraints */
          Laser* _laserf[MAX_LASERS]; /* Forward propagation lasers */
          Laser* _laserb[MAX_LASERS]; /* Backward propagation lasers */
-         int _nlaser; /* Number of lasers */
+         int _nlaser; /* Number of (identical) lasers */
          Laser _shape[MAX_LASERS]; /* temporal shape function */
          Laser _frqmask[MAX_LASERS]; /* freq. mask for freq. OCT*/
          Laser _gamma[MAX_LASERS]; /* Correction field for freq. OCT*/

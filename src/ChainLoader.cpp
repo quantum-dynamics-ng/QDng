@@ -4,7 +4,6 @@
 #include "modules/ModuleLoader.h"
 #include "tools/QDGlobalClock.h"
 #include "tools/Logger.h"
-#include "GlobalOpList.h"
 
 #include "qdlib/OSum.h"
 #include "qdlib/OGridSum.h"
@@ -33,7 +32,7 @@ namespace QDLIB
       GlobalOpList& OpList = GlobalOpList::Instance();
       
       ParamContainer pm;
-      string name, key, ref;
+      string name, key, ref, label;
       Operator *O=NULL;
       XmlNode *child;
       
@@ -141,6 +140,10 @@ namespace QDLIB
       /* Register & prepare to exit */
       OpList.Add(key, O, persist);
 
+      if (pm.isPresent("label")){
+         pm.GetValue("label", label);
+         OpList.SetLabel(key, label);
+      }
 
       return O;
    }

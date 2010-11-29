@@ -19,7 +19,8 @@ namespace QDLIB {
             Operator* Op;
             bool initialized;
             bool persist;
-            _OpEntry() : Op(NULL), initialized(false), persist(false) {}
+            string label;
+            _OpEntry() : Op(NULL), initialized(false), persist(false), label() {}
          };
         
          static GlobalOpList *_ref;
@@ -37,6 +38,12 @@ namespace QDLIB {
          void Clear();
          
          void Add(string &key, Operator* op, bool persist = false);
+         
+         void SetLabel(const string& key, const string& label);
+         
+         int GetLabels(const string& label, Operator** list, int max);
+         
+         bool CheckLabel(const Operator* Op, const string& label);
          
          void Init(Operator* Op, WaveFunction* Psi);
          
