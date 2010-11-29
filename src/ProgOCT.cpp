@@ -490,7 +490,7 @@ namespace QDLIB
       
       /* Exchange laserfields => Switch back to forward propagation */
       for (int l = 0; l < _nlaser; l++)
-         _laserb[l]->swap(*(_laserf[l]));
+         _laserf[l]->swap(*(_laserb[l]));
       
       _U->Forward();
    }
@@ -878,11 +878,12 @@ namespace QDLIB
          case dipole:
             OLaser *CoupOLaser[MAX_LASERS];
             _Coup = FindOperatorType<OLaser> (_H, CoupOLaser, nlasers);
-            _nlaser = nlasers;
+            _nlaser = nlasers; /** \todo get it right with ->NumLasers */
             if (CoupOLaser != NULL) {
                for (int l = 0; l < _nlaser; l++){
                   _laserf[l] = CoupOLaser[l]->GetLaser();
-	          _laserb[l] = _laserf[l];
+                  _laserb[l] = new Laser();
+	          *(_laserb[l]) = *(_laserf[l]);
 	       }
                coupling_ok = true;
             }
