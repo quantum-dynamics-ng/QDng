@@ -13,7 +13,7 @@ namespace QDLIB
       _octNode(OCTNode), _ContentNodes(NULL), _fname(DEFAULT_BASENAME_LASER), _dir(""),
                _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE), _writel(false),
                _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),
-               _ntargets(1), _alpha(1), _Gobbler(NULL), _opwf(NULL), _membuf_init(false),_mv(false)
+               _ntargets(1), _mv(false), _alpha(1), _Gobbler(NULL), _opwf(NULL), _membuf_init(false)
    {
       for (int i = 0; i < MAX_TARGETS; i++) {
          PsiI[i] = NULL;
@@ -487,11 +487,16 @@ namespace QDLIB
          }
          --(*clock);
       }
+      
+      /* Exchange laserfields => Switch back to forward propagation */
+      for (int l = 0; l < _nlaser; l++)
+         _laserb[l]->swap(*(_laserf[l]));
+      
       _U->Forward();
    }
 
    /**
-    *Synchronize overlap targets.
+    * Synchronize overlap targets.
     * 
     * Writes to membuf.
     */
@@ -859,9 +864,9 @@ namespace QDLIB
       /* Make sure our hamiltonian is initalized */
       _H->Clock(clock);
       OpList.Init(_H, PsiI[0]);
-      log.cout() << "Initial engergy: " << _H->Expec(PsiI[0]) << endl;
+      log.cout() << "Initial energy (first initial wf): " << _H->Expec(PsiI[0]) << endl;
       if (_ttype == ov) {
-         log.cout() << "Initial engergy: " << _H->Expec(PsiT[0]) << endl;
+         log.cout() << "Initial energy (first target wf): " << _H->Expec(PsiT[0]) << endl;
          log.cout() << "Initial Overlapp: " << *(PsiI[0]) * (PsiT[0]) << endl;
       }
       log.flush();
