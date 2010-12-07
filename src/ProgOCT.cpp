@@ -6,6 +6,9 @@
 #include "qdlib/Butterworth.h"
 #include "qdlib/FileWF.h"
 
+#include "qdlib/OGridDipole.h"
+#include "qdlib/OHermitianMatrix.h"
+
 namespace QDLIB
 {
 
@@ -520,6 +523,7 @@ namespace QDLIB
       /* Exchange laserfields */
       for (int l = 0; l < _nlaser; l++)
          _laserb[l]->swap(*(_laserf[l]));
+      
       /* Propagate forward */
       PropagateForward(phit);
       /* Write Report & Calculate change */
@@ -547,7 +551,8 @@ namespace QDLIB
 
       if (_ttype == ov)
          SyncTargetOverlap(phii, phit, step);
-      else SyncTargetOperator(phii, phit, step);
+      else
+         SyncTargetOperator(phii, phit, step);
 
       /* Refresh intial */
       _CopyWFs(phii, PsiI);
@@ -907,6 +912,7 @@ namespace QDLIB
       if (section == NULL)
          throw(EParamProblem("No labeled coupling operator found in hamiltonian"));
 
+      log.cout() << endl;
       log.Header("Coupling operator", Logger::SubSection);
       log.IndentInc();
       _Coup = ChainLoader::LoadOperatorChain(section);
@@ -916,18 +922,45 @@ namespace QDLIB
       log.IndentDec();
 
       /* Check the coupling operator */
+      coupling_ok = false;
       switch (_coupling) {
          case dipole:
-            OGridPotential* test[MAX_LASERS];
+            /* Check for the usual grid-potential operator */
+            OGridPotential* testG[MAX_LASERS];
             nlasers = MAX_LASERS;
-            FindOperatorType<OGridPotential> (_Coup, test, nlasers);
-            for (int l = 0; l < nlasers; l++) {
-               if (test[l] == NULL)
-                  throw(EParamProblem("Invalid coupling operator"));
+            Operator* Op;
+            Op = FindOperatorType<OGridPotential> (_Coup, testG, nlasers);
+            
+            if (Op != NULL){
+               for (int l = 0; l < nlasers; l++) {
+                  if (testG[l] == NULL)
+                     throw(EParamProblem("Wrong number/invalid coupling operator"));
+               }
+               coupling_ok = true;
+               log.cout() << "Found Grid Coupling type" << endl<<endl;
+               break;
             }
+            
+            /* Check for matrix-dipole operator */
+            OHermitianMatrix* testM[MAX_LASERS];
+            nlasers = MAX_LASERS;
+            Op = FindOperatorType<OHermitianMatrix> (_Coup, testM, nlasers);
+            
+            if (Op != NULL){
+               for (int l = 0; l < nlasers; l++) {
+                  if (testM[l] == NULL)
+                     throw(EParamProblem("Wrong number/invalid coupling operator"));
+               }
+               coupling_ok = true;
+               log.cout() << "Found Matrix Coupling type" << endl<<endl;
+            }
+
             break;
       }
 
+      if (!coupling_ok)
+         log.cout() << "Warning: unknown coupling operator" << endl;
+      
       /* Unset unity in Multistate => Otherwise Operator will be wrong */
       OMultistate* ms;
       ms = dynamic_cast<OMultistate*> (_Coup);

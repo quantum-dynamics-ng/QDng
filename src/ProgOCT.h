@@ -5,8 +5,9 @@
 #include "tools/XmlNode.h"
 #include "tools/QDGlobalClock.h"
 #include "qdlib/OPropagator.h"
-#include "qdlib/OGridDipole.h"
 #include "qdlib/WFBuffer.h"
+#include "qdlib/OLaser.h"
+
 
 #define DEFAULT_BASENAME_LASER "laser"
 #define DEFAULT_ITERATIONS 50
@@ -43,6 +44,7 @@ namespace QDLIB
     *
     * rabitzfb = Rabitz feedback iterative scheme (W. Zhu and H. Rabitz, J. Chem. Phys 109, 385 (1998))
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
+    * \bug Declaring more than one laserfield doesn't work !?
     */
    class ProgOCT
    {

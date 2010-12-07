@@ -1,7 +1,7 @@
 noinst_DATA = TGE-Cheby.qdi  TGE-GSPO.qdi  TGE-SIL.qdi  TGE-SPO.qdi \
 	      TGP-Expec.qdi  TGP-Expec-SP.qdi  TGPMS-Cheby.qdi  TGPMS-GSPO.qdi
 
-check_SCRIPTS = TGE TGP TLP TGO check.sh
+check_SCRIPTS = TGE TGP TLP TLO TGO check.sh
 
 
 TGE:
@@ -26,6 +26,16 @@ TGP:
 
 TLP:
 	for n in `ls TLP*.qdi`;\
+	do\
+	 name=`echo $$n | sed s/\.qdi//`;\
+	 echo "Running test $$name"; \
+	 ../src/qdng $${name}.qdi > $${name}.log;\
+	done; \
+	a=`grep "Normal termination" $${name}.log | wc -l`; \
+	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
+
+TLO:
+	for n in `ls TLO*.qdi`;\
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
 	 echo "Running test $$name"; \
