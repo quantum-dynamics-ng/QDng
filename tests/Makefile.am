@@ -69,4 +69,5 @@ clean-local:
 	-rm -rf TLPL-*/
 	-rm -rf TGPL-*/
 	-rm -rf TGO-*/
+	-rm -rf TLO-*/
 
