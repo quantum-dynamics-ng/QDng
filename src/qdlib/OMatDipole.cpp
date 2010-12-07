@@ -62,13 +62,13 @@ namespace QDLIB
    void OMatDipole::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       OHermitianMatrix::Apply(destPsi, sourcePsi);
-      *destPsi *= GetLaser()->Get();
+      *destPsi *= -1*GetLaser()->Get();
    }
 
    void OMatDipole::Apply(WaveFunction *Psi)
    {
       OHermitianMatrix::Apply(Psi);
-      *Psi *= GetLaser()->Get();
+      *Psi *= -1*GetLaser()->Get();
    }
 
    Operator * OMatDipole::operator =(Operator * O)
@@ -98,6 +98,6 @@ namespace QDLIB
       if (_dspace == NULL)
          InitDspace();
 
-      ExpElements(exp, _dspace, c * GetLaser()->Get());
+      ExpElements(exp, _dspace, -1 * c * GetLaser()->Get());
    }
 }

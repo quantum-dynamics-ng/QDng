@@ -88,7 +88,7 @@ namespace QDLIB {
    void OGridDipole::InitExponential (cVec *exp, dcomplex c)
    {
       if (_dspace == NULL) InitDspace();
-      ExpElements(exp, _dspace, c * GetLaser()->Get());
+      ExpElements(exp, _dspace, -1 * c * GetLaser()->Get());
    }
 
 }
