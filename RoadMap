@@ -6,7 +6,7 @@
  * Define test inputs + evaluating script. (partly DONE)
 
 * QDng input
- * xsl scheme for input definition [planed for alpha-0.6]
+ * xsl scheme for input definition [planed for alpha-0.6] (DONE)
  * Loops (see Program types) 
  * "macros" for shorter defs., eg. Tkin on a multistate operator [planed for alpha-0.6]
  * GUI Frontend to compose input. [planed for alpha-0.7]
@@ -20,11 +20,11 @@
 * I/O
  * MPI-IO
  * HDF5
- * Mem-chached file buffer (in FileSingle, really needed?)
+ * Mem-chached file buffer (in FileSingle, really needed?) (DONE => WFBuffer)
  * Seperate FileSingle class into specialized parts (WaveFunction->Multistate, other types of data)
    => Special fileWF class (DONE)
 
-* Propgramm types
+* Programm types
  * Pump Probe Spectroscopy simulation
  * Loops in input with formatable loop variable in xml input
 
@@ -43,6 +43,6 @@
 * Density Matrix operations
  * SPO propagator
  * Faber propagator
- * basic operations types for density matrices
+ * basic operation types for density matrices
 
 
