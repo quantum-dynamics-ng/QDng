@@ -606,6 +606,13 @@ namespace QDLIB
 
       /* Propagate Target Backward with new field (1) */
       clock->End();
+      
+      /* Exchange laserfields => switch to backward propagation */
+      for (int l = 0; l < _nlaser; l++)
+         _laserb[l]->swap(*(_laserf[l]));
+      
+      _U->Backward();
+      
       for (int s = 0; s < clock->Steps(); s++) {
          /* Calc new laser field */
          for (int t=0; t < _ntargets; t++)
@@ -623,7 +630,7 @@ namespace QDLIB
 
          /* Do one step back */
          for (int t = 0; t < _ntargets; t++) {
-            //_Ub->Apply(phit[t]);
+            _U->Apply(phit[t]);
             if (_Gobbler) {
                _Gobbler->Apply(phit[t]);
                phit[t]->Normalize();
@@ -636,6 +643,12 @@ namespace QDLIB
       for (int t=0; t < _ntargets; t++)
          _memwfbuf[t].Set(0, phit[t]);
 
+      /* Exchange laserfields => switch to forward propagation */
+      for (int l = 0; l < _nlaser; l++)
+         _laserb[l]->swap(*(_laserf[l]));
+      
+      _U->Forward();
+      
       for (int t=0; t < _ntargets; t++)
          *(phit[t]) = _memwfbuf[t][clock->Steps()];
 
