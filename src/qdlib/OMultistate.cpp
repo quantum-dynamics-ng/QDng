@@ -87,9 +87,20 @@ namespace QDLIB
       
       
    }
-
    
-
+   bool OMultistate::CheckHermitian()
+   {
+      bool Herm = true;
+      for(int i=0; i< _nstates; i++){
+	    for(int j=0; j<= i; j++){
+	      if( i != j && _matrix[i][j] != _matrix[j][i]) {
+		  Herm = false;
+	      }
+	    }
+      }
+      return Herm;
+	   
+   }
    void OMultistate::Init( WaveFunction * Psi )
    {
       WFMultistate *psi;

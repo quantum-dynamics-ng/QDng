@@ -68,7 +68,7 @@ namespace QDLIB
 	     res = FindOperatorType<C>((*sum)[i], sop, max, label, index+nops);
 	     if (res != NULL){
                 for (int k=0; k < max; k++){
-                  found[index+nops+k] = sop[k];
+                  found[index+nops+k] = sop[index+nops+k];
                   /* Abort if limit is reached prematurely */
                   if (nops+k >= n){
                      delete[] sop;
@@ -92,13 +92,13 @@ namespace QDLIB
 	 package->States(ms->States());
 	 for(int i=0; i < ms->States(); i++){
             for(int j=0; j < i; j++){ /** \bug Only works correctly with hermitian ms */
-	       if (ms->State(i,j) != NULL){
+	       if (ms->State(i,j) != NULL){ 
                   max=n;
                   res = FindOperatorType<C>(ms->State(i,j), sop, max, label, index+nops);
 		  if (res != NULL){
 		     package->Add(res, i, j);
                      for (int k=0; k < max; k++){
-                        found[index+nops+k] = sop[k];
+                        found[index+nops+k] = sop[index+nops+k];
                         if (nops+k >= n){
                            delete[] sop;
                            return res;

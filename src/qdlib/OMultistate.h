@@ -45,6 +45,8 @@ namespace QDLIB
 	 
 	 bool Hermitian() {return _hermitian;}
 	 
+	 bool CheckHermitian();
+	 
          /**
           * Set behavior for missing diagonal elements.
           * 
@@ -59,6 +61,7 @@ namespace QDLIB
 	 
 	 /** Number of states */
 	 int States() {return _nstates;}
+	 
 	 
 	 /** Explictly set the number of states. 
 	  *  Usually this is done automaticly in the add method.
