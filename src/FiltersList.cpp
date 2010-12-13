@@ -128,9 +128,9 @@ namespace QDLIB {
 	 }
 	 if (faction != "normalize"){
 	     _olist[_size] = ChainLoader::LoadOperatorChain( filters );  /* Load operator */
-             ParamContainer attr = filters->Attributes();     /* Set label */
-             if (attr.isPresent("label"))
-                attr.GetValue("label", _labels[_size]);
+             ParamContainer attr = filters->Attributes();     /* Set header label */
+             if (attr.isPresent("header"))
+                attr.GetValue("header", _labels[_size]);
               else 
                 _labels[_size] = _olist[_size]->Name();
 	 }

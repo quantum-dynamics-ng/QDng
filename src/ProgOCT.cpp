@@ -569,10 +569,6 @@ namespace QDLIB
 
          for (int l = 0; l < _nlaser; l++)
             _laserf[l]->Set(laser);
-	 
-	 if (_laserf[0]->Get() != _laserf[0]->Get()) {
-	   std::cout << "Laser not identical" << endl;
-	 }
 
          /* Propagate initial with new field */
          for (int t = 0; t < _ntargets; t++) {
@@ -588,20 +584,6 @@ namespace QDLIB
          for (int t=0; t < _ntargets; t++)
             *(phit[t]) = _memwfbuf[t][clock->Steps()];
       }
-      /*
-      //Debug
-      /* Refresh intial */
-      //WaveFunction *Test[MAX_TARGETS];
-      //for (int t=0; t < _ntargets; t++) {
-	// Test[t] = PsiI[t]->NewInstance();
-      //}
-      //_CopyWFs(Test, PsiI);
-      /* Propagate forward */
-      //PropagateForward(Test);
-      //std::cout << endl << "Test: " << _Otarget[0]->Expec(Test[0])<< endl;
-      //End Debug
-      
-     
    }
 
    /**

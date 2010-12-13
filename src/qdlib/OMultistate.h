@@ -45,8 +45,6 @@ namespace QDLIB
 	 
 	 bool Hermitian() {return _hermitian;}
 	 
-	 bool CheckHermitian();
-	 
          /**
           * Set behavior for missing diagonal elements.
           * 

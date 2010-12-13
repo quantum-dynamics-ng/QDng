@@ -87,11 +87,14 @@ namespace QDLIB
       OMultistate* ms;
       ms = dynamic_cast<OMultistate*>(O);
       if (ms != NULL){
+         if (! ms->Hermitian())
+            throw (EParamProblem("Non-hermitian Multistates unsupported", ms->Name())); /** \todo implement for non-hermitian ms ? */
+         
 	 OMultistate* package = new OMultistate();
          sop = new C*[n];
 	 package->States(ms->States());
 	 for(int i=0; i < ms->States(); i++){
-            for(int j=0; j < i; j++){ /** \bug Only works correctly with hermitian ms */
+            for(int j=0; j < i; j++){
 	       if (ms->State(i,j) != NULL){ 
                   max=n;
                   res = FindOperatorType<C>(ms->State(i,j), sop, max, label, index+nops);
