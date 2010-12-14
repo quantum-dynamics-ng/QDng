@@ -205,12 +205,13 @@ namespace QDLIB {
    {
       map<string, _OpEntry>::iterator it;
 
-      for (it = _OpStore.begin(); it != _OpStore.end(); it++) {
+      it = _OpStore.begin();
+      while ( it != _OpStore.end() ) {
          if ( ! ((*it).second).persist ) {
             DELETE_OP(((*it).second).Op);
             _OpStore.erase(it);
             it = _OpStore.begin(); /* iterator is now invalid => start over */
-         }
+         } else it++;
       }
    }
    

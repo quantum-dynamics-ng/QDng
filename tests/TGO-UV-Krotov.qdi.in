@@ -1,0 +1,70 @@
+<qdng>
+<oct alpha="10" dt="1" steps="400" shape="@srcdir@/GridShapeUV" method="krotov" dir="TGO-UV-Krotov" ttype="operator" iterations="20">
+	<propagator name="Cheby" prec="1e-18">
+	  <hamiltonian name="Multistate">
+            <m0.0 name="Sum">
+               <Tkin name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+               <Vpot name="GridPotential" file="@srcdir@/GridPot0" key="V0"/>
+            </m0.0>
+            <m1.1 name="Sum">
+               <Tkin ref="T"/>
+               <Vpot name="GridPotential" file="@srcdir@/GridPot1" key="V1"/>
+            </m1.1>
+	    <m1.0  name="GridDipole" file="@srcdir@/GridDip01" laser="@srcdir@/GridLaser_w0.176"/>
+        </hamiltonian>
+	</propagator>
+        <wfi0 name="Multistate" normalize="true" states="2">
+         <wf0 file="@srcdir@/GridPot0_ef_0"/>
+        </wfi0>
+        <target0 name="Multistate" unity="false" states="2">
+          <m1.1 name="Projection" files="@srcdir@/GridPot0_ef" num="4"/>
+        </target0>
+</oct>
+<propa dt="1" steps="400" wcycle="400" dir="TGO-UV-Krotov" nfile="norm" spectrum="spectrum.dat">
+	<propagator name="Cheby" prec="1e-18">
+	  <hamiltonian name="Multistate">
+            <m0.0 name="Sum">
+               <Tkin name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+               <Vpot name="GridPotential" file="@srcdir@/GridPot0" key="V0"/>
+            </m0.0>
+            <m1.1 name="Sum">
+               <Tkin ref="T"/>
+               <Vpot name="GridPotential" file="@srcdir@/GridPot1" key="V1"/>
+            </m1.1>
+	    <m1.0  name="GridDipole" file="@srcdir@/GridDip01" laser="TGO-UV-Krotov/laser"/>
+        </hamiltonian>
+	</propagator>
+        <wf name="Multistate" normalize="true" states="2">
+           <wf0 file="@srcdir@/GridPot0_ef_0" normalize="true"/>
+        </wf>
+        <filterpost>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m0.0 name="GridMomentum" key="p"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m1.1 ref="p"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m0.0 name="GridPosition" key="x"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m1.1 ref="x"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2" header="proj">
+               <m1.1 name="Projection" files="@srcdir@/GridPot0_ef" num="4"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m0.0 ref="T"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m1.1 ref="T"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m0.0 ref="V0"/>
+            </expeconly>
+            <expeconly name="Multistate" unity="false" states="2">
+               <m1.1 ref="V1"/>
+            </expeconly>
+        </filterpost>
+</propa>
+</qdng>

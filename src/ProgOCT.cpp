@@ -27,8 +27,10 @@ namespace QDLIB
 
    ProgOCT::~ProgOCT()
    {
+      GlobalOpList::Instance().Clear();
       DELETE_ALL_WF();
       DELETE_OP(_Coup);
+      QDGlobalClock::Destroy();
    }
 
    /**
@@ -939,6 +941,8 @@ namespace QDLIB
          ms->Unity(false);
       }
 
+      _Coup->Init(PsiI[0]);
+      
       /* Load the Gobbler */
       section = _ContentNodes->FindNode("gobbler");
       if (section != NULL) {

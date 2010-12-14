@@ -14,6 +14,8 @@ namespace QDLIB {
    {
       private:
          int _size;
+         bool _subinit;    /* Initial content ops */
+         
          Operator* _O[MAX_OPS];
       public:
          OList();
@@ -29,6 +31,13 @@ namespace QDLIB {
          
          void Add(Operator *O);
    
+         /**
+          * Initialize content operators with Init(Wavefunction*).
+          * 
+          * This feature is on per default.
+          */
+         void SubInit(bool init) { _subinit = init; }
+         
          /* Overide Clock setter */
          virtual void Clock (QDClock *cl);
          

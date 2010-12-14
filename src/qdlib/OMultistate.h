@@ -27,6 +27,7 @@ namespace QDLIB
 	 bool _hermitian;  /* Assume hermiticity for missing elements */
 	 int _nstates;
          bool _unity;      /* treat empty diagonal as unity */
+         bool _subinit;    /* Initial content ops */
 	 
 	 Operator* _matrix[QD_MAX_STATES][QD_MAX_STATES];
 	 
@@ -54,6 +55,13 @@ namespace QDLIB
          void Unity(bool unity) {_unity= unity;}
 	 
          bool Unity() {return _hermitian;}
+         
+         /**
+          * Initialize content operators with Init(Wavefunction*).
+          * 
+          * This feature is on per default.
+          */
+         void SubInit(bool init) { _subinit = init; }
          
 	 void Add(Operator *O, int row, int col);
 	 

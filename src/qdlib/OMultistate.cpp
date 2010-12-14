@@ -8,7 +8,7 @@ namespace QDLIB
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OMultistate)
 	 
    OMultistate::OMultistate() : _name("OMultistate"), _hermitian(true),
-                            _nstates(0), _unity(false), _buf1(NULL), _buf2(NULL)
+                            _nstates(0), _unity(false), _subinit(true), _buf1(NULL), _buf2(NULL)
    {
       for(int i=0; i< QD_MAX_STATES; i++){
 	 for(int j=0; j< QD_MAX_STATES; j++){
@@ -111,7 +111,8 @@ namespace QDLIB
 	    for(int j=0; j<= i; j++){
 	       if (i != j && _matrix[j][i] != NULL) _matrix[i][j] = _matrix[j][i]; /* Copy pointer only */
 	       if (_matrix[i][j] != NULL){
-		  _matrix[i][j]->Init(psi->State(j));
+                  if (_subinit)
+		    _matrix[i][j]->Init(psi->State(j));
 		  if (i != j) _matrix[j][i] = _matrix[i][j]; /* Copy pointer only */
 	       }
 	    }
@@ -120,7 +121,8 @@ namespace QDLIB
 	 for(int i=0; i< _nstates; i++){
 	    for(int j=0; j<= _nstates; j++){
 	       if (_matrix[i][j] != NULL)
-		  _matrix[i][j]->Init(psi->State(j));
+                  if (_subinit)
+		    _matrix[i][j]->Init(psi->State(j));
 	    }
 	 }
       }
