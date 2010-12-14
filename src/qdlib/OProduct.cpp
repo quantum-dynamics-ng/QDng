@@ -62,6 +62,15 @@ namespace QDLIB {
           Get(i)->Apply(Psi);
     }
 
+    void QDLIB::OProduct::ApplyParent(WaveFunction * destPsi, WaveFunction * sourcePsi)
+    {
+       Get(Size()-1)->ApplyParent(destPsi, sourcePsi);
+       
+       for (int i=Size()-2; i >= 0; i++)
+          Get(i)->ApplyParent(sourcePsi, sourcePsi);
+
+    }
+    
     void OProduct::Apply(Operator * destOp, Operator * sourceOp)
     {
        Get(Size()-1)->Apply(destOp, sourceOp);
@@ -78,3 +87,4 @@ namespace QDLIB {
 
     
 }
+

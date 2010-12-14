@@ -246,6 +246,27 @@ namespace QDLIB
       *Psi = _buf2;
    }
    
+   void OMultistate::ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   {
+      WFMultistate *psi, *dPsi;
+      psi = dynamic_cast<WFMultistate*>(sourcePsi);
+      dPsi = dynamic_cast<WFMultistate*>(destPsi);
+      
+      *((cVec*) dPsi) = dcomplex(0,0);
+      
+      for(int i=0; i< _nstates; i++){ 
+         for(int j=0; j< _nstates; j++){
+            if (_matrix[i][j] != NULL){
+               _matrix[i][j]->ApplyParent(_buf1->State(i), psi->State(j));
+               AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
+            } else if (i==j && _unity) { /* Diagonal without operator means 1 */
+               AddElements((cVec*) (dPsi->State(i)), (cVec*) (psi->State(j)));
+            }
+         }
+      }
+   }
+
+   
    Operator * OMultistate::operator =( Operator * O )
    {
       Copy(O);
@@ -319,6 +340,4 @@ namespace QDLIB
    
 }
 /* namespace QDLIB */
-
-
 

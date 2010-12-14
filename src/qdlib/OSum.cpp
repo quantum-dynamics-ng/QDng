@@ -91,6 +91,19 @@ namespace QDLIB {
       }
    }
    
+   void OSum::ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   {
+      if (_WFbuf[0] == NULL) _WFbuf[0] = sourcePsi->NewInstance();
+
+      Get(0)->ApplyParent(destPsi, sourcePsi);
+      
+      for (int i=1; i < Size(); i++)
+      {
+         Get(i)->ApplyParent(_WFbuf[0], sourcePsi);
+         AddElements(destPsi, _WFbuf[0]);
+      }
+   }
+   
    void OSum::Apply(Operator * destOp, Operator * sourceOp)
    {
       throw ("Not implementet YET");
@@ -116,8 +129,4 @@ namespace QDLIB {
    }
    
 } /* namespace QDLIB */
-
-
-
-
 

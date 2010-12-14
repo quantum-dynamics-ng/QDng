@@ -49,6 +49,16 @@ namespace QDLIB
 
          /* DSpace features */
          virtual void InitExponential (cVec *exp, dcomplex c);
+         
+         /* OLaser features */
+         
+         /**
+          * Apply the pure dipole moment without laser.
+          */
+         void ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
+         {
+            OGridPotential::Apply(destPsi, sourcePsi);
+         }
    };
 
 } /* namespace QDLIB */

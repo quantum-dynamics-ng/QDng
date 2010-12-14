@@ -93,6 +93,8 @@ namespace QDLIB
 	 virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
 	 virtual void Apply(WaveFunction *Psi);
+         
+         virtual void ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
          virtual Operator* operator=(Operator* O);
 	 

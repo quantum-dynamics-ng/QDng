@@ -197,6 +197,16 @@ namespace QDLIB {
 	  */
 	 virtual void Apply(WaveFunction *Psi) = 0;
 	 	 
+         /**
+          * Use the Apply method of the parent operator.
+          * 
+          * This is needed for the OCT-Coupling operator.
+          */
+         virtual void ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
+         {
+            Apply(destPsi, sourcePsi);
+         }
+         
 	 /**
 	  * Copy operator.
 	  */
