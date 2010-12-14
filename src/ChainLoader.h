@@ -58,15 +58,17 @@ namespace QDLIB
          return t;
       }
       
-      /* Crawl trough Sum operator*/
-      OSum* sum;
-      sum = dynamic_cast<OSum*>(O);
-      if (sum != NULL){
+      /* Crawl trough List operators: Sum, Products, etc. */
+      OList* list;
+      list = dynamic_cast<OList*>(O);
+      if (list != NULL){
          sop = new C*[n];
-	 for(int i=0; i < sum->Size(); i++){
+         OList* package = dynamic_cast<OList*>(list->NewInstance());
+	 for(int i=0; i < list->Size(); i++){
              max=n;
-	     res = FindOperatorType<C>((*sum)[i], sop, max, label, index+nops);
+             res = FindOperatorType<C>((*list)[i], sop, max, label, index+nops);
 	     if (res != NULL){
+                package->Add(res);
                 for (int k=0; k < max; k++){
                   found[index+nops+k] = sop[index+nops+k];
                   /* Abort if limit is reached prematurely */
@@ -80,7 +82,7 @@ namespace QDLIB
 	 }
          n = nops;
          delete[] sop;
-         return res;
+         return package;
       }
       
       /* Crawl trough Multistate operator*/

@@ -53,6 +53,14 @@ namespace QDLIB
 	 }
 	 virtual double Expec(WaveFunction *Psi) { return OHermitianMatrix::Expec(Psi); }
 	 bool Valid(WaveFunction *Psi) { return OHermitianMatrix::Valid(Psi); }
+         
+         /**
+          * Apply the pure dipole matrix without laser.
+          */
+         void ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
+         {
+            OHermitianMatrix::Apply(destPsi, sourcePsi);
+         }
 	 
    };
 
