@@ -210,7 +210,7 @@ namespace QDLIB
          if (log.Debug()){
             log.coutdbg().precision(8);
             log.coutdbg() << fixed;
-            log.coutdbg() << "Norm : " << WF->Norm() <<endl;
+            log.coutdbg() << "Norm : " << multi->Norm() <<endl;
          }
          
 	 pm.GetValue( "normalize", onoff);

@@ -261,13 +261,18 @@ int main(int argc, char **argv)
                log.Header( opdefs->Name(), Logger::SubSection );
                log.IndentInc();
                O = ChainLoader::LoadOperatorChain( opdefs, true );
+               
                log.IndentDec();
                opdefs->NextNode();
+               log.cout() << endl;
             }
          }
          prognodes->NextNode();
          
          if ( log.Debug() )
+            log.cout() << endl;
+            log.Header("Internal Operator list", Logger::SubSection);
+            log.IndentInc();
             GlobalOpList::Instance().PrintList();
       }
       

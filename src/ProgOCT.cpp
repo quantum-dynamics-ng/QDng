@@ -866,7 +866,6 @@ namespace QDLIB
             for (int t = 0; t < _ntargets; t++)
                *(PsiT[t]) = _memwfbuf[t][clock->Steps()]; /* Use last step as "target" */
          }
-         log.cout() << endl;
       } else if (_ttype == op) {
          log.Header("Target operators", Logger::SubSection);
          log.IndentInc();
@@ -881,6 +880,7 @@ namespace QDLIB
             delete section;
          }
       }
+      log.cout() << endl;
 
       log.IndentDec();
 
@@ -966,7 +966,7 @@ namespace QDLIB
 
       Upm = _U->Params();
       log.cout() << "Forward Propagators init parameters:\n\n" << Upm << endl;
-      log.coutdbg() << _U->Exponent() << endl;
+      log.coutdbg() << "The Propagators Exponent: " << _U->Exponent() << endl<<endl;
 
       /* Objects for propagation */
       WaveFunction* phii[MAX_TARGETS];
@@ -988,11 +988,6 @@ namespace QDLIB
          file.ActivateSequence();
          file << _laserf[0];
       }
-
-      /* debuging */
-      FileWF wfile;
-      wfile.Name(_dir + string("wfb"));
-      wfile.ActivateSequence();
 
       /* Initialize gamma for freq. shape */
       if (_method == freq) {
@@ -1077,7 +1072,6 @@ namespace QDLIB
 
       /* Remove tmp WFs */
       for (int i = 0; i < _ntargets; i++) {
-
          DELETE_WF(phii[i]);
          DELETE_WF(phit[i]);
       }
