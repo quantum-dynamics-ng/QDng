@@ -6,7 +6,6 @@
         		<B name="MatDipole" file="@srcdir@/LevelDIPmat" laser="@srcdir@/LevelLaser_w0.15"/>
         	</hamiltonian>
 	</propagator>
-	<coupling name="HermitianMatrix" file="@srcdir@/LevelDIPmat"/>
         <wfi0 name="Level" file="@srcdir@/Level_ef_0"/>
         <wft0 name="Level" file="@srcdir@/Level_ef_1"/>
 </oct>

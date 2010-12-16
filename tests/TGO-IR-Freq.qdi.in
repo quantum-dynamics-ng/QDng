@@ -7,7 +7,6 @@
 	      <C name="GridDipole" file="@srcdir@/GridDip0" laser="@srcdir@/GridLaser_w0.00713"/>
 	</hamiltonian>
 	</propagator>
-        <coupling name="GridPotential" file="@srcdir@/GridDip0"/>
         <wfi0 name="GridCartesian" file="@srcdir@/GridPot0_ef_0" normalize="true"/>
         <wft0 name="GridCartesian" file="@srcdir@/GridPot0_ef_1" normalize="true"/>
 </oct>
