@@ -23,7 +23,7 @@ namespace QDLIB
       public:
 	 static Operator* LoadOperatorChain( XmlNode *Onode, bool persist = false );
 	 static WaveFunction* LoadWaveFunctionChain( XmlNode *WFNode, int seqnum=-1);
-	 static OPropagator* LoadPropagator( XmlNode *Unode );
+         static OPropagator* LoadPropagator( XmlNode *Unode, bool persist = false );
    };
 
    /**
@@ -91,7 +91,7 @@ namespace QDLIB
       ms = dynamic_cast<OMultistate*>(O);
       if (ms != NULL){
          if (! ms->Hermitian())
-            throw (EParamProblem("Non-hermitian Multistates unsupported", ms->Name())); /** \todo implement for non-hermitian ms ? */
+            throw (EParamProblem("Non-hermitian Multistates unsupported")); /** \todo implement for non-hermitian ms ? */
          
 	 OMultistate* package = new OMultistate();
          sop = new C*[n];

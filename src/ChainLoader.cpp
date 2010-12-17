@@ -332,10 +332,10 @@ namespace QDLIB
     * Load a propagator module and depending operators.
     * 
     * \param Unode   The XmlNode containing the parameters.
-    * \param Hamiltonian  Constains the loaded Hamiltonian on exit.
-    * \return The pre-initialized propagator (still need a ReInit)
+    * \param persist Make the Propagator persistent in the GlobalOpList.
+    * \return The pre-initialized propagator (still need a Init(WF) )
     */
-   OPropagator* ChainLoader::LoadPropagator( XmlNode *Unode )
+   OPropagator* ChainLoader::LoadPropagator( XmlNode *Unode, bool persist)
    {
       ModuleLoader* mods = ModuleLoader::Instance();
       Logger& log = Logger::InstanceRef();
@@ -387,7 +387,7 @@ namespace QDLIB
       XmlNode *child = Unode->NextChild();
       XmlNode *ops;
       
-      /* Search for needs and add it */      
+      /* Search for needs and add it */
       log.cout() << "Intialize Operators:\n\n";
       
       while (needs.GetNextValue( name, s )){
@@ -397,14 +397,14 @@ namespace QDLIB
 	 if ( ops != NULL ) { 
 	    log.Header( name, Logger::SubSection );
 	    log.IndentInc();
-	    h = LoadOperatorChain( ops );
+            h = LoadOperatorChain( ops, persist);
 	    log.IndentDec();
 	    log.cout() << endl;
 	    U->AddNeeds( name, h );
 	    delete ops;
 	 }
-      }      
-      OpList.Add(key, U);
+      }
+      OpList.Add(key, U, persist);
       
       log.flush();
       log.IndentDec();

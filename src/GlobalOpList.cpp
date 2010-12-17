@@ -193,6 +193,10 @@ namespace QDLIB {
          log.cout() << "\t\t";
          if (((*it).second).initialized)
             log.cout() << "initialized\t";
+         
+         if (((*it).second).persist)
+            log.cout() << "persitent\t";
+         
          log.cout() << endl;
       }
 

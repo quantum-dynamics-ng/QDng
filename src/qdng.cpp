@@ -260,7 +260,13 @@ int main(int argc, char **argv)
                
                log.Header( opdefs->Name(), Logger::SubSection );
                log.IndentInc();
-               O = ChainLoader::LoadOperatorChain( opdefs, true );
+               if ( opdefs->Name() == "udef" ) {
+                  O = ChainLoader::LoadPropagator( opdefs, true );
+               } else if ( opdefs->Name() == "opdef" ) {
+                  O = ChainLoader::LoadOperatorChain( opdefs, true );
+               } else {
+                  throw(EParamProblem("Unknown definition type: ", opdefs->Name()));
+               }
                
                log.IndentDec();
                opdefs->NextNode();

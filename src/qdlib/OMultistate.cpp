@@ -37,6 +37,9 @@ namespace QDLIB
       if (col+1 > _nstates)
 	 _nstates = col+1;
       
+      if (_matrix[row][col] != NULL)
+         throw (EParamProblem("Multistate matrix element is already in use"));
+         
       _matrix[row][col] = O;
       
       if (O->isTimeDep()) _isTimedependent = true;

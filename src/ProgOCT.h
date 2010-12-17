@@ -102,7 +102,6 @@ namespace QDLIB
          WaveFunction* PsiT[MAX_TARGETS];
          WaveFunction* _opwf; /* Buffer for mu*psi */
          WFBuffer _memwfbuf[MAX_TARGETS]; /* memory buffer for backpropagation */
-         bool _membuf_init; /* indicate initailized membuf */
 
          void _InitParams();
 

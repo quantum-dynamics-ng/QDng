@@ -11,6 +11,10 @@ namespace QDLIB {
    
    /**
     * Global operator container.
+    * 
+    * Operators have a named key to access them (must be unique).
+    * If you put an Operator in the container without a key, a name will be generated.
+    * Additionally you can give operators a label to group them together (the label is not unique).
     */
    class GlobalOpList
    {

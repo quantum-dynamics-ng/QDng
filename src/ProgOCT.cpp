@@ -16,7 +16,7 @@ namespace QDLIB
       _octNode(OCTNode), _ContentNodes(NULL), _fname(DEFAULT_BASENAME_LASER), _dir(""),
                _iterations(DEFAULT_ITERATIONS), _convergence(DEFAULT_CONVERGENCE), _writel(false),
                _method(krotov), _coupling(dipole), _ttype(ov), _phase(false),
-               _ntargets(1), _mv(false), _alpha(1), _Gobbler(NULL), _opwf(NULL), _membuf_init(false)
+               _ntargets(1), _mv(false), _alpha(1), _Gobbler(NULL), _opwf(NULL)
    {
       for (int i = 0; i < MAX_TARGETS; i++) {
          PsiI[i] = NULL;
@@ -28,7 +28,12 @@ namespace QDLIB
    ProgOCT::~ProgOCT()
    {
       GlobalOpList::Instance().Clear();
-      DELETE_ALL_WF();
+      //DELETE_ALL_WF();
+      DELETE_WF(_opwf);
+      for (int i=0; i < _ntargets; i++){
+         DELETE_WF(PsiI[i]);
+         DELETE_WF(PsiT[i]);
+      }
       DELETE_OP(_Coup);
       QDGlobalClock::Destroy();
    }
@@ -814,9 +819,12 @@ namespace QDLIB
       _H = _U->Hamiltonian();
       delete section;
 
+      if (_H == NULL)
+         throw(EParamProblem("Propagator has no hamiltonian"));
+         
+      log.cout() << endl;
       /* Load Initial Wavefunctions */
       log.Header("Initial wave functions", Logger::SubSection);
-      log.IndentInc();
       char num[3];
       for (int i = 0; i < _ntargets; i++) {
          snprintf(num, 3, "%d", i);
@@ -840,7 +848,6 @@ namespace QDLIB
       if (_ttype == ov) {
          /* Load Target Wavefunctions */
          log.Header("Target wave functions", Logger::SubSection);
-         log.IndentInc();
          for (int t = 0; t < _ntargets; t++) {
             snprintf(num, 3, "%d", t);
             section = _ContentNodes->FindNode("wft" + string(num));
@@ -868,7 +875,6 @@ namespace QDLIB
          }
       } else if (_ttype == op) {
          log.Header("Target operators", Logger::SubSection);
-         log.IndentInc();
          for (int t = 0; t < _ntargets; t++) {
             snprintf(num, 3, "%d", t);
             section = _ContentNodes->FindNode("target" + string(num));
@@ -906,6 +912,7 @@ namespace QDLIB
             
             _Coup = FindOperatorType<OLaser> (_H, CoupOLaser, nlasers, &label); /* Try first to find labeled Ops. */
             if (nlasers == 0){
+               DELETE_OP(_Coup);
                nlasers = MAX_LASERS;
                _Coup = FindOperatorType<OLaser> (_H, CoupOLaser, nlasers); /* Otherwise use all unlabeled Ops. */
 	       log.cout() << "Found " << nlasers << " unlabeled laser field(s)\n";
