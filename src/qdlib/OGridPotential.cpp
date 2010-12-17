@@ -31,7 +31,7 @@ namespace QDLIB
       
       _params.GetValue( "dims", n );
       _params.GetValue( "file", s );
-      if (s.size() != 0 && !_init){
+      if (n <= 0 && s.size() != 0 && !_init){
 	 _init = true;
 	 File()->Suffix(BINARY_O_SUFFIX);
 	 File()->Name(s);
