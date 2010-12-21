@@ -122,28 +122,28 @@ void OMatDipoleTest::NUMERIC_Test()
    clock.Begin();
 
    M->Apply(wf2, wf);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), (*wf2)[0].real(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), (*wf2)[1].real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), -(*wf2)[0].real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), -(*wf2)[1].real(), LOOSE_EPS);
    ++clock;
 
    M->Apply(wf2, wf);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), (*wf2)[0].real(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), (*wf2)[1].real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), -(*wf2)[0].real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply1", laser->Get()/sqrt(2), -(*wf2)[1].real(), LOOSE_EPS);
 
    *wf2 = wf;
    M->Apply(wf2);
 
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply2", laser->Get()/sqrt(2), (*wf2)[0].real(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply2", laser->Get()/sqrt(2), (*wf2)[1].real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply2", laser->Get()/sqrt(2), -(*wf2)[0].real(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Apply2", laser->Get()/sqrt(2), -(*wf2)[1].real(), LOOSE_EPS);
 
    cVec exp(2);
 //   M->InitDspace();
    M->InitExponential( &exp, dcomplex(0,-1) );
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM", -0.416146836547142, exp[0].real(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM", +0.909297426825682, exp[0].imag(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM", -0.909297426825682, exp[0].imag(), LOOSE_EPS);
 
    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM",  -0.416146836547142, exp[1].real(), LOOSE_EPS);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM",  -0.909297426825682, exp[1].imag(), LOOSE_EPS);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("expM",  +0.909297426825682, exp[1].imag(), LOOSE_EPS);
    
    DELETE_ALL_OP();
    DELETE_ALL_WF();
