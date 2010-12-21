@@ -6,7 +6,7 @@ AM_CXXFLAGS = -O3 -pedantic -pedantic-errors -fPIC -ansi -ffast-math -funroll-lo
 mathdir = $(pkgincludedir)/math
 math_HEADERS = Matrix.h math_functions.h typedefs.h Vector.h VectorView.h dcomplex.h
 
-if HAVE_OPENMP
+if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
 endif
 

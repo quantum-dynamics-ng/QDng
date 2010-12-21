@@ -21,7 +21,7 @@ then
         MATLAB_FLAGS="-I${MATLAB_DIR}/extern/include -I${MATLAB_DIR}/simulink/include -DMATLAB_MEX_FILE -fPIC -ansi -fno-omit-frame-pointer -fexceptions -D_GNU_SOURCE -pthread -O -DNDEBUG";
         MATLAB_LINK="-shared -pthread -W1,--version-script,${MATLAB_DIR}/extern/lib/glnxa64/mexFunction.map";
         MATLAB_LIB="-W1,--rpath-link,${MATLAB_DIR}/extern/lib/glnxa64,--rpath-link,${MATLAB_DIR}/bin/glnxa64 -L${MATLAB_DIR}/bin/glnxa64 -lmx -lmex -lmat -lm";
-        MEXEXT=mexa64 -lstdc++;;
+        MEXEXT="mexa64";;
     *cygwin*)
         MATLAB_FLAGS="-I${MATLAB_DIR}/extern/include -I${MATLAB_DIR}/simulink/include -fno-exceptions -mno-cygwin -DMATLAB_MEX_FILE -DNDEBUG";
         MATLAB_LINK="-shared -mno-cygwin -W1,--version-script,${MATLAB_DIR}/extern/lib/win32/mexFunction.def";
