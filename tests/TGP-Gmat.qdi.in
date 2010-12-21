@@ -1,0 +1,23 @@
+<qdng>
+<propa dt="20" steps="1000" wcycle="1000" dir="TGP-Gmat" spectrum="spectrum.dat">
+	<propagator name="Cheby">
+	  <hamiltonian name="Sum">
+	      <A name="GridGMat" dims="1" gmat="@srcdir@/GridGM" key="T"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0" key="V"/>
+	  </hamiltonian>
+	</propagator>
+        <wf name="LC" normalize="true">
+            <wf0 file="@srcdir@/GridPot0_ef_0"/>
+            <wf1 file="@srcdir@/GridPot0_ef_1"/>
+            <wf2 file="@srcdir@/GridPot0_ef_2"/>
+            <wf3 file="@srcdir@/GridPot0_ef_3"/>
+        </wf>
+        <filterpost>
+            <expeconly name="GridMomentum"/>
+            <expeconly name="GridPosition"/>
+            <expeconly name="Projection" files="@srcdir@/GridPot0_ef" num="4"/>
+            <expeconly ref="T"/>
+            <expeconly ref="V"/>
+        </filterpost>
+</propa>
+</qdng>
