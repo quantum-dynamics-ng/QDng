@@ -49,15 +49,15 @@ AC_PROG_RANLIB
 dnl
 dnl Matlab Library
 dnl
-sinclude([mex_init.m4])
-sinclude([matlab.m4])
+sinclude([m4/mex_init.m4])
+sinclude([m4/matlab.m4])
 MEX_INIT([MEX],[1],[1],[2])
 CHECK_MATLAB
 
 dnl
 dnl OpenMP
 dnl
-sinclude([ax_openmp.m4])
+sinclude([m4/ax_openmp.m4])
 AC_ARG_ENABLE([openmp],
 	      [AS_HELP_STRING([--enable-openmp],[Enable OpenMP parallelization])],
 	      [AX_OPENMP(enable_openmp=yes,AC_MSG_ERROR(Compiler doesn't provide OpenMP))])
@@ -70,21 +70,21 @@ AC_ARG_ENABLE([sse2],
 	      AC_DEFINE([HAVE_SSE2], [1], [Explictly enable SSE2 optimizations]))
 
 dnl zlib
-sinclude([ax_check_zlib.m4])
+sinclude([m4/ax_check_zlib.m4])
 AX_CHECK_ZLIB()
 
 
 dnl libxml2
-sinclude([acx_libxml2.m4])
+sinclude([m4/acx_libxml2.m4])
 ACX_CHECK_LIBXML2
 
 dnl fftw3
-dnl sinclude([acx_fftw3.m4])
+dnl sinclude([m4/acx_fftw3.m4])
 dnl ACX_FFTW3
 
 dnl blas/lapack
-sinclude([acx_blas.m4])
-sinclude([acx_lapack.m4])
+sinclude([m4/acx_blas.m4])
+sinclude([m4/acx_lapack.m4])
 ACX_BLAS(,AC_MSG_ERROR(BLAS libs are missing/not working))
 ACX_LAPACK(,AC_MSG_ERROR(LAPACK is missing/not working))
 

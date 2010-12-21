@@ -17,4 +17,5 @@ AM_CXXFLAGS = -O3 -g -fPIC
 noinst_LTLIBRARIES = libModuleLoader.la
 libModuleLoader_la_SOURCES = ModuleLoader.cpp InternalMods.cpp
 
-noinst_HEADERS = ModuleLoader.h Module.h InternalMods.h
+modulesdir = $(pkgincludedir)/modules
+modules_HEADERS = ModuleLoader.h Module.h InternalMods.h
