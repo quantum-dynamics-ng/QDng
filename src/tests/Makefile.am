@@ -3,7 +3,7 @@ INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/fftw/api -I/usr/include/cppun
 METASOURCES = AUTO
 AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
 
-if HAVE_OPENMP
+if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
   AM_LDFLAGS = $(OPENMP_CXXFLAGS)
 endif

@@ -9,7 +9,8 @@ libqd_la_SOURCES = GridSystem.cpp Kspace.cpp Laser.cpp \
 	WFMultistate.cpp FileWF.cpp TransformFFT.cpp TransformMat.cpp TransformMSD.cpp \
 	OGSPO.cpp ODMultistate.cpp OMatDipole.cpp OGridKick.cpp WaveFunction.cpp WFBuffer.cpp OLaser.cpp OList.cpp \
 	OFlux.cpp ORK4.cpp
-noinst_HEADERS = Butterworth.h WindowFuncs.h Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
+qdlibdir = $(pkgincludedir)/qdlib
+qdlib_HEADERS = Butterworth.h WindowFuncs.h Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
 	OCheby.h ODMultistate.h ODSpace.h OGobbler.h OGridDipole.h OGridGMat.h OGridKick.h \
 	OGridNabla.h OGridNablaSq.h OGridNAC.h OGridPosition.h OGridPotential.h OGridSum.h OGridsystem.h \
 	OGSPO.h OHermitianMatrix.h OMatDipole.h OMultistate.h Operator.h OProjection.h \
@@ -23,7 +24,7 @@ AM_CXXFLAGS = -pedantic -pedantic-errors -ansi -g -fPIC -O3 -funroll-loops -ffas
 libqd_la_LDFLAGS = -module
 
 
-if HAVE_OPENMP
+if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)
 endif
 
