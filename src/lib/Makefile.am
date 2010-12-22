@@ -3,16 +3,13 @@ METASOURCES = AUTO
 AM_CXXFLAGS = -ansi -fPIC -pedantic -Werror
 lib_LTLIBRARIES = libqdng.la
 libqdng_la_SOURCES = libqdng.cpp
-libqdng_la_LIBADD = $(top_builddir)/fftw/libfftw3.la \
+libqdng_la_LIBADD = $(FFTW_LIBS) \
 	$(top_builddir)/src/tools/libtools.la \
 	$(top_builddir)/src/slatec/libslatecmin.la $(top_builddir)/src/qdlib/libqd.la \
 	$(top_builddir)/src/modules/libModuleLoader.la $(top_builddir)/src/math/libmath.la \
 	$(top_builddir)/src/linalg/liblinalg.la $(top_builddir)/src/fft/libfft.la \
 	$(FLIBS) $(LAPACK_LIBS) $(LIBXML2_LIBS) 
 
-if HAVEOPENMP
-  libqdng_la_LIBADD += $(top_builddir)/fftw/threads/.libs/libfftw3_threads.la
-endif
 
 libqdng_la_LDFLAGS = -all-static
 #libqdng_la_LDFLAGS = -Wl,-static
