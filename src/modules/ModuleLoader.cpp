@@ -71,11 +71,11 @@ namespace QDLIB {
       else
          s = INTERNAL_BASENAME_WF + name;
       
-      instWF* InstanceWF = InternalWF(s);
+      fptr InstanceWF;
+      InstanceWF.WFptr = InternalWF(s);
       
-      if (InstanceWF != NULL){
-	 _mod_map[name].InstanceWF = InstanceWF;
-	 _mod_map[name].InstanceOP = NULL;
+      if (InstanceWF.voidptr != NULL){
+	 _mod_map[name].Instance = InstanceWF;
 	 _mod_map[name].link_count++;
 	 _mod_map[name].handle = NULL;
 	 return true;
@@ -91,13 +91,11 @@ namespace QDLIB {
 #ifdef USE_DYNMODS
    void ModuleLoader::_RegisterWF(void *handle, const string &name)
    {
+      fptr InstanceWF;
+      InstanceWF.voidptr = dlsym(handle, "InstanceWF");
 
-       
-      instWF* InstanceWF = (instWF*) dlsym(handle, "InstanceWF");
-
-      if (InstanceWF != NULL){
-	 _mod_map[name].InstanceWF = InstanceWF;
-	 _mod_map[name].InstanceOP = NULL;
+      if (InstanceWF.voidptr != NULL){
+	 _mod_map[name].Instance = InstanceWF;
 	 _mod_map[name].link_count++;
 	 _mod_map[name].handle = handle;
       } else {
@@ -114,14 +112,14 @@ namespace QDLIB {
    bool ModuleLoader::_InternalOP(const string &name)
    {
       string s;
-      
+      fptr InstanceOP;
       
       s = INTERNAL_BASENAME_OP + name;
-      instOP* InstanceOP = InternalOP(s);
       
-      if (InstanceOP != NULL){
-	 _mod_map[name].InstanceWF = NULL;
-	 _mod_map[name].InstanceOP = InstanceOP;
+      InstanceOP.Opptr = InternalOP(s);
+      
+      if (InstanceOP.voidptr != NULL){
+	 _mod_map[name].Instance = InstanceOP;
 	 _mod_map[name].link_count++;
 	 _mod_map[name].handle = NULL;
 	 return true;
@@ -139,10 +137,11 @@ namespace QDLIB {
    {
     
       
-      instOP* InstanceOP = (instOP*) dlsym(handle, "InstanceOP");
-      if (InstanceOP != NULL){
-	 _mod_map[name].InstanceWF = NULL;
-	 _mod_map[name].InstanceOP = InstanceOP;
+      fptr InstanceOP;
+      InstanceOP.voidptr = dlsym(handle, "InstanceOP");
+      
+      if (InstanceOP.voidptr != NULL){
+	 _mod_map[name].Instance = InstanceOP;
 	 _mod_map[name].link_count++;
 	 _mod_map[name].handle = handle;
       } else {
@@ -183,12 +182,12 @@ namespace QDLIB {
       /* is already loaded? */
       if (_isLoaded(name)) {
 	 _mod_map[name].link_count++;
-	 return _mod_map[name].InstanceWF();
+	 return _mod_map[name].Instance.WFptr();
       }
 #endif
       /* try compiled in module */
       if (_InternalWF(name)){
-	 return _mod_map[name].InstanceWF();
+         return _mod_map[name].Instance.WFptr();
       }
 #ifdef USE_DYNMODS   
       /* try user path */
@@ -198,7 +197,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterWF(handle, s);
-	 return _mod_map[name].InstanceWF();
+         return _mod_map[name].Instance.WFptr();
       }
       
       /* try system path */
@@ -207,7 +206,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterWF(handle, name);
-	 return _mod_map[name].InstanceWF();
+         return _mod_map[name].Instance.WFptr();
       } else {
 	 throw ( Exception( dlerror() ) );
       }
@@ -235,12 +234,12 @@ namespace QDLIB {
       /* is already loaded? */
       if (_isLoaded(name)) {
 	 _mod_map[name].link_count++;
-	 return _mod_map[name].InstanceOP();
+	 return _mod_map[name].Instance.Opptr();
       }
 #endif
       /* try compiled in module */
       if (_InternalOP(name)){
-	 return _mod_map[name].InstanceOP();
+         return _mod_map[name].Instance.Opptr();
       }
       
 #ifdef USE_DYNMODS
@@ -250,7 +249,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);
-	 return _mod_map[name].InstanceOP();
+         return _mod_map[name].Instance.Opptr();
       }
       
       /* try system path */
@@ -259,7 +258,7 @@ namespace QDLIB {
       if ( handle != NULL )
       {
 	 _RegisterOP(handle, name);
-	 return _mod_map[name].InstanceOP();
+         return _mod_map[name].Instance.Opptr();
       } else {
 	 throw ( Exception( dlerror() ) );
       }

@@ -33,11 +33,17 @@ namespace QDLIB {
 	 typedef WaveFunction* (instWF)();
 	 typedef Operator* (instOP)();
 	 
+         /** Union to avoid iso c++ casting problems */
+         typedef union {
+            void*   voidptr;
+            instWF* WFptr;
+            instOP* Opptr;
+         } fptr;
+         
 	 struct module {
 	    void *handle;
 	    int link_count;
-	    instWF* InstanceWF;
-	    instOP* InstanceOP;
+            fptr Instance;
 	 };
 	 
 	 string _user_path;
