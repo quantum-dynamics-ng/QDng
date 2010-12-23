@@ -1,6 +1,6 @@
 INCLUDES = $(LIBXML2_CFLAGS) $(all_includes) -I$(top_srcdir)/src
 METASOURCES = AUTO
-AM_CXXFLAGS = -ansi -fPIC -pedantic -Werror
+AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 lib_LTLIBRARIES = libqdng.la
 libqdng_la_SOURCES = libqdng.cpp
 libqdng_la_LIBADD = $(FFTW_LIBS) \

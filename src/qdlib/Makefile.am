@@ -20,7 +20,7 @@ qdlib_HEADERS = Butterworth.h WindowFuncs.h Conversion.h FileWF.h GridSystem.h K
 
 
 
-AM_CXXFLAGS = -pedantic -pedantic-errors -ansi -g -fPIC -O3 -funroll-loops -ffast-math
+AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 libqd_la_LDFLAGS = -module
 
 

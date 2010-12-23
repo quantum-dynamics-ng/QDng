@@ -6,7 +6,7 @@ libfft_la_SOURCES = fft.cpp
 fftdir = $(pkgincludedir)/fft
 fft_HEADERS = fft.h
 
-AM_CXXFLAGS = -ansi -O3 -fPIC -pedantic -Werror
+AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS)
 
 if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)

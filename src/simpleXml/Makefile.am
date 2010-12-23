@@ -1,7 +1,6 @@
 INCLUDES = -I$(top_srcdir)/src $(all_includes)
 AM_YFLAGS = -d
 AM_CXXFLAGS = 
-CXXFLAGS = -g
 
 noinst_LTLIBRARIES = libsimplexml.la
 

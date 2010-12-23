@@ -53,6 +53,7 @@ void show_version()
 #endif
    log.cout() << ")" << endl;
    
+#ifdef HAVE_UNAME
    /* Get machine info */
    struct utsname ubuf;
    uname(&ubuf);
@@ -61,7 +62,7 @@ void show_version()
    log.cout() << " (" << ubuf.sysname<< ", " <<ubuf.machine << ")";
    log.cout()<<endl;
    log.flush();
-   
+#endif
 }
 
 /**

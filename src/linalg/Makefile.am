@@ -4,7 +4,7 @@ METASOURCES = AUTO
 
 # noinst_LIBRARIES = liblinalg.a
 # liblinalg_a_SOURCES = Bessel.cpp BlasMatVec.cpp LapackDiag.cpp
-AM_CXXFLAGS = -Werror -ansi -pedantic-errors -fPIC
+AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 linalgdir = $(pkgincludedir)/linalg
 linalg_HEADERS = LapackDiag.h Bessel.h
 noinst_LTLIBRARIES = liblinalg.la 

@@ -10,7 +10,7 @@ METASOURCES = AUTO
 #OGridNablaSq_la_LDFLAGS = -module
 
 
-AM_CXXFLAGS = -O3 -g -fPIC
+AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 #libqd_OGridNablaSq_la_LIBADD = $(top_builddir)/src/tools/libtools.la \
 #	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la \
 #	$(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS)

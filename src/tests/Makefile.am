@@ -1,7 +1,7 @@
 INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/fftw/api -I/usr/include/cppunit \
 	$(all_includes) -I/usr/include/libxml2
 METASOURCES = AUTO
-AM_CXXFLAGS = -O2 -Werror -pedantic -pedantic-errors
+AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS)
 
 if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)

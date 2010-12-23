@@ -14,7 +14,7 @@ if HAVE_MATLAB
   OPT_DIRS+=mex
 endif
 
-AM_CXXFLAGS = -O3 -ansi -pedantic-errors -Werror -DQDNG_BUILD_DATE="\"`date`\"" -DQDNG_BUILD_HOST="\"`uname -n`\"" \
+AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS) -DQDNG_BUILD_DATE="\"`date`\"" -DQDNG_BUILD_HOST="\"`uname -n`\"" \
 	      -DQDNG_BUILD_MACH="\"`uname -m`\"" -DQDNG_REV="\"`git rev-list --max-count=1 HEAD`\""
 
 if HAVEOPENMP
