@@ -57,28 +57,28 @@ class varstring
    public:
       varstring() {}
 
-      varstring(string s)
+      varstring(const string& s)
       {
          seqlist.push_back(s);
          seqtype.push_back(str);
          fmtlist.push_back("%s");
       }
 
-      varstring(char* s)
+      varstring(const char* s)
       {
          seqlist.push_back(string(s));
          seqtype.push_back(str);
          fmtlist.push_back("%s");
       }
 
-      void AppendString(char *s)
+      void AppendString(const char *s)
       {
          seqlist.push_back(string(s));
          seqtype.push_back(str);
          fmtlist.push_back("%s");
       }
 
-      void AppendVar(char *s, char *fmt = "%s")
+      void AppendVar(const char *s, const char *fmt = "%s")
       {
          seqlist.push_back(string(s));
          seqtype.push_back(var);
@@ -104,23 +104,22 @@ class varstring
                fprintf(_yyout, fmtlist[i].c_str(), seqlist[i].c_str());
             else {
                string& s = fmtlist[i];
-               char& fmt = s[s.length()-1];
-	       char prnt[128];
-	       cout << "fmt " << s <<" "<<s[s.length()-1]<< endl;
-	       switch (fmt) {
-		  case 'd' :
-		     fprintf(_yyout, fmtlist[i].c_str(), Str2Int(varlist[seqlist[i]]) );
-		  break;
-		  case 'f' :
-		     fprintf(_yyout, fmtlist[i].c_str(), Str2Double(varlist[seqlist[i]]) );
-		     //cout << "fmt " << fmtlist[i] << " " << vald << " " <<s << endl;
-		  break;		  
-		  case 's' :
-		  default:
-		     fprintf(_yyout, fmtlist[i].c_str(), varlist[seqlist[i]].c_str());
-		  break;		  
-	       }
-               //fprintf(_yyout, fmtlist[i].c_str(), varlist[seqlist[i]].c_str());
+               char& fmt = s[s.length() - 1];
+               char prnt[128];
+               switch (fmt) {
+                  case 'd':
+                     fprintf(_yyout, fmtlist[i].c_str(), Str2Int(varlist[seqlist[i]]));
+                     break;
+                  case 'f':
+                     fprintf(_yyout, fmtlist[i].c_str(), Str2Double(varlist[seqlist[i]]));
+
+                     break;
+                  case 's':
+                  default:
+                     fprintf(_yyout, fmtlist[i].c_str(), varlist[seqlist[i]].c_str());
+                     break;
+               }
+
             }
          }
 
@@ -234,11 +233,11 @@ class forloop: public block
       virtual void execute()
       {
          Indent();
-         fprintf(_yyout, "<!-- for %s = %f %f %f -->\n", loopvar.c_str(), begin, end, step );
+         fprintf(_yyout, "<!-- for %s = %g %g %g -->\n", loopvar.c_str(), begin, end, step );
          double d = begin;
          for (int i; i <= int(fabs((begin-end)/step)); i++){
             char s[64];
-            sprintf(s, "%f", d);
+            sprintf(s, "%g", d);
             varlist[loopvar] = s;
             block::execute();
             d += step;
@@ -279,7 +278,7 @@ class xmlnode: public block
             attributes[i].print();
             fprintf(_yyout, "=\"");
             values[i].print();
-	    fprintf(_yyout, "\"");
+            fprintf(_yyout, "\"");
          }
 
          if (children.size() > 0) {

@@ -37,13 +37,13 @@ block *root = NULL;
 block *level = NULL;
 varstring *vstr = NULL;
 
-void AppendStr(char* s)
+void AppendStr(const char* s)
 {
 	if (vstr == NULL) vstr = new varstring(s);
 	else vstr->AppendString(s);
 }
 
-void AppendVar(char* s, char* fmt = "%s")
+void AppendVar(const char* s, const char* fmt = "%s")
 {
 	if (vstr == NULL) vstr = new varstring();
 	vstr->AppendVar(s,fmt);
@@ -119,7 +119,6 @@ line:
 		xmlnode *node = new xmlnode($1);
 		level->AddChild(node);
 		level = node; 
-		cout << "Open Section "<<$1<<"\n";
 		
 	}
 	|
@@ -132,28 +131,26 @@ line:
       }
       varstring attr($1);
       node->AddAttribute(attr, *vstr);
-      cout << "Add Attribute "<< $1 << " = " << vstr->GetString() << "\n";
       delete vstr;
       vstr = NULL;
    }
-	|
+   |
 	ENDSEC
 	{        
              indent--;
              level = level->Parent();
              if (indent == 0){
-                cout << "exec\n"; 
                 root->execute();
                 delete root;
              }
 	}
 ;
 strexp:
-	TOKID { AppendStr($1); cout << "Append TOKID "<< $1 << "\n"; }
-	| QSTRING { AppendStr($1); cout << "Append QWORD " << $1 << "\n";}
-	| VAREXP { AppendVar(strdup(string($1).c_str())); cout << "Append VAREXP " << $1 << "\n"; }	
-	| VAREXP FMT { AppendVar(strdup(string($1).c_str()),$2); cout << "Append VAREXP " << $1 <<" " <<$2<< "\n"; }
-	| strexp CONCAT strexp { cout << " Concat " << $1 <<" "<< $3 << "\n"; }
+	TOKID { AppendStr($1); }
+	| QSTRING { AppendStr($1); }
+	| VAREXP { AppendVar(strdup(string($1).c_str())); }	
+	| VAREXP FMT { AppendVar(strdup(string($1).c_str()),$2); }
+	| strexp CONCAT strexp { }
 ;	
 	
 %%
