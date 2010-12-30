@@ -35,7 +35,7 @@ namespace QDLIB
     * 
     * Transform the wavefunction into position space.
    */
-   void QDLIB::TransformFFT::Backward(WaveFunction * Psi)
+   void TransformFFT::Backward(WaveFunction * Psi)
    {
       WFGridSystem* psi=dynamic_cast<WFGridSystem*>(Psi);
       
@@ -46,6 +46,19 @@ namespace QDLIB
       psi->IsKspace(false);
    }
 
+   void TransformFFT::Forward(WaveFunction *Psi, int dim)
+   {
+      WFGridSystem* psi=dynamic_cast<WFGridSystem*>(Psi);
+      psi->fft->forward(dim);
+      psi->IsKspace(true);
+   }
+
+   void TransformFFT::Backward(WaveFunction *Psi, int dim)
+   {
+      WFGridSystem* psi=dynamic_cast<WFGridSystem*>(Psi);
+      psi->fft->backward(dim);
+      psi->IsKspace(false);
+   }
 }
 
 

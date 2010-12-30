@@ -5,27 +5,59 @@
  #include <omp.h>
 #endif
 
-#include "tools/GlobalParams.h"
-#include "tools/Logger.h"
+#include "fft.h"
+#include "FFTGlobal.h"
 
 namespace QDLIB {
-  
+
+   /** Determine points in lower other dimensions.
+    *  (for coloumn major, QD-order)
+    **/
+   int FFT::_lothers(int dim) const
+   {
+      int lothers = 1;
+      if (dim>0)
+      {
+         for(int i=0; i < dim; i++)
+            lothers *= _dims[i];
+      }
+      return lothers;
+   }
+
+   /** Determine points in lower other dimensions.
+    *  (for row major, C-order)
+    **/
+   int FFT::_uothers(int cdim) const
+   {
+      return _lothers(_ndims - cdim -1);
+   }
+
+
+   void FFT::_initplans()
+   {
+      for (int i=0; i < MAX_DIMS+1; i++) {
+         _planf[i] = NULL;
+         _planb[i] = NULL;
+      }
+   }
+
    /**
    * 1D complex-to-complex FFT.
    * 
-   * Meaning of in and out will be reveresed for backward transformation.
+   * Meaning of in and out will be reversed for backward transformation.
    * 
    * \param in     input
    * \param out    output
    * \param oneway If true only the forward plan will be created
    */
-   FFT::FFT(cVec &in, cVec &out, bool oneway) : _dims(NULL)
+   FFT::FFT(cVec &in, cVec &out, bool oneway) : _dims(NULL), _rdims(NULL), _ndims(1), _oneway(oneway), _in(NULL), _out(NULL)
    {
       cVec inbuf = in;
+      _initplans();
       
-      _planf = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);
+      _planf[0] = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);
       if (!(_oneway = oneway)){
-	 _planb = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_MEASURE);
+         _planb[0] = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_MEASURE);
       }
       in = inbuf;
       
@@ -34,124 +66,48 @@ namespace QDLIB {
    /**
    * ND complex-to-complex FFT.
    * 
-   * Meaning of in and out will be reveresed for backward transformation.
+   * Meaning of in and out will be reversed for backward transformation.
    * 
    * \param grid   GridSystem description
    * \param in     input
-   * \param out    output
+   * \param out    output (content maybe destroyed)
    * \param oneway If true only the forward plan will be created
    */
-   FFT::FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway) : _dims(NULL)
+   FFT::FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway) : _ndims(grid.Dim()), _oneway(oneway), _in(&in), _out(&out)
    {
-      cVec inbuf;
-      int fftwFlag;
-      
-#ifdef _OPENMP
-      _nthreads = omp_get_max_threads();
-      /* Initalisation */
-      
-      if (fftw_init_threads() == 0)
-          cerr << "FFTW init thread error" << endl;
-      
-      fftw_plan_with_nthreads(_nthreads);
-#endif
-      
-      /* Read plan */
-      if (!_planed){
-	 Logger& log = Logger::InstanceRef();
-	 ParamContainer& gp = GlobalParams::Instance();
-	 string wisdom("wisdom"); /* This is the default: wisdom in the current directory */
-	 bool fftwOptimize;
-	 
-	 if ( gp.isPresent("wisdom") )
-	    gp.GetValue("wisdom", wisdom);
-	 
-	 gp.GetValue("fftwOptimize", fftwOptimize, true);
-	 
-	 /* Read wisdom */
-         inbuf = in;
-	 FILE * pFile;
-	 if ((pFile = fopen(wisdom.c_str() , "r"))){
-	    if (fftw_import_wisdom_from_file(pFile) == 1)
-	       log.cout() << "Reading fftw3 wisdom from file: " << wisdom << endl;
-	    else
-	       log.cout() << "Reading fftw3 wisdom from file: " << wisdom << " failed!" << endl;
-	    
-	    fclose(pFile); 
-	    fftwFlag = FFTW_MEASURE;
-	 } else { 
-	    if ( fftwOptimize ) { /* Optimal fftw plan */
-	      fftwFlag = FFTW_PATIENT;
-	      log.cout() << "No wisdom found. Creating an optimal plan. This can take a while..." << endl;
-	    } else {
-	       fftwFlag = FFTW_ESTIMATE;
-	    }
-	 }
-	 log.flush();
-      } else {
-	 fftwFlag = FFTW_ESTIMATE;
+
+      int optflag = FFTGlobal::Instance().OptimizeFlag();
+      _initplans();
+
+      _dims = new int[grid.Dim()];
+      _rdims = new int[grid.Dim()]; /* reverse order of dimension array */
+      for (int i = 0; i < grid.Dim(); i++) {
+         _rdims[grid.Dim() - i - 1] = grid.DimSize(i);
+         _rdims[i] = grid.DimSize(i);
       }
-      
-      
-      switch (grid.Dim()){
-	 case 1:  /* 1D */
-	    _planf = fftw_plan_dft_1d(grid.DimSize(0), (fftw_complex*) in.begin(0),
-				      (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);
-	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_1d(grid.DimSize(0), (fftw_complex*) out.begin(0),
-					 (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
-	    }
-	    break;
-	 case 2: /* 2D */
-	    _planf = fftw_plan_dft_2d(grid.DimSize(1) , grid.DimSize(0), (fftw_complex*) in.begin(0),
-				      (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);
-	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_2d(grid.DimSize(1) , grid.DimSize(0), (fftw_complex*) out.begin(0),
-					 (fftw_complex*) in.begin(0),  FFTW_BACKWARD, fftwFlag);
-	    }
-	    break;
-	 case 3: /* 3D */
-	    _planf = fftw_plan_dft_3d(grid.DimSize(2) , grid.DimSize(1), grid.DimSize(0),
-				      (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);	
-	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft_3d(grid.DimSize(2) , grid.DimSize(1), grid.DimSize(0),
-					 (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
-	    }
-	    break;
-	 default: /* arb. dims */
-	    _dims = new int[grid.Dim()];      /* reverse order of dimension array */
-	    for (int i=0; i < grid.Dim(); i++){
-	       _dims[grid.Dim() - i - 1] = grid.DimSize(i);
-	    }
-	    _planf = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) in.begin(0),
-				   (fftw_complex*) out.begin(0), FFTW_FORWARD, fftwFlag);	
-	    if (!(_oneway = oneway)){
-	       _planb = fftw_plan_dft(grid.Dim(), _dims, (fftw_complex*) out.begin(0),
-				      (fftw_complex*) in.begin(0), FFTW_BACKWARD, fftwFlag);
-	    }
-	 
-      } /* switch  */
-      
-      /* Save plan */
-      if (!_planed) {
-	 Logger& log = Logger::InstanceRef();
-	 ParamContainer& gp = GlobalParams::Instance();
-	 string wisdom("wisdom"); /* This is the default: wisdom in the current directory */
-	 
-	 if ( gp.isPresent("wisdomsave") )
-	    gp.GetValue("wisdomsave", wisdom);
-	 
-	 in = inbuf;
-	 _planed = true;
-	 FILE * pFile;
-	 if ((pFile = fopen(wisdom.c_str(), "w"))){
-	    log.cout() << "Write fftw3 wisdom to file: " << wisdom << endl;
-	    fftw_export_wisdom_to_file(pFile);
-	    fclose(pFile);
-	 }
-	 
+
+      /* Create fftw plans */
+      _planf[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) in.begin(0),
+               (fftw_complex*) out.begin(0), FFTW_FORWARD, optflag | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
+
+      if (_planf[0] == NULL){ /* Create fresh, optimized plan */
+         cVec inbuf;
+         inbuf = in; /* Save for planning */
+         _planf[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) in.begin(0),
+                  (fftw_complex*) out.begin(0), FFTW_FORWARD, optflag);
+
+         in = inbuf;
       }
-      
+
+      /* backward plan */
+      if (!(_oneway = oneway)) {
+         _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
+                  (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
+         if (_planb[0] == NULL){
+            _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
+                     (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag);
+         }
+      }
    }
    
    
@@ -162,11 +118,12 @@ namespace QDLIB {
    * \param out    output. Note that the outputsize must be n/2+1.
    * \param oneway If true only the forward plan will be created.
    */
-   FFT::FFT(dVec &in, cVec &out, bool oneway) : _dims(NULL)
+   FFT::FFT(dVec &in, cVec &out, bool oneway) : _dims(NULL), _rdims(NULL), _ndims(1), _oneway(oneway), _in(NULL), _out(NULL)
    {
-      _planf = fftw_plan_dft_r2c_1d(in.size(), in.begin(0), (fftw_complex*) out.begin(0), FFTW_ESTIMATE);	
+      _initplans();
+      _planf[0] = fftw_plan_dft_r2c_1d(in.size(), in.begin(0), (fftw_complex*) out.begin(0), FFTW_ESTIMATE);
       if (!(_oneway = oneway)){
-	 _planb = fftw_plan_dft_c2r_1d(in.size(), (fftw_complex*) out.begin(0), in.begin(0), FFTW_ESTIMATE);
+         _planb[0] = fftw_plan_dft_c2r_1d(in.size(), (fftw_complex*) out.begin(0), in.begin(0), FFTW_ESTIMATE);
       }
    }
       
@@ -177,17 +134,74 @@ namespace QDLIB {
    */
    FFT::~FFT()
    {
-         if (_dims != NULL) delete _dims;
-	 fftw_destroy_plan(_planf);
-	 if(!_oneway) fftw_destroy_plan(_planb); 
+      if (_rdims != NULL) delete _rdims;
+      for (int i=0; i < MAX_DIMS+1; i++){
+         if (_planf[i] != NULL) fftw_destroy_plan(_planf[i]);
+         if (_planb[i] != NULL) fftw_destroy_plan(_planb[i]);
+      }
    }
    
+   /**
+    * Create Plan for a single dimension.
+    */
+   void FFT::_CreatePlanDim(int dim)
+   {
+      int nothers;
+      int lothers = _lothers(dim);  /* points in lower dims */
+      int cdim = _ndims - dim - 1; /* reversed dim index (C-order) */
+
+      /* Determine how many times one x_i value is present */
+      for(int i=0; i < _ndims; i++)
+      {
+         if (i != dim) nothers *= _dims[i];
+      }
+
+
+      /* describe 1D-stripes */
+      fftw_iodim datadim;
+      datadim.n = _rdims[cdim];
+      datadim.is = datadim.os = lothers;
+
+      /* describe loop over other dimension */
+      fftw_iodim* loopdim = new fftw_iodim[_ndims-1];
+      int k = 0;
+      for (int i=0; i < _ndims; i++){
+         if (i != cdim){
+            loopdim[k].n = _rdims[cdim];
+            loopdim[k].is = _uothers(i);
+            k++;
+         }
+      }
+
+      /* Create plans for the specific dimension */
+      _planf[dim] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
+                                       (fftw_complex*) _in->begin(0),
+                                       (fftw_complex*) _out->begin(0),
+                                       FFTW_FORWARD, FFTW_PATIENT | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
+
+      if (_planf[dim] == NULL){ /* Create fresh, optimized plan */
+         cVec inbuf;
+         inbuf = *_in; /* Save for planning */
+         _planf[dim] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
+                                          (fftw_complex*) _in->begin(0),
+                                          (fftw_complex*) _out->begin(0),
+                                          FFTW_FORWARD, FFTW_PATIENT);
+         *_in = inbuf;
+      }
+
+      if (!_oneway)
+         _planf[dim] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
+                                          (fftw_complex*) _out->begin(0),
+                                          (fftw_complex*) _in->begin(0),
+                                          FFTW_BACKWARD, FFTW_PATIENT);
+   }
+
    /**
    * Execute forward FFT.
    */
    void FFT::forward()
    {
-	 fftw_execute(_planf);
+      fftw_execute(_planf[0]);
    }
    
    
@@ -196,12 +210,26 @@ namespace QDLIB {
    */
    void FFT::backward()
    {
-	 fftw_execute(_planb);
+      fftw_execute(_planb[0]);
    }
 
-   bool FFT::_planed = false;
-   int FFT::_nthreads = 1;
-   
+   /**
+    * Execute fft along specified dimension
+    */
+   void FFT::forward(int dim)
+   {
+      if (_planf[dim] == 0) _CreatePlanDim(dim);
+      fftw_execute(_planf[dim]);
+   }
+
+   /**
+    * Execute fft along specified dimension
+    */
+   void FFT::backward(int dim)
+   {
+      if (_planb[dim] == 0) _CreatePlanDim(dim);
+      fftw_execute(_planb[dim]);
+   }
    
 } /* namespace QDLIB */
 

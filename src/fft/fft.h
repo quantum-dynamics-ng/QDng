@@ -24,20 +24,29 @@ namespace QDLIB {
     */
    class FFT {
       private:
-	 fftw_plan _planf;
-	 fftw_plan _planb;
-	 int *_dims;
-	 bool _oneway;
-	 static bool _planed;
-	 static int _nthreads;
+         fftw_plan _planf[MAX_DIMS + 1]; /* Holds forward plans for full fft + n single dim ffts */
+         fftw_plan _planb[MAX_DIMS + 1]; /* Holds forward plans for full fft + n single dim ffts */
+         int *_dims; /* Dim sizes */
+         int *_rdims; /* Dim sizes. reveresed, C-Order*/
+         int _ndims; /* number of dims */
+         bool _oneway;
+         cVec *_in;
+         cVec *_out;
+
+         void _initplans();
+         void _CreatePlanDim(int dim);
+         int _lothers(int dim) const;
+         int _uothers(int cdim) const;
       public:
-	 FFT(cVec &in, cVec &out, bool oneway = false);
-	 FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway = false);
-	 FFT(dVec &in, cVec &out, bool oneway = false);
-	 	 
-	 ~FFT();
-	 void forward();	
-	 void backward();	
+         FFT(cVec &in, cVec &out, bool oneway = false);
+         FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway = false);
+         FFT(dVec &in, cVec &out, bool oneway = false);
+
+         ~FFT();
+         void forward();
+         void forward(int dim);
+         void backward();
+         void backward(int dim);
       };
 
 

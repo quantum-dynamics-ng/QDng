@@ -30,7 +30,10 @@ namespace QDLIB {
 #endif
                
 using namespace std;
-         
+
+/* Defines the maximum number of dimensions in a grid */
+#define MAX_DIMS 4
+
 namespace QDLIB {
    /**
     * Enable multiplication of type double with arbitrary Types of Vector.

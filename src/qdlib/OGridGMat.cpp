@@ -246,10 +246,10 @@ namespace QDLIB {
       
       lint i;
       for (i=0; i < _size; i++){ /* Loop over dims*/
-	 /* d/dx from WF */ 
-	 _FFT.Forward(_wfbuf[i]);
-	 MultElementsComplex( (cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(buf->size()) );
-         _FFT.Backward(_wfbuf[i]);
+      /* d/dx from WF */
+      _FFT.Forward(_wfbuf[i], i);
+      MultElementsComplex((cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1 / double(buf->size()));
+      _FFT.Backward(_wfbuf[i], i);
          
  	 for (lint j=0; j < _size; j++){
 	    if ( (i == j) | _KinCoup){ /* Kinetic coupling ?*/
@@ -257,9 +257,9 @@ namespace QDLIB {
 	       /* Multiply Gmatrix element */
 	       if (_GmatC[i][j] != 0 ){ /* Constant G-Element*/
 		  /* d/dx from G* d/dx WF */
-		  _FFT.Forward(buf);
+		  _FFT.Forward(buf, j);
 		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) * _GmatC[i][j]);
-		  _FFT.Backward(buf);
+		  _FFT.Backward(buf, j);
 		  
 	       } else { /* Coordinate dependent lu*/
 		  if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
@@ -268,9 +268,9 @@ namespace QDLIB {
 		    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
 	       	       
 		  /* d/dx from G* d/dx WF */
-		  _FFT.Forward(buf);
+		  _FFT.Forward(buf, j);
 		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
-		  _FFT.Backward(buf);
+		  _FFT.Backward(buf, j);
 	       }
 	       *destPsi += buf;
 	    }

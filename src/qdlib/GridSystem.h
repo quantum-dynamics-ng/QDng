@@ -1,8 +1,7 @@
 #ifndef QDLIBGRIDSYSTEM_H
 #define QDLIBGRIDSYSTEM_H
 
-/* Defines the maximum number of dimensions in a grid */
-#define MAX_DIMS 4 
+#include "math/typedefs.h"
 
 namespace QDLIB {
 

@@ -23,6 +23,9 @@ namespace QDLIB
          virtual void Backward(WaveFunction *Psi);
          
          virtual double Normalization(){ return _norm; }
+
+         void Forward(WaveFunction *Psi, int dim);
+         void Backward(WaveFunction *Psi, int dim);
    };
 
 } /* namespace QDLIB */
