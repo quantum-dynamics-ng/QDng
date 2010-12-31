@@ -69,26 +69,20 @@ namespace QDLIB {
             _fftwFlag = FFTW_ESTIMATE;
          }
       }
+
+      /* Save wisdom to file */
+      if ( gp.isPresent("wisdomsave") )
+         gp.GetValue("wisdomsave", wisdom);
+
+      log.cout() << "Write fftw3 wisdom to file: " << wisdom << endl;
+
       log.flush();
    }
 
 
    FFTGlobal::~FFTGlobal()
    {
-      Logger& log = Logger::InstanceRef();
-      ParamContainer& gp = GlobalParams::Instance();
-      string wisdom("wisdom"); /* This is the default: wisdom in the current directory */
-
-      /* Save wisdom to file */
-      if ( gp.isPresent("wisdomsave") )
-         gp.GetValue("wisdomsave", wisdom);
-
-      FILE * pFile;
-      if ((pFile = fopen(wisdom.c_str(), "w"))){
-         log.cout() << "Write fftw3 wisdom to file: " << wisdom << endl;
-         fftw_export_wisdom_to_file(pFile);
-         fclose(pFile);
-      }
+      FlushWisdom();
 
       /* Cleanup memory */
 #ifdef _OPENMP
@@ -105,6 +99,22 @@ namespace QDLIB {
    {
       static FFTGlobal instance;
       return instance;
+   }
+
+   void FFTGlobal::FlushWisdom()
+   {
+      ParamContainer& gp = GlobalParams::Instance();
+      string wisdom("wisdom"); /* This is the default: wisdom in the current directory */
+
+      /* Save wisdom to file */
+      if ( gp.isPresent("wisdomsave") )
+         gp.GetValue("wisdomsave", wisdom);
+
+      FILE * pFile;
+      if ((pFile = fopen(wisdom.c_str(), "w"))){
+         fftw_export_wisdom_to_file(pFile);
+         fclose(pFile);
+      }
    }
 }
 

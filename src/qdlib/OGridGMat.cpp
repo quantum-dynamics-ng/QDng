@@ -93,6 +93,7 @@ namespace QDLIB {
       }
       
       _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
+
    }
    
    /**
@@ -248,9 +249,9 @@ namespace QDLIB {
       for (i=0; i < _size; i++){ /* Loop over dims*/
       /* d/dx from WF */
       _FFT.Forward(_wfbuf[i], i);
-      MultElementsComplex((cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1 / double(buf->size()));
+      MultElementsComplex((cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1 / double(GridSystem::DimSize(i)));
       _FFT.Backward(_wfbuf[i], i);
-         
+
  	 for (lint j=0; j < _size; j++){
 	    if ( (i == j) | _KinCoup){ /* Kinetic coupling ?*/
 	       buf->FastCopy(*(_wfbuf[i]));
@@ -258,7 +259,7 @@ namespace QDLIB {
 	       if (_GmatC[i][j] != 0 ){ /* Constant G-Element*/
 		  /* d/dx from G* d/dx WF */
 		  _FFT.Forward(buf, j);
-		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) * _GmatC[i][j]);
+		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(GridSystem::DimSize(j)) * _GmatC[i][j]);
 		  _FFT.Backward(buf, j);
 		  
 	       } else { /* Coordinate dependent lu*/
@@ -269,8 +270,9 @@ namespace QDLIB {
 	       	       
 		  /* d/dx from G* d/dx WF */
 		  _FFT.Forward(buf, j);
-		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(buf->size()) );
+		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(GridSystem::DimSize(j)) );
 		  _FFT.Backward(buf, j);
+
 	       }
 	       *destPsi += buf;
 	    }

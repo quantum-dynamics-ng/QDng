@@ -83,7 +83,7 @@ namespace QDLIB {
       _rdims = new int[grid.Dim()]; /* reverse order of dimension array */
       for (int i = 0; i < grid.Dim(); i++) {
          _rdims[grid.Dim() - i - 1] = grid.DimSize(i);
-         _rdims[i] = grid.DimSize(i);
+         _dims[i] = grid.DimSize(i);
       }
 
       /* Create fftw plans */
@@ -97,6 +97,7 @@ namespace QDLIB {
                   (fftw_complex*) out.begin(0), FFTW_FORWARD, optflag);
 
          in = inbuf;
+         FFTGlobal::Instance().FlushWisdom();
       }
 
       /* backward plan */
@@ -107,6 +108,7 @@ namespace QDLIB {
             _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
                      (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag);
          }
+         FFTGlobal::Instance().FlushWisdom();
       }
    }
    
@@ -134,7 +136,8 @@ namespace QDLIB {
    */
    FFT::~FFT()
    {
-      if (_rdims != NULL) delete _rdims;
+      if (_rdims != NULL) delete[] _rdims;
+      if (_dims != NULL) delete [] _dims;
       for (int i=0; i < MAX_DIMS+1; i++){
          if (_planf[i] != NULL) fftw_destroy_plan(_planf[i]);
          if (_planb[i] != NULL) fftw_destroy_plan(_planb[i]);
@@ -150,13 +153,6 @@ namespace QDLIB {
       int lothers = _lothers(dim);  /* points in lower dims */
       int cdim = _ndims - dim - 1; /* reversed dim index (C-order) */
 
-      /* Determine how many times one x_i value is present */
-      for(int i=0; i < _ndims; i++)
-      {
-         if (i != dim) nothers *= _dims[i];
-      }
-
-
       /* describe 1D-stripes */
       fftw_iodim datadim;
       datadim.n = _rdims[cdim];
@@ -167,33 +163,51 @@ namespace QDLIB {
       int k = 0;
       for (int i=0; i < _ndims; i++){
          if (i != cdim){
-            loopdim[k].n = _rdims[cdim];
+            loopdim[k].n = _rdims[i];
             loopdim[k].is = _uothers(i);
+            loopdim[k].os = _uothers(i);
             k++;
          }
       }
 
       /* Create plans for the specific dimension */
-      _planf[dim] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
+      _planf[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
                                        (fftw_complex*) _in->begin(0),
                                        (fftw_complex*) _out->begin(0),
                                        FFTW_FORWARD, FFTW_PATIENT | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
 
-      if (_planf[dim] == NULL){ /* Create fresh, optimized plan */
+
+
+      if (_planf[dim+1] == NULL){ /* Create fresh, optimized plan */
          cVec inbuf;
          inbuf = *_in; /* Save for planning */
-         _planf[dim] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
+         _planf[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
                                           (fftw_complex*) _in->begin(0),
                                           (fftw_complex*) _out->begin(0),
                                           FFTW_FORWARD, FFTW_PATIENT);
          *_in = inbuf;
+         FFTGlobal::Instance().FlushWisdom();
       }
 
-      if (!_oneway)
-         _planf[dim] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
+
+      /* backward plan */
+      if (!_oneway){
+         _planb[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
                                           (fftw_complex*) _out->begin(0),
                                           (fftw_complex*) _in->begin(0),
-                                          FFTW_BACKWARD, FFTW_PATIENT);
+                                          FFTW_BACKWARD, FFTW_PATIENT | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
+
+         if (_planb[dim+1] == NULL){ /* Create fresh, optimized plan */
+            _planb[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
+                                             (fftw_complex*) _out->begin(0),
+                                             (fftw_complex*) _in->begin(0),
+                                             FFTW_BACKWARD, FFTW_PATIENT);
+            FFTGlobal::Instance().FlushWisdom();
+         }
+
+      }
+
+      delete[] loopdim;
    }
 
    /**
@@ -218,8 +232,8 @@ namespace QDLIB {
     */
    void FFT::forward(int dim)
    {
-      if (_planf[dim] == 0) _CreatePlanDim(dim);
-      fftw_execute(_planf[dim]);
+      if (_planf[dim+1] == NULL) _CreatePlanDim(dim);
+      fftw_execute(_planf[dim+1]);
    }
 
    /**
@@ -227,8 +241,8 @@ namespace QDLIB {
     */
    void FFT::backward(int dim)
    {
-      if (_planb[dim] == 0) _CreatePlanDim(dim);
-      fftw_execute(_planb[dim]);
+      if (_planb[dim+1] == NULL) _CreatePlanDim(dim);
+      fftw_execute(_planb[dim+1]);
    }
    
 } /* namespace QDLIB */

@@ -112,7 +112,7 @@ if test "x$have_matlab" = "xyes" -o "x$use_internal_fftw" = "xyes"; then
    AC_MSG_NOTICE([Using shipped fftw3])
    FFTW_INCLUDE="\$(top_srcdir)/fftw/api";
    FFTW_LIBS="\$(top_builddir)/fftw/libfftw3.la";
-   if test "x$have_matlab" = "xyes" -a "x$enable_openmp" = "xyes"; then
+   if test "x$enable_openmp" = "xyes"; then
       FFTW_LIBS="\$(top_builddir)/fftw/threads/.libs/libfftw3_threads.la $FFTW_LIBS";
    fi
    FFTW_CFLAGS="";

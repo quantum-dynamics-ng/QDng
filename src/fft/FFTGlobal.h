@@ -35,6 +35,7 @@ namespace QDLIB
          /** Tell fftw Optimizer flag. */
          int OptimizeFlag() { return _fftwFlag; }
 
+         void FlushWisdom();
 #ifdef _OPENMP
          /** Returns the max usable fft threads. */
          int Threads () { return _nthreads; }

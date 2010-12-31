@@ -1,3 +1,6 @@
+#ifndef VECTORVIEW_H
+#define VECTORVIEW_H
+
 #include "Vector.h"
 
 namespace QDLIB 
@@ -206,3 +209,5 @@ namespace QDLIB
    }
    
 }
+
+#endif
