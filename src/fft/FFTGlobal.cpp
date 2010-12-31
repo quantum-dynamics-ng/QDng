@@ -86,9 +86,9 @@ namespace QDLIB {
 
       /* Cleanup memory */
 #ifdef _OPENMP
-      //fftw_cleanup_threads();
+      fftw_cleanup_threads();
 #else
-      //fftw_cleanup();
+      fftw_cleanup();
 #endif
    }
 

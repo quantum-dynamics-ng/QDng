@@ -97,7 +97,6 @@ namespace QDLIB {
                   (fftw_complex*) out.begin(0), FFTW_FORWARD, optflag);
 
          in = inbuf;
-         FFTGlobal::Instance().FlushWisdom();
       }
 
       /* backward plan */
@@ -108,7 +107,6 @@ namespace QDLIB {
             _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
                      (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag);
          }
-         FFTGlobal::Instance().FlushWisdom();
       }
    }
    
@@ -186,7 +184,6 @@ namespace QDLIB {
                                           (fftw_complex*) _out->begin(0),
                                           FFTW_FORWARD, FFTW_PATIENT);
          *_in = inbuf;
-         FFTGlobal::Instance().FlushWisdom();
       }
 
 
@@ -202,7 +199,6 @@ namespace QDLIB {
                                              (fftw_complex*) _out->begin(0),
                                              (fftw_complex*) _in->begin(0),
                                              FFTW_BACKWARD, FFTW_PATIENT);
-            FFTGlobal::Instance().FlushWisdom();
          }
 
       }

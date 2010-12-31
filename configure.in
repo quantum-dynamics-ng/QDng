@@ -206,7 +206,7 @@ if test "x$use_internal_fftw" = "xyes"; then
    mkdir -p fftw;
    cd fftw;
    if test "x$enable_openmp" = "xyes"; then fftw_thread_config="--enable-threads"; else fftw_thread_config=""; fi
-   ../${srcdir}/fftw/configure CFLAGS="-fPIC" --prefix=${prefix} "$fftw_thread_config"
+   ../${srcdir}/fftw/configure CFLAGS="-fPIC -O3" --prefix=${prefix} "$fftw_thread_config --enable-sse2"
    cd ..
 fi
 

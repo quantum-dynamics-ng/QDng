@@ -4,6 +4,7 @@
 #include "Kspace.h"
 #include "tools/FileSingleDefs.h"
 #include "math/math_functions.h"
+#include "fft/FFTGlobal.h"
 
 namespace QDLIB {
 
@@ -94,6 +95,7 @@ namespace QDLIB {
       
       _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
 
+      FFTGlobal::Instance().FlushWisdom();
    }
    
    /**
