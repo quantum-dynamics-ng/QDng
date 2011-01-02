@@ -104,8 +104,11 @@ namespace QDLIB {
          _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
                   (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
          if (_planb[0] == NULL){
+            cVec inbuf;
+            inbuf = in; /* Save for planning */
             _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
                      (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag);
+            in = inbuf;
          }
       }
    }
@@ -147,7 +150,6 @@ namespace QDLIB {
     */
    void FFT::_CreatePlanDim(int dim)
    {
-      int nothers;
       int lothers = _lothers(dim);  /* points in lower dims */
       int cdim = _ndims - dim - 1; /* reversed dim index (C-order) */
 
@@ -189,16 +191,20 @@ namespace QDLIB {
 
       /* backward plan */
       if (!_oneway){
+
          _planb[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
                                           (fftw_complex*) _out->begin(0),
                                           (fftw_complex*) _in->begin(0),
                                           FFTW_BACKWARD, FFTW_PATIENT | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
 
          if (_planb[dim+1] == NULL){ /* Create fresh, optimized plan */
+            cVec inbuf;
+            inbuf = *_in; /* Save for planning */
             _planb[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
                                              (fftw_complex*) _out->begin(0),
                                              (fftw_complex*) _in->begin(0),
                                              FFTW_BACKWARD, FFTW_PATIENT);
+           *_in = inbuf;
          }
 
       }
