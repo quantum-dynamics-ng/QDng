@@ -55,7 +55,7 @@ void modify_wf::add_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
     WF_result = WF1->NewInstance ();
     
     /*add WF1 and WF2*/
-    *WF_result = *WF1;
+    *WF_result = WF1;
     *WF_result += WF2;
     
     /*return ObectHandle*/
@@ -85,7 +85,7 @@ void modify_wf::sub_wf(mxArray **handle_result, mxArray *handle_WF1, mxArray *ha
     WF_result = WF1->NewInstance ();
     
     /*sub WF1 and WF2*/
-    *WF_result = *WF1;
+    *WF_result = WF1;
     *WF_result -= WF2;
     
     /*return ObectHandle*/
@@ -116,7 +116,7 @@ void modify_wf::wf_assigne(mxArray **handle_result, mxArray *handle_WF1, mxArray
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
     WF_result = WF1->NewInstance ();
-    *WF_result = *WF1;
+    *WF_result = WF1;
     
     /*nult WF1 with the double*/
     *WF_result = dc;
@@ -150,7 +150,7 @@ void modify_wf::mult_wf_double(mxArray **handle_result, mxArray *handle_WF1, mxA
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
     WF_result = WF1->NewInstance ();
-    *WF_result = *WF1;
+    *WF_result = WF1;
     
     /*nult WF1 with the double*/
     *WF_result *= dc;
@@ -208,10 +208,9 @@ void modify_wf::mult_wf_complex(mxArray **handle_result, mxArray *handle_WF1, mx
     
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
-    WF_result = WF1->NewInstance ();
     
     /*calc the direct conjugate Product*/
-    *WF_result = DirectProductConugate(WF1, WF2);
+    WF_result = DirectProductConugate(WF1, WF2);
     
     /*return ObectHandle*/
     wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
@@ -236,10 +235,9 @@ void modify_wf::mult_wf_pointwise(mxArray **handle_result, mxArray *handle_WF1, 
     
     /* Init WF_result*/
     WaveFunction *WF_result=NULL;
-    WF_result = WF1->NewInstance ();
-    
+
     /*calc the direct Product*/
-    *WF_result = DirectProduct(WF1, WF2);
+    WF_result = DirectProduct(WF1, WF2);
     
     /*return ObectHandle*/
     wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
@@ -413,7 +411,7 @@ void modify_wf::mult_wf_complex(mxArray *handle_WF1, mxArray *handle_WF2) {
       mexErrMsgTxt("Bad input. Wavefunction do not match!");
     
     /*calc the direct conjugate Product*/
-    *WF1 = DirectProductConugate(WF1, WF2);
+    WF1->DirectProductConjugate(WF2);
     
 }
 
@@ -436,7 +434,7 @@ void modify_wf::mult_wf_pointwise(mxArray *handle_WF1, mxArray *handle_WF2) {
     
     
     /*calc the direct Product*/
-    *WF1 = DirectProduct(WF1, WF2);
+    WF1->DirectProduct(WF2);
     
 }
 

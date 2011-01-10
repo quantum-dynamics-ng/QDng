@@ -134,6 +134,9 @@ namespace QDLIB {
          /** Copy. */
          virtual WaveFunction* operator=(WaveFunction* Psi) = 0;
          
+         /** Copy operator. */
+         virtual WaveFunction* operator=(WaveFunction &Psi)  { return *this = &Psi; }
+         
          /** Scalar product. */
          virtual dcomplex operator*(WaveFunction* Psi) = 0;
          
