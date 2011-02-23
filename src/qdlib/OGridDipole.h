@@ -27,8 +27,6 @@ namespace QDLIB
          
          virtual const string& Name();
 
-         virtual void Clock(QDClock *cl);
-
          virtual Operator* NewInstance();
 
          virtual void Init(ParamContainer &params);

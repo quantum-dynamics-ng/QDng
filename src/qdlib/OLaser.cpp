@@ -19,6 +19,93 @@ namespace QDLIB {
       if (_Pol != NULL) delete[] _Pol;
    }
 
+   void OLaser::Clock( QDClock * cl )
+   {
+      clock = cl;
+      
+      /* Generate Laser */
+      if (_genParams.isPresent("gen")) {
+         string type;
+         _genParams.GetValue("gen", type);
+         
+         if (type == "gauss"){
+            /* Init pulse parameters */
+            double Emax=0.0001;
+            double t0 = cl->Steps()/2 * cl->Dt();
+            double sigma = cl->Steps()/8 * cl->Dt();
+            double w0 = 0.05695; // lambda = 800nm
+            double phi = 0;
+            double b = 0;        // Quadratic chirp
+                           
+            if (_genParams.isPresent("Emax"))
+               _genParams.GetValue("Emax", Emax);
+                  
+            if (_genParams.isPresent("t0"))
+               _genParams.GetValue("t0", t0);
+      
+            if (_genParams.isPresent("sigma"))
+               _genParams.GetValue("sigma", sigma);
+      
+            if (_genParams.isPresent("w0"))
+               _genParams.GetValue("w0", w0);
+                  
+            if (_genParams.isPresent("phi"))
+               _genParams.GetValue("phi", phi);
+      
+            if (_genParams.isPresent("b"))
+               _genParams.GetValue("b", b);
+      
+            /* Init Laser */
+            Laser *Et = GetLaser();
+            Et->Dt(cl->Dt());
+            Et->Nt(cl->Steps());
+            Et->Clock(cl);
+                  
+            for (int i=0; i < Et->size(); i++){
+               double t = i * cl->Dt();
+               (*Et)[i] = Emax * exp(-(t-t0)*(t-t0) / 2 / (sigma*sigma) ) * cos(w0 * (t-t0) + phi + b*(t-t0)*(t-t0)) ;
+            }
+         }
+         
+         if (_genParams.isPresent("lasero")){
+            string fname;
+            Laser::FileLaser file = GetLaser()->File();
+            
+            _genParams.GetValue("lasero", fname);
+            file.Suffix(BINARY_O_SUFFIX);
+            file.Name(fname);
+            file << GetLaser();
+         }
+      } else
+         GetLaser()->Clock(cl);
+      
+   }
+   
+   void OLaser::Init(ParamContainer &params)
+   {
+      /* Read the laser field */
+      if (params.isPresent("laser")){
+         string name;
+         Laser::FileLaser file = GetLaser()->File();
+         
+         params.GetValue("laser", name);
+         file.Suffix(BINARY_O_SUFFIX);
+         file.Name(name);
+         file >> GetLaser();
+      } else if (params.isPresent("gen")) {
+         string type;
+         params.GetValue("gen", type);
+         
+         _genParams = params;
+         
+         if (type == "gauss"){
+         } else
+            throw (EParamProblem("Unknown laser type"));
+         
+      } else
+         throw (EParamProblem("No laser given"));
+   }
+   
    /**
     * This decides wether the to use polarisation vectors or not.
     * 

@@ -17,12 +17,6 @@ namespace QDLIB
    {
    }
 
-   void OMatDipole::Clock(QDClock * cl)
-   {
-      Operator::clock = cl;
-      GetLaser()->Clock(cl);
-   }
-
    void OMatDipole::Init(ParamContainer &params)
    {
       bool leave_empty;
@@ -31,16 +25,7 @@ namespace QDLIB
 
       /* Protect from double initalization */
       if (!_init && !leave_empty) {
-         /* Read the laser field */
-         string name;
-         Laser::FileLaser file = GetLaser()->File();
-
-         if (!params.isPresent("laser"))
-            throw(EParamProblem("No laser file name given"));
-         params.GetValue("laser", name);
-         file.Suffix(BINARY_O_SUFFIX);
-         file.Name(name);
-	 file >> GetLaser();
+         OLaser::Init(params);
       }
       _init = true;
 

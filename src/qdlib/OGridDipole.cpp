@@ -11,26 +11,11 @@ namespace QDLIB {
       _isTimedependent = true;
    }
 
-   void QDLIB::OGridDipole::Clock( QDClock * cl )
-   {
-      clock = cl;
-      GetLaser()->Clock(cl);
-   }
-
    void OGridDipole::Init(ParamContainer &params)
    {
       /* Protect from double initalization */
       if (!_init){
-	 /* Read the laser field */
-	 string name;
-	 Laser::FileLaser file = GetLaser()->File();
-
-	 if (!params.isPresent("laser"))
-	    throw (EParamProblem("No laser file name given"));
-	 params.GetValue("laser", name);
-	 file.Suffix(BINARY_O_SUFFIX);
-	 file.Name(name);
-	 file >> GetLaser();
+         OLaser::Init(params);
       }
       _init = true;
 

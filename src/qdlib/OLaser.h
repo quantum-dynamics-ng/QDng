@@ -21,7 +21,8 @@ namespace QDLIB {
 	 Laser* _laser;        /* Laserpointer :) */
 	 dVec* _Pol;           /* Polarisation vectors */
 	 bool _UsePol;         /* Use the polarisation vecotors ? */
-	 
+         
+         ParamContainer _genParams;
       protected:
 	 void UsePol(bool use);
 	 void NumLaser(int num);
@@ -31,7 +32,11 @@ namespace QDLIB {
 	 OLaser(int num);
 	 
 	 ~OLaser();
-	 
+         
+         /* Operator Interface */
+         virtual void Clock(QDClock *cl);
+         virtual void Init(ParamContainer &params);
+         
 	 void SetLaser(Laser &laser);
 	 void SetLaser(int n, Laser &laser);
 	 
