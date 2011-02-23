@@ -14,7 +14,7 @@ namespace QDLIB {
       return wf;
    }
    
-   WaveFunction* DirectProductConugate(WaveFunction* PsiA, WaveFunction* PsiB)
+   WaveFunction* DirectProductConjugate(WaveFunction* PsiA, WaveFunction* PsiB)
    {
       WaveFunction *wf;
          

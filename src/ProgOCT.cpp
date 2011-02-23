@@ -269,7 +269,7 @@ namespace QDLIB
       else log.cout() << endl;
 
       if (!_phase && (_ttype == op))
-         log.cout() << "WARNING : OPOC + phase insensitive is not meaningfull" << endl;
+         log.cout() << "Using Sundermann OPOC (Operator + phase=false)" << endl;
 
       if (_method == freq) {
          log.cout() << endl << "Frequency mask parameters: ";

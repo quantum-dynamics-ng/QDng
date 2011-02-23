@@ -257,7 +257,7 @@ namespace QDLIB {
    WaveFunction* DirectProduct(WaveFunction* PsiA, WaveFunction* PsiB);
 
    /** Pointwise Complex multiplication.Psi* x Psi */
-   WaveFunction* DirectProductConugate(WaveFunction* PsiA, WaveFunction* PsiB);
+   WaveFunction* DirectProductConjugate(WaveFunction* PsiA, WaveFunction* PsiB);
 
 
   

@@ -1,13 +1,8 @@
 * Coding issues
  * Add Output to operators Init functions. [planed for alpha-0.7]
- * Cleanup optimization flags => configure should decide (DONE)
-
-* Testing
- * Define test inputs + evaluating script. (DONE)
 
 * QDng input
  * xsl scheme for input definition [planed for alpha-0.7] (DONE)
- * Loops (DONE) 
  * "macros" for shorter defs., eg. Tkin on a multistate operator [planed for alpha-0.7]
  * GUI Frontend to compose input. [planed for alpha-0.7 needed?]
 
@@ -20,9 +15,6 @@
 * I/O
  * MPI-IO
  * HDF5
- * Mem-chached file buffer (in FileSingle, really needed?) (DONE => WFBuffer)
- * Seperate FileSingle class into specialized parts (WaveFunction->Multistate, other types of data)
-   => Special fileWF class (DONE)
 
 * Programm types
  * Pump Probe Spectroscopy simulation
@@ -31,10 +23,6 @@
  * Efficient Storage Scheme for Symmetric
  * -"- Hermitian 
  * Band Matrix
-
-* Operators to implement
- * SOD (Worth implementing? => No!)
-
 
 * FFT
  * MPI-FFT (how to combine with data distribution?)

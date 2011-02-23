@@ -210,7 +210,7 @@ void modify_wf::mult_wf_complex(mxArray **handle_result, mxArray *handle_WF1, mx
     WaveFunction *WF_result=NULL;
     
     /*calc the direct conjugate Product*/
-    WF_result = DirectProductConugate(WF1, WF2);
+    WF_result = DirectProductConjugate(WF1, WF2);
     
     /*return ObectHandle*/
     wf_ObjectHandle_interface::WF_to_handle_mxArray(handle_result, WF_result);
