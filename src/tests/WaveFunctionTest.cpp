@@ -38,8 +38,8 @@ void WaveFunctionTest::setUp()
    for (lint i=0; i < WF_TEST_SIZE; i++){
       (*wfc)[i] = dcomplex( sin(2 * M_PI *double(i) / double(WF_TEST_SIZE))
 	    , cos(2 * M_PI *double(i) / double(WF_TEST_SIZE)) );
-      vc[i] = dcomplex( sin(2 * M_PI *double(i) / WF_TEST_SIZE)
-	    , cos(2 * M_PI *double(i) / WF_TEST_SIZE) );
+      vc[i] = dcomplex( sin(2 * M_PI *double(i) / double(WF_TEST_SIZE))
+            , cos(2 * M_PI *double(i) / double(WF_TEST_SIZE)) );
       (*wfr)[i] = 0.5*sin(2 * M_PI *double(i) / double(WF_TEST_SIZE));
       vr[i] = 0.5*sin(2 * M_PI *double(i) / double(WF_TEST_SIZE));
       
@@ -57,7 +57,7 @@ void WaveFunctionTest::NUMERIC_Test()
 {
    
 //    operator*= (const double d)
-   *wfbuf = *wfc; /* Copy operator from cVec parent */
+   *((cVec*) wfbuf) = *((cVec*) wfc); /* Copy operator from cVec parent */
    *wfbuf *= 2;
    for (lint i=0; i < WF_TEST_SIZE; i++){
       CPPUNIT_ASSERT_DOUBLES_EQUAL(vc[i].real() * 2, (*wfbuf)[i].real(), TIGHT_EPS);
@@ -65,7 +65,7 @@ void WaveFunctionTest::NUMERIC_Test()
    }
    
 //    operator*= (const dcomplex d)
-   *wfbuf = *wfc; /* Copy operator from cVec parent */
+   *((cVec*) wfbuf) = *((cVec*) wfc); /* Copy operator from cVec parent */
    *wfbuf *= dcomplex(1,2);
    for (lint i=0; i < WF_TEST_SIZE; i++){
       CPPUNIT_ASSERT_DOUBLES_EQUAL((vc[i] * dcomplex(1,2)).real(), (*wfbuf)[i].real(), TIGHT_EPS);
@@ -96,7 +96,7 @@ void WaveFunctionTest::NUMERIC_Test()
    DELETE_WF(wfsum);
    
 //    WaveFunction* operator+=(WaveFunction* Psi)
-   *wfbuf = *wfc; /* Copy operator from cVec parent */
+   *((cVec*) wfbuf) = *((cVec*) wfc); /* Copy operator from cVec parent */
    *((WaveFunction*) wfbuf) += wfc;
    for (lint i=0; i < WF_TEST_SIZE; i++){
       CPPUNIT_ASSERT_DOUBLES_EQUAL((vc[i] + vc[i]).real(), (*wfbuf)[i].real(), TIGHT_EPS);
@@ -104,7 +104,7 @@ void WaveFunctionTest::NUMERIC_Test()
    }
    
 //    WaveFunction* operator-=(WaveFunction* Psi)
-      *wfbuf = *wfc; /* Copy operator from cVec parent */
+      *((cVec*) wfbuf) = *((cVec*) wfc); /* Copy operator from cVec parent */
       *((WaveFunction*) wfbuf) -= wfc;
       for (lint i=0; i < WF_TEST_SIZE; i++){
 	 CPPUNIT_ASSERT_DOUBLES_EQUAL((vc[i] - vc[i]).real(), (*wfbuf)[i].real(), TIGHT_EPS);
