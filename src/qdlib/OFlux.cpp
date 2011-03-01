@@ -28,10 +28,12 @@ namespace QDLIB {
       OList::Init(Psi);
       
       DELETE_WF(_buf);
+      DELETE_WF(_one);
       
-      _buf = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
-      if(_buf == NULL)
-         throw ( EIncompatible("Flux can only operate on GridSystem wave functions") );
+      _buf = Psi->NewInstance();
+      _one = Psi->NewInstance();
+      
+      *_one = -2;
       
       if (Size() != 2)
          throw ( EParamProblem("Flux: Misterious number of operators. Should be 2") );
@@ -47,7 +49,7 @@ namespace QDLIB {
       
       /* Integrate over inner Volume */
       Get(_indG)->Apply(_buf);
-      return dcomplex(-2 * _buf->Integral());
+      return dcomplex(*_one * _buf);
    }
 
    double OFlux::Expec(WaveFunction * Psi)

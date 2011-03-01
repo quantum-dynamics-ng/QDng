@@ -20,7 +20,8 @@ namespace QDLIB {
    {
       private:
          string _name;
-         WFGridSystem *_buf;
+         WaveFunction *_buf;
+         WaveFunction *_one;
          int _indT;           /* index of the kinetic energy operator */
          int _indG;           /* index of the Gobbler */
       public:
