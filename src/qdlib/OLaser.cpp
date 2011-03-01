@@ -28,7 +28,7 @@ namespace QDLIB {
          string type;
          _genParams.GetValue("gen", type);
          
-         if (type == "gauss"){
+         if (type == "gauss" || type == "gauss2"){
             /* Init pulse parameters */
             double Emax=0.0001;
             double t0 = cl->Steps()/2 * cl->Dt();
@@ -65,6 +65,40 @@ namespace QDLIB {
                double t = i * cl->Dt();
                (*Et)[i] = Emax * exp(-(t-t0)*(t-t0) / 2 / (sigma*sigma) ) * cos(w0 * (t-t0) + phi + b*(t-t0)*(t-t0)) ;
             }
+            
+            /* Generate 2. pulse */
+            if (type == "gauss2"){
+               Emax=0.0001;
+               t0 = cl->Steps()/2 * cl->Dt();
+               sigma = cl->Steps()/8 * cl->Dt();
+               w0 = 0.05695; // lambda = 800nm
+               phi = 0;
+               b = 0;        // Quadratic chirp
+                           
+               if (_genParams.isPresent("Emax2"))
+                  _genParams.GetValue("Emax2", Emax);
+                  
+               if (_genParams.isPresent("t02"))
+                  _genParams.GetValue("t02", t0);
+      
+               if (_genParams.isPresent("sigma2"))
+                  _genParams.GetValue("sigma2", sigma);
+      
+               if (_genParams.isPresent("w02"))
+                  _genParams.GetValue("w02", w0);
+                  
+               if (_genParams.isPresent("phi2"))
+                  _genParams.GetValue("phi2", phi);
+      
+               if (_genParams.isPresent("b2"))
+                  _genParams.GetValue("b2", b);
+               
+               for (int i=0; i < Et->size(); i++){
+                  double t = i * cl->Dt();
+                  (*Et)[i] += Emax * exp(-(t-t0)*(t-t0) / 2 / (sigma*sigma) ) * cos(w0 * (t-t0) + phi + b*(t-t0)*(t-t0)) ;
+               }
+
+            }
          }
          
          if (_genParams.isPresent("lasero")){
@@ -98,9 +132,9 @@ namespace QDLIB {
          
          _genParams = params;
          
-         if (type == "gauss"){
+         if (type == "gauss" || type == "gauss2"){
          } else
-            throw (EParamProblem("Unknown laser type"));
+            throw (EParamProblem("Unknown laser type", type));
          
       } else
          throw (EParamProblem("No laser given"));
