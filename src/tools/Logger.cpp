@@ -125,6 +125,7 @@ namespace QDLIB {
     */
    void Logger::ConsoleOutput()
    {
+      if ( _ofile.is_open() ) FileClose();
       _global_out = &std::cout;
    }
    

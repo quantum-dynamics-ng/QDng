@@ -321,6 +321,7 @@ int main(int argc, char **argv)
       }
       log.cout() << "Normal termination\n\n";
    } catch (Exception e) {
+      log.ConsoleOutput();
       log.flush();
       log.cout() << "\n\n\t!!!A problematic error occured:\n\t";
       log.cout() << e.GetMessage() << "\n\n\n";
