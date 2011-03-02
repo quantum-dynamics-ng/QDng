@@ -184,6 +184,24 @@ int main(int argc, char **argv)
       if(! cmdline.GetNonOption(0, fname) )
 	 throw ( EParamProblem ("No input file given") );
       
+      /* Check & parse variable definitions */
+      int i=1;
+      string vardef;
+      extern map<string, string> varlist; /* defined along with Syntatic Tree model */
+      while ( cmdline.GetNonOption(i, vardef) ){
+         size_t pos = vardef.find_first_of('=');
+         
+         if (pos == string::npos)
+            throw (EParamProblem ("Invalid variable definition"));
+         
+         string varname = vardef.substr(0,pos);
+         string varval = vardef.substr(pos+1);
+
+         varlist[varname] = varval; /* Write variable into storage of qds parser */
+         
+         i++;
+      }
+      
    } catch (Exception e) {
       cerr << e.GetMessage() << "\n";
       show_version();
