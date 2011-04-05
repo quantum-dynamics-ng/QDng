@@ -73,6 +73,8 @@ namespace QDLIB {
       if (Psi == NULL)
 	 throw ( EIncompatible("Projector got a void wave function") );
       
+      if (_size > 0) return;
+      
       _buf = Psi->NewInstance();
             
       /* Read a WF sequence from disk (Has to be here because we need to know the WF type) */
@@ -90,12 +92,13 @@ namespace QDLIB {
             _params.GetValue("step", step);
          }
          
-// 	 log.cout() << "Projector:\n";
-// 	 log.cout() << "Reading from files: " << files << endl;
-// 	 log.cout() << "from " << start;
-// 	 if (num > 1)
-// 	    log.cout() << " to " << num-start-1;
-// 	 log.cout() << endl << endl;
+/*         Logger& log = Logger::InstanceRef();
+	 log.cout() << "Projector:\n";
+	 log.cout() << "Reading from files: " << files << endl;
+	 log.cout() << "from " << start;
+	 if (num > 1)
+	    log.cout() << " to " << num-start-1;
+	 log.cout() << endl << endl;*/
 	 
          wfs.Suffix(BINARY_WF_SUFFIX);
          wfs.Name(files);
@@ -112,7 +115,6 @@ namespace QDLIB {
             _size++;
          }
       }
-      
    }
    
    void QDLIB::OProjection::Init( ParamContainer & params )
