@@ -289,6 +289,7 @@ namespace QDLIB
       log.cout() << "Maximum number of iterations : " << _iterations << endl;
       log.cout().precision(1);
       log.cout() << "Convergence : " << scientific << _convergence << endl;
+      log.cout() << "Directory for output: " << _dir << endl;
 
       log.flush();
    }
