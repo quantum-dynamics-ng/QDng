@@ -16,8 +16,8 @@ namespace QDLIB {
     */
    class OSum: public OList {
       private:
-	 string _name;
-	 WaveFunction* _WFbuf[MAX_OPS];    /* Use a buffer for wfs, to get rid of much mallocs */
+         string _name;
+         WaveFunction* _WFbuf[MAX_OPS];    /* Use a buffer for wfs, to get rid of much mallocs */
       public:
          
          ~OSum();
@@ -28,16 +28,14 @@ namespace QDLIB {
          virtual Operator* NewInstance();
 	 	 
          virtual const string& Name();
-	                
-         virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
 	 
-	 virtual dcomplex Emax();
+         virtual dcomplex Emax();
 	 
-	 virtual dcomplex Emin();
+         virtual dcomplex Emin();
 	 
-	 virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
+         virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
-	 virtual void Apply(WaveFunction *Psi);
+         virtual void Apply(WaveFunction *Psi);
          
          virtual void ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
@@ -45,7 +43,7 @@ namespace QDLIB {
          
          virtual void Apply(Operator* Op);
          
-	 virtual Operator* Copy(Operator* O);
+         virtual Operator* Copy(Operator* O);
 
    };
    

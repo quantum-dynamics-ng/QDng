@@ -38,10 +38,6 @@ namespace QDLIB {
 
             virtual void UpdateTime(){}
 
-            virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
-
-            virtual double Expec(WaveFunction *Psi);
-
 	    virtual dcomplex Emax() {return dcomplex(0);}
 
 	    virtual dcomplex Emin() {return dcomplex(0);}

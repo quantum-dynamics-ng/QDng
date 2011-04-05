@@ -46,8 +46,6 @@ namespace QDLIB {
          virtual void Init(ParamContainer &params) {}
          
          virtual void Init( WaveFunction * Psi );
-            
-         virtual double Expec(WaveFunction *Psi);
          
          virtual Operator* operator=(Operator* O);
          

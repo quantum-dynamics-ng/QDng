@@ -37,15 +37,6 @@ namespace QDLIB {
       return *PsiBra * _buf;
    }
    
-   
-   double OScalar::Expec(WaveFunction * Psi)
-   {
-      dcomplex c;
-      
-      c = MatrixElement(Psi, Psi);
-      return c.real();
-   }
-   
    void OScalar::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       MultElementsCopy((cVec*) destPsi, (cVec*) sourcePsi, _value);

@@ -32,7 +32,6 @@ namespace QDLIB {
 	 virtual const string& Name();
          virtual void UpdateTime() {};
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
-	 virtual double Expec(WaveFunction *Psi);
 	 virtual dcomplex Emax() { return dcomplex(_value); }
 	 virtual dcomplex Emin() { return dcomplex(0); }
 	 virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);

@@ -35,24 +35,6 @@ namespace QDLIB
 
    }
 
-   dcomplex ORK4::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
-   {
-      WaveFunction* OpKet = PsiKet->NewInstance();
-      dcomplex c;
-
-      *OpKet = PsiKet;
-      Apply(OpKet);
-      c = *PsiBra * OpKet;
-
-      DELETE_WF(OpKet);
-      return c;
-   }
-
-   double ORK4::Expec(WaveFunction *Psi)
-   {
-      return MatrixElement(Psi,Psi).real();
-   }
-
    void ORK4::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       *sourcePsi = destPsi;

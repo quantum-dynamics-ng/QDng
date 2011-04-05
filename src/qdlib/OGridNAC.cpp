@@ -123,30 +123,6 @@ namespace QDLIB {
       
       return dcomplex(min);
    }
-   
-   dcomplex OGridNAC::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-   {
-      dcomplex c(0,0);
-      
-      WaveFunction *opPsi;
-      
-      opPsi = PsiKet->NewInstance();
-      Apply(opPsi, PsiKet);
-      
-      c = *PsiBra * opPsi;
-      
-      DELETE_WF(opPsi);
-      return c;
-   }
-
-   double OGridNAC::Expec(WaveFunction * Psi)
-   {
-      dcomplex c;
-      
-      c = MatrixElement(Psi, Psi);
-     
-      return c.real();
-   }
 
    void OGridNAC::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {

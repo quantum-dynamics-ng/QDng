@@ -170,28 +170,6 @@ namespace QDLIB {
       *((GridSystem*) this) = *((GridSystem*) _Gmat[0][0]);
    }
 
-   dcomplex OGridGMat::MatrixElement( WaveFunction * PsiBra, WaveFunction * PsiKet )
-   {
-      dcomplex d;
-      WaveFunction *opKet;
-      
-      opKet = PsiKet->NewInstance();
-      Apply(opKet, PsiKet);
-      d = *PsiBra * opKet;
-      DELETE_WF(opKet);
-      
-      return d;
-   }
-
-   double OGridGMat::Expec( WaveFunction * Psi )
-   {
-      dcomplex d;
-      
-      d = MatrixElement(Psi,Psi);
-      
-      return d.real();
-   }
-
    /**
     * Maximum kintetic energy is given by the maximum  possible momenta:
     * \f$ T_{max}  = \frac{\pi^2}{2} \sum_r \sum_s \frac{1}{\Delta x_r} G_{rs} \frac{1}{\Delta x_s} \f$

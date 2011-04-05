@@ -38,8 +38,6 @@ namespace QDLIB {
          virtual const string& Name();
          
          virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
-         
-         virtual double Expec(WaveFunction *Psi);
         
          virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
          

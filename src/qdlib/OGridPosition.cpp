@@ -71,29 +71,6 @@ namespace QDLIB {
          _InitDim(view, _dim);
       }
    }
-   
-   dcomplex OGridPosition::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-   {
-      dcomplex c;
-      WaveFunction *OpPsi = PsiKet->NewInstance();
-      
-      Apply(OpPsi, PsiKet);
-      
-      c = *PsiBra * OpPsi;
-      
-      DELETE_WF(OpPsi);
-      
-      return c;
-   }
-
-   double OGridPosition::Expec(WaveFunction * Psi)
-   {
-      dcomplex c;
-      
-      c = MatrixElement(Psi, Psi);
-      
-      return c.real();
-   }
 
    dcomplex OGridPosition::Emax()
    {

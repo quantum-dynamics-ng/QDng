@@ -144,22 +144,7 @@ namespace QDLIB {
       *((GridSystem*) this) = *((GridSystem*) psi);
       _Init();
    }
-   
-   dcomplex OGobbler::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-   {
-      WaveFunction *ket;
-      dcomplex c;
-	    
-      
-      ket = PsiKet->NewInstance();
-      Apply(ket, PsiKet);
-      c = *PsiBra * ket;
-      
-      DELETE_WF(ket);
-      
-      return c;
-   }
-   
+
    double OGobbler::Expec(WaveFunction * Psi)
    {
       dcomplex c;

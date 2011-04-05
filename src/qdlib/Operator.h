@@ -101,16 +101,22 @@ namespace QDLIB {
 	  */
 	 virtual Operator* NewInstance() = 0;
 	 	 
-         /**
-          * Initialize and update the parameters of the operator.
-          */
-         virtual void Init(ParamContainer &params) = 0;
+    /**
+     * Initialize and update the parameters of the operator.
+     *
+     * This is the first Method which must be called.
+     */
+    virtual void Init(ParamContainer &params) = 0;
 	 
 	 /**
 	  * Initialize the operator with a wavefunction.
 	  * 
-	  * This should be done after initalisation with all parameters and
+	  * This must be done after initialization with Init(params) and
 	  * before using the Operator with any wave function.
+	  * If the Operator is time dependent it needs a valid clock before this
+	  * method is called.
+	  * Second usage of this method must not lead an error or different behavoir
+	  * of the class instance.
 	  */
 	 virtual void Init(WaveFunction *Psi) = 0;
 	 
@@ -120,8 +126,8 @@ namespace QDLIB {
 	 ParamContainer& Params() { return _params; };
 	 	 
 	 /**
-          * Should return a unique ID which idenfies the operator.
-          */
+      * Should return a unique ID which identifies the operator.
+      */
 	 virtual const string& Name() = 0;
 	 
 	 /**
@@ -134,7 +140,7 @@ namespace QDLIB {
 	  * 
 	  * This is used to to tell the operator that it has to move to a new time step.
 	  */
-         virtual void UpdateTime() = 0;
+     virtual void UpdateTime() = 0;
 	 
 	 /**
 	  * Set the Clock of the operator.
@@ -147,7 +153,7 @@ namespace QDLIB {
 	 }
 	 
 	 /**
-          * \return The operators clock.
+     * \return The operators clock.
 	  */
 	 QDClock* Clock()
 	 {
@@ -156,17 +162,33 @@ namespace QDLIB {
 
 	 /**
 	  * Complex Bra.Op.Ket value of two Wavefunctions.
-          * 
-          * \todo This is general function. Move to Base class?
+     *
+     * This is the standard way to this task. Might be overloaded.
 	  */
-	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet) = 0;
+	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
+	 {
+	    WaveFunction *opPsi = PsiKet->NewInstance();
+	    dcomplex result;
+
+	    Apply(opPsi, PsiKet);
+	    result = *PsiBra * opPsi;
+	    DELETE_WF(opPsi);
+
+	    return result;
+	 }
 	 
 	 /**
 	  * Expectation value.
-          * 
-          * \todo This is general function. Move to Base class?
+     *
+     * Gives the expectation value of the operator.
+     * If your operator has an complex expectation value the use MatrixElement
+     * otherwise the only the real part is returned.
+     *
 	  */
-	 virtual double Expec(WaveFunction *Psi) = 0;
+	 virtual double Expec(WaveFunction *Psi)
+	 {
+	    return MatrixElement(Psi,Psi).real();
+	 }
 	 
 	 /**
 	  * Maximum eigenvalue of the operator.

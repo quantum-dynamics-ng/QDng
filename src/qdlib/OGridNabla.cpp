@@ -54,28 +54,6 @@ namespace QDLIB {
       _InitDspaceReal(); /* Setup internal kspace */
    }
 
-   dcomplex OGridNabla::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-   {
-      dcomplex c;
-      WaveFunction *opPsi;
-
-      opPsi = PsiBra->NewInstance();
-      Apply(opPsi, PsiKet);
-      c = *PsiBra * opPsi;
-      DELETE_WF(opPsi);
-
-      return c;
-   }
-
-   double QDLIB::OGridNabla::Expec(WaveFunction * Psi)
-   {
-      dcomplex c;
-
-      c = MatrixElement(Psi, Psi);
-
-      return c.real();
-   }
-
    /** \todo Refine function
     * \return 0
     */

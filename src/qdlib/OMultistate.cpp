@@ -131,36 +131,6 @@ namespace QDLIB
       }
    }
 
-   dcomplex OMultistate::MatrixElement( WaveFunction * PsiBra, WaveFunction * PsiKet )
-   {
-      WaveFunction* opPsi;
-      dcomplex c;
-      
-      opPsi=PsiKet->NewInstance();
-      
-      Apply( opPsi, PsiKet);
-      c = *PsiBra * opPsi;
-      DELETE_WF(opPsi);
-      
-      return c;
-   }
-
-   double OMultistate::Expec( WaveFunction * Psi )
-   {
-      dcomplex c;
-      WaveFunction *opPsi;
-      
-          
-      opPsi = Psi->NewInstance();
-      Apply( opPsi, Psi);
-      
-      c = *opPsi * Psi;
-
-      DELETE_WF(opPsi);
-      
-      return c.real();
-   }
-
    void OMultistate::UpdateTime()
    {
       if (_hermitian){

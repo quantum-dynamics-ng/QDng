@@ -98,30 +98,7 @@ namespace QDLIB {
          ExpElements(_exp, &exp, 1*I);
       }
    }
-   
-   
-   dcomplex OGridKick::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-   {
-      dcomplex c;
-      WaveFunction *opPsi;
 
-      opPsi = PsiBra->NewInstance();
-      Apply(opPsi, PsiKet);
-      c = *PsiBra * opPsi;
-      delete opPsi;
-
-      return c;
-   }
-         
-   double OGridKick::Expec(WaveFunction * Psi)
-   {
-      dcomplex c;
-
-      c = MatrixElement(Psi, Psi);
-
-      return c.real();
-   }
-   
    Operator * OGridKick::operator =(Operator * O)
    {
       Copy(O);

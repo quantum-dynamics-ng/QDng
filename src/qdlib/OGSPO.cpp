@@ -82,23 +82,6 @@ namespace QDLIB
 
    }
 
-   dcomplex OGSPO::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
-   {
-      WaveFunction *opKet;
-      opKet = PsiKet->NewInstance();
-      dcomplex c;
-
-      Apply(opKet, PsiKet);
-      c = *PsiBra * PsiKet;
-      DELETE_WF(opKet);
-      return c;
-   }
-
-   double OGSPO::Expec(WaveFunction *Psi)
-   {
-      return MatrixElement(Psi, Psi).real();
-   }
-
    void OGSPO::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       *destPsi = sourcePsi;

@@ -48,10 +48,6 @@ namespace QDLIB {
 
          virtual dcomplex Emin();
          
-         virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
-	 
-         virtual double Expec(WaveFunction *Psi);
-	
          virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 
          virtual void Apply(WaveFunction *Psi);

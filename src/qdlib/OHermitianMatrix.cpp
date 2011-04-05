@@ -132,34 +132,6 @@ namespace QDLIB {
       return _name;
    }
 
-   /**
-    * Calulate a "matrix" element.
-    *
-    * This looks strange because we are a matrix at the moment.
-    * But never the less \f$ \langle \psi_1 \vert \hat O \vert \psi_2 \rangle\f$ is calculated
-    * and thus it is still straight forward.
-    */
-   dcomplex OHermitianMatrix::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
-   {
-      dcomplex c;
-      WaveFunction *ket = PsiKet->NewInstance();
-
-      *ket = PsiKet;
-      Apply(ket, PsiKet);
-      c = *PsiBra * ket;
-      
-      DELETE_WF(ket);
-      return c;
-   }
-
-   /**
-    * Calulate an expectation value.
-    */
-   double OHermitianMatrix::Expec(WaveFunction *Psi)
-   {
-      return MatrixElement(Psi, Psi).real();
-   }
-
    /** Return the largest eigenvalue */
    dcomplex OHermitianMatrix::Emax()
    {

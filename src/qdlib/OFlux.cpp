@@ -52,11 +52,6 @@ namespace QDLIB {
       return dcomplex(*_one * _buf);
    }
 
-   double OFlux::Expec(WaveFunction * Psi)
-   {
-      return MatrixElement(Psi,Psi).real();
-   }
-
    void OFlux::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       throw ( EIncompatible("Flux Operator apply not implemented") );

@@ -94,26 +94,6 @@ namespace QDLIB
    }
 
    void OGridPotential::UpdateTime(){/* We are not time dependend*/}
-   
-   dcomplex OGridPotential::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
-   {
-      dcomplex d;
-      
-      WaveFunction *opket = PsiKet->NewInstance();
-      
-      Apply(opket, PsiKet);
-      d = (*PsiBra) * opket;
-      
-      DELETE_WF(opket);
-      
-      return d;
-   }
-	 
-   double OGridPotential::Expec(WaveFunction *Psi)
-   {
-      return MatrixElement(Psi, Psi).real();
-   }
-   
    	 
    dcomplex OGridPotential::Emax( )
    {

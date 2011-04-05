@@ -57,17 +57,6 @@ namespace QDLIB
       } else _order = 0;
    }
    
-   dcomplex OCheby::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
-   {
-      return dcomplex(0,0); /* Doesn't make sense */
-   }
-   
-   double OCheby::Expec( WaveFunction * Psi )
-   {
-      return 0; /* Doesn't make sense */
-   }
-
-   
    void OCheby::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
      

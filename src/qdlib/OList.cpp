@@ -96,15 +96,6 @@ namespace QDLIB {
       }
    }
 
-   double OList::Expec(WaveFunction *Psi)
-   {
-      dcomplex d;
-      
-      d = MatrixElement(Psi,Psi);
-      
-      return d.real();
-   }
-
    Operator* OList::operator=(Operator* O)
    {
       Copy(O);

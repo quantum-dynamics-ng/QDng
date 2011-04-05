@@ -64,13 +64,9 @@ namespace QDLIB {
          
          virtual void UpdateTime() {}  /* Operator is not time dependent */
 	 
-         virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
-	 
-         virtual double Expec(WaveFunction *Psi);
-	 
-	 virtual dcomplex Emax();
-	 
-	 virtual dcomplex Emin() { return dcomplex(0); }
+         virtual dcomplex Emax();
+
+         virtual dcomplex Emin() { return dcomplex(0); }
 	 
          virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	 

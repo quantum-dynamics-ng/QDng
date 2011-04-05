@@ -29,8 +29,6 @@ namespace QDLIB {
 	 virtual void Init(WaveFunction *Psi);
 	 virtual const string& Name();
          virtual void UpdateTime(){}
-	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet);
-	 virtual double Expec(WaveFunction *Psi);
 	 virtual dcomplex Emax();
 	 virtual dcomplex Emin();
 	 virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);

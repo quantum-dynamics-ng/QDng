@@ -21,22 +21,6 @@ namespace QDLIB {
       }
    }
    
-   
-   /* Interface implementation, Operator */
-		  
-   dcomplex OSum::MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
-   {
-      WaveFunction  *out;
-      dcomplex d;
-     
-      out = PsiKet->NewInstance();
-      Apply(out, PsiKet);
-      d = *PsiBra * out;
-      DELETE_WF(out);
-      
-      return d;
-   }
-   
    dcomplex OSum::Emax()
    {
       if (Size() == 0)

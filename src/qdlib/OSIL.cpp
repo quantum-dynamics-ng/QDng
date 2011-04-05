@@ -70,11 +70,6 @@ namespace QDLIB {
         return (*PsiBra) * buf2;
     }
 
-    double OSIL::Expec(WaveFunction * Psi)
-    {
-       return MatrixElement(Psi, Psi).real();
-    }
-
     /**
      * Create Lanczos vectors + Hamiltonian.
      */

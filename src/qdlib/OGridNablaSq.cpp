@@ -70,28 +70,6 @@ namespace QDLIB
    {/* No need for */
    }
 
-   dcomplex OGridNablaSq::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-   {
-      dcomplex c;
-      WaveFunction *opPsi;
-
-      opPsi = PsiBra->NewInstance();
-      Apply(opPsi, PsiKet);
-      c = *PsiBra * opPsi;
-      DELETE_WF(opPsi);
-
-      return c;
-   }
-
-   double OGridNablaSq::Expec(WaveFunction * Psi)
-   {
-      dcomplex c;
-
-      c = MatrixElement(Psi, Psi);
-
-      return c.real();
-   }
-
    dcomplex OGridNablaSq::Emax()
    {
       if (GridSystem::Dim() == 0)
