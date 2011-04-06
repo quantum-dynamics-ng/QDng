@@ -47,6 +47,7 @@ namespace QDLIB {
          T* Resize(size_t size);
          
          void Close(bool remove = true);
+         void Flush();
          
          void Seek(size_t pos);
          size_t Read(T* buf, size_t count);
@@ -222,6 +223,60 @@ namespace QDLIB {
       if (remove) FS::Remove(_fname);
       
       _fname.clear();
+   }
+   
+   /**
+    * Flush buffer to disk.
+    * 
+    * For mmaped files the buffer is synced.
+    */
+   template<typename T>
+   void TmpFile<T>::Flush()
+   {
+      if (_mmap) msync(_mapbase, _size*sizeof(T), MS_SYNC);
+   }
+   
+   /**
+    * Seek to position in file.
+    */
+   template<typename T>
+   void TmpFile<T>::Seek(size_t pos)
+   {
+      int res = lseek(_fd, pos*sizeof(T), SEEK_SET);
+      if (res == -1){
+         close(_fd);
+         _open = false;
+         throw(EIOError("Seek error"));
+      }
+   }
+   
+   /**
+    * Read from actual file position.
+    */
+   template<typename T>
+   size_t TmpFile<T>::Read(T* buf, size_t count)
+   {
+      ssize_t res = read(_fd, (T*) buf, sizeof(T) * count);
+      if (res == -1 || (size_t) res != count * sizeof(T) ){
+         close(_fd);
+         _open = false;
+         throw(EIOError("Read error"));
+      }
+      return (size_t) res;
+   }
+   
+   /**
+    * Write to actual file position.
+    */
+   template<typename T>
+   void TmpFile<T>::Write(T* buf, size_t count)
+   {
+      ssize_t res = write(_fd, (T*) buf, sizeof(T) * count);
+      if (res == -1 || (size_t) res != count * sizeof(T) ){
+         close(_fd);
+         _open = false;
+         throw(EIOError("Write error"));
+      }
    }
 }
 

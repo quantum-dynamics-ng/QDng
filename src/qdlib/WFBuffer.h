@@ -10,6 +10,7 @@
 #include "qdlib/WaveFunction.h"
 #include "tools/TmpFile.h"
 
+#define DEFAULT_BUFFER_SIZE 1 * 1024*1024*1024  /* Default Max buffer size */
 
 #define WFBUFFER_LOCK_LAST 2
 

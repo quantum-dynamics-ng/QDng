@@ -11,12 +11,54 @@
 namespace QDLIB {
 
    WFBuffer::WFBuffer() : _size(0), _wfsize(0), _LastLocks(WFBUFFER_LOCK_LAST),
-		      _inmem(0), _locked(0), _maxmem(SIZE_MAX), _ondisk(0), _MaxBuf(0), _diskbuf(NULL)
+                      _inmem(0), _locked(0), _maxmem(SIZE_MAX), _ondisk(0), _MaxBuf(DEFAULT_BUFFER_SIZE), _diskbuf(NULL)
    {
       ParamContainer& gp = GlobalParams::Instance();
             
-      if (gp.isPresent("MaxBufferSize"))
-         gp.GetValue("MaxBufferSize", (long int&) _MaxBuf);
+      if (gp.isPresent("MaxBufferSize")){
+         string s;
+         long int factor;
+         
+         gp.GetValue("MaxBufferSize", s);
+         
+         /* Search for unit suffix K, M or G and convert to factor */
+         char suffix = s[s.length()-1];
+         switch(suffix){
+            case 'K':
+               factor = 1024;
+               break;
+            case 'M':
+               factor = 1024*1024;
+               break;
+            case 'G':
+               factor = 1024*1024*1024;
+               break;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+               factor = 1;
+               break;
+            default:
+               factor = 0;
+         }
+         if (factor > 1)
+            s.erase(s.length()-1, 1); /* Remove suffix */
+         
+         sscanf(s.c_str(), "%ld", (long int*) &_MaxBuf);
+         _MaxBuf *= factor;
+         
+         if (_MaxBuf == 0)
+            throw(EParamProblem("Invalid buffer size given"));
+         
+         
+      }
    }
 
 
@@ -39,7 +81,7 @@ namespace QDLIB {
       if (_File.isOpen())
          _diskbuf = _File.Resize(_diskmap.size()*_wfsize);
       else
-         _diskbuf = _File.Open(_diskmap.size()*_wfsize,true);
+         _diskbuf = _File.Open(_diskmap.size()*_wfsize,false);
       
       return _diskmap.size()-1;
    }
@@ -75,9 +117,12 @@ namespace QDLIB {
             _diskmap[dpos] = i;
             
             /* Be sure to move all strides */
-            for (int s=0; s < _buf[i].Psi->strides(); s++)
-               memcpy(reinterpret_cast<void*>( & (_diskbuf[_wfsize*dpos + s * _buf[i].Psi->lsize()])), 
-                      reinterpret_cast<void*>(_buf[i].Psi->begin(s)), _buf[i].Psi->sizeBytes());
+            for (int s=0; s < _buf[i].Psi->strides(); s++){
+/*               memcpy(reinterpret_cast<void*>( & (_diskbuf[_wfsize*dpos + s * _buf[i].Psi->lsize()])),
+                      reinterpret_cast<void*>(_buf[i].Psi->begin(s)), _buf[i].Psi->sizeBytes());*/
+               _File.Seek(_wfsize*dpos + s * _buf[i].Psi->lsize());
+               _File.Write(_buf[i].Psi->begin(s), _buf[i].Psi->lsize());
+            }
                    
             _ondisk++;
             _inmem--;
@@ -99,9 +144,12 @@ namespace QDLIB {
       if (_buf[pos].Psi == NULL)
          _buf[pos].Psi = _ValidEntry()->NewInstance();
       
-      for (int s=0; s < _buf[pos].Psi->strides(); s++)
-         memcpy(reinterpret_cast<void*>(_buf[pos].Psi->begin(s)),
-                reinterpret_cast<void*>(&(_diskbuf[_wfsize*_buf[pos].BufPos + s * _buf[pos].Psi->lsize()])), _buf[pos].Psi->sizeBytes());
+      for (int s=0; s < _buf[pos].Psi->strides(); s++){
+/*         memcpy(reinterpret_cast<void*>(_buf[pos].Psi->begin(s)),
+                reinterpret_cast<void*>(&(_diskbuf[_wfsize*_buf[pos].BufPos + s * _buf[pos].Psi->lsize()])), _buf[pos].Psi->sizeBytes());*/
+         _File.Seek(_wfsize*_buf[pos].BufPos + s * _buf[pos].Psi->lsize());
+         _File.Read(_buf[pos].Psi->begin(s), _buf[pos].Psi->lsize());
+      }
       
       /* Invalidate disk buffer element */ 
       _diskmap[_buf[pos].BufPos] = -1;
@@ -137,7 +185,7 @@ namespace QDLIB {
             throw (EParamProblem("Not enough memory for buffer available"));
             
          if (_maxmem < _size){
-            _diskbuf = _File.Open((_size-_maxmem)*_wfsize,true);
+            _diskbuf = _File.Open((_size-_maxmem)*_wfsize,false);
             _diskmap.assign(_size-_maxmem, -1);
          }
          
