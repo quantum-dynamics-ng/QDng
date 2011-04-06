@@ -4,6 +4,7 @@
 #include <stack>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <typeinfo>
 
 #include "tools/Exception.h"
@@ -16,6 +17,13 @@ extern void rewind(int n);
 
 FILE *_yyout = stdout;
 
+/* Helper for line numbers */
+/*typedef struct YYLTYPE {
+   int first_line;
+} YYLTYPE;*/
+
+//extern YYLTYPE yylloc;
+
 void yyerror(const char *str)
 {
    throw (QDLIB::EParamProblem(str));
@@ -25,7 +33,8 @@ extern "C" {
    int yywrap()
    {
    return 1;
-   } 
+   }
+
 }
 
 
@@ -126,8 +135,11 @@ line:
    {
       xmlnode *node = dynamic_cast<xmlnode*>(level);
       if (node == NULL){
-         char mesg[]="Attribute definition not allowed here";
-         yyerror(mesg);
+         stringstream ss;
+         string err;
+         ss << "xmlsimple parser: Attribute definition not allowed here (line " << @1.first_line << ")";
+         err = ss.str();
+         yyerror(err.c_str());
       }
       varstring attr($1);
       node->AddAttribute(attr, *vstr);
@@ -144,6 +156,14 @@ line:
                 delete root;
              }
 	}
+   | error
+   {
+      stringstream ss;
+      string err;
+      ss << "xmlsimple parser error at line " << @1.first_line <<endl;
+      err = ss.str();
+      throw (QDLIB::EParamProblem(err.c_str()));
+   }
 ;
 strexp:
 	TOKID { AppendStr($1); }

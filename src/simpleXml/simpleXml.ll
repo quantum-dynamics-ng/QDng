@@ -1,6 +1,9 @@
 %{
 #include "grammar.h"
 #include "stdio.h"
+
+/* Helper for line numbers */
+#define YY_USER_INIT yylloc.first_line=1;
 %}
 
 %%
@@ -28,7 +31,7 @@ $\([a-zA-Z0-9_]+\)        {
 \=		return EQUAL;
 \"		return QUOTE;
 \~		return CONCAT;
-\n ;
+\n yylloc.first_line++;
 [ \t] ;
 %%
 
