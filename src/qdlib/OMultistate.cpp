@@ -106,6 +106,8 @@ namespace QDLIB
       if (psi->States() != _nstates)
 	 throw (EParamProblem ("Multistate operator can only use WFs with same number of states"));
       
+      if (_buf1 != NULL) return; // Avoid init twice
+      
       _buf1 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
       _buf2 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
       

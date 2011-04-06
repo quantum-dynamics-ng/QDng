@@ -98,6 +98,8 @@ namespace QDLIB {
 	  throw ( EIncompatible("SPO needs a GridSystem WF", Psi->Name()) ); 
       }
             
+      if (_buf != NULL) return; //Avoid init twice
+      
       if (_coupling) {
          _cV = OPropagator::Exponent();
 	 _cT = OPropagator::Exponent()/2;
@@ -106,7 +108,7 @@ namespace QDLIB {
 	 _cT = OPropagator::Exponent();
       }
       
-      if (_buf == NULL) _buf = Psi->NewInstance();
+      _buf = Psi->NewInstance();
       
       /* Check if everythings complete */
       if (_Tkin == NULL || _Vpot[0] == NULL)

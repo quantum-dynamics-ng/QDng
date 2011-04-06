@@ -54,6 +54,7 @@ namespace QDLIB {
         if (Psi == NULL)
             throw(EParamProblem("SIL: Invalid WaveFunction"));
 
+        if (buf0 != NULL) return; //Avoid init twice
         buf0 = Psi->NewInstance();
         buf1 = Psi->NewInstance();
         buf2 = Psi->NewInstance();

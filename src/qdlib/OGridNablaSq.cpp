@@ -58,11 +58,12 @@ namespace QDLIB
       if (opPsi == NULL)
          throw(EIncompatible("Psi is not of type WFGridSystem", Psi->Name()));
 
+      
       /* re-Init k-space ?*/
-      if (*this != *((GridSystem*) opPsi) || _dspace == NULL) {
-         *((GridSystem*) this) = *((GridSystem*) opPsi);
-         InitDspace();
-      }
+      if (_dspace != NULL) return;  // Avoid init twice
+      *((GridSystem*) this) = *((GridSystem*) opPsi);
+      InitDspace();
+
 
    }
 

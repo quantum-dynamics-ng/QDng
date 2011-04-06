@@ -80,13 +80,15 @@ namespace QDLIB {
    void OGridNAC::Init(WaveFunction * Psi)
    {
       WFGridSystem *psi;
-
+      
       psi = dynamic_cast<WFGridSystem*>(Psi);
       if (psi == NULL)
          throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
       
       if (Dim() != psi->Dim())
          throw ( EIncompatible("NAC: Psi has different num of dims", Psi->Name()) );
+      
+      if (_buf != NULL) return; // Avoid init twice
       
       *((GridSystem*) this) = *((GridSystem*) psi);
       

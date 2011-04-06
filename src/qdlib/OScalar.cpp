@@ -27,6 +27,8 @@ namespace QDLIB {
       if (Psi == NULL)
          throw( EIncompatible("Scalar got empty wavefunction") );
       
+      if (_buf != NULL) return; // Avoid init twice
+      
       _buf = Psi->NewInstance();
    }
 

@@ -21,11 +21,6 @@ namespace QDLIB
    OGSPO::~OGSPO()
    {
       DELETE_OP(_H);
-//      for (int i = 0; i < GSPO_MAX_LEN; i++) {
-//         if (_ops[i] != NULL) {
-//            delete _ops[i];
-//         }
-//      }
    }
 
    /**
@@ -72,11 +67,12 @@ namespace QDLIB
       if (_spoLen < 1)
          throw(EParamProblem("GSPO is empty!"));
 
+      if (_exp[0].size() > 0) return; // Avoid init twice
+      
       for (int i = 0; i < _spoLen; i++) {
          if (_ops[i] == NULL)
             throw(EParamProblem("GSPO misses an operator. Sequence must be A, B, C, ..."));
 
-//         _ops[i]->Init(Psi); /* Operators init round */
          _exp[i].newsize(Psi->size(), Psi->strides());
       }
 

@@ -6,7 +6,7 @@ namespace QDLIB {
    
    
    OFlux::OFlux()
-   : _name("OFlux"), _buf(NULL), _indT(0), _indG(1)
+   : _name("OFlux"), _buf(NULL), _one(0), _indT(0), _indG(1)
    {
    }
    
@@ -27,8 +27,7 @@ namespace QDLIB {
    {
       OList::Init(Psi);
       
-      DELETE_WF(_buf);
-      DELETE_WF(_one);
+      if  (_buf != NULL) return;  // Avoid init twice
       
       _buf = Psi->NewInstance();
       _one = Psi->NewInstance();

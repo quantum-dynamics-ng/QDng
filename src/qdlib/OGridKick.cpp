@@ -66,37 +66,39 @@ namespace QDLIB {
       if (opPsi->Dim() != Dim())
          throw(EIncompatible("GridKick got wrong number of dimensions"));
       
-      /* re-Init exponential ?*/
-      if (*this != *((GridSystem*) opPsi) || _exp== NULL) {
-         *((GridSystem*) this) = *((GridSystem*) opPsi);
-         
-         
-         dVec x1;
-         dVec exp;
+      
+      if (_exp != NULL) return;  // Avoid init twice
+      
+      
+      *((GridSystem*) this) = *((GridSystem*) opPsi);
+      
+      
+      dVec x1;
+      dVec exp;
 
-         if (_exp == NULL)
-            _exp = new cVec(GridSystem::Size(), true);
-         else _exp->newsize(GridSystem::Size());
-         
-         exp.newsize(GridSystem::Size());
-         exp = 0;
-         dVecView view(exp, GridSystem::Dim(), GridSystem::DimSizes());
-         
-         /* Run over dimension - create exp(i * k_n * x_n) */
-         for (int n=0; n < GridSystem::Dim(); n++){
-	    if (_kn[n] != 0){
-	       x1.newsize( GridSystem::DimSize(n) );
-	       view.ActiveDim(n);
-	       /* init spatial coordinate*/
-	       for (int i=0; i < GridSystem::DimSize(n); i++){
-		  x1[i] = GridSystem::Xmin(n) + double(i)*GridSystem::Dx(n);
-		  x1[i] *= _kn[n];
-	       }
-            view += x1;
-	    }	 
-         }
-         ExpElements(_exp, &exp, 1*I);
+      if (_exp == NULL)
+         _exp = new cVec(GridSystem::Size(), true);
+      else _exp->newsize(GridSystem::Size());
+      
+      exp.newsize(GridSystem::Size());
+      exp = 0;
+      dVecView view(exp, GridSystem::Dim(), GridSystem::DimSizes());
+      
+      /* Run over dimension - create exp(i * k_n * x_n) */
+      for (int n=0; n < GridSystem::Dim(); n++){
+         if (_kn[n] != 0){
+            x1.newsize( GridSystem::DimSize(n) );
+            view.ActiveDim(n);
+            /* init spatial coordinate*/
+            for (int i=0; i < GridSystem::DimSize(n); i++){
+               x1[i] = GridSystem::Xmin(n) + double(i)*GridSystem::Dx(n);
+               x1[i] *= _kn[n];
+            }
+         view += x1;
+         }	 
       }
+      ExpElements(_exp, &exp, 1*I);
+      
    }
 
    Operator * OGridKick::operator =(Operator * O)

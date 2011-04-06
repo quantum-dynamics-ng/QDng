@@ -53,6 +53,8 @@ namespace QDLIB {
       if (wf == NULL)
          throw ( EIncompatible("OGridPosition needs a gridsystem wavefunction: ", Psi->Name()) );
       
+      if (dVec::size() > 0) return; // Avoid init twice
+      
       /* Copy grid parameters */
       *((GridSystem*) this) = *((GridSystem*) wf);
       dVec::newsize(GridSystem::Size());

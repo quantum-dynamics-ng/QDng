@@ -30,6 +30,9 @@ namespace QDLIB
    
    void ODMultistate::Init(WaveFunction *Psi)
    {
+      
+      if (_state_size != 0) return;  // Avoid init twice
+         
       /* Parent initalization */
       OMultistate::Init(Psi);
       

@@ -69,11 +69,6 @@ namespace QDLIB
    {
       WaveFunction *swap;
       
-      if (ket0 == NULL) ket0 = Psi->NewInstance();
-      if (ket1 == NULL) ket1 = Psi->NewInstance();
-      if (ket2 == NULL) ket2 = Psi->NewInstance();
-      if (buf == NULL) buf =  Psi->NewInstance();
-      
       _exp  = OPropagator::Exponent()/clock->Dt();
 
       ket0->FastCopy(*Psi);   /* phi_0 */
@@ -229,13 +224,20 @@ namespace QDLIB
    
    void OCheby::Init( WaveFunction *Psi )
    {
-      
+            
       if (H == NULL)
 	 throw ( EParamProblem("Chebychev Progagator is missing a hamiltonian") );
       if (clock == NULL)
 	 throw ( EParamProblem("Chebychev Progagator is missing a clock") );
       if (clock->Dt() == 0)
 	 throw ( EParamProblem("No time step defined") );
+      
+      if (ket0 != NULL) return;  // Avoid init twice
+      ket0 = Psi->NewInstance();
+      ket1 = Psi->NewInstance();
+      ket2 = Psi->NewInstance();
+      buf =  Psi->NewInstance();
+
       
       /* Energy range & offset */
       _offset._real =  (H->Emax() + H->Emin()).real()/2; /* [-i:i] */
@@ -316,11 +318,6 @@ namespace QDLIB
       _params.SetValue("exponent Re", _exp.real());
       _params.SetValue("exponent Im", _exp.imag());
       
-      /* Remove WF buffers => new operator type  needs new WF type */
-      DELETE_WF(ket0);
-      DELETE_WF(ket1);
-      DELETE_WF(ket2);
-
    }
 
    

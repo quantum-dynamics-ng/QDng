@@ -141,6 +141,8 @@ namespace QDLIB {
       if (psi == NULL)
 	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
       
+      if (GridSystem::Size() > 0) return;  // Avoid init twice
+      
       *((GridSystem*) this) = *((GridSystem*) psi);
       _Init();
    }

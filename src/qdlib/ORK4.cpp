@@ -14,7 +14,8 @@ namespace QDLIB
    ORK4::ORK4() : _name("ORK4")
    {
       _needs.SetValue("hamiltonian", 0);
-
+      for (int i=0; i < 5; i++)
+         _buf[i] = NULL;
    }
 
    ORK4::~ORK4()
@@ -28,8 +29,9 @@ namespace QDLIB
       if (Psi == NULL)
           throw(EParamProblem("RK4: Invalid WaveFunction"));
 
+      if (_buf[0] != NULL) return; // Avoid init twice
+      
       for (int i=0; i < 5; i++){
-         DELETE_WF(_buf[i]);
          _buf[i] = Psi->NewInstance();
       }
 
