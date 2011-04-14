@@ -54,12 +54,10 @@ namespace QDLIB {
       _InitDspaceReal(); /* Setup internal kspace */
    }
 
-   /** \todo Refine function
-    * \return 0
-    */
+   /** \return largest k-value*/
    dcomplex OGridNabla::Emax()
    {
-      return dcomplex(0);
+      return dcomplex( (*_kspace)[GridSystem::Size()/2] );
    }
 
    void OGridNabla::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
