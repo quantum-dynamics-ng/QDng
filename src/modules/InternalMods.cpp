@@ -108,6 +108,7 @@ namespace QDLIB
    instOP* InternalOP(const string &name)
    {
       QDNG_STRING_TO_INSTANCE_PTR(OSum)
+      QDNG_STRING_TO_INSTANCE_PTR(OProduct)
 
       QDNG_STRING_TO_INSTANCE_PTR(OCheby)
       QDNG_STRING_TO_INSTANCE_PTR(OSPO)

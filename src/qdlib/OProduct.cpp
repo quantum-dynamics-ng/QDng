@@ -31,7 +31,7 @@ namespace QDLIB {
     {
        dcomplex val(1);
        
-       for (int i=Size()-1; i >= 0; i++)
+       for (int i=Size()-1; i >= 0; i--)
           val *= Get(i)->Emax();
        
        return val;
@@ -41,7 +41,7 @@ namespace QDLIB {
     {
        dcomplex val(1);
        
-       for (int i=Size()-1; i >= 0; i++)
+       for (int i=Size()-1; i >= 0; i--)
           val *= Get(i)->Emin();
        
        return val;
@@ -51,14 +51,14 @@ namespace QDLIB {
     {
        Get(Size()-1)->Apply(destPsi, sourcePsi);
        
-       for (int i=Size()-2; i >= 0; i++)
-          Get(i)->Apply(sourcePsi);
+       for (int i=Size()-2; i >= 0; i--)
+          Get(i)->Apply(destPsi);
 
     }
 
     void OProduct::Apply(WaveFunction * Psi)
     {
-       for (int i=Size()-1; i >= 0; i++)
+       for (int i=Size()-1; i >= 0; i--)
           Get(i)->Apply(Psi);
     }
 
@@ -66,8 +66,8 @@ namespace QDLIB {
     {
        Get(Size()-1)->ApplyParent(destPsi, sourcePsi);
        
-       for (int i=Size()-2; i >= 0; i++)
-          Get(i)->ApplyParent(sourcePsi, sourcePsi);
+       for (int i=Size()-2; i >= 0; i--)
+          Get(i)->ApplyParent(destPsi, destPsi);
 
     }
     
@@ -75,13 +75,13 @@ namespace QDLIB {
     {
        Get(Size()-1)->Apply(destOp, sourceOp);
        
-       for (int i=Size()-2; i >= 0; i++)
-          Get(i)->Apply(sourceOp);
+       for (int i=Size()-2; i >= 0; i--)
+          Get(i)->Apply(destOp);
     }
 
     void OProduct::Apply(Operator * Op)
     {
-       for (int i=Size()-1; i >= 0; i++)
+       for (int i=Size()-1; i >= 0; i--)
           Get(i)->Apply(Op);
     }
 

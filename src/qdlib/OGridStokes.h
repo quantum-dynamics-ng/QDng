@@ -13,6 +13,7 @@ namespace QDLIB {
    {
       private:
          string _name;
+	 WaveFunction *_buf;
          double _mass;
          double _eta;
          double _R;

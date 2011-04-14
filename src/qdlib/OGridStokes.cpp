@@ -3,13 +3,15 @@
 namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridStokes)
    
-    OGridStokes::OGridStokes(): _name("OGridStokes")
+    OGridStokes::OGridStokes() : OGridNabla(true),
+       _name("OGridStokes"), _buf(NULL), _mass(0), _eta(0), _R(0)
     {
     }
 
 
     OGridStokes::~OGridStokes()
     {
+       DELETE_WF(_buf);
     }
 
     void OGridStokes::Init(ParamContainer &params)
@@ -35,6 +37,9 @@ namespace QDLIB {
     
     void OGridStokes::Init(WaveFunction *Psi)
     {
+       if (_buf != NULL) return;
+
+       _buf = Psi->NewInstance();
        OGridNabla::Init(Psi);
        OGridPosition::Init(Psi);
     }
@@ -48,17 +53,29 @@ namespace QDLIB {
     
     void OGridStokes::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
     {
-       OGridPosition::Apply(destPsi);
-       OGridNabla::Apply(destPsi,sourcePsi);
-       
+       OGridNabla::Apply(_buf ,sourcePsi);
+       OGridPosition::Apply(_buf);
+       OGridPosition::Apply(destPsi ,sourcePsi);
+       OGridNabla::Apply(destPsi);
+     
+//       *destPsi = sourcePsi;
+//       *destPsi *= 0.5;
+       *destPsi += _buf;
+//       OGridPosition::Apply(_buf ,sourcePsi);
+//       *destPsi += _buf;
        *destPsi *= _eta / _mass * _R * 6 * M_PI;
     }
     
     void OGridStokes::Apply(WaveFunction *Psi)
     {
+       OGridNabla::Apply(_buf ,Psi);
+       OGridPosition::Apply(_buf);
        OGridPosition::Apply(Psi);
        OGridNabla::Apply(Psi);
-       
+
+   
+//       *Psi *= 0.5;
+       *Psi += _buf;
        *Psi *= _eta / _mass * _R * 6 * M_PI;
     }
     
@@ -78,6 +95,7 @@ namespace QDLIB {
        _mass = o->_mass;
        _eta = o->_eta;
        _R = o->_R;
+       _buf = o->_buf->NewInstance();
        
        OGridNabla::Copy(O);
        OGridPosition::Copy(O);
