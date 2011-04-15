@@ -53,12 +53,38 @@ namespace QDLIB {
     
     void OGridStokes::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
     {
+       
+       /* 1/2 {x,p} */
        OGridNabla::Apply(_buf ,sourcePsi);
+//        double p = (*_buf * sourcePsi).real();
        OGridPosition::Apply(_buf);
        OGridPosition::Apply(destPsi ,sourcePsi);
+       double x = (*destPsi * sourcePsi).real();
        OGridNabla::Apply(destPsi);
        
        *destPsi += _buf;
+       *destPsi *= 0.5;
+       
+       
+       OGridPosition::Apply(_buf ,sourcePsi);
+       OGridPosition::Apply(_buf);
+       *destPsi += _buf;
+       
+       /* <p><x> */
+/*       *_buf = sourcePsi;
+       *_buf *= p*x;
+       *destPsi -= _buf;*/
+       
+       /* <x>p */
+       OGridNabla::Apply(_buf ,sourcePsi);
+       *_buf *= x;
+       *destPsi -= _buf;
+       
+       /* <p>x */
+//        OGridPosition::Apply(_buf ,sourcePsi);
+//        *_buf *= p;
+//        *destPsi += _buf;
+
        *destPsi *= _eta / _mass * _R * 6 * M_PI;
     }
     
@@ -69,9 +95,8 @@ namespace QDLIB {
        OGridPosition::Apply(Psi);
        OGridNabla::Apply(Psi);
 
-   
-//       *Psi *= 0.5;
        *Psi += _buf;
+       *Psi *= 0.5;
        *Psi *= _eta / _mass * _R * 6 * M_PI;
     }
     
