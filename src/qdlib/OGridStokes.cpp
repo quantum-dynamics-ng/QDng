@@ -57,12 +57,8 @@ namespace QDLIB {
        OGridPosition::Apply(_buf);
        OGridPosition::Apply(destPsi ,sourcePsi);
        OGridNabla::Apply(destPsi);
-     
-//       *destPsi = sourcePsi;
-//       *destPsi *= 0.5;
+       
        *destPsi += _buf;
-//       OGridPosition::Apply(_buf ,sourcePsi);
-//       *destPsi += _buf;
        *destPsi *= _eta / _mass * _R * 6 * M_PI;
     }
     
