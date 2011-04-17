@@ -25,10 +25,10 @@ namespace QDLIB {
    void FiltersList::_destroy()
    {
       for (int i=0; i < MAX_FILTERS; i++){
-	 if (_olist[i] != NULL) {
-	    DELETE_OP(_olist[i]);
-	    _olist[i] = NULL;
-	 }
+//	 if (_olist[i] != NULL) {
+//	    DELETE_OP(_olist[i]);
+//	    _olist[i] = NULL;
+//	 }
       }
       _size = 0;
       _initalized = false;

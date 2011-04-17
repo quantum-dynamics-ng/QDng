@@ -280,11 +280,11 @@ namespace QDLIB {
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
 	_U->Apply(Psi);                 /* Propagate */
+	++(*clock);                     /* Step the clock */
 	if (_usepost) _postfilter.Apply( Psi );/* Apply post-filters*/
 	if (i % _wcycle == 0){
            wfile << Psi;  /* Write wavefunction */
         }
-	++(*clock);                     /* Step the clock */
       }
       if( _writenorm )  log.FileClose();
       _reporter.Finalize();

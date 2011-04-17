@@ -4,7 +4,7 @@ namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridStokes)
    
     OGridStokes::OGridStokes() : OGridNabla(true),
-       _name("OGridStokes"), _buf(NULL), _mass(0), _eta(0), _R(0)
+       _name("OGridStokes"), _buf(NULL), _mass(0), _eta(0), _R(0), _c(1)
     {
     }
 
@@ -25,6 +25,12 @@ namespace QDLIB {
 
        if ( !params.isPresent("R") )
           throw(EParamProblem("Stokes operators needs a stokes radius"));
+
+       if ( params.isPresent("c") ){
+          params.GetValue("c", _c);
+          if (_c < 0 || _c > 1)
+             throw(EParamProblem("c-parameter must be between 0 and 1"));
+       }
 
        params.GetValue("mass", _mass);
        params.GetValue("eta", _eta);
@@ -56,7 +62,7 @@ namespace QDLIB {
        
        /* 1/2 {x,p} */
        OGridNabla::Apply(_buf ,sourcePsi);
-//        double p = (*_buf * sourcePsi).real();
+       double p = (*_buf * sourcePsi).real();
        OGridPosition::Apply(_buf);
        OGridPosition::Apply(destPsi ,sourcePsi);
        double x = (*destPsi * sourcePsi).real();
@@ -65,39 +71,36 @@ namespace QDLIB {
        *destPsi += _buf;
        *destPsi *= 0.5;
        
-       
        OGridPosition::Apply(_buf ,sourcePsi);
        OGridPosition::Apply(_buf);
        *destPsi += _buf;
        
-       /* <p><x> */
-/*       *_buf = sourcePsi;
-       *_buf *= p*x;
-       *destPsi -= _buf;*/
-       
-       /* <x>p */
+       /* - <x>p */
        OGridNabla::Apply(_buf ,sourcePsi);
        *_buf *= x;
        *destPsi -= _buf;
+
+       *destPsi *= _c;
        
        /* <p>x */
-//        OGridPosition::Apply(_buf ,sourcePsi);
-//        *_buf *= p;
-//        *destPsi += _buf;
+        OGridPosition::Apply(_buf ,sourcePsi);
+        *_buf *= p * (1 - _c);
+        *destPsi += _buf;
+
+        *_buf = sourcePsi;
+        *_buf *= x * p * (1-_c);
 
        *destPsi *= _eta / _mass * _R * 6 * M_PI;
     }
     
     void OGridStokes::Apply(WaveFunction *Psi)
     {
-       OGridNabla::Apply(_buf ,Psi);
-       OGridPosition::Apply(_buf);
-       OGridPosition::Apply(Psi);
-       OGridNabla::Apply(Psi);
+       WaveFunction *buf;
 
-       *Psi += _buf;
-       *Psi *= 0.5;
-       *Psi *= _eta / _mass * _R * 6 * M_PI;
+       buf = Psi->NewInstance();
+       *buf = Psi;
+
+       Apply(Psi, buf);
     }
     
     
