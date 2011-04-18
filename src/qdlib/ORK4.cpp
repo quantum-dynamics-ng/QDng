@@ -48,6 +48,7 @@ namespace QDLIB
    {
 
       H->Apply(_buf[1], Psi); /* k1 = f(t, y0) */
+      H->RecalcInternals(false);  /* Non-linear operator should not recalulate internal WF specfic values until end of recursion */
       *(_buf[1]) *= Exponent()/clock->Dt();
 
       /* k2 = f(t+1/2*dt, y0 + 1/2 * dt * k1) */
@@ -83,6 +84,8 @@ namespace QDLIB
       *(_buf[1]) *= clock->Dt()/6;
 
       *Psi += _buf[1];
+      
+      H->RecalcInternals(true); /* turn it on again */
    }
 
    Operator* ORK4::operator=(Operator* O)

@@ -315,6 +315,16 @@ namespace QDLIB
       return valid;
    }
    
+   void OMultistate::RecalcInternals(bool on)
+   {
+      Operator::RecalcInternals(on);
+      for(int i=0; i< _nstates; i++){
+         for(int j=0; j< _nstates; j++){
+            if (_matrix[i][j] != NULL)
+               _matrix[i][j]->RecalcInternals(on);
+         }
+      }
+   }
 }
 /* namespace QDLIB */
 

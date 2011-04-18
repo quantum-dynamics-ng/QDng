@@ -80,6 +80,7 @@ namespace QDLIB {
 
         _Lzb.Set(0, Psi);
         H->Apply(buf0,  _Lzb[0]);           /* H*q_0 */
+        H->RecalcInternals(false);  /* Non-linear operator should not recalulate internal WF specfic values until end of recursion */
         _alpha[0] = (*(_Lzb[0]) * buf0).real();     /* a_0 = <q_0 | H | _q0 > */
         
         _Lzb.Set(1, buf0);
@@ -109,6 +110,7 @@ namespace QDLIB {
         }
 
         _alpha[it-1] = H->Expec(_Lzb[it-1]);
+        H->RecalcInternals(true); /* turn it on again */
     }
 
     /**

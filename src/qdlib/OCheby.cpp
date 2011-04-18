@@ -75,6 +75,7 @@ namespace QDLIB
       
       ket1->FastCopy(*Psi);
       H->Apply(ket1);
+      H->RecalcInternals(false);  /* Non-linear operator should not recalulate internal WF specfic values until end of recursion */
       
       AddElements((cVec*) ket1, (cVec*) Psi, -1*_offset ); /* Offset*/
       MultElements( (cVec*) ket1, _exp / _scaling);
@@ -174,6 +175,7 @@ namespace QDLIB
 	 ket1 = ket0;
 	 ket0 = swap;
       }
+      H->RecalcInternals(true); /* turn it on again */
    }
 
    Operator * OCheby::operator =( Operator * O )

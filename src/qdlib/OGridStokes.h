@@ -22,15 +22,24 @@ namespace QDLIB {
     *  \li eta  friction coeffiecient of the solvent
     *  \li c    weight factor of the non-linear potentials.
     */
-   class OGridStokes : public OGridNabla, public OGridPosition
+   class OGridStokes : protected OGridNabla, public OGridPosition
    {
       private:
          string _name;
 	 WaveFunction *_buf;
-         double _mass;
+         WaveFunction *_psi;
+         
+         dVec _sigmoid;  /* Sigmoid shape mask */
+         double _x0;
+         double _slope;
+         
+         double _mass;  /* Parameter for Stokes formula */
          double _eta;
          double _R;
          double _c;
+         
+         double _xe;   /* <x> */
+         double _pe;   /* <p> */
       public:
          OGridStokes();
          ~OGridStokes();

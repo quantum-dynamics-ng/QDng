@@ -132,6 +132,14 @@ namespace QDLIB {
       }
       return valid;
    }
+   
+   void OList::RecalcInternals(bool on)
+   {
+      Operator::RecalcInternals(on);
+      for(int i=0; i < _size; i++){
+         _O[i]->RecalcInternals(on);
+      }
+   }
 }
 
 

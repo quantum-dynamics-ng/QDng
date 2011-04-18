@@ -52,6 +52,8 @@ namespace QDLIB {
          virtual Operator* Copy(Operator* O);
          
          virtual bool Valid(WaveFunction *Psi);
+         
+         virtual void RecalcInternals(bool on);
    };
 
 }

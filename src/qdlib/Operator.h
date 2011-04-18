@@ -58,6 +58,8 @@ namespace QDLIB {
    class Operator
    {
 
+      private:
+         bool _recalc; /* Indicates if operator internal should be recalculted or not. */
       protected:
 	 /**
           * Parameter storage for the implementation.
@@ -82,7 +84,7 @@ namespace QDLIB {
 	 /**
 	  * Standard constructor
 	  */
-	 Operator() :  _isTimedependent(false), clock(NULL)
+         Operator() : _recalc(true), _isTimedependent(false), clock(NULL)
 	 {
          }
 	  
@@ -273,6 +275,17 @@ namespace QDLIB {
           * \return true if is compatible with initalized. If incompatible or NULL => false.
           */
          virtual bool Valid(WaveFunction *Psi) = 0;
+         
+         /**
+          * This is intended for non-linear operators which depend on expectation values.
+          * 
+          * This is needed by recursive operators, to prevent the calculation of non-sense
+          * internally used expectation values.
+          */
+         virtual void RecalcInternals(bool on) { _recalc = on; }
+         
+         /** Check if Internal should be recalculated. */
+         virtual bool RecalcInternals() { return _recalc; }
          	 
    }; /* class Operator */
 

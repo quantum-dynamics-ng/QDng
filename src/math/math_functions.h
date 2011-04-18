@@ -21,6 +21,7 @@ namespace QDLIB {
       public:
          static void BwHighpass(VECT &vec, double center, int order);
          static void BwLowpass(VECT &vec, double center, int order);
+         static void Sigmoid(VECT &vec, double x0, double b);
          static void Hann(VECT &vec);
    };
 
@@ -66,9 +67,27 @@ namespace QDLIB {
       
    }
    
+   
+   /**
+    * Sigmoid function.
+    * 
+    * \param x0 in units of grid points.
+    * \f$ f(x) = \frac{1}{1+e^{-b(x-x_0}}\f$
+    */
+   template <class VECT>
+   void FunctionGenerator<VECT>::Sigmoid(VECT &vec, double x0, double b)
+   {
+      int size = vec.size();
+      for (int n=0; n < size; n++)
+         vec[n] = 1/( 1 + exp(-b * (double(n) - x0) ) );
+   }
+   
+   
    /**
     * Hann window.
     *
+    * Apply is in place.
+    * 
     * \f$ w(n) = 0.5 \left( 1-cos(\frac{2\pi n}{N-1}) \right) \f$
     */
    template <class VECT>

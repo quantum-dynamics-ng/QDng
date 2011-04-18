@@ -16,7 +16,6 @@ namespace QDLIB {
 
 
 #include "dcomplex.h"
-//#include "tnt/tnt.h"
 #include "Vector.h"
 #include "VectorView.h"
 #include "Matrix.h"
