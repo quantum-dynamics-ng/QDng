@@ -11,7 +11,7 @@ libqd_la_SOURCES = GridSystem.cpp Kspace.cpp Laser.cpp \
 	OFlux.cpp ORK4.cpp \
 	OGridStokes.cpp
 qdlibdir = $(pkgincludedir)/qdlib
-qdlib_HEADERS = Butterworth.h WindowFuncs.h Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
+qdlib_HEADERS = Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
 	OCheby.h ODMultistate.h ODSpace.h OGobbler.h OGridDipole.h OGridGMat.h OGridKick.h \
 	OGridNabla.h OGridNablaSq.h OGridNAC.h OGridPosition.h OGridPotential.h OGridSum.h OGridsystem.h \
 	OGSPO.h OHermitianMatrix.h OMatDipole.h OMultistate.h Operator.h OProjection.h \

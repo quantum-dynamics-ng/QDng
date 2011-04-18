@@ -1,7 +1,6 @@
 #include "OGridNabla.h"
 #include "WFGridSystem.h"
 #include "Kspace.h"
-#include "Butterworth.h"
 
 namespace QDLIB {
 

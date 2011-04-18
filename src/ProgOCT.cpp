@@ -5,7 +5,6 @@
 #include "tools/Logger.h"
 #include "tools/fstools.h"
 #include "ChainLoader.h"
-#include "qdlib/Butterworth.h"
 #include "qdlib/FileWF.h"
 
 #include "qdlib/OGridDipole.h"
