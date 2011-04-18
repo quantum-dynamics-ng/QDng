@@ -1,6 +1,6 @@
 #include "OGobbler.h"
 #include "WaveFunction.h"
-#include "Butterworth.h"
+#include "math/math_functions.h"
 #include "WFGridSystem.h"
 
 namespace QDLIB {
@@ -49,7 +49,7 @@ namespace QDLIB {
 	       throw ( EParamProblem ("Center of filter edge out of the grid") );
 	    
 	    filter.newsize(GridSystem::DimSize(i));
-	    Butterworth<dVec>::Lowpass(filter, x, _order);
+	    FunctionGenerator<dVec>::BwLowpass(filter, x, _order);
 	
 	    view.ActiveDim(i);
 	    view *= filter;
@@ -60,7 +60,7 @@ namespace QDLIB {
 	       throw ( EParamProblem ("Center of filter edge out of the grid") );
 	    
 	    filter.newsize(GridSystem::DimSize(i));
-	    Butterworth<dVec>::Highpass(filter, x, _order);
+            FunctionGenerator<dVec>::BwHighpass(filter, x, _order);
 	    
 	    view.ActiveDim(i);
 	    

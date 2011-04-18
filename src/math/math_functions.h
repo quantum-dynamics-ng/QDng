@@ -1,6 +1,83 @@
+#ifndef QDLIBMATH_FUNCTIONS_H
+#define QDLIBMATH_FUNCTIONS_H
 #include "typedefs.h"
 
+
+
 namespace QDLIB {
+   
+   /**
+    * Butterworth filter generator.
+    * 
+    * The template works with every vector type.
+    * 
+    * For mathematical details \see Wikipedia
+    * 
+    * @author Markus Kowalewski
+    */
+   template <class VECT>
+   class FunctionGenerator
+   {
+      public:
+         static void BwHighpass(VECT &vec, double center, int order);
+         static void BwLowpass(VECT &vec, double center, int order);
+         static void Hann(VECT &vec);
+   };
+
+   
+   
+   /**
+    * Generates a butterworth highpass transfer function.
+    * For mathematical details \see Wikipedia
+    * 
+    * \param vec     The vector which should be filled
+    * \param center  Center gridpoint 
+    * \param order   filter order
+    */
+   template <class VECT>
+   void FunctionGenerator<VECT>::BwHighpass(VECT & vec, double center, int order)
+   {
+      double k = double(order);
+      int size = vec.size();
+      
+      for (int i=0; i < size; i++){
+         vec[i] = 1 / (1 + pow( center / double(i) , 2 * k) );
+      }
+      
+   }
+
+   /**
+    * Generates a butterworth highpass transfer function.
+    * For mathematical details \see Wikipedia
+    * 
+    * \param vec     The vector which should be filled
+    * \param center  Center gridpoint 
+    * \param order   filter order
+    */   
+   template <class VECT>
+   void FunctionGenerator<VECT>::BwLowpass(VECT & vec, double center, int order)
+   {
+      double k = double(order);
+      int size = vec.size();
+      
+      for (int i=0; i < size; i++){
+         vec[i] = 1 / (1 + pow(  double(i) / center, 2 * k) );
+      }
+      
+   }
+   
+   /**
+    * Hann window.
+    *
+    * \f$ w(n) = 0.5 \left( 1-cos(\frac{2\pi n}{N-1}) \right) \f$
+    */
+   template <class VECT>
+   void FunctionGenerator<VECT>::Hann(VECT &vec)
+   {
+      int size = vec.size();
+      for (int n=0; n < size; n++)
+         vec[n] *= 0.5 * (1. - cos( 2*M_PI*double(n) / double(size-1) ));
+   }
    
    extern double VecMin(dVec &v);
    extern double VecMax(dVec &v);
@@ -72,3 +149,5 @@ namespace QDLIB {
       
    }
 }
+
+#endif

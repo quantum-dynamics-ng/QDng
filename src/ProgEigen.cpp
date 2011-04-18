@@ -15,7 +15,7 @@
 #include "qdlib/Conversion.h"
 #include "qdlib/WFBuffer.h"
 #include "tools/PeakFinder.h"
-#include "qdlib/WindowFuncs.h"
+#include "math/math_functions.h"
 #include "fft/fft.h"
 
 #include "linalg/LapackDiag.h"
@@ -457,7 +457,7 @@ namespace QDLIB
      
       /* Apply a window function and do FFT */
       if (_win)
-         WindowFuncs<cVec>::Hann(autocorr);
+         FunctionGenerator<cVec>::Hann(autocorr);
           
       Reporter::WriteSpectrum(autocorr, clock->Dt(), _dir+_spectrum);
       

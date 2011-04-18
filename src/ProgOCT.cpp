@@ -1,5 +1,7 @@
 #include "ProgOCT.h"
 
+#include "math/math_functions.h"
+
 #include "tools/Logger.h"
 #include "tools/fstools.h"
 #include "ChainLoader.h"
@@ -142,7 +144,7 @@ namespace QDLIB
                cutoff = abs(cutoffl) * (steps - 1) * dt / (2 * M_PI); /* convert freq. => grid point */
                if (cutoff > steps / 2 + 1)
                   throw(EParamProblem("Lower frequency bound larger than Nyquist frequency"));
-               Butterworth<dVec>::Highpass(mask, cutoff, 100);
+               FunctionGenerator<dVec>::BwHighpass(mask, cutoff, 100);
                for (int i = 0; i < steps / 2 + 1; i++) {
                   (_frqmask[0])[i] *= mask[i];
                }
@@ -153,7 +155,7 @@ namespace QDLIB
                cutoff = abs(cutoffh) * (steps - 1) * dt / (2 * M_PI); /* convert freq. => grid point */
                if (cutoff > steps / 2 + 1)
                   throw(EParamProblem("Upper frequency bound larger than Nyquist frequency"));
-               Butterworth<dVec>::Lowpass(mask, cutoff, 100);
+               FunctionGenerator<dVec>::BwLowpass(mask, cutoff, 100);
                for (int i = 0; i < steps / 2 + 1; i++) {
                   (_frqmask[0])[i] *= mask[i];
                }

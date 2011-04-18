@@ -2,7 +2,7 @@
 #include "tools/QDGlobalClock.h"
 #include "fft/fft.h"
 #include "tools/Logger.h"
-#include "qdlib/WindowFuncs.h"
+#include "math/math_functions.h"
 
 namespace QDLIB
 {
@@ -200,7 +200,7 @@ namespace QDLIB
       
       if (_spectrum){
          if (_window)
-            WindowFuncs<cVec>::Hann(_specbuf);
+            FunctionGenerator<cVec>::Hann(_specbuf);
             
          WriteSpectrum(_specbuf, clock->Dt(), _specname);
       }
