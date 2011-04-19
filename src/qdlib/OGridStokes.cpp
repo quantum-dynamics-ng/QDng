@@ -82,6 +82,7 @@ namespace QDLIB {
        
        /* Apply sigmoid shape */
        MultElementsCopy( (cVec*) _psi, (cVec*) sourcePsi, (dVec*) &_sigmoid);
+       //*_psi = sourcePsi;
        /* Recalc expectation values */
        if ( RecalcInternals() ) {
           OGridPosition::Apply(_buf, _psi);
@@ -97,7 +98,7 @@ namespace QDLIB {
        *destPsi *= _pe * (1 - _c);
        
        /* <p><x> */
-       *_buf = _psi;
+       *_buf = sourcePsi;
        *_buf *= _xe * _pe * (1 - _c);
        
        *destPsi += _buf;
