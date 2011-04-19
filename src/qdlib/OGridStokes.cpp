@@ -60,6 +60,7 @@ namespace QDLIB {
        
        /* Position dependent scaling */
        _sigmoid.newsize(Psi->size());
+       _sigmoidInt.newsize(Psi->size());
        if (_slope != 0) {
          double x0 = ( _x0 - double( OGridPosition::Xmin(0) ) ) / double( OGridPosition::Dx(0) ); /* Convert x0 to gridpoint units */
          FunctionGenerator<dVec>::Sigmoid(_sigmoid, x0, _slope);
@@ -86,18 +87,24 @@ namespace QDLIB {
           _xe = (*_buf * _psi).real() / sourcePsi->Norm();
           OGridNabla::Apply(_buf, _psi);
           _pe = (*_buf * _psi).real() / sourcePsi->Norm();
+          
+          if (_slope != 0) {
+             double x0 = ( _xe - double( OGridPosition::Xmin(0) ) ) / double( OGridPosition::Dx(0) ); /* Convert x0 to gridpoint units */
+             FunctionGenerator<dVec>::SigmoidInt(_sigmoidInt, x0, _slope);
+          }
        }
        
        
        /* <p>x */
-       OGridPosition::Apply(destPsi, _psi);
+       MultElementsCopy( (cVec*) destPsi, (cVec*) sourcePsi, (dVec*) &_sigmoidInt);
+       //OGridPosition::Apply(destPsi, _psi);
        *destPsi *= _pe * (1 - _c);
        
        /* <p><x> */
-       *_buf = _psi;
-       *_buf *= _xe * _pe * (1 - _c);
-       
-       *destPsi += _buf;
+//        *_buf = _psi;
+//        *_buf *= _xe * _pe * (1 - _c);
+//        
+//        *destPsi += _buf;
 
        
        /* c/2 (xp + px -2<x>p) */

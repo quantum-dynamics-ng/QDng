@@ -30,6 +30,7 @@ namespace QDLIB {
          WaveFunction *_psi;
          
          dVec _sigmoid;  /* Sigmoid shape mask */
+         dVec _sigmoidInt;  /* Sigmoid shape mask */
          double _x0;
          double _slope;
          
