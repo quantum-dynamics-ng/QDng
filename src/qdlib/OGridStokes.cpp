@@ -86,9 +86,9 @@ namespace QDLIB {
        /* Recalc expectation values */
        if ( RecalcInternals() ) {
           OGridPosition::Apply(_buf, _psi);
-          _xe = (*_buf * _psi).real() / sourcePsi->Norm();
+          _xe = (*_buf * _psi).real() / _psi->Norm();
           OGridNabla::Apply(_buf, _psi);
-          _pe = (*_buf * _psi).real() / sourcePsi->Norm();
+          _pe = (*_buf * _psi).real() / _psi->Norm();
        }
        
        
