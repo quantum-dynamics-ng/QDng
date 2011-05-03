@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/fftw/api $(all_includes)
+INCLUDES = -I$(top_srcdir)/src -I$(FFTW_INCLUDE) $(all_includes)
 METASOURCES = AUTO
 noinst_LTLIBRARIES = libqd.la
 libqd_la_SOURCES = GridSystem.cpp Kspace.cpp Laser.cpp \

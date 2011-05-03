@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 -I$(top_srcdir)/src/fftw/api $(all_includes)
+INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 -I$(FFTW_INCLUDE) $(all_includes)
 METASOURCES = AUTO
 
 

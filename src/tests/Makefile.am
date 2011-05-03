@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/fftw/api -I/usr/include/cppunit \
+INCLUDES = -I$(top_srcdir)/src -I$(FFTW_INCLUDE) -I/usr/include/cppunit \
 	$(all_includes) -I/usr/include/libxml2
 METASOURCES = AUTO
 AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS)

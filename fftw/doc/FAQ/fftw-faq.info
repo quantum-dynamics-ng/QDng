@@ -1,4 +1,4 @@
-Info file: ../../../../../src/fftw/doc/FAQ/fftw-faq.info,    -*-Text-*-
+Info file: ../../../../fftw/doc/FAQ/fftw-faq.info,    -*-Text-*-
 produced by bfnnconv.pl from the Bizarre Format With No Name.
 
 START-INFO-DIR-ENTRY
@@ -9,7 +9,7 @@ END-INFO-DIR-ENTRY
 File: $prefix.info, Node: Top, Next: Question 1.1, Up: (dir)
 
             FFTW FREQUENTLY ASKED QUESTIONS WITH ANSWERS
-                            21 Dez 2010
+                            03 Mai 2011
 			     Matteo Frigo
 			   Steven G. Johnson
 			    <fftw@fftw.org>
@@ -103,7 +103,7 @@ Section 5, Known bugs
 
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Section 1, Next: Section 2, Previous: Top, Up: Top
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Section 1, Next: Section 2, Previous: Top, Up: Top
 
 Introduction and General Information
 
@@ -116,7 +116,7 @@ Introduction and General Information
 
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 1.1, Next: Question 1.2, Previous: Top, Up: Section 1
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 1.1, Next: Question 1.2, Previous: Top, Up: Section 1
 
 Question 1.1.  What is FFTW?
 
@@ -130,7 +130,7 @@ FFTW uses novel code-generation and runtime self-optimization techniques
 (along with many other tricks).
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 1.2, Next: Question 1.3, Previous: Question 1.1, Up: Section 1
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 1.2, Next: Question 1.3, Previous: Question 1.1, Up: Section 1
 
 Question 1.2.  How do I obtain FFTW?
 
@@ -138,7 +138,7 @@ FFTW can be found at the FFTW web page.  You can also retrieve it from
 ftp.fftw.org in /pub/fftw.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 1.3, Next: Question 1.4, Previous: Question 1.2, Up: Section 1
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 1.3, Next: Question 1.4, Previous: Question 1.2, Up: Section 1
 
 Question 1.3.  Is FFTW free software?
 
@@ -152,7 +152,7 @@ Non-free licenses for FFTW are also available that permit different terms
 of use than the GPL.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 1.4, Next: Question 1.5, Previous: Question 1.3, Up: Section 1
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 1.4, Next: Question 1.5, Previous: Question 1.3, Up: Section 1
 
 Question 1.4.  What is this about non-free licenses?
 
@@ -169,7 +169,7 @@ would neither affect their licensing revenue nor irritate existing
 licensees.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 1.5, Next: Question 2.1, Previous: Question 1.4, Up: Section 1
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 1.5, Next: Question 2.1, Previous: Question 1.4, Up: Section 1
 
 Question 1.5.  In the West? I thought MIT was in the East?
 
@@ -177,7 +177,7 @@ Not to an Italian.  You could say that we're a Spaghetti Western (with
 apologies to Sergio Leone).
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Section 2, Next: Section 3, Previous: Section 1, Up: Top
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Section 2, Next: Section 3, Previous: Section 1, Up: Top
 
 Installing FFTW
 
@@ -200,7 +200,7 @@ Installing FFTW
 
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.1, Next: Question 2.2, Previous: Question 1.5, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.1, Next: Question 2.2, Previous: Question 1.5, Up: Section 2
 
 Question 2.1.  Which systems does FFTW run on?
 
@@ -211,7 +211,7 @@ take advantage of certain hardware-specific features, such as cycle
 counters and SIMD instructions, but this is optional.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.2, Next: Question 2.3, Previous: Question 2.1, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.2, Next: Question 2.3, Previous: Question 2.1, Up: Section 2
 
 Question 2.2.  Does FFTW run on Windows?
 
@@ -223,7 +223,7 @@ notes, *Note Question 2.3:: `My compiler has trouble with FFTW.', and
 jour?'.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.3, Next: Question 2.4, Previous: Question 2.2, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.3, Next: Question 2.4, Previous: Question 2.2, Up: Section 2
 
 Question 2.3.  My compiler has trouble with FFTW.
 
@@ -302,7 +302,7 @@ reportedly fixed in gcc version 4.2.1 and later.  A workaround is to
 compile libbench2/verify-lib.c without optimization.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.4, Next: Question 2.5, Previous: Question 2.3, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.4, Next: Question 2.5, Previous: Question 2.3, Up: Section 2
 
 Question 2.4.  FFTW does not compile on Solaris, complaining about const.
 
@@ -332,7 +332,7 @@ then the compiler is wrong.  The right message is something like
 cc: WorkShop Compilers 4.2 30 Oct 1996 C 4.2
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.5, Next: Question 2.6, Previous: Question 2.4, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.5, Next: Question 2.6, Previous: Question 2.4, Up: Section 2
 
 Question 2.5.  What's the difference between --enable-3dnow and --enable-k7?
 
@@ -346,7 +346,7 @@ This works on earlier AMD processors, but it is not as fast as our special
 assembly routines.  As of fftw-3.1, --enable-3dnow is no longer supported.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.6, Next: Question 2.7, Previous: Question 2.5, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.6, Next: Question 2.7, Previous: Question 2.5, Up: Section 2
 
 Question 2.6.  What's the difference between the fma and the non-fma versions?
 
@@ -375,7 +375,7 @@ tried them.  Please send us your feedback so that we can update this FAQ
 entry.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.7, Next: Question 2.8, Previous: Question 2.6, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.7, Next: Question 2.8, Previous: Question 2.6, Up: Section 2
 
 Question 2.7.  Which language is FFTW written in?
 
@@ -390,7 +390,7 @@ Objective Caml system.  Objective Caml is available from the Caml web
 page.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.8, Next: Question 2.9, Previous: Question 2.7, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.8, Next: Question 2.9, Previous: Question 2.7, Up: Section 2
 
 Question 2.8.  Can I call FFTW from Fortran?
 
@@ -406,7 +406,7 @@ identifiers, which should cover most other Fortran compilers on Linux at
 least.)
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.9, Next: Question 2.10, Previous: Question 2.8, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.9, Next: Question 2.10, Previous: Question 2.8, Up: Section 2
 
 Question 2.9.  Can I call FFTW from C++?
 
@@ -416,7 +416,7 @@ bit-compatible with FFTW's complex-number format (see the FFTW manual for
 more details).
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.10, Next: Question 2.11, Previous: Question 2.9, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.10, Next: Question 2.11, Previous: Question 2.9, Up: Section 2
 
 Question 2.10.  Why isn't FFTW written in Fortran/C++?
 
@@ -424,7 +424,7 @@ Because we don't like those languages, and neither approaches the
 portability of C.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.11, Next: Question 2.12, Previous: Question 2.10, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.11, Next: Question 2.12, Previous: Question 2.10, Up: Section 2
 
 Question 2.11.  How do I compile FFTW to run in single precision?
 
@@ -434,7 +434,7 @@ you must then recompile FFTW.  In FFTW 3, all FFTW identifiers will then
 begin with fftwf_ instead of fftw_.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 2.12, Next: Question 3.1, Previous: Question 2.11, Up: Section 2
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 2.12, Next: Question 3.1, Previous: Question 2.11, Up: Section 2
 
 Question 2.12.  --enable-k7 does not work on x86-64
 
@@ -450,7 +450,7 @@ special-purpose compiler.  It is hard to produce assembly code that works
 in both 32-bit and 64-bit mode.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Section 3, Next: Section 4, Previous: Section 2, Up: Top
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Section 3, Next: Section 4, Previous: Section 2, Up: Top
 
 Using FFTW
 
@@ -481,7 +481,7 @@ Using FFTW
 
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.1, Next: Question 3.2, Previous: Question 2.12, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.1, Next: Question 3.2, Previous: Question 2.12, Up: Section 3
 
 Question 3.1.  Why not support the FFTW 2 interface in FFTW 3?
 
@@ -494,7 +494,7 @@ size).  We believe that it should be possible to upgrade most programs
 without any difficulty, however.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.2, Next: Question 3.3, Previous: Question 3.1, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.2, Next: Question 3.3, Previous: Question 3.1, Up: Section 3
 
 Question 3.2.  Why do FFTW 3 plans encapsulate the input/output arrays and not just the algorithm?
 
@@ -511,7 +511,7 @@ There are several reasons:
 * If you need to transform many arrays of the same size at once, you
   should really use the plan_many routines in FFTW's "advanced" interface.
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.3, Next: Question 3.4, Previous: Question 3.2, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.3, Next: Question 3.4, Previous: Question 3.2, Up: Section 3
 
 If the abovementioned array characteristics are the same, you are willing to pay close attention to the documentation, and you really need to, we provide a "new-array execution" interface to apply a plan to a new array.  Question 3.3.  FFTW seems really slow.
 
@@ -529,7 +529,7 @@ you can use the wisdom feature to precompute the plan; see *Note Question
 3.9:: `Can I save FFTW's plans?'
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.4, Next: Question 3.5, Previous: Question 3.3, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.4, Next: Question 3.5, Previous: Question 3.3, Up: Section 3
 
 Question 3.4.  FFTW slows down after repeated calls.
 
@@ -539,7 +539,7 @@ that repeatedly FFTing the same array is a diverging process (because FFTW
 computes the unnormalized transform).
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.5, Next: Question 3.6, Previous: Question 3.4, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.5, Next: Question 3.6, Previous: Question 3.4, Up: Section 3
 
 Question 3.5.  An FFTW routine is crashing when I call it.
 
@@ -552,7 +552,7 @@ don't complain to us unless you can come up with a minimal self-contained
 program (preferably under 30 lines) that illustrates the problem.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.6, Next: Question 3.7, Previous: Question 3.5, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.6, Next: Question 3.7, Previous: Question 3.5, Up: Section 3
 
 Question 3.6.  My Fortran program crashes when calling FFTW.
 
@@ -561,7 +561,7 @@ variables large enough to hold a pointer, for example integer*8.  We
 recommend using integer*8 on 32-bit machines as well, to simplify porting.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.7, Next: Question 3.8, Previous: Question 3.6, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.7, Next: Question 3.8, Previous: Question 3.6, Up: Section 3
 
 Question 3.7.  FFTW gives results different from my old FFT.
 
@@ -582,7 +582,7 @@ numerical accuracy; typically a fractional difference of 1e-15 or so in
 double precision).
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.8, Next: Question 3.9, Previous: Question 3.7, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.8, Next: Question 3.9, Previous: Question 3.7, Up: Section 3
 
 Question 3.8.  FFTW gives different results between runs
 
@@ -598,7 +598,7 @@ algorithm is deterministic and the results should be identical between
 runs.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.9, Next: Question 3.10, Previous: Question 3.8, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.9, Next: Question 3.10, Previous: Question 3.8, Up: Section 3
 
 Question 3.9.  Can I save FFTW's plans?
 
@@ -606,7 +606,7 @@ Yes. Starting with version 1.2, FFTW provides the wisdom mechanism for
 saving plans; see the FFTW manual.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.10, Next: Question 3.11, Previous: Question 3.9, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.10, Next: Question 3.11, Previous: Question 3.9, Up: Section 3
 
 Question 3.10.  Why does your inverse transform return a scaled result?
 
@@ -623,7 +623,7 @@ preceded by some computation on the data, into which the scale factor can
 typically be absorbed at little or no cost.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.11, Next: Question 3.12, Previous: Question 3.10, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.11, Next: Question 3.12, Previous: Question 3.10, Up: Section 3
 
 Question 3.11.  How can I make FFTW put the origin (zero frequency) at the center of its output?
 
@@ -636,7 +636,7 @@ indices of the element.  (This trick is a general property of the DFT, and
 is not specific to FFTW.)
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.12, Next: Question 3.13, Previous: Question 3.11, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.12, Next: Question 3.13, Previous: Question 3.11, Up: Section 3
 
 Question 3.12.  How do I FFT an image/audio file in *foobar* format?
 
@@ -646,7 +646,7 @@ you are responsible for figuring out your data format and converting it to
 the form FFTW requires.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.13, Next: Question 3.14, Previous: Question 3.12, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.13, Next: Question 3.14, Previous: Question 3.12, Up: Section 3
 
 Question 3.13.  My program does not link (on Unix).
 
@@ -655,7 +655,7 @@ The libraries must be listed in the correct order (-lfftw3 -lm for FFTW
 if *A* uses *B*, then *A* must be listed before *B* in the link command.).
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.14, Next: Question 3.15, Previous: Question 3.13, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.14, Next: Question 3.15, Previous: Question 3.13, Up: Section 3
 
 Question 3.14.  I included your header, but linking still fails.
 
@@ -664,7 +664,7 @@ and link it into your program, not just #include <fftw3.h>.  (Yes, this is
 really a FAQ.)
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.15, Next: Question 3.16, Previous: Question 3.14, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.15, Next: Question 3.16, Previous: Question 3.14, Up: Section 3
 
 Question 3.15.  My program crashes, complaining about stack space.
 
@@ -674,7 +674,7 @@ allocate the arrays you want to transform if they are larger than a few
 hundred elements.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.16, Next: Question 3.17, Previous: Question 3.15, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.16, Next: Question 3.17, Previous: Question 3.15, Up: Section 3
 
 Question 3.16.  FFTW seems to have a memory leak.
 
@@ -685,7 +685,7 @@ deallocate all of FFTW's internally allocated memory, if you wish, by
 calling fftw_cleanup(), as documented in the manual.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.17, Next: Question 3.18, Previous: Question 3.16, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.17, Next: Question 3.18, Previous: Question 3.16, Up: Section 3
 
 Question 3.17.  The output of FFTW's transform is all zeros.
 
@@ -694,7 +694,7 @@ you use FFTW_ESTIMATE: planning with FFTW_MEASURE or FFTW_PATIENT
 overwrites the input/output arrays, as described in the manual.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.18, Next: Question 3.19, Previous: Question 3.17, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.18, Next: Question 3.19, Previous: Question 3.17, Up: Section 3
 
 Question 3.18.  How do I call FFTW from the Microsoft language du jour?
 
@@ -704,7 +704,7 @@ appropriate Usenet discussion group and ask your question there.  See also
 *Note Question 2.2:: `Does FFTW run on Windows?'.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 3.19, Next: Question 4.1, Previous: Question 3.18, Up: Section 3
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 3.19, Next: Question 4.1, Previous: Question 3.18, Up: Section 3
 
 Question 3.19.  Can I compute only a subset of the DFT outputs?
 
@@ -726,7 +726,7 @@ There are also some algorithms that compute pruned transforms
 *approximately*, but they are beyond the scope of this FAQ.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Section 4, Next: Section 5, Previous: Section 3, Up: Top
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Section 4, Next: Section 5, Previous: Section 3, Up: Top
 
 Internals of FFTW
 
@@ -736,7 +736,7 @@ Internals of FFTW
 
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 4.1, Next: Question 4.2, Previous: Question 3.19, Up: Section 4
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 4.1, Next: Question 4.2, Previous: Question 3.19, Up: Section 4
 
 Question 4.1.  How does FFTW work?
 
@@ -753,7 +753,7 @@ Johnson, *Proc. ICASSP* 3, 1381 (1998), also available at the FFTW web
 page.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 4.2, Next: Question 5.1, Previous: Question 4.1, Up: Section 4
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 4.2, Next: Question 5.1, Previous: Question 4.1, Up: Section 4
 
 Question 4.2.  Why is FFTW so fast?
 
@@ -774,7 +774,7 @@ G. Johnson, *Proc. ICASSP* 3, 1381 (1998), available along with other
 references at the FFTW web page.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Section 5, Previous: Section 4, Up: Top
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Section 5, Previous: Section 4, Up: Top
 
 Known bugs
 
@@ -801,7 +801,7 @@ Known bugs
 
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.1, Next: Question 5.2, Previous: Question 4.2, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.1, Next: Question 5.2, Previous: Question 4.2, Up: Section 5
 
 Question 5.1.  FFTW 1.1 crashes in rfftwnd on Linux.
 
@@ -810,7 +810,7 @@ incorrect amount of memory to be allocated.  The bug showed up in Linux
 with libc-5.3.12 (and nowhere else that we know of).
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.2, Next: Question 5.3, Previous: Question 5.1, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.2, Next: Question 5.3, Previous: Question 5.1, Up: Section 5
 
 Question 5.2.  The MPI transforms in FFTW 1.2 give incorrect results/leak memory.
 
@@ -819,7 +819,7 @@ the transpose routines) in FFTW 1.2 had bugs that could cause errors in
 some situations.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.3, Next: Question 5.4, Previous: Question 5.2, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.3, Next: Question 5.4, Previous: Question 5.2, Up: Section 5
 
 Question 5.3.  The test programs in FFTW 1.2.1 fail when I change FFTW to use single precision.
 
@@ -828,7 +828,7 @@ single precision, but the test programs didn't--the error tolerances in
 the tests were set for double precision.)
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.4, Next: Question 5.5, Previous: Question 5.3, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.4, Next: Question 5.5, Previous: Question 5.3, Up: Section 5
 
 Question 5.4.  The test program in FFTW 1.2.1 fails for n > 46340.
 
@@ -838,14 +838,14 @@ we used for comparison overflows 32 bit integer precision, breaking the
 test.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.5, Next: Question 5.6, Previous: Question 5.4, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.5, Next: Question 5.6, Previous: Question 5.4, Up: Section 5
 
 Question 5.5.  The threaded code fails on Linux Redhat 5.0
 
 We had problems with glibc-2.0.5.  The code should work with glibc-2.0.7.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.6, Next: Question 5.7, Previous: Question 5.5, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.6, Next: Question 5.7, Previous: Question 5.5, Up: Section 5
 
 Question 5.6.  FFTW 2.0's rfftwnd fails for rank > 1 transforms with a final dimension >= 65536.
 
@@ -853,7 +853,7 @@ This bug was fixed in FFTW 2.0.1.  (There was a 32-bit integer overflow
 due to a poorly-parenthesized expression.)
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.7, Next: Question 5.8, Previous: Question 5.6, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.7, Next: Question 5.8, Previous: Question 5.6, Up: Section 5
 
 Question 5.7.  FFTW 2.0's complex transforms give the wrong results with prime factors 17 to 97.
 
@@ -863,7 +863,7 @@ intermediate-size prime factors (17-97).  This bug was fixed in FFTW
 2.1.1.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.8, Next: Question 5.9, Previous: Question 5.7, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.8, Next: Question 5.9, Previous: Question 5.7, Up: Section 5
 
 Question 5.8.  FFTW 2.1.1's MPI test programs crash with MPICH.
 
@@ -872,7 +872,7 @@ when using the MPICH implementation of MPI with the ch_p4 device (TCP/IP);
 the transforms themselves worked fine.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.9, Next: Question 5.10, Previous: Question 5.8, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.9, Next: Question 5.10, Previous: Question 5.8, Up: Section 5
 
 Question 5.9.  FFTW 2.1.2's multi-threaded transforms don't work on AIX.
 
@@ -882,7 +882,7 @@ idiosyncratically creates threads in detached (non-joinable) mode by
 default.
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.10, Next: Question 5.11, Previous: Question 5.9, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.10, Next: Question 5.11, Previous: Question 5.9, Up: Section 5
 
 Question 5.10.  FFTW 2.1.2's complex transforms give incorrect results for large prime sizes.
 
@@ -892,7 +892,7 @@ that caused incorrect results for many primes greater than 32768 (on
 32-bit machines).  (Sizes without large prime factors are not affected.)
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.11, Next: Question 5.12, Previous: Question 5.10, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.11, Next: Question 5.12, Previous: Question 5.10, Up: Section 5
 
 Question 5.11.  FFTW 2.1.3's multi-threaded transforms don't give any speedup on Solaris.
 
@@ -901,7 +901,7 @@ that do not parallelize over multiple processors, so one has to request
 the proper behavior specifically.)
 
 
-File: ../../../../../src/fftw/doc/FAQ/fftw-faq.info, Node: Question 5.12, Previous: Question 5.11, Up: Section 5
+File: ../../../../fftw/doc/FAQ/fftw-faq.info, Node: Question 5.12, Previous: Question 5.11, Up: Section 5
 
 Question 5.12.  FFTW 2.1.3 crashes on AIX.
 
