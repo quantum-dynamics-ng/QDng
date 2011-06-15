@@ -50,6 +50,12 @@ namespace QDLIB {
 	 
 	 void Init(XmlNode* section);
 	 
+	 void Add(const Operator* O, const string& header, const string& faction, const string& val, bool integrate = false);
+
+	 void PrepareOutput();
+
+	 lint Size() const { return _size; }
+
 	 void Apply( WaveFunction *Psi );
    };
    

@@ -45,6 +45,92 @@ namespace QDLIB {
    }
    
    /**
+    * Add a filter to chain.
+    *
+    * \param O       The Operator to use
+    * \param header  Coloumn header to use. Defaults to the operator name (if string is empty)
+    * \param faction One of apply, expec, expeconly, normalize. [expeconly]
+    * \param val     What part of the expectation should be plotted: real, imag, complex [real]
+    */
+   void FiltersList::Add(const Operator* O, const string& header, const string& faction, const string& val, bool integrate)
+   {
+      string action, value;
+
+      /* Set defaults */
+      if (faction.length() == 0)
+         action = "expeconly";
+      else
+         action = faction;
+
+      if (val.length() == 0)
+         value = "expeconly";
+      else
+         value = val;
+
+      /* Check if full */
+      if (_size >= MAX_FILTERS)
+         throw EParamProblem ("Maximum numbers of filters reached.");
+
+      /* Handle type of value */
+      if (value == "real")
+         _value[_size] = real;
+      else if (value == "imag")
+         _value[_size] = imag;
+      else if (value == "complex")
+         _value[_size] = complex;
+      else
+         throw EParamProblem ("Value type not known: ", value);
+
+      /* Accumulate/Integrate values ?*/
+      _integrate[_size] = integrate;
+      _sum[_size] = dcomplex(0);
+
+      /* Check which filter action should be taken */
+      if (action == "normalize")
+      {
+         _action[_size] = normalize;
+      }
+      if (action == "expec")
+      {
+         _action[_size] = expec;
+         _writefile = true;
+      }
+      else if (action == "apply")
+         _action[_size] = apply;
+      else if (action == "expeconly")
+      {
+         _action[_size] = expeconly;
+         _writefile = true;
+      }
+      else
+      {
+         string errormsg("Unknown filter action provided: ");
+         errormsg += action;
+         throw EParamProblem(errormsg.c_str());
+      }
+
+      _size++;
+   }
+
+   /**
+    * If Output is redirected to file it is openend here.
+    * If Operators are pushed via Add then this must be used before the filter is applied.
+    *
+    */
+   void FiltersList::PrepareOutput()
+   {
+      Logger& log = Logger::InstanceRef();
+
+      if (_writefile)
+      {
+         log.cout() << "Filter expectation value file: " << _fname << endl;
+         log.flush();
+         _ofile.open(_fname.c_str());
+         _ofile.precision(10);
+      }
+   }
+
+   /**
     * Initialize the filter list
     * 
     * \param section XmlNode which which contains the filter definitions
@@ -55,94 +141,62 @@ namespace QDLIB {
     * \li expeconly  Only calculate and show the expectation value
     * \li normalize  Simple normalization of wave function
     */
-   void FiltersList::Init( XmlNode *section )
+   void FiltersList::Init(XmlNode *section)
    {
-      Logger& log = Logger::InstanceRef();
-      
+
       ParamContainer params;
       XmlNode *filters;
-      
-      if (section == NULL) return;
-      
-      if (_size > 0) _destroy();
-      
+
+      if (section == NULL)
+         return;
+
+      if (_size > 0)
+         _destroy();
+
       /* Check for output file name */
       params = section->Attributes();
-      if (params.isPresent("fname")){
-	 params.GetValue("fname", _fname);
+      if (params.isPresent("fname"))
+      {
+         params.GetValue("fname", _fname);
       }
-      
+
       /* Load the filter list*/
       filters = section->NextChild();
       if (filters == NULL)
-	 throw EParamProblem ("Empty filter list provided");
-      
-      /* Load the operator list */
-      string faction;
-      string value;
-      
-      while (filters->EndNode()){
-         if (_size >= MAX_FILTERS)
-            throw EParamProblem ("Maximum numbers of filters reached.");
-            
-	 faction = filters->Name();
-	 ParamContainer& attr = filters->Attributes();
-	 
-	 /* Check which kind of value we want to see */
-	 if (attr.isPresent("value")){
-	    attr.GetValue("value", value);
-	    if (value == "real")
-	       _value[_size] = real;
-	    else if (value == "imag")
-	       _value[_size] = imag;
-	    else if (value == "complex")
-	       _value[_size] = complex;
-	    else
-	       throw EParamProblem ("Value type not known: ", value);
-	    
-	 } else
-	    _value[_size] = real;
-	 
-         /* Check which kind of value we want to see */
-         
-         attr.GetValue("int", _integrate[_size], false);
-         _sum[_size] = dcomplex(0);
+         throw EParamProblem("Empty filter list provided");
 
-	 /* Check which filter action should be taken */
-	 if (faction == "normalize"){
-	    _action[_size] = normalize;
-	 }
-	 if (faction == "expec"){
-	    _action[_size] = expec;
-	    _writefile = true;
-	 }
-	 else if (faction == "apply")
-	    _action[_size] = apply;
-	 else if (faction == "expeconly"){
-	    _action[_size] = expeconly;
-	    _writefile = true;
-	 } else {
-	    string errormsg("Unknown filter action provided: ");
-	    errormsg += faction;
-	    throw EParamProblem (errormsg.c_str());
-	 }
-	 if (faction != "normalize"){
-	     _olist[_size] = ChainLoader::LoadOperatorChain( filters );  /* Load operator */
-             ParamContainer attr = filters->Attributes();     /* Set header label */
-             if (attr.isPresent("header"))
-                attr.GetValue("header", _labels[_size]);
-              else 
-                _labels[_size] = _olist[_size]->Name();
-	 }
-	 _size++;
-	 filters->NextNode();
+      /* Load the operator list */
+      while (filters->EndNode())
+      {
+         string faction("expeconly"), value("real"), header;
+         bool integrate = false;
+
+         if (_size >= MAX_FILTERS)
+            throw EParamProblem("Maximum numbers of filters reached.");
+
+         faction = filters->Name();
+         ParamContainer& attr = filters->Attributes();
+
+         /* Check which kind of value we want to see */
+         if (attr.isPresent("value"))
+            attr.GetValue("value", value);
+
+         Operator* O=NULL;
+         if (faction != "normalize")
+         {
+            _olist[_size] = ChainLoader::LoadOperatorChain(filters); /* Load operator */
+            ParamContainer attr = filters->Attributes(); /* Set header label */
+            if (attr.isPresent("header"))
+               attr.GetValue("header", _labels[_size]);
+            else _labels[_size] = _olist[_size]->Name();
+         }
+
+         Add(O, header, faction, value, integrate);
+
+         filters->NextNode();
       }
-      
-      if (_writefile){
-	 log.cout() << "Filter expectation value file: " << _fname << endl; log.flush();
-         _ofile.open(_fname.c_str());
-         _ofile.precision(10);
-      }
+
+      PrepareOutput();
    }
    
    /**
