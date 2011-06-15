@@ -79,6 +79,7 @@ namespace QDLIB
 	    for (int i=0; i < mspsi->States(); i++)
 	       if (_norm) log.cout() << "\t\tPop_" << i;
 	 }
+	 if (_H == NULL) _energy = false; /* Turn off energy calculation! */
 	 if (_energy) log.cout() << "\t\tEnergy[au]";
 	 if (_proj0 && !_proj0Sq) log.cout() << "\t<Psi0|PsiT>";
 	 if (_proj0 && _proj0Sq) log.cout() << "\t|<Psi0|PsiT>|^2";

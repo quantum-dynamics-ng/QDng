@@ -27,6 +27,7 @@
 
 #include "ChainLoader.h"
 #include "ProgPropa.h"
+#include "ProgFilter.h"
 #include "ProgEigen.h"
 #include "ProgOCT.h"
 
@@ -311,6 +312,11 @@ int main(int argc, char **argv)
 	    propa.SetDirectory(dir);
 	    log.Header("Propagation", Logger::Chapter);
 	    propa.Run();
+    } else if (progname == "filter") {
+       ProgFilter filter(*prognodes);
+       filter.SetDirectory(dir);
+       log.Header("Filter", Logger::Chapter);
+       filter.Run();
 	 } else if (progname == "eigen") {
 	    ProgEigen eigen(*prognodes);
 	    eigen.SetDirectory(dir);
@@ -324,7 +330,7 @@ int main(int argc, char **argv)
 	 } else if (progname == "densmat") {
 	    throw ( EParamProblem ("Density matrix propagation not implementet yet") );
 	 } else {
-	    throw ( EParamProblem ("Programm type not known", progname) );
+	    throw ( EParamProblem ("Programm type not known ", progname) );
 	 }
 	 
 	 /* Show time consumption */
