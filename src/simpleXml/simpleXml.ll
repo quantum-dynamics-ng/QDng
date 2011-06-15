@@ -21,7 +21,7 @@ $\([a-zA-Z0-9_]+\)        {
 			  }
 \%[0-9.fds]+		  yylval.sval=strdup(yytext); return FMT;
 [a-zA-Z0-9.\-_:]+         yylval.sval=strdup(yytext); return TOKID;
-\"[a-zA-Z0-9\-./_+:;#°% \t~]+\"	 {  
+\"[a-zA-Z0-9\-./_+:;#°% \t~\<\>\^\&]+\"	 {  
 		             yylval.sval=strdup(yytext+1);
 		             yylval.sval[yyleng-2] = 0;			 
 			     return QSTRING;

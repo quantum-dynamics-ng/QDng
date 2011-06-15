@@ -138,19 +138,24 @@ namespace QDLIB
       Reporter report;
       report.PsiInitial(WF);
 
-      /* Do the first step */
-      _filter.Apply(WF);
-      report.Analyze(WF);
-      ++(*clock);
-
-      /* Loop file series */
-      for(int i=0; i < clock->Steps(); i++){
-         wffiles >> WF;
+      try {
+         /* Do the first step */
          _filter.Apply(WF);
          report.Analyze(WF);
          ++(*clock);
-      }
 
+         /* Loop file series */
+         for (int i = 0; i < clock->Steps(); i++)
+         {
+            wffiles >> WF;
+            _filter.Apply(WF);
+            report.Analyze(WF);
+            ++(*clock);
+         }
+      } catch (Exception e) {
+         report.Finalize();
+         throw;
+      }
       report.Finalize();
    }
 

@@ -136,6 +136,31 @@ namespace QDLIB {
 
 
    /**
+    * Close log files und write Propagation.meta
+    */
+   void ProgPropa::_Finalize()
+   {
+      Logger& log = Logger::InstanceRef();
+      QDClock *clock = QDGlobalClock::Instance(); /* use the global clock */
+      if (_writenorm)
+         log.FileClose();
+
+      _reporter.Finalize();
+
+      /* Write propagation meta file*/
+      ParamContainer p;
+      p.SetValue("CLASS", "Propagation");
+      p.SetValue("Nt", clock->Steps());
+      p.SetValue("dt", clock->Dt());
+      p.SetValue("WFBaseName", _fname);
+      p.SetValue("Wcycle", _wcycle);
+      KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
+      if (!meta_file_propa.Write(p))
+         EIOError("Can not write meta file");
+   }
+
+
+   /**
     * Run the propagation program.
     */
    void ProgPropa::Run()
@@ -276,6 +301,7 @@ namespace QDLIB {
       
       clock->TimeStep(_start);
       
+      try {
       for (lint i=start; i <= clock->Steps(); i++){
 	 if (_usepre) _prefilter.Apply( Psi ); /* Apply pre-filters*/
 	 _reporter.Analyze( Psi );      /* propagation report. */
@@ -286,19 +312,13 @@ namespace QDLIB {
            wfile << Psi;  /* Write wavefunction */
         }
       }
-      if( _writenorm )  log.FileClose();
-      _reporter.Finalize();
+      } catch (Exception e) {
+         _Finalize();
+         DELETE_WF(Psi);
+         throw;
+      }
 
-      /* Write propagation meta file*/
-      ParamContainer p;
-      p.SetValue("CLASS", "Propagation" );
-      p.SetValue("Nt", clock->Steps() );
-      p.SetValue("dt", clock->Dt() );
-      p.SetValue("WFBaseName", _fname );
-      p.SetValue("Wcycle", _wcycle );
-      KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
-      if ( !meta_file_propa.Write(p) ) EIOError("Can not write meta file");
-
+      _Finalize();
       DELETE_WF(Psi);
    }
 

@@ -47,14 +47,14 @@ namespace QDSXML {
       bool xml = false;
       
       /* Check for XML */
-      ind = strstr(buf, "<");
-      if (ind != NULL) xml = true;
+//      ind = strstr(buf, "<");
+//      if (ind != NULL) xml = true;
       ind = strstr(buf, "/>");
       if (ind != NULL) xml |= true;
       ind = strstr(buf, "</");
       if (ind != NULL) xml |= true;
-      ind = strstr(buf, ">");
-      if (ind != NULL) xml &= true;
+//      ind = strstr(buf, ">");
+//      if (ind != NULL) xml &= true;
       
       if (xml) return XML;
       

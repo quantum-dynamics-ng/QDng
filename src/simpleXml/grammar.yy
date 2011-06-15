@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stack>
 #include <vector>
 #include <string>
@@ -45,6 +46,41 @@ int indent=0;
 block *root = NULL;
 block *level = NULL;
 varstring *vstr = NULL;
+
+
+char* EscapeString(const char* s)
+{
+	char* es = (char*) malloc(strlen(s)*6+1);
+	char* scpy = es;
+ 	for(size_t i=0; i < strlen(s); i++){
+ 		switch(s[i]) {
+ 		 	case '<':
+ 		 	 		 *scpy = '&';scpy++;
+ 		 	 		 *scpy = 'l';scpy++;
+ 		 	 		 *scpy = 't';scpy++;
+ 		 	 		 *scpy = ';';scpy++;
+ 		 	 		 break;
+ 		 	case '>':
+ 		 	 		 *scpy = '&';scpy++;
+ 		 	 		 *scpy = 'g';scpy++;
+ 		 	 		 *scpy = 't';scpy++;
+ 		 	 		 *scpy = ';';scpy++;
+ 		 	 		 break;
+ 		 	case '&':
+ 		 	 		 *scpy = '&';scpy++;
+ 		 	 		 *scpy = 'a';scpy++;
+ 		 	 		 *scpy = 'm';scpy++;
+ 		 	 		 *scpy = 'p';scpy++;
+ 		 	 		 *scpy = ';';scpy++;
+ 		 	 		 break;
+ 		 	default:
+    				*scpy = s[i];	
+ 					scpy++;
+ 		}
+ 	}
+ 	*scpy = 0;
+ 	return es;
+}
 
 void AppendStr(const char* s)
 {
@@ -167,7 +203,7 @@ line:
 ;
 strexp:
 	TOKID { AppendStr($1); }
-	| QSTRING { AppendStr($1); }
+	| QSTRING { char* es=EscapeString($1); AppendStr(es);  free(es);}
 	| VAREXP { AppendVar(strdup(string($1).c_str())); }	
 	| VAREXP FMT { AppendVar(strdup(string($1).c_str()),$2); }
 	| strexp CONCAT strexp { }
