@@ -74,7 +74,7 @@ namespace QDLIB {
 	 
       if (_gain != 1)
 	 MultElements((dVec*) this, _gain);
-      
+
    }
    
    
@@ -86,39 +86,24 @@ namespace QDLIB {
       _params = params;
 	 
       /* Check filter order */
-      if (_params.isPresent("order") ){
-	 _params.GetValue("order", _order);
-	 if (_order < 1)
-	    throw ( EParamProblem ("Filter order to small") );
-      } else {
-	 _order = 20;      /* default value */
-	 _params.SetValue("order", _order);
+      if (_params.isPresent("order"))
+      {
+         _params.GetValue("order", _order);
+         if (_order < 1)
+            throw(EParamProblem("Filter order to small"));
+      }
+      else {
+         _order = 20; /* default value */
+         _params.SetValue("order", _order);
       }
       
       /* Get all the params from the ParamContainer */
-      _params.GetValue( "dims", n );
-      GridSystem::Dim(n);
-   
-   
-      int i=0;
-      char c[256];
-
-      for (i=0; i < n; i++){
-	 sprintf (c, "%d", i);
-	 /* check the left pass */
-	 if (_params.isPresent(string("lp") + string(c))) {
-	    _params.GetValue(string("lp") + string(c), _lpx[i]);
-	    _lp[i] = true;
-	 } else _lp[i] = false;
-	    
-	 /* check the right pass */
-	 if (_params.isPresent(string("rp") + string(c))) {
-	    _params.GetValue(string("rp") + string(c), _rpx[i]);
-	    _rp[i] = true;
-	 } else _rp[i] = false;
-	 
+      if (_params.isPresent("dims")){
+         _params.GetValue( "dims", n );
+         GridSystem::Dim(n);
       }
-      
+
+
       /* negative imaginary potential */
       _params.GetValue("nip", _nip, false);
       
@@ -137,10 +122,38 @@ namespace QDLIB {
       
       psi = dynamic_cast<WFGridSystem*>(Psi);
       if (psi == NULL)
-	 throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
-      
+         throw ( EIncompatible("Psi is not of type WFGridSystem", Psi->Name()) );
+
       if (GridSystem::Size() > 0) return;  // Avoid init twice
-      
+
+      if ( GridSystem::Dim() == 0){ /* Take Dims from WF*/
+         Dim(psi->Dim());
+      } else if ( GridSystem::Dim() !=  psi->Dim() ) { /* dims has been given in input (check it)*/
+         throw ( EIncompatible("OGobbler: Number of dims doesn't match WF") );
+      }
+
+      char c[256];
+      for (int i = 0; i < Dim(); i++)
+      {
+         sprintf(c, "%d", i);
+         /* check the left pass */
+         if (_params.isPresent(string("lp") + string(c)))
+         {
+            _params.GetValue(string("lp") + string(c), _lpx[i]);
+            _lp[i] = true;
+         }
+         else _lp[i] = false;
+
+         /* check the right pass */
+         if (_params.isPresent(string("rp") + string(c)))
+         {
+            _params.GetValue(string("rp") + string(c), _rpx[i]);
+            _rp[i] = true;
+         }
+         else _rp[i] = false;
+
+      }
+
       *((GridSystem*) this) = *((GridSystem*) psi);
       _Init();
    }

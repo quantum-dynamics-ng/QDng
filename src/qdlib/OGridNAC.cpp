@@ -33,9 +33,6 @@ namespace QDLIB {
          if (dim < 1)
             throw (EParamProblem("NAC got nonsense dims"));
          
-         if (dim > MAX_DIMS)
-            throw (EParamProblem("Dims for NAC exceedes MAX_DIMS"));
-         
          Dim(dim);
       } else
          Dim(1); /* Default */

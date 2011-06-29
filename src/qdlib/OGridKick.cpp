@@ -30,27 +30,15 @@ namespace QDLIB {
    
    void OGridKick::Init(ParamContainer & params)
    {
-      int n;
-   
       _params = params;
-      _params.GetValue("dims", n);
-   
-      if (n < 1)
-         throw(EParamProblem("Kick operator needs at least one dimension"));
-   
-      GridSystem::Dim(n);
-   
-      char c[256];
-   
-      string s;
-   
-      for (int i = 0; i < n; i++) {
-         sprintf(c, "k%d", i);
-         s = c;
-   
-         if (_params.isPresent(s)) 
-            _params.GetValue(string(c), _kn[i]);
-         else _kn[i] = 0; /* Mark as 0 => don't build k-space */
+
+      if ( _params.isPresent("dims") ) {
+         int n;
+         _params.GetValue("dims", n);
+         if (n < 1)
+            throw(EParamProblem("Kick operator needs at least one dimension"));
+
+         GridSystem::Dim(n);
       }
    
    }
@@ -63,12 +51,24 @@ namespace QDLIB {
       if (opPsi == NULL)
          throw(EIncompatible("Psi is not of type WFGridSystem", Psi->Name()));
       
-      if (opPsi->Dim() != Dim())
-         throw(EIncompatible("GridKick got wrong number of dimensions"));
-      
-      
       if (_exp != NULL) return;  // Avoid init twice
       
+      if ( GridSystem::Dim() == 0){ /* Take Dims from WF*/
+         Dim(opPsi->Dim());
+      } else if ( GridSystem::Dim() !=  opPsi->Dim() ) { /* dims has been given in input (check it)*/
+         throw ( EIncompatible("OGridNablaSq: Number of dims doesn't match WF") );
+      }
+      
+      /* Get k-values from config */
+      char c[256];
+
+      for (int i = 0; i < Dim(); i++) {
+         sprintf(c, "k%d", i);
+
+         if (_params.isPresent(c))
+            _params.GetValue(string(c), _kn[i]);
+         else _kn[i] = 0; /* Mark as 0 => don't build k-space */
+      }
       
       *((GridSystem*) this) = *((GridSystem*) opPsi);
       

@@ -74,6 +74,7 @@ void OGridNablaSqTest::API_Test()
    CPPUNIT_ASSERT(O->Name() == "OGridNablaSq");
    
    /* Inits */
+   p.SetValue("dims", 0);
    CPPUNIT_ASSERT_THROW(O->Init(p), Exception);
    
    p.SetValue("dims", 1);

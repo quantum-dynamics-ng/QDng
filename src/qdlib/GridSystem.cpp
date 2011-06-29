@@ -88,6 +88,8 @@ namespace QDLIB {
    {
       int size=1;
       
+      if (_ndims == 0) return 0;
+
       for (int i=0; i < _ndims; i++)
 	 size *= _dims[i];
       

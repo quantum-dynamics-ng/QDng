@@ -53,7 +53,6 @@ namespace QDLIB
       }
       
       
-      if ( n > MAX_DIMS ) throw ( EOverflow("More than MAX_DIMS for Potential defined") );
       GridSystem::Dim(n);
       
       /* Get all the params from the ParamContainer */

@@ -21,34 +21,16 @@ namespace QDLIB
 
    void OGridNablaSq::Init(ParamContainer & params)
    {
-      int n;
-
       _params = params;
-      _params.GetValue("dims", n);
+      if (_params.isPresent("dims") ) {
+         int n;
+         _params.GetValue("dims", n);
 
-      if (n < 1)
-         throw(EParamProblem("Nabla operator needs at least one dimension"));
+         if (n < 1)
+            throw(EParamProblem("Nabla operator needs at least one dimension"));
 
-      GridSystem::Dim(n);
-
-      char c[256];
-      string s;
-      bool eff = false;  /* Indicate at least 1 non-zero dim */
-      
-      for (int i = 0; i < n; i++) {
-         sprintf(c, "mass%d", i);
-         s = c;
-         if (_params.isPresent(s)) {
-            _params.GetValue(string(c), _mass[i]);
-            if (_mass[i] == 0)
-               throw(EParamProblem("Zero mass defined"));
-            
-            eff = true;
-         } else _mass[i] = -1; /* Mark as -1 => don't build k-space */
+         GridSystem::Dim(n);
       }
-      
-      if (!eff)
-         throw(EParamProblem("Nabla^2 Operator is empty (no masses defined)"));
    }
 
    void OGridNablaSq::Init(WaveFunction *Psi)
@@ -62,6 +44,33 @@ namespace QDLIB
       
       /* re-Init k-space ?*/
       if (_dspace != NULL) return;  // Avoid init twice
+
+      if ( GridSystem::Dim() == 0){ /* Take Dims from WF*/
+         Dim(opPsi->Dim());
+      } else if ( GridSystem::Dim() !=  opPsi->Dim() ) { /* dims has been given in input (check it)*/
+         throw ( EIncompatible("OGridNablaSq: Number of dims doesn't match WF") );
+      }
+
+      /* Get masses */
+      char c[256];
+      string s;
+      bool eff = false;  /* Indicate at least 1 non-zero dim */
+
+      for (int i = 0; i < Dim(); i++) {
+         sprintf(c, "mass%d", i);
+         s = c;
+         if (_params.isPresent(s)) {
+            _params.GetValue(string(c), _mass[i]);
+            if (_mass[i] == 0)
+               throw(EParamProblem("Zero mass defined"));
+
+            eff = true;
+         } else _mass[i] = -1; /* Mark as -1 => don't build k-space */
+      }
+
+      if (!eff)
+         throw(EParamProblem("Nabla^2 Operator is empty (no masses defined)"));
+
       *((GridSystem*) this) = *((GridSystem*) opPsi);
       InitDspace();
 
