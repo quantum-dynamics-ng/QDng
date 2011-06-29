@@ -28,6 +28,7 @@ namespace QDLIB
 
       if (n < 1)
          throw(EParamProblem("Nabla operator needs at least one dimension"));
+
       GridSystem::Dim(n);
 
       char c[256];
@@ -158,10 +159,6 @@ namespace QDLIB
       return true;
    }
 
-   /**
-    * \todo clean Vector view.
-    * \bug dimensions are inverse => x (lowest number ) is the fastest!
-    */
    void OGridNablaSq::InitDspace()
    {
 

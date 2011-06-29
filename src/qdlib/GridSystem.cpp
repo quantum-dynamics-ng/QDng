@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include "GridSystem.h"
+#include "tools/Exception.h"
 
 #define GRID_EPS 1e-10
 
@@ -38,6 +39,12 @@ namespace QDLIB {
     */
    void GridSystem::Dim(int dims)
    {
+      if (dims > MAX_DIMS)
+         throw(EParamProblem("GridSystem: Number of Dimensions exceeds MAX_DIMS"));
+
+      if (dims < 0)
+         throw(EParamProblem("GridSystem: Number of Dimensions is negative"));
+
       _ndims = dims;
    }
          

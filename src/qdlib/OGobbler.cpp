@@ -97,8 +97,6 @@ namespace QDLIB {
       
       /* Get all the params from the ParamContainer */
       _params.GetValue( "dims", n );
-      if ( n > MAX_DIMS ) throw ( EOverflow("More than MAX_DIMS for gobbler defined") );
-      if ( n <= 0 ) throw ( EParamProblem("Zero number of dimension defined") );
       GridSystem::Dim(n);
    
    
