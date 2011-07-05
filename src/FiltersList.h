@@ -46,7 +46,7 @@ namespace QDLIB {
 	 FiltersList();
 	 ~FiltersList();
 	 
-	 void SetDefaultName(string &s);
+	 void SetDefaultName(const string &s);
 	 
 	 void Init(XmlNode* section);
 	 

@@ -84,6 +84,13 @@ namespace QDLIB
       p.GetValue("WFBaseName", _fname );
 
 
+      /* Output file */
+      if (attr.isPresent("fname")){
+         attr.GetValue("fname", s);
+         _filter.SetDefaultName(_dir+s);
+      } else
+         _filter.SetDefaultName(_dir + DEFAULT_EXPEC_FILENAME);
+
       /* Summarize the configuration */
       log.cout() << "Number of time steps: " << clock->Steps() << endl;
       log.cout() << "Time step : " << clock->Dt() << endl;
@@ -92,6 +99,8 @@ namespace QDLIB
       log.cout() << "Directory for input: " << _path << endl;
       if (! _dir.empty())
          log.cout() << "Directory for output: " << _dir << endl;
+      if (attr.isPresent("fname"))
+         log.cout() << "Filename for expec table: " << s << endl;
 
       log.cout() << "\n\n";
       log.flush();
@@ -121,10 +130,8 @@ namespace QDLIB
       XmlNode *section = ContentNodes->FindNode( "filterdef" );
       if (section != NULL)
       {
-         string s(_dir + DEFAULT_EXPEC_FILENAME);
          log.Header("Define filters", Logger::SubSection);
          log.IndentInc();
-         _filter.SetDefaultName(s);
          _filter.Init(section);
          log.IndentDec();
          log.cout() << endl;

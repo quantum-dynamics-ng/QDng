@@ -39,7 +39,7 @@ namespace QDLIB {
    /**
     * Set the default filename for expectation value table output.
     */
-   void FiltersList::SetDefaultName(string &s)
+   void FiltersList::SetDefaultName(const string &s)
    {
       _fname = s;
    }
@@ -89,8 +89,7 @@ namespace QDLIB {
       if (action == "normalize")
       {
          _action[_size] = normalize;
-      }
-      if (action == "expec")
+      } else if (action == "expec")
       {
          _action[_size] = expec;
          _writefile = true;
@@ -210,9 +209,11 @@ namespace QDLIB {
       if (! _initalized){
          _ofile << "time \t";
 	 for(int i=0; i < _size; i++){
-	    _olist[i]->Clock(_clock);
-	    GlobalOpList::Instance().Init(_olist[i], Psi);
-	    if (_writefile && (_action[i] == expec || _action[i] == expeconly))
+	    if (_action[i] != normalize){
+	       _olist[i]->Clock(_clock);
+	       GlobalOpList::Instance().Init(_olist[i], Psi);
+	    }
+	    if (_writefile && (_action[i] == expec || _action[i] == expeconly) && _action[i] != normalize)
 	       _ofile << _labels[i] << "\t";
 	 }
 	 if (_writefile)
