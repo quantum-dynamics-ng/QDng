@@ -1,8 +1,11 @@
+#include <cppunit/extensions/HelperMacros.h>
+
 #include "FileWFTest.h"
 #include "qdlib/WFGridCartesian.h"
 #include "qdlib/WFMultistate.h"
 #include "function_gens.h"
 #include "tools/fstools.h"
+#include "defs.h"
 
 #define WF_TEST_SIZE 64
 
@@ -143,6 +146,156 @@ void FileWFTest::IO_Test_Single()
 
    DELETE_ALL_WF();
 }
+
+#ifdef HAVE_LIBZ
+/**
+ * Check for Writing & Reading a ZLIB compressed WF-file.
+ */
+void FileWFTest::IO_Test_ZLIB()
+{
+   ParamContainer p, p_in;
+   WaveFunction *psi, *psi_in;
+   string s;
+   int n;
+
+   CollectorWF *Cwf = CollectorWF::Instance();
+
+   /* Init Test WF */
+   psi = new WFGridCartesian();
+   Cwf->Register(psi);
+   psi_in = new WFGridCartesian();
+   Cwf->Register(psi_in);
+
+   p.SetValue("dims",1);
+   p.SetValue("N0", WF_TEST_SIZE);
+   p.SetValue("xmin0", -5);
+   p.SetValue("xmax0", 5);
+
+   psi->Init(p);
+
+   fgen_sin_norm(*psi, -5, 5);
+
+   *psi *= cexpI(M_PI);
+
+   /* Setup FileWF class for writing to disk */
+   file.Name("ZLIBTEST");
+   file.Suffix(".wftest");
+   file.Compress(true);
+   file.CompressionTolerance(ROUGH_EPS * 3);
+   file.CompressMethod(FileWF::ZLIB);
+
+   CPPUNIT_ASSERT_NO_THROW(file << psi);
+
+   /* Reread single file with pre-initialized class */
+   CPPUNIT_ASSERT_NO_THROW(file >> psi_in);
+
+   /* both wfs should match */
+   p_in = psi_in->Params();
+   CPPUNIT_ASSERT( psi->size() == psi_in->size() );
+
+   p_in.GetValue("CLASS", s);
+   CPPUNIT_ASSERT(s == "WFGridCartesian");
+
+   p_in.GetValue("dims",n);
+   CPPUNIT_ASSERT(n == 1);
+   p_in.GetValue("N0", n);
+   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
+   p_in.GetValue("xmin0", n);
+   CPPUNIT_ASSERT(n == -5);
+   p_in.GetValue("xmax0", n);
+   CPPUNIT_ASSERT(n == 5);
+
+   /* Values should match roughly due to lossy compression */
+   for (int i=0; i < psi->size(); i++){
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( (*psi)[i].real(), (*psi_in)[i].real(),  ROUGH_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( (*psi)[i].imag(), (*psi_in)[i].imag(),  ROUGH_EPS);
+   }
+   DELETE_WF(psi_in);
+
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("ZLIBTEST.wftest"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("ZLIBTEST.meta"));
+
+   DELETE_ALL_WF();
+   file.Compress(false);
+}
+#endif
+
+
+#ifdef HAVE_LIBBZ2
+/**
+ * Check for Writing & Reading a ZLIB compressed WF-file.
+ */
+void FileWFTest::IO_Test_BZIP()
+{
+   ParamContainer p, p_in;
+   WaveFunction *psi, *psi_in;
+   string s;
+   int n;
+
+   CollectorWF *Cwf = CollectorWF::Instance();
+
+   /* Init Test WF */
+   psi = new WFGridCartesian();
+   Cwf->Register(psi);
+   psi_in = new WFGridCartesian();
+   Cwf->Register(psi_in);
+
+   p.SetValue("dims",1);
+   p.SetValue("N0", WF_TEST_SIZE);
+   p.SetValue("xmin0", -5);
+   p.SetValue("xmax0", 5);
+
+   psi->Init(p);
+
+   fgen_sin_norm(*psi, -5, 5);
+
+   *psi *= cexpI(M_PI);
+
+   /* Setup FileWF class for writing to disk */
+   file.Name("BZIPTEST");
+   file.Suffix(".wftest");
+   file.Compress(true);
+   file.CompressionTolerance(ROUGH_EPS * 3);
+   file.CompressMethod(FileWF::BZIP);
+
+   CPPUNIT_ASSERT_NO_THROW(file << psi);
+
+   /* Reread single file with pre-initialized class */
+   //try { file >> psi_in; } catch (Exception e) { cout << endl << e.GetMessage() << endl; }
+   CPPUNIT_ASSERT_NO_THROW(file >> psi_in);
+
+   /* both wfs should match */
+   p_in = psi_in->Params();
+   CPPUNIT_ASSERT( psi->size() == psi_in->size() );
+
+   p_in.GetValue("CLASS", s);
+   CPPUNIT_ASSERT(s == "WFGridCartesian");
+
+   p_in.GetValue("dims",n);
+   CPPUNIT_ASSERT(n == 1);
+   p_in.GetValue("N0", n);
+   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
+   p_in.GetValue("xmin0", n);
+   CPPUNIT_ASSERT(n == -5);
+   p_in.GetValue("xmax0", n);
+   CPPUNIT_ASSERT(n == 5);
+
+   /* Values should match roughly due to lossy compression */
+   for (int i=0; i < psi->size(); i++){
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( (*psi)[i].real(), (*psi_in)[i].real(),  ROUGH_EPS);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( (*psi)[i].imag(), (*psi_in)[i].imag(),  ROUGH_EPS);
+   }
+   DELETE_WF(psi_in);
+
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("BZIPTEST.wftest"));
+   CPPUNIT_ASSERT_NO_THROW(FS::Remove("BZIPTEST.meta"));
+
+   DELETE_ALL_WF();
+   file.Compress(false);
+}
+#endif
+
+
 
 /**
  * Check for correct Multistate handling.

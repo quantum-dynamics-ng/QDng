@@ -20,6 +20,12 @@ class FileWFTest : public CppUnit::TestFixture
    CPPUNIT_TEST( API_Test );
    CPPUNIT_TEST( IO_Test_Single );
    CPPUNIT_TEST( IO_Test_Multistate );
+#ifdef HAVE_LIBZ
+   CPPUNIT_TEST( IO_Test_ZLIB );
+#endif
+#ifdef HAVE_LIBBZ2
+   CPPUNIT_TEST( IO_Test_BZIP );
+#endif
    CPPUNIT_TEST_SUITE_END();
    public:
       
@@ -31,6 +37,12 @@ class FileWFTest : public CppUnit::TestFixture
    protected:
       void API_Test();
       void IO_Test_Single();
+#ifdef HAVE_LIBZ
+      void IO_Test_ZLIB();
+#endif
+#ifdef HAVE_LIBBZ2
+   void IO_Test_BZIP ();
+#endif
       void IO_Test_Multistate();
    private:
       FileWF file;

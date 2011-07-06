@@ -14,14 +14,25 @@ namespace QDLIB {
    */
    class FileWF : public FileSingle<WaveFunction>
    {
+      public:
+         typedef enum {ZLIB, BZIP, INVALID} compMethod_t;
       private:
          bool _compress;         /* Use compression on write */
          int _compLevel;         /* Compression level 0..9; 0 = no compression, 9 = best */
          double _compTolerance;   /* Cut off factor for lossy compression */
+         compMethod_t _compMethod;     /* Compression method */
          cVec *_buf;
          
          void CheckBuf(WaveFunction *data);
          void _ReadFromFile(WaveFunction *data);
+#ifdef HAVE_LIBZ
+         void _CompressZLIB(WaveFunction * data);
+         void _DecompressZLIB(WaveFunction * data);
+
+         void _CompressBZIP(WaveFunction * data);
+         void _DecompressBZIP(WaveFunction * data);
+
+#endif
       public:
          FileWF();
          ~FileWF();
@@ -35,6 +46,10 @@ namespace QDLIB {
          /** Get file compression mode. */
          bool Compress() const { return _compress; }
          
+         void CompressMethod(compMethod_t method){
+            _compMethod = method;
+         }
+
          /** Set file compression. */
          void Compress(bool on) { _compress = on; }
          

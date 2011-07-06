@@ -140,6 +140,11 @@ dnl zlib
 sinclude([m4/ax_check_zlib.m4])
 AX_CHECK_ZLIB()
 
+dnl bzip2
+sinclude([m4/ax_libbz2.m4])
+AX_CHECK_LIBBZ2()
+
+
 
 dnl libxml2
 sinclude([m4/acx_libxml2.m4])
