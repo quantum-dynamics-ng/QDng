@@ -1,0 +1,10 @@
+0.6.1
+  * Added simple pulsegenerator to Laser class
+  * Flux operator works now with multistate WFs
+  * Define variables on the commandline
+  * Added Experimental Stokes friction operator
+  * Added Filter programm which allows filtering of existing propagations
+  * Added bzip2 compression support for WFs
+  * bugfixes
+
+
