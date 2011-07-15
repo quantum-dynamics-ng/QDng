@@ -31,6 +31,9 @@ void PrepareCmdline(Getopt &cmdline)
    cmdline.SetHelp('l', "compression level", false, 
                    "compression level (0=no compression, 9=best & slowest)", "4");
 
+   cmdline.SetHelp('m', "compression method", false,
+                   "compression method (z=zlib [default], j=bzip2)", "m");
+
 
 }
 
@@ -101,7 +104,7 @@ void DeCompress(string fname, bool series)
  * \param tol Cut off tolerance
  * \param level zlib compression level
  */
-void Compress(string fname, bool series, double tol, int level)
+void Compress(string fname, bool series, double tol, int level, const string &method)
 {
    FileWF wio;
    WaveFunction *WF;
@@ -113,6 +116,9 @@ void Compress(string fname, bool series, double tol, int level)
    wio.Compress(true);
    wio.CompressionTolerance(tol);
    wio.CompressionLevel(level);
+   if (method == "z") wio.CompressMethod(FileWF::ZLIB);
+   else if (method == "j") wio.CompressMethod(FileWF::BZIP);
+   else wio.CompressMethod(FileWF::INVALID);
    
    if (!series) {
       WF = wio.LoadWaveFunctionByMeta();
@@ -191,6 +197,7 @@ int main (int argc, char **argv)
       } else {
          double tol;
          int level;
+         string method;
          
          cmdline.GetOption('t', tol);
          if (tol > 1)
@@ -200,8 +207,12 @@ int main (int argc, char **argv)
          if (level < 1 || level > 9)
             throw (EParamProblem("Compression Level must be between 0 and 9"));
          
+         cmdline.GetOption('m', method);
+         if (method != "z" && method != "j")
+            throw (EParamProblem("Compression must be either z or j"));
+
          cout << "\nStarting WF compression...\n";
-         Compress(fname, series, abs(tol), level);
+         Compress(fname, series, abs(tol), level, method);
       }
    } catch (Exception e) {
       cerr << "\n\n\t!!!A problematic error occured:\n\t";
