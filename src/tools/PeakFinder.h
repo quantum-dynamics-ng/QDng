@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <set>
 #include "math/typedefs.h"
 
 namespace QDLIB
@@ -23,6 +24,10 @@ namespace QDLIB
          double _sigma;
          vector<int> _peaks;
          vector<int>::iterator _it;
+
+         double _Mean(dVec &data, uint start, uint end);
+         double _Sigma(dVec &data, uint start, uint end, double mean);
+         void _FindData(dVec &data, uint start, uint end);
       public:
          PeakFinder();
          ~PeakFinder();
@@ -36,6 +41,8 @@ namespace QDLIB
          
          void Find(dVec &data);
          
+         void Find(dVec &data, uint winsize);
+
          /** Returns the number of found peaks. */
          int NumPeaks() { return _peaks.size(); }
          
@@ -49,8 +56,12 @@ namespace QDLIB
          bool End();
          void Reset();
 	 
-	 /** Get a peak by index */
-	 int operator[] (size_t n) { return _peaks[n]; }
+         /** Get a peak by index */
+         int operator[] (size_t n) { return _peaks[n]; }
+
+         set<uint>* Maximas(dVec &data);
+
+         set<uint>* Minimas(dVec &data);
    };
 
 }

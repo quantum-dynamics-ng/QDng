@@ -3,7 +3,7 @@
 
 #include <stack>
 
-#include "libxml/parser.h"
+#include <libxml/parser.h>
 #ifndef LIBXML_TREE_ENABLED
 #error "LIBXML_TREE_ENABLED not enabled. I rely on that feature"
 #endif

@@ -1,3 +1,7 @@
+x.x.x
+  * Added mex-module for the peak finder
+  * bzip2 support for qdz
+
 0.6.1
   * Added simple pulsegenerator to Laser class
   * Flux operator works now with multistate WFs

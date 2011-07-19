@@ -34,7 +34,9 @@ install-exec-hook:
         	$(DESTDIR)$(pkglibdir)/expec_op$(MEXEXT)
 	$(LN_S) -f $(DESTDIR)$(pkglibdir)/libget_all_op_handle.so \
         	$(DESTDIR)$(pkglibdir)/get_all_op_handle$(MEXEXT)
-
+	$(LN_S) -f $(DESTDIR)$(pkglibdir)/libPeakFinder.so \
+        	$(DESTDIR)$(pkglibdir)/PeakFinder$(MEXEXT)
+        	
 #CXXFLAGS  = -O1
 
 #libexec_PROGRAMS = readwf
@@ -56,10 +58,10 @@ pkglib_LTLIBRARIES = libget_wf_handle.la \
 	libinit_wf_file.la libwrite_wf_file.la libdelete_wf_handle.la \
 	libinit_wf_struct.la libwf_mod.la libget_all_wf_handle.la \
 	libinit_op.la libdelete_op_handle.la libapply_op.la  \
-	libexpec_op.la libget_all_op_handle.la
+	libexpec_op.la libget_all_op_handle.la libPeakFinder.la
 
 pkglib_DATA = apply_op.m delete_wf_handle.m  get_all_op_handle.m  get_wf_handle.m  init_wf_file.m  wf_mod.m \
-	delete_op_handle.m  expec_op.m  get_all_wf_handle.m  init_op.m  init_wf_struct.m  write_wf_file.m
+	delete_op_handle.m  expec_op.m  get_all_wf_handle.m  init_op.m  init_wf_struct.m  write_wf_file.m PeakFinder.m
 
 
 #	libmextest2.la libreadwfstatic.la readwf.la
@@ -155,3 +157,11 @@ libget_all_op_handle_la_SOURCES = get_all_op_handle.cpp
 libget_all_op_handle_la_CXXFLAGS  = $(MATLAB_FLAGS)
 libget_all_op_handle_la_LDFLAGS = $(MATLAB_LINK) -version-info $(MEX_INTERFACE_VERSION)
 libget_all_op_handle_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+
+libPeakFinder_la_SOURCES = PeakFinder.cpp
+libPeakFinder_CXXFLAGS  = $(MATLAB_FLAGS)
+libPeakFinder_la_LDFLAGS = $(MATLAB_LINK) -version-info $(MEX_INTERFACE_VERSION)
+libPeakFinder_la_LIBADD = $(top_builddir)/src/lib/libqdng.la  $(MATLAB_LIB)
+
+
