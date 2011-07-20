@@ -14,8 +14,6 @@ namespace QDLIB {
     */
    class GlobalParams {
       private:
-         static ParamContainer *_ref;
-         
          GlobalParams(){};
          GlobalParams(const GlobalParams &p){};
          ~GlobalParams(){};

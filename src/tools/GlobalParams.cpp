@@ -4,21 +4,14 @@ namespace QDLIB {
 
    ParamContainer& GlobalParams::Instance()
    {
-      if (_ref == NULL){
-         _ref = new ParamContainer();
-      }
-      return *_ref;
+      static ParamContainer ref;
+      return ref;
    }
 
    void GlobalParams::Destroy()
    {
-      if (_ref != NULL){
-         delete _ref;
-         _ref = NULL;
-      }
+      Instance().clear();
    }
-
-   ParamContainer* GlobalParams::_ref = 0;
 
 }
 
