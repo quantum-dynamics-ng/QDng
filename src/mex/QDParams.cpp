@@ -19,6 +19,9 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
    QDLIB::ParamContainer& pm = QDLIB::GlobalParams::Instance();
 
    if (nrhs == 0){ /* Show all parameters */
+      if (nlhs != 0)
+         mexErrMsgTxt("Function doesn't return values");
+
       cout << pm << endl;
    } else if (nrhs == 1){ /* Get parameter */
       if ( mxGetClassID(prhs[0]) != mxCHAR_CLASS )

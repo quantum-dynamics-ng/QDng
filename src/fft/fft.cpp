@@ -150,6 +150,8 @@ namespace QDLIB {
     */
    void FFT::_CreatePlanDim(int dim)
    {
+      int optflag = FFTGlobal::Instance().OptimizeFlag();
+
       int lothers = _lothers(dim);  /* points in lower dims */
       int cdim = _ndims - dim - 1; /* reversed dim index (C-order) */
 
@@ -184,7 +186,7 @@ namespace QDLIB {
          _planf[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
                                           (fftw_complex*) _in->begin(0),
                                           (fftw_complex*) _out->begin(0),
-                                          FFTW_FORWARD, FFTW_PATIENT);
+                                          FFTW_FORWARD, optflag);
          *_in = inbuf;
       }
 
@@ -203,7 +205,7 @@ namespace QDLIB {
             _planb[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
                                              (fftw_complex*) _out->begin(0),
                                              (fftw_complex*) _in->begin(0),
-                                             FFTW_BACKWARD, FFTW_PATIENT);
+                                             FFTW_BACKWARD, optflag);
            *_in = inbuf;
          }
 
