@@ -3,6 +3,9 @@
 
 #include "ParamContainer.h"
 
+#define QD_CONFIG_FILE_HOME   ".qdconfig"
+#define QD_CONFIG_FILE_LOCAL  ".qdconfig"
+
 namespace QDLIB {
 
    /**
@@ -14,7 +17,9 @@ namespace QDLIB {
     */
    class GlobalParams {
       private:
-         GlobalParams(){};
+         static ParamContainer *_ref;
+
+         GlobalParams();
          GlobalParams(const GlobalParams &p){};
          ~GlobalParams(){};
       public:

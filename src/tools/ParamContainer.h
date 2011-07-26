@@ -67,6 +67,7 @@ typedef map<string,string> string_map;
 	 void SetValue(const string name, const bool &value);
          
 	 ParamContainer& operator=(const ParamContainer &params);
+	 ParamContainer& operator+=(const ParamContainer &params);
 
    }; /* class ParamContainer */
 

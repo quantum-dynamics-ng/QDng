@@ -382,7 +382,27 @@ namespace QDLIB {
       _it = _param_map.begin();
       return *this;
    }
+
+   /**
+    * Add operator.
+    *
+    * Merges the two Containers. Entries may be overridden by the rhs argument.
+    */
+   ParamContainer& ParamContainer::operator+=(const ParamContainer &params)
+   {
+
+      string_map::iterator it;
+      string_map addmap = params._param_map;
       
+      for (it = addmap.begin(); it != addmap.end(); it++)
+      {
+         _param_map[it->first] = it->second;
+      }
+
+      _it = _param_map.begin();
+
+      return *this;
+   }
    
    /**
     * ASCII output for ParamContainers.

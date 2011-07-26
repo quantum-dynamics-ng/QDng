@@ -228,7 +228,7 @@ int main(int argc, char **argv)
       /* enables multiple programm nodes*/
       if (rnodes.Name() == "multi" || rnodes.Name() == "qdng") {
          /* Read out global attributes/parameters */
-         gp = rnodes.Attributes();
+         gp += rnodes.Attributes();
 	 prognodes = rnodes.NextChild();
       } else 
 	 prognodes = &rnodes;
@@ -256,6 +256,8 @@ int main(int argc, char **argv)
       
       log.cout() <<  endl;
       log.Header("Global Parameters", Logger::SubSection);
+      log.cout() << gp;
+      log.flush();
       if (log.Debug())
 	 log.cout() << "Debug output on\n";
 #ifdef _OPENMP
@@ -264,8 +266,6 @@ int main(int argc, char **argv)
 #ifdef HAVE_SSE2
       log.cout() << "Using SSE2 optimizations.\n";
 #endif
-      log.cout() << gp;
-      log.flush();
       
       if (prognodes == NULL)
 	 throw ( EParamProblem ("Empty parameter file provided") );

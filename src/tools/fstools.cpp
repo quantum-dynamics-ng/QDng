@@ -118,8 +118,10 @@ namespace QDLIB {
       
       ret =  stat(name.c_str(), &statbuf);
       
-      if (ret != 0)
-	 throw ( EIOError(errno, name) );
+      if (ret != 0 && errno != ENOENT)
+         throw ( EIOError(errno, name) );
+      else if (ret != 0 && errno == ENOENT)
+         return false;
       
       if (S_ISREG(statbuf.st_mode)) return true;
       
