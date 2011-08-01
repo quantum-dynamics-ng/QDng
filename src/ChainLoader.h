@@ -90,9 +90,6 @@ namespace QDLIB
       OMultistate* ms;
       ms = dynamic_cast<OMultistate*>(O);
       if (ms != NULL){
-         if (! ms->Hermitian())
-            throw (EParamProblem("Non-hermitian Multistates unsupported")); /** \todo implement for non-hermitian ms ? */
-         
 	 OMultistate* package = new OMultistate();
          sop = new C*[n];
 	 package->States(ms->States());
@@ -104,6 +101,11 @@ namespace QDLIB
                   res = FindOperatorType<C>(ms->State(i,j), sop, max, label, index+nops);
 		  if (res != NULL){
 		     package->Add(res, i, j);
+		     if (ms->State(i,j) != ms->State(j,i)){  /* The operator/matrix element you're looking for must hermitian e.g. the same object */
+		        stringstream ss;
+		        ss << "(" << i << ", " << j << ")";
+		        throw (EParamProblem("Non-hermitian Multistate element found at ", ss.str()));
+		     }
                      for (int k=0; k < max; k++){
                         found[index+nops+k] = sop[index+nops+k];
                         if (nops+k >= n){
