@@ -458,7 +458,7 @@ namespace QDLIB {
    {
       /* Read meta file & Init */
       if (!_drop_meta){
-	 ParamContainer p;
+	 ParamContainer& p = data->Params();
          ReadMeta(p);
 	 data->Init(p);
       }

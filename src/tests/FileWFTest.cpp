@@ -79,6 +79,7 @@ void FileWFTest::IO_Test_Single()
    *psi *= cexpI(M_PI);
    
    /* Setup FileWF class for writing to disk */
+   file.Compress(false);
    file.Name("TEST");
    file.Suffix(".wftest");
    
@@ -338,6 +339,7 @@ void FileWFTest::IO_Test_Multistate()
    CPPUNIT_ASSERT_NO_THROW( wfm->Add(psi1, 1) );
       
    /* Setup file writer */
+   file.Compress(false);
    file.Name("TESTMS");
    file.Suffix(".wftest");
    
