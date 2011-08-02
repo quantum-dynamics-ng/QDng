@@ -234,7 +234,7 @@ int main(int argc, char **argv)
 	 prognodes = &rnodes;
       
 	 /* Check if debug output is requested */
-	 if (!gp.isPresent("debug")){
+	 if (gp.isPresent("debug")){
 	    bool dbg;
 	    gp.GetValue("debug", dbg);
 	    log.Debug(dbg);

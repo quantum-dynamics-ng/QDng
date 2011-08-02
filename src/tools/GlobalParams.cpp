@@ -13,8 +13,6 @@ namespace QDLIB {
 
          KeyValFile config;
 
-         cout << "construct\n";
-
          /* Look for config file in home */
          string home(getenv("HOME"));
          if ( FS::IsFile(home + "/" + QD_CONFIG_FILE_HOME) ){
