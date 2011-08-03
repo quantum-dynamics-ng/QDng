@@ -64,7 +64,7 @@ namespace QDLIB
       if (list != NULL){
          sop = new C*[n];
          OList* package = dynamic_cast<OList*>(list->NewInstance());
-         package->SubInit(false);
+         package->SubInit(true);
 	 for(int i=0; i < list->Size(); i++){
              max=n;
              res = FindOperatorType<C>((*list)[i], sop, max, label, index+nops);
@@ -93,7 +93,6 @@ namespace QDLIB
 	 OMultistate* package = new OMultistate();
          sop = new C*[n];
 	 package->States(ms->States());
-         package->SubInit(false);
 	 for(int i=0; i < ms->States(); i++){
             for(int j=0; j < i; j++){
 	       if (ms->State(i,j) != NULL){ 

@@ -70,6 +70,7 @@ namespace QDLIB {
 	 void _InitParams();
 	 void _InitSumOperator();
 	 void _Finalize();
+	 void _WriteMeta();
 
       public:
 	 ProgPropa(XmlNode &PropaNode);

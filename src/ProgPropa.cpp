@@ -134,18 +134,12 @@ namespace QDLIB {
       _reporter.SciNorm(_scinorm);
    }
 
-
    /**
-    * Close log files und write Propagation.meta
+    * Write Propagation.meta
     */
-   void ProgPropa::_Finalize()
+   void ProgPropa::_WriteMeta()
    {
-      Logger& log = Logger::InstanceRef();
       QDClock *clock = QDGlobalClock::Instance(); /* use the global clock */
-      if (_writenorm)
-         log.FileClose();
-
-      _reporter.Finalize();
 
       /* Write propagation meta file*/
       ParamContainer p;
@@ -157,6 +151,20 @@ namespace QDLIB {
       KeyValFile meta_file_propa(_dir + "Propagation" + METAFILE_SUFFIX);
       if (!meta_file_propa.Write(p))
          EIOError("Can not write meta file");
+   }
+
+   /**
+    * Close log files und write Propagation.meta
+    */
+   void ProgPropa::_Finalize()
+   {
+      Logger& log = Logger::InstanceRef();
+
+      if (_writenorm)
+         log.FileClose();
+
+      _reporter.Finalize();
+      _WriteMeta();
    }
 
 
@@ -310,6 +318,7 @@ namespace QDLIB {
 	if (_usepost) _postfilter.Apply( Psi );/* Apply post-filters*/
 	if (i % _wcycle == 0){
            wfile << Psi;  /* Write wavefunction */
+           _WriteMeta(); /* Write meta file */
         }
       }
       } catch (Exception e) {

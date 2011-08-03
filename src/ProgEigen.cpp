@@ -109,7 +109,7 @@ namespace QDLIB
       
       /* Init the clock */
       if ( !attr.isPresent("dt") ) 
-	 throw ( EParamProblem ("No Delta t given") );
+	 throw ( EParamProblem ("No Delta t given") ); /** \todo If method=ac and propagation is taken from read => no dt is needed in input */
       
       attr.GetValue("dt", _dt);
                      
