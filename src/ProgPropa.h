@@ -70,7 +70,7 @@ namespace QDLIB {
 	 void _InitParams();
 	 void _InitSumOperator();
 	 void _Finalize();
-	 void _WriteMeta();
+	 void _WriteMeta(int Nt = QDGlobalClock::Instance()->Steps());
 
       public:
 	 ProgPropa(XmlNode &PropaNode);

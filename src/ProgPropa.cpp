@@ -137,14 +137,14 @@ namespace QDLIB {
    /**
     * Write Propagation.meta
     */
-   void ProgPropa::_WriteMeta()
+   void ProgPropa::_WriteMeta(int Nt)
    {
       QDClock *clock = QDGlobalClock::Instance(); /* use the global clock */
 
       /* Write propagation meta file*/
       ParamContainer p;
       p.SetValue("CLASS", "Propagation");
-      p.SetValue("Nt", clock->Steps());
+      p.SetValue("Nt", Nt);
       p.SetValue("dt", clock->Dt());
       p.SetValue("WFBaseName", _fname);
       p.SetValue("Wcycle", _wcycle);
@@ -318,7 +318,7 @@ namespace QDLIB {
 	if (_usepost) _postfilter.Apply( Psi );/* Apply post-filters*/
 	if (i % _wcycle == 0){
            wfile << Psi;  /* Write wavefunction */
-           _WriteMeta(); /* Write meta file */
+           _WriteMeta(i); /* Write meta file */
         }
       }
       } catch (Exception e) {

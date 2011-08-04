@@ -271,11 +271,13 @@ namespace QDLIB
          pres.SetValue("step", 1);
          pres.SetValue("files", _dir+_fname);
          _P->Init(pres);
+         _P->Init(_PsiInitial);
          log.cout() << "Re-read eigenfunctions 0-" << _start-1 << endl<<endl;
       }
             
       /* Recalc Energies */
       if (_start > 0) {
+         _efile.Counter(_start); /* Set the file counter to the right value */
          for (int i=0; i < _start; i++){
             _Energies_raw[i] = _H->Expec(_P->Get(i) );
          }

@@ -41,7 +41,7 @@ namespace QDLIB
       
       if (pm.isPresent("ref")) {
          pm.GetValue("ref", ref);
-	 log.cout() << "Reference to " << ref << endl;
+	 log.cout() << "Reference to " << ref << endl << endl;
          return OpList[ref];
       }
 

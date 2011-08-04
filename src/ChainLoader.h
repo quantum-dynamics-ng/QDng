@@ -64,7 +64,6 @@ namespace QDLIB
       if (list != NULL){
          sop = new C*[n];
          OList* package = dynamic_cast<OList*>(list->NewInstance());
-         package->SubInit(true);
 	 for(int i=0; i < list->Size(); i++){
              max=n;
              res = FindOperatorType<C>((*list)[i], sop, max, label, index+nops);

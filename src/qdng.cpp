@@ -257,6 +257,7 @@ int main(int argc, char **argv)
       log.cout() <<  endl;
       log.Header("Global Parameters", Logger::SubSection);
       log.cout() << gp;
+      log.cout() << endl;
       log.flush();
       if (log.Debug())
 	 log.cout() << "Debug output on\n";

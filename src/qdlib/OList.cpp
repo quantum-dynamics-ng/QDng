@@ -3,7 +3,7 @@
 namespace QDLIB {
 
    OList::OList()
-      : Operator(), _size(0), _subinit(true)
+      : Operator(), _size(0)
    {
       for(int i=0; i < MAX_OPS; i++){
          _O[i] = NULL;
@@ -89,10 +89,8 @@ namespace QDLIB {
 
    void OList::Init( WaveFunction *Psi)
    {
-      if (_subinit){
-         for(int i=0; i < _size; i++){
-            _O[i]->Init(Psi);
-         }
+      for(int i=0; i < _size; i++){
+         _O[i]->Init(Psi);
       }
    }
 
