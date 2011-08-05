@@ -38,6 +38,10 @@ install-exec-hook:
         	$(DESTDIR)$(pkglibdir)/PeakFinder$(MEXEXT)
 	$(LN_S) -f $(DESTDIR)$(pkglibdir)/libQDParams.so \
         	$(DESTDIR)$(pkglibdir)/QDParams$(MEXEXT)
+	$(LN_S) -f $(DESTDIR)$(pkglibdir)/libQDReadMeta.so \
+        	$(DESTDIR)$(pkglibdir)/QDReadMeta$(MEXEXT)
+	$(LN_S) -f $(DESTDIR)$(pkglibdir)/libQDWriteMeta.so \
+        	$(DESTDIR)$(pkglibdir)/QDWriteMeta$(MEXEXT)
         	
 #CXXFLAGS  = -O1
 
@@ -60,11 +64,12 @@ pkglib_LTLIBRARIES = libget_wf_handle.la \
 	libinit_wf_file.la libwrite_wf_file.la libdelete_wf_handle.la \
 	libinit_wf_struct.la libwf_mod.la libget_all_wf_handle.la \
 	libinit_op.la libdelete_op_handle.la libapply_op.la  \
-	libexpec_op.la libget_all_op_handle.la libPeakFinder.la libQDParams.la
+	libexpec_op.la libget_all_op_handle.la libPeakFinder.la libQDParams.la \ 
+	libQDReadMeta.la libQDWriteMeta.la
 
 pkglib_DATA = apply_op.m delete_wf_handle.m  get_all_op_handle.m  get_wf_handle.m  init_wf_file.m  wf_mod.m \
 	delete_op_handle.m  expec_op.m  get_all_wf_handle.m  init_op.m  init_wf_struct.m  write_wf_file.m PeakFinder.m \
-	QDParams.m
+	QDParams.m QDReadMeta.m QDWriteMeta.m
 
 
 #	libmextest2.la libreadwfstatic.la readwf.la
@@ -171,3 +176,13 @@ libQDParams_la_SOURCES = QDParams.cpp
 libQDParams_CXXFLAGS  = $(MATLAB_FLAGS)
 libQDParams_la_LDFLAGS = $(MATLAB_LINK) -version-info $(MEX_INTERFACE_VERSION)
 libQDParams_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+libQDReadMeta_la_SOURCES = QDReadMeta.cpp
+libQDReadMeta_CXXFLAGS  = $(MATLAB_FLAGS)
+libQDReadMeta_la_LDFLAGS = $(MATLAB_LINK) -version-info $(MEX_INTERFACE_VERSION)
+libQDReadMeta_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)
+
+libQDWriteMeta_la_SOURCES = QDWriteMeta.cpp
+libQDWriteMeta_CXXFLAGS  = $(MATLAB_FLAGS)
+libQDWriteMeta_la_LDFLAGS = $(MATLAB_LINK) -version-info $(MEX_INTERFACE_VERSION)
+libQDWriteMeta_la_LIBADD = $(top_builddir)/src/lib/libqdng.la $(top_builddir)/src/mex/libs/libObjectHandle.la $(MATLAB_LIB)

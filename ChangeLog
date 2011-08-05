@@ -2,6 +2,8 @@ x.x.x
   * OCT support for operators which are marked as non-hermitian.
   * Added external config files for global parameters in home dir and cwd (~/.qdconfig and .qdconfig)
   * Added mex-module for the peak finder
+  * Added mex-module for global parameters
+  * Added mex-modules for meta files
   * bzip2 support for qdz
 
 0.6.1

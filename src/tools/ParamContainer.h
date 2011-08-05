@@ -58,6 +58,8 @@ typedef map<string,string> string_map;
 	 
 	 void clear();
 	 
+	 size_t Size() { return _param_map.size(); }
+
 	 void SetValue(const string name, const char *value);
 	 void SetValue(const string name, const string &value);
 	 void SetValue(const string name, const int &value);

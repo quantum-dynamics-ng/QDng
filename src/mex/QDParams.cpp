@@ -7,7 +7,7 @@
 
 #include "mex.h"
 #include "tools/GlobalParams.h"
-
+#include "mex/libs/DataConversion.h"
 
 /**
  * Set or get QDng global parameters.
@@ -46,21 +46,8 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 
       /* Get the key */
       char* key = mxArrayToString(prhs[0]);
-      char* sval;
 
-      /* Get the value */
-      switch (mxGetClassID(prhs[1])){
-         case mxCHAR_CLASS:
-            sval = mxArrayToString(prhs[1]);
-            pm.SetValue(key, sval);
-            mxFree(sval);
-            break;
-         case mxDOUBLE_CLASS:
-            pm.SetValue(key, *(mxGetPr(prhs[1])) );
-            break;
-         default:
-            mexErrMsgTxt("Value has incompatble type");
-      }
+      QDMEX::DataConversion::ParamContainerSetValue(pm, key, prhs[1]);
 
       mxFree(key);
    } else  /* Any thing else is an error */
