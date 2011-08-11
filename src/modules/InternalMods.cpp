@@ -14,6 +14,7 @@
 #include "qdlib/OGridGMat.h"
 #include "qdlib/OGridPotential.h"
 #include "qdlib/OGridDipole.h"
+#include "qdlib/OGridRaman.h"
 #include "qdlib/OGridPosition.h"
 #include "qdlib/OGridNAC.h"
 #include "qdlib/OGridKick.h"
@@ -72,6 +73,7 @@ namespace QDLIB
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridGMat)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridPotential)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridDipole)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridRaman)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridPosition)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNabla)
 
@@ -120,6 +122,7 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(OGridGMat)
       QDNG_STRING_TO_INSTANCE_PTR(OGridPotential)
       QDNG_STRING_TO_INSTANCE_PTR(OGridDipole)
+      QDNG_STRING_TO_INSTANCE_PTR(OGridRaman)
       QDNG_STRING_TO_INSTANCE_PTR(OGridPosition)
 
       /* This is an alias */

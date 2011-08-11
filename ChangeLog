@@ -1,4 +1,6 @@
 x.x.x
+  * Increased max. number of filters.
+  * Added Raman Operator for 2 Photon couplings
   * OCT support for operators which are marked as non-hermitian.
   * Added external config files for global parameters in home dir and cwd (~/.qdconfig and .qdconfig)
   * Added mex-module for the peak finder

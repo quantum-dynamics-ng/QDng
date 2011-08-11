@@ -11,6 +11,7 @@ namespace QDLIB {
    QDLIB::OLaser::OLaser(int num) :  _numlasers(num), _Pol(NULL), _UsePol(false)
    {
       _laser = new Laser[num];
+      _isTimedependent = true;
    }
    
    OLaser::~OLaser()
@@ -111,17 +112,36 @@ namespace QDLIB {
             file << GetLaser();
          }
       } else
-         GetLaser()->Clock(cl);
+         for (int i=0; i < _numlasers; i++)
+            GetLaser(i)->Clock(cl);
       
    }
    
    void OLaser::Init(ParamContainer &params)
    {
       /* Read the laser field */
-      if (params.isPresent("laser")){
+      if (_numlasers > 1) {
+         for (int i=0; i < _numlasers; i++) {
+            stringstream id;
+            string name;
+            Laser::FileLaser file = GetLaser(i)->File();
+            id << "laser" << i;
+            if ( params.isPresent(id.str()) ) /* Try laser# */
+               params.GetValue(id.str(), name);
+            else { /* Otherwise try default "laser" */
+               if (! params.isPresent("laser") )
+                  throw( EParamProblem("Missing laser field") );
+               else
+                 params.GetValue("laser", name);
+            }
+            file.Suffix(BINARY_O_SUFFIX);
+            file.Name(name);
+            file >> GetLaser(i);
+         }
+      } else if (params.isPresent("laser")){
          string name;
          Laser::FileLaser file = GetLaser()->File();
-         
+
          params.GetValue("laser", name);
          file.Suffix(BINARY_O_SUFFIX);
          file.Name(name);

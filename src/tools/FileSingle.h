@@ -482,9 +482,9 @@ namespace QDLIB {
             file.SetName( name );
             
             if ( !file.Parse(p) )
-               throw( EIOError("Can not read meta file", name) );
+               throw( EIOError("Can not read meta file", name + " or " + _name) );
          } else {
-            throw( EIOError("Can not read meta file", name) );
+            throw( EIOError("Can not read meta file", name + " or " + _name) );
          }
       }
    }

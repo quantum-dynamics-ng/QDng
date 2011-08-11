@@ -8,7 +8,7 @@
 #include "tools/XmlNode.h"
 #include "tools/QDGlobalClock.h"
 
-#define MAX_FILTERS 32           /* Maximum number of filters */
+#define MAX_FILTERS 128           /* Maximum number of filters */
 #define DEFAULT_EXPEC_FILENAME "expec.dat"  /* Default filename for expectation values */
 
 namespace QDLIB {
