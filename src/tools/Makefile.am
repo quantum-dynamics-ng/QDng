@@ -8,4 +8,4 @@ AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 toolsdir = $(pkgincludedir)/tools
 tools_HEADERS = Exception.h FileSingleDefs.h FileSingle.h fstools.h Getopt.h \
 	GlobalParams.h helpers.h KeyValFile.h Logger.h ParamContainer.h QDClock.h \
-	QDGlobalClock.h tnt_io.h XmlNode.h XmlParser.h Collector.h PeakFinder.h
+	QDGlobalClock.h tnt_io.h XmlNode.h XmlParser.h Collector.h PeakFinder.h TmpFile.h
