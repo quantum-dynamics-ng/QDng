@@ -3,8 +3,7 @@
 
 namespace QDLIB {
    
-   Laser::Laser() : _name("Laser"), _clock(NULL), _fft(NULL),
-      _spectrum(NULL)
+   Laser::Laser() : _name("Laser"), _clock(NULL), _scale(1), _fft(NULL), _spectrum(NULL)
    {}
 
    Laser::~ Laser()
@@ -120,7 +119,7 @@ namespace QDLIB {
     */
    double Laser::Get()
    {
-      return (*this)[_clock->TimeStep()];
+      return (*this)[_clock->TimeStep()] * _scale;
    }
    
    /**
@@ -158,7 +157,7 @@ namespace QDLIB {
       for(int i=0; i < size(); i++){
 	 d += (*this)[i] * (*this)[i];
       }
-
+      d *= _scale;
       return ( 137.0359996  / (4 * M_PI) * d * _dt );
       /*       c0 in au          eps_0 in au             */
    }

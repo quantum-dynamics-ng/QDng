@@ -102,6 +102,7 @@ namespace QDLIB {
             }
          }
          
+         /* Write generated laser to file */
          if (_genParams.isPresent("lasero")){
             string fname;
             Laser::FileLaser file = GetLaser()->File();
@@ -111,10 +112,18 @@ namespace QDLIB {
             file.Name(fname);
             file << GetLaser();
          }
-      } else
+      } else { /* Init existing laser with clock */
          for (int i=0; i < _numlasers; i++)
             GetLaser(i)->Clock(cl);
-      
+      }
+
+      /* Set scaling factor */
+      if ( _params.isPresent("scale") ){
+         double s;
+         _params.GetValue("scale", s);
+         for (int i=0; i < _numlasers; i++)
+            GetLaser(i)->Scale(s);
+      }
    }
    
    void OLaser::Init(ParamContainer &params)
