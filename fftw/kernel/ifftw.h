@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,6 +62,10 @@
   typedef long double R;
 # define X(name) CONCAT(fftwl_, name)
 # define TRIGREAL_IS_LONG_DOUBLE
+#elif defined(FFTW_QUAD)
+  typedef __float128 R;
+# define X(name) CONCAT(fftwq_, name)
+# define TRIGREAL_IS_QUAD
 #else
   typedef double R;
 # define X(name) CONCAT(fftw_, name)
@@ -86,12 +90,16 @@ extern void X(extract_reim)(int sign, R *c, R **r, R **i);
 #define STRINGIZEx(x) #x
 #define STRINGIZE(x) STRINGIZEx(x)
 
+/* define HAVE_SIMD if any simd extensions are supported */
 #if defined(HAVE_SSE) || defined(HAVE_SSE2) || defined(HAVE_ALTIVEC) || \
-    defined(HAVE_MIPS_PS)
+     defined(HAVE_MIPS_PS) || defined(HAVE_AVX)
 #define HAVE_SIMD 1
 #else
 #define HAVE_SIMD 0
 #endif
+
+extern int X(have_simd_sse2)(void);
+extern int X(have_simd_avx)(void);
 
 /* forward declarations */
 typedef struct problem_s problem;
@@ -103,8 +111,16 @@ typedef struct scanner_s scanner;
 
 /*-----------------------------------------------------------------------*/
 /* alloca: */
-#if HAVE_SIMD || HAVE_CELL
-#define MIN_ALIGNMENT 16
+#if HAVE_SIMD
+#  ifdef HAVE_AVX
+#    define MIN_ALIGNMENT 32  /* best alignment for AVX, conservative for
+			       * everything else */
+#  else
+     /* Note that we cannot use 32-byte alignment for all SIMD.  For
+	example, MacOS X malloc is 16-byte aligned, but there was no
+	posix_memalign in MacOS X until version 10.6. */
+#    define MIN_ALIGNMENT 16
+#  endif
 #endif
 
 #if defined(HAVE_ALLOCA) && defined(FFTW_ENABLE_ALLOCA)
@@ -134,23 +150,47 @@ void *alloca(size_t);
 #endif
 
 #  ifdef MIN_ALIGNMENT
-#    define STACK_MALLOC(T, p, x)				\
+#    define STACK_MALLOC(T, p, n)				\
      {								\
-         p = (T)alloca((x) + MIN_ALIGNMENT);			\
+         p = (T)alloca((n) + MIN_ALIGNMENT);			\
          p = (T)(((uintptr_t)p + (MIN_ALIGNMENT - 1)) &	\
                (~(uintptr_t)(MIN_ALIGNMENT - 1)));		\
      }
-#    define STACK_FREE(x) 
+#    define STACK_FREE(n) 
 #  else /* HAVE_ALLOCA && !defined(MIN_ALIGNMENT) */
-#    define STACK_MALLOC(T, p, x) p = (T)alloca(x) 
-#    define STACK_FREE(x) 
+#    define STACK_MALLOC(T, p, n) p = (T)alloca(n) 
+#    define STACK_FREE(n) 
 #  endif
 
 #else /* ! HAVE_ALLOCA */
    /* use malloc instead of alloca */
-#  define STACK_MALLOC(T, p, x) p = (T)MALLOC(x, OTHER)
-#  define STACK_FREE(x) X(ifree)(x)
+#  define STACK_MALLOC(T, p, n) p = (T)MALLOC(n, OTHER)
+#  define STACK_FREE(n) X(ifree)(n)
 #endif /* ! HAVE_ALLOCA */
+
+/* allocation of buffers.  If these grow too large use malloc(), else
+   use STACK_MALLOC (hopefully reducing to alloca()). */
+
+/* 64KiB ought to be enough for anybody */
+#define MAX_STACK_ALLOC ((size_t)64 * 1024)
+
+#define BUF_ALLOC(T, p, n)			\
+{						\
+     if (n < MAX_STACK_ALLOC) {			\
+	  STACK_MALLOC(T, p, n);		\
+     } else {					\
+	  p = (T)MALLOC(n, BUFFERS);		\
+     }						\
+}
+
+#define BUF_FREE(p, n)				\
+{						\
+     if (n < MAX_STACK_ALLOC) {			\
+	  STACK_FREE(p);			\
+     } else {					\
+	  X(ifree)(p);				\
+     }						\
+}
 
 /*-----------------------------------------------------------------------*/
 /* define uintptr_t if it is not already defined */
@@ -232,14 +272,12 @@ extern void X(ifree0)(void *ptr);
 IFFTW_EXTERN void *X(malloc_debug)(size_t n, enum malloc_tag what,
 			     const char *file, int line);
 #define MALLOC(n, what) X(malloc_debug)(n, what, __FILE__, __LINE__)
-#define NATIVE_MALLOC(n, what) MALLOC(n, what)
 IFFTW_EXTERN void X(malloc_print_minfo)(int vrbose);
 
 #else /* ! FFTW_DEBUG_MALLOC */
 
 IFFTW_EXTERN void *X(malloc_plain)(size_t sz);
 #define MALLOC(n, what)  X(malloc_plain)(n)
-#define NATIVE_MALLOC(n, what) malloc(n)
 
 #endif
 
@@ -693,6 +731,8 @@ struct planner_s {
      void (*hook)(struct planner_s *plnr, plan *pln, 
 		  const problem *p, int optimalp);
      double (*cost_hook)(const problem *p, double t, cost_kind k);
+     int (*wisdom_ok_hook)(const problem *p, flags_t flags);
+     void (*nowisdom_hook)(const problem *p);
 
      /* solver descriptors */
      slvdesc *slvdescs;
@@ -838,8 +878,10 @@ void X(twiddle_awake)(enum wakefulness wakefulness,
 
 /*-----------------------------------------------------------------------*/
 /* trig.c */
-#ifdef TRIGREAL_IS_LONG_DOUBLE
+#if defined(TRIGREAL_IS_LONG_DOUBLE)
    typedef long double trigreal;
+#elif defined(TRIGREAL_IS_QUAD)
+   typedef __float128 trigreal;
 #else
    typedef double trigreal;
 #endif
@@ -940,17 +982,14 @@ typedef void (*cpy2d_func)(R *I, R *O,
 			   INT n1, INT is1, INT os1,
 			   INT vl);
 
-#if HAVE_CELL
-int X(cell_transpose_applicable)(R *I, const iodim *d, INT vl);
-void X(cell_transpose)(R *I, INT n, INT s0, INT s1, INT vl);
-int X(cell_copy_applicable)(R *I, R *O, const iodim *n, const iodim *v);
-void X(cell_copy)(R *I, R *O, const iodim *n, const iodim *v);
-#endif
-
 /*-----------------------------------------------------------------------*/
 /* misc stuff */
 void X(null_awake)(plan *ego, enum wakefulness wakefulness);
 double X(iestimate_cost)(const planner *, const plan *, const problem *);
+
+#ifdef FFTW_RANDOM_ESTIMATOR
+extern unsigned X(random_estimate_seed);
+#endif
 
 double X(measure_execution_time)(const planner *plnr, 
 				 plan *pln, const problem *p);
@@ -963,7 +1002,7 @@ INT X(bufdist)(INT n, INT vl);
 int X(toobig)(INT n);
 int X(ct_uglyp)(INT min_n, INT v, INT n, INT r);
 
-#if HAVE_SIMD || HAVE_CELL
+#if HAVE_SIMD
 R *X(taint)(R *p, INT s);
 R *X(join_taint)(R *p1, R *p2);
 #define TAINT(p, s) X(taint)(p, s)
@@ -993,8 +1032,10 @@ R *X(join_taint)(R *p1, R *p2);
 
 typedef R E;  /* internal precision of codelets. */
 
-#ifdef FFTW_LDOUBLE
+#if defined(FFTW_LDOUBLE)
 #  define K(x) ((E) x##L)
+#elif defined(FFTW_QUAD)
+#  define K(x) ((E) x##Q)
 #else
 #  define K(x) ((E) x)
 #endif
@@ -1077,57 +1118,6 @@ static __inline__ E FNMS(E a, E b, E c)
 #define FMS(a, b, c) (((a) * (b)) - (c))
 #define FNMA(a, b, c) (- (((a) * (b)) + (c)))
 #define FNMS(a, b, c) ((c) - ((a) * (b)))
-#endif
-
-/* stack-alignment hackery */
-#ifdef __ICC /* Intel's compiler for ia32 */
-#define WITH_ALIGNED_STACK(what)				\
-{								\
-     /*								\
-      * Simply calling alloca seems to do the right thing.	\
-      * The size of the allocated block seems to be irrelevant.	\
-      */							\
-     _alloca(16);						\
-     what							\
-}
-#endif
-
-#if defined(__GNUC__) && defined(__i386__) && !defined(WITH_ALIGNED_STACK) \
-    && !(defined(__MACOSX__) || defined(__APPLE__)) /* OSX ABI is aligned */
-/*
- * horrible hack to align the stack to a 16-byte boundary.
- *
- * We assume a gcc version >= 2.95 so that
- * -mpreferred-stack-boundary works.  Otherwise, all bets are
- * off.  However, -mpreferred-stack-boundary does not create a
- * stack alignment, but it only preserves it.  Unfortunately,
- * many versions of libc on linux call main() with the wrong
- * initial stack alignment, with the result that the code is now
- * pessimally aligned instead of having a 50% chance of being
- * correct.
- */
-
-#define WITH_ALIGNED_STACK(what)				\
-{								\
-     /*								\
-      * Use alloca to allocate some memory on the stack.	\
-      * This alerts gcc that something funny is going		\
-      * on, so that it does not omit the frame pointer		\
-      * etc.							\
-      */							\
-     (void)__builtin_alloca(16);				\
-								\
-     /*								\
-      * Now align the stack pointer				\
-      */							\
-     __asm__ __volatile__ ("andl $-16, %esp");			\
-								\
-     what							\
-}
-#endif
-
-#ifndef WITH_ALIGNED_STACK
-#define WITH_ALIGNED_STACK(what) what
 #endif
 
 #endif /* __IFFTW_H__ */

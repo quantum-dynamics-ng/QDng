@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Row-major Format - FFTW 3.2.2</title>
+<title>Row-major Format - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array-Format" title="Multi-dimensional Array Format">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -57,7 +57,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Multi_002ddimensional-Array-Format.html
 
 <h4 class="subsection">3.2.1 Row-major Format</h4>
 
-<p><a name="index-row_002dmajor-112"></a>
+<p><a name="index-row_002dmajor-115"></a>
 The multi-dimensional arrays passed to <code>fftw_plan_dft</code> etcetera
 are expected to be stored as a single contiguous block in
 <dfn>row-major</dfn> order (sometimes called &ldquo;C order&rdquo;).  Basically, this
@@ -80,13 +80,13 @@ must be of type <code>fftw_complex</code>; i.e. a (real, imaginary) pair of
 which the indices are computed can be different from (larger than)
 the logical dimensions of the transform to be computed, in order to
 transform a subset of a larger array. 
-<a name="index-advanced-interface-113"></a>Note also that, in the advanced interface, the expression above is
+<a name="index-advanced-interface-116"></a>Note also that, in the advanced interface, the expression above is
 multiplied by a <dfn>stride</dfn> to get the actual array index&mdash;this is
 useful in situations where each element of the multi-dimensional array
 is actually a data structure (or another array), and you just want to
 transform a single field. In the basic interface, however, the stride
 is 1. 
-<a name="index-stride-114"></a>
+<a name="index-stride-117"></a>
 <!-- =========> -->
 
    </body></html>

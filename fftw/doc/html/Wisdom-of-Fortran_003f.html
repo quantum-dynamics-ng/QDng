@@ -1,16 +1,16 @@
 <html lang="en">
 <head>
-<title>Wisdom of Fortran? - FFTW 3.2.2</title>
+<title>Wisdom of Fortran? - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
-<link rel="up" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran" title="Calling FFTW from Fortran">
+<link rel="up" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran" title="Calling FFTW from Legacy Fortran">
 <link rel="prev" href="Fortran-Examples.html#Fortran-Examples" title="Fortran Examples">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -49,25 +49,26 @@ Copyright (C) 2003 Massachusetts Institute of Technology.
 <a name="Wisdom-of-Fortran_003f"></a>
 <p>
 Previous:&nbsp;<a rel="previous" accesskey="p" href="Fortran-Examples.html#Fortran-Examples">Fortran Examples</a>,
-Up:&nbsp;<a rel="up" accesskey="u" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran">Calling FFTW from Fortran</a>
+Up:&nbsp;<a rel="up" accesskey="u" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">Calling FFTW from Legacy Fortran</a>
 <hr>
 </div>
 
-<h3 class="section">7.5 Wisdom of Fortran?</h3>
+<h3 class="section">8.5 Wisdom of Fortran?</h3>
 
 <p>In this section, we discuss how one can import/export FFTW wisdom
 (saved plans) to/from a Fortran program; we assume that the reader is
 already familiar with wisdom, as described in <a href="Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">Words of Wisdom-Saving Plans</a>.
 
-   <p><a name="index-portability-352"></a>The basic problem is that is difficult to (portably) pass files and
+   <p><a name="index-portability-596"></a>The basic problem is that is difficult to (portably) pass files and
 strings between Fortran and C, so we cannot provide a direct Fortran
 equivalent to the <code>fftw_export_wisdom_to_file</code>, etcetera,
 functions.  Fortran interfaces <em>are</em> provided for the functions
 that do not take file/string arguments, however:
 <code>dfftw_import_system_wisdom</code>, <code>dfftw_import_wisdom</code>,
 <code>dfftw_export_wisdom</code>, and <code>dfftw_forget_wisdom</code>. 
-<a name="index-dfftw_005fimport_005fsystem_005fwisdom-353"></a><a name="index-dfftw_005fimport_005fwisdom-354"></a><a name="index-dfftw_005fexport_005fwisdom-355"></a><a name="index-dfftw_005fforget_005fwisdom-356"></a>
-So, for example, to import the system-wide wisdom, you would do:
+<a name="index-dfftw_005fimport_005fsystem_005fwisdom-597"></a><a name="index-dfftw_005fimport_005fwisdom-598"></a><a name="index-dfftw_005fexport_005fwisdom-599"></a><a name="index-dfftw_005fforget_005fwisdom-600"></a>
+
+   <p>So, for example, to import the system-wide wisdom, you would do:
 
 <pre class="example">             integer isuccess
              call dfftw_import_system_wisdom(isuccess)
@@ -86,6 +87,5 @@ implement <code>import_wisdom_from_file</code> and
 cannot be compiled into the FFTW library itself, lest all FFTW-using
 programs be required to link with the Fortran I/O library.)
 
-<!-- ************************************************************ -->
    </body></html>
 

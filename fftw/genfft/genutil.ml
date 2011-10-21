@@ -1,7 +1,7 @@
 (*
  * Copyright (c) 1997-1999 Massachusetts Institute of Technology
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -237,10 +237,13 @@ let declare_register_fcn name =
   if name = "" then
     "void NAME(planner *p)\n"
   else 
-    "void X(codelet_" ^ name ^ ")(planner *p)\n"
+    "void " ^ (choose_simd "X" "XSIMD") ^
+      "(codelet_" ^ name ^ ")(planner *p)\n"
 
 let stringify name = 
-  if name = "" then "STRINGIZE(NAME)" else "\"" ^ name ^ "\""
+  if name = "" then "STRINGIZE(NAME)" else 
+    choose_simd ("\"" ^ name ^ "\"")
+      ("XSIMD_STRING(\"" ^ name ^ "\")")
 
 let parse user_speclist usage =
   Arg.parse
@@ -303,7 +306,7 @@ let unparse tree =
   else
     C.unparse_function tree)
 
-let add_constants ast = 
+let finalize_fcn ast = 
   let mergedecls = function
       C.Block (d1, [C.Block (d2, s)]) -> C.Block (d1 @ d2, s)
     | x -> x
@@ -313,7 +316,7 @@ let add_constants ast =
     else
       C.extract_constants
 	
-  in mergedecls (C.Block (extract_constants ast, [ast]))
+  in mergedecls (C.Block (extract_constants ast, [ast; C.Simd_leavefun]))
 
 let twinstr_to_string vl x =
   if !Simdmagic.simd_mode then 

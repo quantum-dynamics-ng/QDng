@@ -1,7 +1,7 @@
 (*
  * Copyright (c) 1997-1999 Massachusetts Institute of Technology
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ type c_decl =
 
 and c_ast =
   | Asch of annotated_schedule
+  | Simd_leavefun
   | Return of c_ast
   | For of c_ast * c_ast * c_ast * c_ast
   | If of c_ast * c_ast
@@ -132,6 +133,8 @@ and unparse_expr_generic =
     | [Times (c, d); (Times (a, b))] -> quaternary "FMMA" a b c d
     | [(Uminus (Times (a, b))); c] -> ternary "FNMS" a b c
     | [c; (Uminus (Times (a, b)))] -> ternary "FNMS" a b c
+    | [(Uminus c); (Times (a, b))] -> ternary "FMS" a b c
+    | [(Times (a, b)); (Uminus c)] -> ternary "FMS" a b c
     | [c; (Times (a, b))] -> ternary "FMA" a b c
     | [(Times (a, b)); c] -> ternary "FMA" a b c
     | [a; Uminus b] -> binary "SUB" a b
@@ -202,6 +205,7 @@ and unparse_ast =
   in
   function
     | Asch a -> (unparse_annotated true a)
+    | Simd_leavefun -> "" (* used only in SIMD code *)
     | Return x -> "return " ^ unparse_ast x ^ ";"
     | For (a, b, c, d) ->
 	"for (" ^

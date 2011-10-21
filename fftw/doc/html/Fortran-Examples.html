@@ -1,17 +1,17 @@
 <html lang="en">
 <head>
-<title>Fortran Examples - FFTW 3.2.2</title>
+<title>Fortran Examples - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
-<link rel="up" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran" title="Calling FFTW from Fortran">
+<link rel="up" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran" title="Calling FFTW from Legacy Fortran">
 <link rel="prev" href="FFTW-Execution-in-Fortran.html#FFTW-Execution-in-Fortran" title="FFTW Execution in Fortran">
 <link rel="next" href="Wisdom-of-Fortran_003f.html#Wisdom-of-Fortran_003f" title="Wisdom of Fortran?">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -50,11 +50,11 @@ Copyright (C) 2003 Massachusetts Institute of Technology.
 <p>
 Next:&nbsp;<a rel="next" accesskey="n" href="Wisdom-of-Fortran_003f.html#Wisdom-of-Fortran_003f">Wisdom of Fortran?</a>,
 Previous:&nbsp;<a rel="previous" accesskey="p" href="FFTW-Execution-in-Fortran.html#FFTW-Execution-in-Fortran">FFTW Execution in Fortran</a>,
-Up:&nbsp;<a rel="up" accesskey="u" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran">Calling FFTW from Fortran</a>
+Up:&nbsp;<a rel="up" accesskey="u" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">Calling FFTW from Legacy Fortran</a>
 <hr>
 </div>
 
-<h3 class="section">7.4 Fortran Examples</h3>
+<h3 class="section">8.4 Fortran Examples</h3>
 
 <p>In C, you might have something like the following to transform a
 one-dimensional complex array:
@@ -76,7 +76,7 @@ one-dimensional complex array:
              call dfftw_execute_dft(plan, in, out)
              call dfftw_destroy_plan(plan)
 </pre>
-   <p><a name="index-dfftw_005fplan_005fdft_005f1d-341"></a><a name="index-dfftw_005fexecute_005fdft-342"></a><a name="index-dfftw_005fdestroy_005fplan-343"></a>
+   <p><a name="index-dfftw_005fplan_005fdft_005f1d-585"></a><a name="index-dfftw_005fexecute_005fdft-586"></a><a name="index-dfftw_005fdestroy_005fplan-587"></a>
 Notice how all routines are called as Fortran subroutines, and the
 plan is returned via the first argument to <code>dfftw_plan_dft_1d</code>. 
 Notice also that we changed <code>fftw_execute</code> to
@@ -87,7 +87,7 @@ the same thing, but using 8 threads in parallel (see <a href="Multi_002dthreaded
              call dfftw_init_threads(iret)
              call dfftw_plan_with_nthreads(8)
 </pre>
-   <p><a name="index-dfftw_005finit_005fthreads-344"></a><a name="index-dfftw_005fplan_005fwith_005fnthreads-345"></a>
+   <p><a name="index-dfftw_005finit_005fthreads-588"></a><a name="index-dfftw_005fplan_005fwith_005fnthreads-589"></a>
 (You might want to check the value of <code>iret</code>: if it is zero, it
 indicates an unlikely error during thread initialization.)
 
@@ -112,7 +112,7 @@ indicates an unlikely error during thread initialization.)
              call dfftw_execute_dft(plan, arr, arr)
              call dfftw_destroy_plan(plan)
 </pre>
-   <p><a name="index-dfftw_005fplan_005fdft_005f3d-346"></a>
+   <p><a name="index-dfftw_005fplan_005fdft_005f3d-590"></a>
 Note that we pass the array dimensions in the &ldquo;natural&rdquo; order in both C
 and Fortran.
 
@@ -128,7 +128,7 @@ and Fortran.
              call dfftw_execute_dft_r2c(plan, in, out)
              call dfftw_destroy_plan(plan)
 </pre>
-   <p><a name="index-dfftw_005fplan_005fdft_005fr2c_005f1d-347"></a><a name="index-dfftw_005fexecute_005fdft_005fr2c-348"></a>
+   <p><a name="index-dfftw_005fplan_005fdft_005fr2c_005f1d-591"></a><a name="index-dfftw_005fexecute_005fdft_005fr2c-592"></a>
 To transform a two-dimensional real array, out of place, you might use
 the following:
 
@@ -142,13 +142,13 @@ the following:
              call dfftw_execute_dft_r2c(plan, in, out)
              call dfftw_destroy_plan(plan)
 </pre>
-   <p><a name="index-dfftw_005fplan_005fdft_005fr2c_005f2d-349"></a>
+   <p><a name="index-dfftw_005fplan_005fdft_005fr2c_005f2d-593"></a>
 <strong>Important:</strong> Notice that it is the <em>first</em> dimension of the
 complex output array that is cut in half in Fortran, rather than the
 last dimension as in C.  This is a consequence of the interface routines
 reversing the order of the array dimensions passed to FFTW so that the
 Fortran program can use its ordinary column-major order. 
-<a name="index-column_002dmajor-350"></a><a name="index-r2c_002fc2r-multi_002ddimensional-array-format-351"></a>
+<a name="index-column_002dmajor-594"></a><a name="index-r2c_002fc2r-multi_002ddimensional-array-format-595"></a>
 <!--  -->
 
    </body></html>

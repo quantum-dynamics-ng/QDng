@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Multi-Dimensional DFTs of Real Data - FFTW 3.2.2</title>
+<title>Multi-Dimensional DFTs of Real Data - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Tutorial.html#Tutorial" title="Tutorial">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -69,7 +69,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Tutorial.html#Tutorial">Tutorial</a>
                                  double *in, fftw_complex *out,
                                  unsigned flags);
 </pre>
-   <p><a name="index-fftw_005fplan_005fdft_005fr2c_005f2d-58"></a><a name="index-fftw_005fplan_005fdft_005fr2c_005f3d-59"></a><a name="index-fftw_005fplan_005fdft_005fr2c-60"></a>
+   <p><a name="index-fftw_005fplan_005fdft_005fr2c_005f2d-59"></a><a name="index-fftw_005fplan_005fdft_005fr2c_005f3d-60"></a><a name="index-fftw_005fplan_005fdft_005fr2c-61"></a>
 as well as the corresponding <code>c2r</code> routines with the input/output
 types swapped.  These routines work similarly to their complex
 analogues, except for the fact that here the complex output array is cut
@@ -79,7 +79,7 @@ transforms (as in 1d, above).
    <p>As before, <code>n</code> is the logical size of the array, and the
 consequences of this on the the format of the complex arrays deserve
 careful attention. 
-<a name="index-r2c_002fc2r-multi_002ddimensional-array-format-61"></a>Suppose that the real data has dimensions n<sub>0</sub>&nbsp;&times;&nbsp;n<sub>1</sub>&nbsp;&times;&nbsp;n<sub>2</sub>&nbsp;&times;&nbsp;&hellip;&nbsp;&times;&nbsp;n<sub>d-1</sub> (in row-major order). 
+<a name="index-r2c_002fc2r-multi_002ddimensional-array-format-62"></a>Suppose that the real data has dimensions n<sub>0</sub>&nbsp;&times;&nbsp;n<sub>1</sub>&nbsp;&times;&nbsp;n<sub>2</sub>&nbsp;&times;&nbsp;&hellip;&nbsp;&times;&nbsp;n<sub>d-1</sub> (in row-major order). 
 Then, after an r2c transform, the output is an n<sub>0</sub>&nbsp;&times;&nbsp;n<sub>1</sub>&nbsp;&times;&nbsp;n<sub>2</sub>&nbsp;&times;&nbsp;&hellip;&nbsp;&times;&nbsp;(n<sub>d-1</sub>/2 + 1) array of
 <code>fftw_complex</code> values in row-major order, corresponding to slightly
 over half of the output of the corresponding complex DFT.  (The division
@@ -91,7 +91,7 @@ complications arise for in-place transforms.  In this case, the final
 dimension of the real data must be padded with extra values to
 accommodate the size of the complex data&mdash;two values if the last
 dimension is even and one if it is odd. 
-<a name="index-padding-62"></a>That is, the last dimension of the real data must physically contain
+<a name="index-padding-63"></a>That is, the last dimension of the real data must physically contain
 2 * (n<sub>d-1</sub>/2+1)<code>double</code> values (exactly enough to hold the complex data). 
 This physical array size does not, however, change the <em>logical</em>
 array size&mdash;only
@@ -113,15 +113,15 @@ are only used for output).
    <p>The following illustration depicts the input and output arrays just
 described, for both the out-of-place and in-place transforms (with the
 arrows indicating consecutive memory locations):
-
-   <div class="block-image"><img src="rfftwnd.png" alt="rfftwnd.png"></div>
+<img src="rfftwnd-for-html.png" alt="rfftwnd-for-html.png">
 
    <p>These transforms are unnormalized, so an r2c followed by a c2r
 transform (or vice versa) will result in the original data scaled by
 the number of real data elements&mdash;that is, the product of the
 (logical) dimensions of the real data. 
-<a name="index-normalization-63"></a>
-(Because the last dimension is treated specially, if it is equal to
+<a name="index-normalization-64"></a>
+
+   <p>(Because the last dimension is treated specially, if it is equal to
 <code>1</code> the transform is <em>not</em> equivalent to a lower-dimensional
 r2c/c2r transform.  In that case, the last complex dimension also has
 size <code>1</code> (<code>=1/2+1</code>), and no advantage is gained over the

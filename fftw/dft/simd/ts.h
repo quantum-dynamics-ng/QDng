@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
  *
  */
 
-#include "simd.h"
+#include SIMD_HEADER
 
 #undef LD
 #define LD LDA
@@ -29,6 +29,6 @@
 #define TWVL TWVLS
 #define LDW(x) LDA(x, 0, 0) /* load twiddle factor */
 
-#define GENUS X(dft_tssimd_genus)
+#define GENUS XSIMD(dft_tssimd_genus)
 extern const ct_genus GENUS;
 

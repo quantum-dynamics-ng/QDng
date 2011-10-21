@@ -6,8 +6,12 @@
 #include <string.h>
 #include "fftw-bench.h"
 
-#if defined(HAVE_THREADS) || defined(HAVE_OPENMP)
-#define HAVE_SMP
+#ifdef _OPENMP
+#  include <omp.h>
+#endif
+
+#ifdef HAVE_SMP
+int threads_ok = 1;
 #endif
 
 FFTW(plan) the_plan = 0;
@@ -23,8 +27,8 @@ int amnesia = 0;
 extern void install_hook(void);  /* in hook.c */
 extern void uninstall_hook(void);  /* in hook.c */
 
-#if HAVE_CELL
-extern void FFTW(cell_set_nspe)(int); /* in fftw-cell.h */
+#ifdef FFTW_RANDOM_ESTIMATOR
+extern unsigned FFTW(random_estimate_seed);
 #endif
 
 void useropt(const char *arg)
@@ -46,8 +50,8 @@ void useropt(const char *arg)
      else if (!strcmp(arg, "wisdom")) usewisdom = 1;
      else if (!strcmp(arg, "amnesia")) amnesia = 1;
      else if (sscanf(arg, "nthreads=%d", &x) == 1) nthreads = x;
-#if HAVE_CELL
-     else if (sscanf(arg, "nspe=%d", &x) == 1) FFTW(cell_set_nspe)(x);
+#ifdef FFTW_RANDOM_ESTIMATOR
+     else if (sscanf(arg, "eseed=%d", &x) == 1) FFTW(random_estimate_seed) = x;
 #endif
      else if (sscanf(arg, "timelimit=%lg", &y) == 1) {
 	  FFTW(set_timelimit)(y);
@@ -65,8 +69,17 @@ void rdwisdom(void)
      if (havewisdom) return;
 
 #ifdef HAVE_SMP
-     BENCH_ASSERT(FFTW(init_threads)());
-     FFTW(plan_with_nthreads)(nthreads);
+     if (threads_ok) {
+	  BENCH_ASSERT(FFTW(init_threads)());
+	  FFTW(plan_with_nthreads)(nthreads);
+#ifdef _OPENMP
+	  omp_set_num_threads(nthreads);
+#endif
+     }
+     else if (nthreads > 1 && verbose > 1) {
+	  fprintf(stderr, "bench: WARNING - nthreads = %d, but threads not supported\n", nthreads);
+	  nthreads = 1;
+     }
 #endif
 
      if (!usewisdom) return;
@@ -173,15 +186,16 @@ void setup(bench_problem *p)
      BENCH_ASSERT(the_plan);
      
      {
-	  double add, mul, nfma, cost;
+	  double add, mul, nfma, cost, pcost;
 	  FFTW(flops)(the_plan, &add, &mul, &nfma);
 	  cost = FFTW(estimate_cost)(the_plan);
+	  pcost = FFTW(cost)(the_plan);
 	  if (verbose > 1) {
 	       FFTW(print_plan)(the_plan);
 	       printf("\n");
 	       printf("flops: %0.0f add, %0.0f mul, %0.0f fma\n",
 		      add, mul, nfma);
-	       printf("estimated cost: %f\n", cost);
+	       printf("estimated cost: %f, pcost = %f\n", cost, pcost);
 	  }
      }
 }

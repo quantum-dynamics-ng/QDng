@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,7 +135,9 @@ void X(khc2c_register)(planner *p, khc2c codelet, const hc2c_desc *desc,
 
 extern const solvtab X(solvtab_rdft_r2cf);
 extern const solvtab X(solvtab_rdft_r2cb);
-extern const solvtab X(solvtab_rdft_simd);
+extern const solvtab X(solvtab_rdft_sse2);
+extern const solvtab X(solvtab_rdft_avx);
+extern const solvtab X(solvtab_rdft_altivec);
 
 /* real-input & output DFT-like codelets (DHT, etc.) */
 typedef struct kr2r_desc_s kr2r_desc;

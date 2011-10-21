@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>The Halfcomplex-format DFT - FFTW 3.2.2</title>
+<title>The Halfcomplex-format DFT - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="More-DFTs-of-Real-Data.html#More-DFTs-of-Real-Data" title="More DFTs of Real Data">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -58,11 +58,11 @@ Up:&nbsp;<a rel="up" accesskey="u" href="More-DFTs-of-Real-Data.html#More-DFTs-o
 <h4 class="subsection">2.5.1 The Halfcomplex-format DFT</h4>
 
 <p>An r2r kind of <code>FFTW_R2HC</code> (<dfn>r2hc</dfn>) corresponds to an r2c DFT
-<a name="index-FFTW_005fR2HC-71"></a><a name="index-r2c-72"></a><a name="index-r2hc-73"></a>(see <a href="One_002dDimensional-DFTs-of-Real-Data.html#One_002dDimensional-DFTs-of-Real-Data">One-Dimensional DFTs of Real Data</a>) but with &ldquo;halfcomplex&rdquo;
+<a name="index-FFTW_005fR2HC-72"></a><a name="index-r2c-73"></a><a name="index-r2hc-74"></a>(see <a href="One_002dDimensional-DFTs-of-Real-Data.html#One_002dDimensional-DFTs-of-Real-Data">One-Dimensional DFTs of Real Data</a>) but with &ldquo;halfcomplex&rdquo;
 format output, and may sometimes be faster and/or more convenient than
 the latter. 
-<a name="index-halfcomplex-format-74"></a>The inverse <dfn>hc2r</dfn> transform is of kind <code>FFTW_HC2R</code>. 
-<a name="index-FFTW_005fHC2R-75"></a><a name="index-hc2r-76"></a>This consists of the non-redundant half of the complex output for a 1d
+<a name="index-halfcomplex-format-75"></a>The inverse <dfn>hc2r</dfn> transform is of kind <code>FFTW_HC2R</code>. 
+<a name="index-FFTW_005fHC2R-76"></a><a name="index-hc2r-77"></a>This consists of the non-redundant half of the complex output for a 1d
 real-input DFT of size <code>n</code>, stored as a sequence of <code>n</code> real
 numbers (<code>double</code>) in the format:
 
@@ -80,8 +80,9 @@ only if <code>n</code> is even)&mdash;in these two cases, the imaginary part is
 zero due to symmetries of the real-input DFT, and is not stored. 
 Thus, the r2hc transform of <code>n</code> real values is a halfcomplex array of
 length <code>n</code>, and vice versa for hc2r. 
-<a name="index-normalization-77"></a>
-Aside from the differing format, the output of
+<a name="index-normalization-78"></a>
+
+   <p>Aside from the differing format, the output of
 <code>FFTW_R2HC</code>/<code>FFTW_HC2R</code> is otherwise exactly the same as for
 the corresponding 1d r2c/c2r transform
 (i.e. <code>FFTW_FORWARD</code>/<code>FFTW_BACKWARD</code> transforms, respectively). 

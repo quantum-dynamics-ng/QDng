@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 static plan *mkplan0(planner *plnr, unsigned flags, 
 		     const problem *prb, int hash_info, 
 		     wisdom_state_t wisdom_state)
-WITH_ALIGNED_STACK({
+{
      /* map API flags into FFTW flags */
      X(mapflags)(plnr, flags);
 
@@ -32,12 +32,7 @@ WITH_ALIGNED_STACK({
 
      /* create plan */
      return plnr->adt->mkplan(plnr, prb);
-})
-
-static void aligned_awake(plan *ego, enum wakefulness wakefulness)
-WITH_ALIGNED_STACK({
-     X(plan_awake)(ego, wakefulness);
-})
+}
 
 static unsigned force_estimator(unsigned flags)
 {
@@ -89,6 +84,7 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
      unsigned int pats[] = {FFTW_ESTIMATE, FFTW_MEASURE,
 			    FFTW_PATIENT, FFTW_EXHAUSTIVE};
      int pat, pat_max;
+     double pcost = 0;
 
      if (flags & FFTW_WISDOM_ONLY) {
 	  /* Special mode that returns a plan only if wisdom is present,
@@ -123,6 +119,7 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
 	       X(plan_destroy_internal)(pln);
 	       pln = pln1;
 	       flags_used_for_planning = tmpflags;
+	       pcost = pln->pcost;
 	  }
      }
 
@@ -135,13 +132,16 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
 	  /* re-create plan from wisdom, adding blessing */
 	  p->pln = mkplan(plnr, flags_used_for_planning, prb, BLESSING);
 
+	  /* record pcost from most recent measurement for use in X(cost) */
+	  p->pln->pcost = pcost;
+
 	  if (sizeof(trigreal) > sizeof(R)) {
 	       /* this is probably faster, and we have enough trigreal
 		  bits to maintain accuracy */
-	       aligned_awake(p->pln, AWAKE_SQRTN_TABLE);
+	       X(plan_awake)(p->pln, AWAKE_SQRTN_TABLE);
 	  } else {
 	       /* more accurate */
-	       aligned_awake(p->pln, AWAKE_SINCOS);
+	       X(plan_awake)(p->pln, AWAKE_SINCOS);
 	  }
 	  
 	  /* we don't use pln for p->pln, above, since by re-creating the
@@ -152,6 +152,10 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
      
      /* discard all information not necessary to reconstruct the plan */
      plnr->adt->forget(plnr, FORGET_ACCURSED);
+
+#ifdef FFTW_RANDOM_ESTIMATOR
+     X(random_estimate_seed)++; /* subsequent "random" plans are distinct */
+#endif
      
      return p;
 }

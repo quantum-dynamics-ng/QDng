@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Complex numbers - FFTW 3.2.2</title>
+<title>Complex numbers - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Data-Types-and-Files.html#Data-Types-and-Files" title="Data Types and Files">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -62,7 +62,7 @@ complex numbers as:
 
 <pre class="example">     typedef double fftw_complex[2];
 </pre>
-   <p><a name="index-fftw_005fcomplex-136"></a>
+   <p><a name="index-fftw_005fcomplex-139"></a>
 Here, the <code>[0]</code> element holds the real part and the <code>[1]</code>
 element holds the imaginary part.
 
@@ -75,20 +75,21 @@ complex type and you can manipulate it with ordinary arithmetic
 (e.g. <code>x = y * (3+4*I)</code>, where <code>x</code> and <code>y</code> are
 <code>fftw_complex</code> and <code>I</code> is the standard symbol for the
 imaginary unit);
-<a name="index-C99-137"></a>
-C++ has its own <code>complex&lt;T&gt;</code> template class, defined in the
+<a name="index-C99-140"></a>
+
+   <p>C++ has its own <code>complex&lt;T&gt;</code> template class, defined in the
 standard <code>&lt;complex&gt;</code> header file.  Reportedly, the C++ standards
 committee has recently agreed to mandate that the storage format used
 for this type be binary-compatible with the C99 type, i.e. an array
 <code>T[2]</code> with consecutive real <code>[0]</code> and imaginary <code>[1]</code>
 parts.  (See report
-<a href="http://anubis.dkuug.dk/JTC1/SC22/WG21/docs/papers/2002/1388.pdf">WG21/N1388</a>.)  Although not part of the official standard as of this
+<a href="http://www.open-std.org/jtc1/sc22/WG21/docs/papers/2002/n1388.pdf WG21/N1388">http://www.open-std.org/jtc1/sc22/WG21/docs/papers/2002/n1388.pdf WG21/N1388</a>.)  Although not part of the official standard as of this
 writing, the proposal stated that: &ldquo;This solution has been tested with
 all current major implementations of the standard library and shown to
 be working.&rdquo;  To the extent that this is true, if you have a variable
 <code>complex&lt;double&gt; *x</code>, you can pass it directly to FFTW via
 <code>reinterpret_cast&lt;fftw_complex*&gt;(x)</code>. 
-<a name="index-C_002b_002b-138"></a><a name="index-portability-139"></a>
+<a name="index-C_002b_002b-141"></a><a name="index-portability-142"></a>
 <!-- =========> -->
 
    </body></html>

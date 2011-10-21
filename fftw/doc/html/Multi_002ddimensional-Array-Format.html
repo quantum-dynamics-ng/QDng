@@ -1,17 +1,17 @@
 <html lang="en">
 <head>
-<title>Multi-dimensional Array Format - FFTW 3.2.2</title>
+<title>Multi-dimensional Array Format - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Other-Important-Topics.html#Other-Important-Topics" title="Other Important Topics">
-<link rel="prev" href="Data-Alignment.html#Data-Alignment" title="Data Alignment">
+<link rel="prev" href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc" title="SIMD alignment and fftw_malloc">
 <link rel="next" href="Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans" title="Words of Wisdom-Saving Plans">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -50,7 +50,7 @@ Copyright (C) 2003 Massachusetts Institute of Technology.
 <a name="Multi_002ddimensional-Array-Format"></a>
 <p>
 Next:&nbsp;<a rel="next" accesskey="n" href="Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">Words of Wisdom-Saving Plans</a>,
-Previous:&nbsp;<a rel="previous" accesskey="p" href="Data-Alignment.html#Data-Alignment">Data Alignment</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">SIMD alignment and fftw_malloc</a>,
 Up:&nbsp;<a rel="up" accesskey="u" href="Other-Important-Topics.html#Other-Important-Topics">Other Important Topics</a>
 <hr>
 </div>
@@ -60,7 +60,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Other-Important-Topics.html#Other-Impor
 <p>This section describes the format in which multi-dimensional arrays
 are stored in FFTW.  We felt that a detailed discussion of this topic
 was necessary.  Since several different formats are common, this topic
-is often a source of confusion among users.
+is often a source of confusion.
 
 <ul class="menu">
 <li><a accesskey="1" href="Row_002dmajor-Format.html#Row_002dmajor-Format">Row-major Format</a>

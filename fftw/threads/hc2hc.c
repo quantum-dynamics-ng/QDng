@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,13 +34,13 @@ typedef struct {
 } PD;
 
 static void *spawn_apply(spawn_data *d)
-WITH_ALIGNED_STACK({
+{
      PD *ego = (PD *) d->data;
      
      plan_hc2hc *cldw = (plan_hc2hc *) (ego->cldws[d->thr_num]);
      cldw->apply((plan *) cldw, ego->IO);
      return 0;
-})
+}
 
 static void apply_dit(const plan *ego_, R *I, R *O)
 {

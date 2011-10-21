@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Wisdom Import - FFTW 3.2.2</title>
+<title>Wisdom Import - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Wisdom.html#Wisdom" title="Wisdom">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -57,11 +57,11 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Wisdom.html#Wisdom">Wisdom</a>
 <h4 class="subsection">4.7.2 Wisdom Import</h4>
 
 <pre class="example">     int fftw_import_system_wisdom(void);
-     int fftw_import_wisdom_from_file(FILE *input_file);
+     int fftw_import_wisdom_from_filename(const char *filename);
      int fftw_import_wisdom_from_string(const char *input_string);
      int fftw_import_wisdom(int (*read_char)(void *), void *data);
 </pre>
-   <p><a name="index-fftw_005fimport_005fwisdom-273"></a><a name="index-fftw_005fimport_005fsystem_005fwisdom-274"></a><a name="index-fftw_005fimport_005fwisdom_005ffrom_005ffile-275"></a><a name="index-fftw_005fimport_005fwisdom_005ffrom_005fstring-276"></a>
+   <p><a name="index-fftw_005fimport_005fwisdom-282"></a><a name="index-fftw_005fimport_005fsystem_005fwisdom-283"></a><a name="index-fftw_005fimport_005fwisdom_005ffrom_005ffilename-284"></a><a name="index-fftw_005fimport_005fwisdom_005ffrom_005ffile-285"></a><a name="index-fftw_005fimport_005fwisdom_005ffrom_005fstring-286"></a>
 These functions import wisdom into a program from data stored by the
 <code>fftw_export_wisdom</code> functions above. (See <a href="Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">Words of Wisdom-Saving Plans</a>.)  The imported wisdom replaces any wisdom
 already accumulated by the running program.
@@ -73,12 +73,15 @@ input; its parameter is the <code>data</code> pointer passed to
 <code>fftw_import_wisdom</code>. If the end of the input data is reached
 (which should never happen for valid data), <code>read_char</code> should
 return <code>EOF</code> (as defined in <code>&lt;stdio.h&gt;</code>).  For convenience,
-the following two &ldquo;wrapper&rdquo; routines are provided:
+the following three &ldquo;wrapper&rdquo; routines are provided:
 
-   <p><code>fftw_import_wisdom_from_file</code> reads wisdom from the current
-position in <code>input_file</code>, which should be open with read
-permission.  Upon exit, the file remains open, but the position of the
-read pointer is unspecified.
+   <p><code>fftw_import_wisdom_from_filename</code> reads wisdom from a file named
+<code>filename</code>.  A lower-level function, which requires you to open
+and close the file yourself (e.g. if you want to read wisdom from a
+portion of a larger file) is <code>fftw_import_wisdom_from_file</code>. This
+reads wisdom from the current position in <code>input_file</code> (which
+should be open with read permission); upon exit, the file remains
+open, but the position of the read pointer is unspecified.
 
    <p><code>fftw_import_wisdom_from_string</code> reads wisdom from the
 <code>NULL</code>-terminated string <code>input_string</code>.
@@ -86,8 +89,9 @@ read pointer is unspecified.
    <p><code>fftw_import_system_wisdom</code> reads wisdom from an
 implementation-defined standard file (<code>/etc/fftw/wisdom</code> on Unix
 and GNU systems). 
-<a name="index-wisdom_002c-system_002dwide-277"></a>
-The return value of these import routines is <code>1</code> if the wisdom was
+<a name="index-wisdom_002c-system_002dwide-287"></a>
+
+   <p>The return value of these import routines is <code>1</code> if the wisdom was
 read successfully and <code>0</code> otherwise. Note that, in all of these
 functions, any data in the input stream past the end of the wisdom data
 is simply ignored.

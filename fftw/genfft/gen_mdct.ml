@@ -1,7 +1,7 @@
 (*
  * Copyright (c) 1997-1999 Massachusetts Institute of Technology
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -242,7 +242,7 @@ let generate n mode =
 	  @ (if (not (window_param mode)) then [] 
 	       else [Decl (C.constrealtypep, window)])
 	 ),
-	 add_constants (Asch annot))
+	 finalize_fcn (Asch annot))
 
   in
   (unparse tree) ^ "\n"

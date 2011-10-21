@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ char *X(export_wisdom_to_string)(void)
      plnr->adt->exprt(plnr, p);
      X(printer_destroy)(p);
 
-     s = (char *) NATIVE_MALLOC(sizeof(char) * (cnt + 1), OTHER);
+     s = (char *) malloc(sizeof(char) * (cnt + 1));
      if (s) {
           p = mkprinter_str(s);
           plnr->adt->exprt(plnr, p);

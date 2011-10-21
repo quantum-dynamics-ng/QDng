@@ -1,5 +1,5 @@
             FFTW FREQUENTLY ASKED QUESTIONS WITH ANSWERS
-                            03 Mai 2011
+                            27 Jul 2011
 			     Matteo Frigo
 			   Steven G. Johnson
  			    <fftw@fftw.org>
@@ -53,6 +53,7 @@ Index
  Q3.17       The output of FFTW's transform is all zeros.
  Q3.18       How do I call FFTW from the Microsoft language du jour?
  Q3.19       Can I compute only a subset of the DFT outputs?
+ Q3.20       Can I use FFTW's routines for in-place and out-of-place matrix tra
 
  Section 4.  Internals of FFTW
  Q4.1        How does FFTW work?
@@ -415,6 +416,7 @@ Section 3.  Using FFTW
  Q3.17       The output of FFTW's transform is all zeros.
  Q3.18       How do I call FFTW from the Microsoft language du jour?
  Q3.19       Can I compute only a subset of the DFT outputs?
+ Q3.20       Can I use FFTW's routines for in-place and out-of-place matrix tra
 
 -------------------------------------------------------------------------------
 
@@ -647,6 +649,38 @@ details, see pruned FFTs with FFTW.
 
 There are also some algorithms that compute pruned transforms
 *approximately*, but they are beyond the scope of this FAQ.
+
+-------------------------------------------------------------------------------
+
+Question 3.20.  Can I use FFTW's routines for in-place and out-of-place matrix transposition?
+
+You can use the FFTW guru interface to create a rank-0 transform of vector
+rank 2 where the vector strides are transposed.  (A rank-0 transform is
+equivalent to a 1D transform of size 1, which.  just copies the input into
+the output.)  Specifying the same location for the input and output makes
+the transpose in-place.
+
+For double-valued data stored in row-major format, plan creation looks
+like this:
+
+fftw_plan plan_transpose(int rows, int cols, double *in, double *out)
+{
+    const unsigned flags = FFTW_ESTIMATE; /* other flags are possible */
+    fftw_iodim howmany_dims[2];
+
+    howmany_dims[0].n  = rows;
+    howmany_dims[0].is = cols;
+    howmany_dims[0].os = 1;
+
+    howmany_dims[1].n  = cols;
+    howmany_dims[1].is = 1;
+    howmany_dims[1].os = rows;
+
+    return fftw_plan_guru_r2r(/*rank=*/ 0, /*dims=*/ NULL,
+                              /*howmany_rank=*/ 2, howmany_dims,
+                              in, out, /*kind=*/ NULL, flags);
+}
+(This entry was written by Rhys Ulerich.)
 
 ===============================================================================
 

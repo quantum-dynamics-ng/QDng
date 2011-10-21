@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Precision - FFTW 3.2.2</title>
+<title>Precision - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Data-Types-and-Files.html#Data-Types-and-Files" title="Data Types and Files">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -56,7 +56,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Data-Types-and-Files.html#Data-Types-an
 
 <h4 class="subsection">4.1.2 Precision</h4>
 
-<p><a name="index-precision-140"></a>
+<p><a name="index-precision-143"></a>
 You can install single and long-double precision versions of FFTW,
 which replace <code>double</code> with <code>float</code> and <code>long double</code>,
 respectively (see <a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>).  To use these
@@ -85,8 +85,16 @@ subroutine parameters.
    <p>Depending upon your compiler and/or hardware, <code>long double</code> may not
 be any more precise than <code>double</code> (or may not be supported at all,
 although it is standard in C99). 
-<a name="index-C99-141"></a>
-<!-- =========> -->
+<a name="index-C99-144"></a>
 
+   <p>We also support using the nonstandard <code>__float128</code>
+quadruple-precision type provided by recent versions of <code>gcc</code> on
+32- and 64-bit x86 hardware (see <a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>). 
+To use this type, link with <code>-lfftw3q -lquadmath -lm</code> (the
+<code>libquadmath</code> library provided by <code>gcc</code> is needed for
+quadruple-precision trigonometric functions) and use &lsquo;<samp><span class="samp">fftwq_</span></samp>&rsquo;
+identifiers.
+
+<!-- =========> -->
    </body></html>
 

@@ -13,27 +13,30 @@ endif
 
 ACLOCAL_AMFLAGS=-I m4
 
-SUBDIRS=support $(GENFFT) kernel simd dft rdft reodft api threads \
-cell libbench2 . tests doc tools m4
-EXTRA_DIST=COPYRIGHT bootstrap.sh CONVENTIONS fftw.pc.in README.Cell
+SUBDIRS=support $(GENFFT) kernel simd-support dft rdft reodft api	\
+threads libbench2 . tests mpi doc tools m4
+EXTRA_DIST=COPYRIGHT bootstrap.sh CONVENTIONS fftw.pc.in
 
-if HAVE_SIMD
-SIMD_LIBS=							\
-	simd/nonportable/libsimd_nonportable.la			\
-	dft/simd/libdft_simd.la					\
-	dft/simd/codelets/libdft_simd_codelets.la		\
-	rdft/simd/librdft_simd.la				\
-	rdft/simd/codelets/librdft_simd_codelets.la	
-SIMD_OR_CELL_LIBS=simd/libsimd.la
+SIMD_LIBS =						\
+	simd-support/libsimd_support.la			\
+	simd-support/libsimd_sse2_nonportable.la
+
+if HAVE_SSE2
+SSE2_LIBS = dft/simd/sse2/libdft_sse2_codelets.la	\
+rdft/simd/sse2/librdft_sse2_codelets.la
 endif
 
-if HAVE_CELL
-CELL_LIBS=cell/libcell.la
-SIMD_OR_CELL_LIBS=simd/libsimd.la
+if HAVE_AVX
+AVX_LIBS = dft/simd/avx/libdft_avx_codelets.la	\
+rdft/simd/avx/librdft_avx_codelets.la
 endif
 
+if HAVE_ALTIVEC
+ALTIVEC_LIBS = dft/simd/altivec/libdft_altivec_codelets.la	\
+rdft/simd/altivec/librdft_altivec_codelets.la
+endif
 
-if SMP
+if THREADS
 if COMBINED_THREADS
 COMBINED_THREADLIBS=threads/libfftw3@PREC_SUFFIX@_threads.la
 endif
@@ -53,11 +56,16 @@ libfftw3@PREC_SUFFIX@_la_LIBADD =			\
 	rdft/scalar/r2r/librdft_scalar_r2r.la		\
 	reodft/libreodft.la				\
 	api/libapi.la					\
-        $(SIMD_LIBS) $(CELL_LIBS) $(SIMD_OR_CELL_LIBS)	\
+        $(SIMD_LIBS) $(SSE2_LIBS) $(AVX_LIBS) $(ALTIVEC_LIBS)    	\
 	$(COMBINED_THREADLIBS)
 
+if QUAD
+# cannot use -no-undefined since dependent on libquadmath
+libfftw3@PREC_SUFFIX@_la_LDFLAGS = -version-info @SHARED_VERSION_INFO@
+else
 libfftw3@PREC_SUFFIX@_la_LDFLAGS = -no-undefined -version-info	\
 @SHARED_VERSION_INFO@
+endif
 
 fftw3@PREC_SUFFIX@.pc: fftw.pc
 	cp -f fftw.pc fftw3@PREC_SUFFIX@.pc
