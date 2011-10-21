@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Installation and Supported Hardware/Software - FFTW 3.2.2</title>
+<title>Installation and Supported Hardware/Software - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW" title="Multi-threaded FFTW">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -62,19 +62,27 @@ subdirectory of the FFTW package.  On Unix systems, the FFTW threads
 libraries and header files can be automatically configured, compiled,
 and installed along with the uniprocessor FFTW libraries simply by
 including <code>--enable-threads</code> in the flags to the <code>configure</code>
-script (see <a href="Installation-on-Unix.html#Installation-on-Unix">Installation on Unix</a>). 
-<a name="index-configure-319"></a>
-<a name="index-portability-320"></a>The threads routines require your operating system to have some sort
+script (see <a href="Installation-on-Unix.html#Installation-on-Unix">Installation on Unix</a>), or <code>--enable-openmp</code> to use
+<a href="http://www.openmp.org">OpenMP</a> threads. 
+<a name="index-configure-329"></a>
+
+   <p><a name="index-portability-330"></a><a name="index-OpenMP-331"></a>The threads routines require your operating system to have some sort
 of shared-memory threads support.  Specifically, the FFTW threads
 package works with POSIX threads (available on most Unix variants,
-from GNU/Linux to MacOS X) and Win32 threads.  We also support using
-<a href="http://www.openmp.org">OpenMP</a>, enabled by using
-<code>--enable-openmp</code> (<em>instead</em> of <code>--enable-threads</code>). 
-(This may be useful if you are employing that sort of directive in
-your own code, in order to minimize conflicts.)  If you have a
+from GNU/Linux to MacOS X) and Win32 threads.  OpenMP threads, which
+are supported in many common compilers (e.g. gcc) are also supported,
+and may give better performance on some systems.  (OpenMP threads are
+also useful if you are employing OpenMP in your own code, in order to
+minimize conflicts between threading models.)  If you have a
 shared-memory machine that uses a different threads API, it should be
 a simple matter of programming to include support for it; see the file
 <code>threads/threads.c</code> for more detail.
+
+   <p>You can compile FFTW with <em>both</em> <code>--enable-threads</code> and
+<code>--enable-openmp</code> at the same time, since they install libraries
+with different names (&lsquo;<samp><span class="samp">fftw3_threads</span></samp>&rsquo; and &lsquo;<samp><span class="samp">fftw3_omp</span></samp>&rsquo;, as
+described below).  However, your programs may only link to <em>one</em>
+of these two libraries at a time.
 
    <p>Ideally, of course, you should also have multiple processors in order to
 get any benefit from the threaded transforms.

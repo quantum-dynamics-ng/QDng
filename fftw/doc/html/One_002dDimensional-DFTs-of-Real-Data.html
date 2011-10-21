@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>One-Dimensional DFTs of Real Data - FFTW 3.2.2</title>
+<title>One-Dimensional DFTs of Real Data - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Tutorial.html#Tutorial" title="Tutorial">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -59,7 +59,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Tutorial.html#Tutorial">Tutorial</a>
 
 <p>In many practical applications, the input data <code>in[i]</code> are purely
 real numbers, in which case the DFT output satisfies the &ldquo;Hermitian&rdquo;
-<a name="index-Hermitian-45"></a>redundancy: <code>out[i]</code> is the conjugate of <code>out[n-i]</code>.  It is
+<a name="index-Hermitian-46"></a>redundancy: <code>out[i]</code> is the conjugate of <code>out[n-i]</code>.  It is
 possible to take advantage of these circumstances in order to achieve
 roughly a factor of two improvement in both speed and memory usage.
 
@@ -69,17 +69,17 @@ input and output arrays are of <em>different sizes and types</em>: the
 input is <code>n</code> real numbers, while the output is <code>n/2+1</code>
 complex numbers (the non-redundant outputs); this also requires slight
 &ldquo;padding&rdquo; of the input array for
-<a name="index-padding-46"></a>in-place transforms.  Second, the inverse transform (complex to real)
+<a name="index-padding-47"></a>in-place transforms.  Second, the inverse transform (complex to real)
 has the side-effect of <em>destroying its input array</em>, by default. 
 Neither of these inconveniences should pose a serious problem for
 users, but it is important to be aware of them.
 
    <p>The routines to perform real-data transforms are almost the same as
 those for complex transforms: you allocate arrays of <code>double</code>
-and/or <code>fftw_complex</code> (preferably using <code>fftw_malloc</code>),
-create an <code>fftw_plan</code>, execute it as many times as you want with
-<code>fftw_execute(plan)</code>, and clean up with
-<code>fftw_destroy_plan(plan)</code> (and <code>fftw_free</code>).  The only
+and/or <code>fftw_complex</code> (preferably using <code>fftw_malloc</code> or
+<code>fftw_alloc_complex</code>), create an <code>fftw_plan</code>, execute it as
+many times as you want with <code>fftw_execute(plan)</code>, and clean up
+with <code>fftw_destroy_plan(plan)</code> (and <code>fftw_free</code>).  The only
 differences are that the input (or output) is of type <code>double</code>
 and there are new routines to create the plan.  In one dimension:
 
@@ -88,35 +88,38 @@ and there are new routines to create the plan.  In one dimension:
      fftw_plan fftw_plan_dft_c2r_1d(int n, fftw_complex *in, double *out,
                                     unsigned flags);
 </pre>
-   <p><a name="index-fftw_005fplan_005fdft_005fr2c_005f1d-47"></a><a name="index-fftw_005fplan_005fdft_005fc2r_005f1d-48"></a>
+   <p><a name="index-fftw_005fplan_005fdft_005fr2c_005f1d-48"></a><a name="index-fftw_005fplan_005fdft_005fc2r_005f1d-49"></a>
 for the real input to complex-Hermitian output (<dfn>r2c</dfn>) and
 complex-Hermitian input to real output (<dfn>c2r</dfn>) transforms. 
-<a name="index-r2c-49"></a><a name="index-c2r-50"></a>Unlike the complex DFT planner, there is no <code>sign</code> argument. 
+<a name="index-r2c-50"></a><a name="index-c2r-51"></a>Unlike the complex DFT planner, there is no <code>sign</code> argument. 
 Instead, r2c DFTs are always <code>FFTW_FORWARD</code> and c2r DFTs are
 always <code>FFTW_BACKWARD</code>. 
-<a name="index-FFTW_005fFORWARD-51"></a><a name="index-FFTW_005fBACKWARD-52"></a>(For single/long-double precision
+<a name="index-FFTW_005fFORWARD-52"></a><a name="index-FFTW_005fBACKWARD-53"></a>(For single/long-double precision
 <code>fftwf</code> and <code>fftwl</code>, <code>double</code> should be replaced by
 <code>float</code> and <code>long double</code>, respectively.) 
-<a name="index-precision-53"></a>
-Here, <code>n</code> is the &ldquo;logical&rdquo; size of the DFT, not necessarily the
+<a name="index-precision-54"></a>
+
+   <p>Here, <code>n</code> is the &ldquo;logical&rdquo; size of the DFT, not necessarily the
 physical size of the array.  In particular, the real (<code>double</code>)
 array has <code>n</code> elements, while the complex (<code>fftw_complex</code>)
 array has <code>n/2+1</code> elements (where the division is rounded down). 
 For an in-place transform,
-<a name="index-in_002dplace-54"></a><code>in</code> and <code>out</code> are aliased to the same array, which must be
+<a name="index-in_002dplace-55"></a><code>in</code> and <code>out</code> are aliased to the same array, which must be
 big enough to hold both; so, the real array would actually have
-<code>2*(n/2+1)</code> elements, where the elements beyond the first <code>n</code>
-are unused padding.  The kth element of the complex array is
-exactly the same as the kth element of the corresponding complex
-DFT.  All positive <code>n</code> are supported; products of small factors are
-most efficient, but an <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>) algorithm is used even for prime
-sizes.
+<code>2*(n/2+1)</code> elements, where the elements beyond the first
+<code>n</code> are unused padding.  (Note that this is very different from
+the concept of &ldquo;zero-padding&rdquo; a transform to a larger length, which
+changes the logical size of the DFT by actually adding new input
+data.)  The kth element of the complex array is exactly the
+same as the kth element of the corresponding complex DFT.  All
+positive <code>n</code> are supported; products of small factors are most
+efficient, but an <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>) algorithm is used even for prime sizes.
 
    <p>As noted above, the c2r transform destroys its input array even for
 out-of-place transforms.  This can be prevented, if necessary, by
 including <code>FFTW_PRESERVE_INPUT</code> in the <code>flags</code>, with
 unfortunately some sacrifice in performance. 
-<a name="index-flags-55"></a><a name="index-FFTW_005fPRESERVE_005fINPUT-56"></a>This flag is also not currently supported for multi-dimensional real
+<a name="index-flags-56"></a><a name="index-FFTW_005fPRESERVE_005fINPUT-57"></a>This flag is also not currently supported for multi-dimensional real
 DFTs (next section).
 
    <p>Readers familiar with DFTs of real data will recall that the 0th (the
@@ -131,7 +134,7 @@ any case; FFTW does not support it.
    <p>An alternative interface for one-dimensional r2c and c2r DFTs can be
 found in the &lsquo;<samp><span class="samp">r2r</span></samp>&rsquo; interface (see <a href="The-Halfcomplex_002dformat-DFT.html#The-Halfcomplex_002dformat-DFT">The Halfcomplex-format DFT</a>), with &ldquo;halfcomplex&rdquo;-format output that <em>is</em> the same size
 (and type) as the input array. 
-<a name="index-halfcomplex-format-57"></a>That interface, although it is not very useful for multi-dimensional
+<a name="index-halfcomplex-format-58"></a>That interface, although it is not very useful for multi-dimensional
 transforms, may sometimes yield better performance.
 
 <!--  -->

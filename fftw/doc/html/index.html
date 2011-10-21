@@ -1,14 +1,14 @@
 <html lang="en">
 <head>
-<title>FFTW 3.2.2</title>
+<title>FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="#Top">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -42,7 +42,7 @@ Copyright (C) 2003 Massachusetts Institute of Technology.
 --></style>
 </head>
 <body>
-<h1 class="settitle">FFTW 3.2.2</h1>
+<h1 class="settitle">FFTW 3.3</h1>
 <div class="contents">
 <h2>Table of Contents</h2>
 <ul>
@@ -63,11 +63,7 @@ Copyright (C) 2003 Massachusetts Institute of Technology.
 </li></ul>
 <li><a name="toc_Other-Important-Topics" href="Other-Important-Topics.html#Other-Important-Topics">3 Other Important Topics</a>
 <ul>
-<li><a href="Data-Alignment.html#Data-Alignment">3.1 Data Alignment</a>
-<ul>
-<li><a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">3.1.1 SIMD alignment and fftw_malloc</a>
-<li><a href="Stack-alignment-on-x86.html#Stack-alignment-on-x86">3.1.2 Stack alignment on x86</a>
-</li></ul>
+<li><a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">3.1 SIMD alignment and fftw_malloc</a>
 <li><a href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array-Format">3.2 Multi-dimensional Array Format</a>
 <ul>
 <li><a href="Row_002dmajor-Format.html#Row_002dmajor-Format">3.2.1 Row-major Format</a>
@@ -137,32 +133,76 @@ Copyright (C) 2003 Massachusetts Institute of Technology.
 <li><a href="How-Many-Threads-to-Use_003f.html#How-Many-Threads-to-Use_003f">5.3 How Many Threads to Use?</a>
 <li><a href="Thread-safety.html#Thread-safety">5.4 Thread safety</a>
 </li></ul>
-<li><a name="toc_FFTW-on-the-Cell-Processor" href="FFTW-on-the-Cell-Processor.html#FFTW-on-the-Cell-Processor">6 FFTW on the Cell Processor</a>
+<li><a name="toc_Distributed_002dmemory-FFTW-with-MPI" href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI">6 Distributed-memory FFTW with MPI</a>
 <ul>
-<li><a href="Cell-Installation.html#Cell-Installation">6.1 Cell Installation</a>
-<li><a href="Cell-Caveats.html#Cell-Caveats">6.2 Cell Caveats</a>
-<li><a href="FFTW-Accuracy-on-Cell.html#FFTW-Accuracy-on-Cell">6.3 FFTW Accuracy on Cell</a>
-</li></ul>
-<li><a name="toc_Calling-FFTW-from-Fortran" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran">7 Calling FFTW from Fortran</a>
+<li><a href="FFTW-MPI-Installation.html#FFTW-MPI-Installation">6.1 FFTW MPI Installation</a>
+<li><a href="Linking-and-Initializing-MPI-FFTW.html#Linking-and-Initializing-MPI-FFTW">6.2 Linking and Initializing MPI FFTW</a>
+<li><a href="2d-MPI-example.html#2d-MPI-example">6.3 2d MPI example</a>
+<li><a href="MPI-Data-Distribution.html#MPI-Data-Distribution">6.4 MPI Data Distribution</a>
 <ul>
-<li><a href="Fortran_002dinterface-routines.html#Fortran_002dinterface-routines">7.1 Fortran-interface routines</a>
-<li><a href="FFTW-Constants-in-Fortran.html#FFTW-Constants-in-Fortran">7.2 FFTW Constants in Fortran</a>
-<li><a href="FFTW-Execution-in-Fortran.html#FFTW-Execution-in-Fortran">7.3 FFTW Execution in Fortran</a>
-<li><a href="Fortran-Examples.html#Fortran-Examples">7.4 Fortran Examples</a>
-<li><a href="Wisdom-of-Fortran_003f.html#Wisdom-of-Fortran_003f">7.5 Wisdom of Fortran?</a>
+<li><a href="Basic-and-advanced-distribution-interfaces.html#Basic-and-advanced-distribution-interfaces">6.4.1 Basic and advanced distribution interfaces</a>
+<li><a href="Load-balancing.html#Load-balancing">6.4.2 Load balancing</a>
+<li><a href="Transposed-distributions.html#Transposed-distributions">6.4.3 Transposed distributions</a>
+<li><a href="One_002ddimensional-distributions.html#One_002ddimensional-distributions">6.4.4 One-dimensional distributions</a>
 </li></ul>
-<li><a name="toc_Upgrading-from-FFTW-version-2" href="Upgrading-from-FFTW-version-2.html#Upgrading-from-FFTW-version-2">8 Upgrading from FFTW version 2</a>
-<li><a name="toc_Installation-and-Customization" href="Installation-and-Customization.html#Installation-and-Customization">9 Installation and Customization</a>
+<li><a href="Multi_002ddimensional-MPI-DFTs-of-Real-Data.html#Multi_002ddimensional-MPI-DFTs-of-Real-Data">6.5 Multi-dimensional MPI DFTs of Real Data</a>
+<li><a href="Other-Multi_002ddimensional-Real_002ddata-MPI-Transforms.html#Other-Multi_002ddimensional-Real_002ddata-MPI-Transforms">6.6 Other multi-dimensional Real-Data MPI Transforms</a>
+<li><a href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes">6.7 FFTW MPI Transposes</a>
 <ul>
-<li><a href="Installation-on-Unix.html#Installation-on-Unix">9.1 Installation on Unix</a>
-<li><a href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems">9.2 Installation on non-Unix systems</a>
-<li><a href="Cycle-Counters.html#Cycle-Counters">9.3 Cycle Counters</a>
-<li><a href="Generating-your-own-code.html#Generating-your-own-code">9.4 Generating your own code</a>
+<li><a href="Basic-distributed_002dtranspose-interface.html#Basic-distributed_002dtranspose-interface">6.7.1 Basic distributed-transpose interface</a>
+<li><a href="Advanced-distributed_002dtranspose-interface.html#Advanced-distributed_002dtranspose-interface">6.7.2 Advanced distributed-transpose interface</a>
+<li><a href="An-improved-replacement-for-MPI_005fAlltoall.html#An-improved-replacement-for-MPI_005fAlltoall">6.7.3 An improved replacement for MPI_Alltoall</a>
 </li></ul>
-<li><a name="toc_Acknowledgments" href="Acknowledgments.html#Acknowledgments">10 Acknowledgments</a>
-<li><a name="toc_License-and-Copyright" href="License-and-Copyright.html#License-and-Copyright">11 License and Copyright</a>
-<li><a name="toc_Concept-Index" href="Concept-Index.html#Concept-Index">12 Concept Index</a>
-<li><a name="toc_Library-Index" href="Library-Index.html#Library-Index">13 Library Index</a>
+<li><a href="FFTW-MPI-Wisdom.html#FFTW-MPI-Wisdom">6.8 FFTW MPI Wisdom</a>
+<li><a href="Avoiding-MPI-Deadlocks.html#Avoiding-MPI-Deadlocks">6.9 Avoiding MPI Deadlocks</a>
+<li><a href="FFTW-MPI-Performance-Tips.html#FFTW-MPI-Performance-Tips">6.10 FFTW MPI Performance Tips</a>
+<li><a href="Combining-MPI-and-Threads.html#Combining-MPI-and-Threads">6.11 Combining MPI and Threads</a>
+<li><a href="FFTW-MPI-Reference.html#FFTW-MPI-Reference">6.12 FFTW MPI Reference</a>
+<ul>
+<li><a href="MPI-Files-and-Data-Types.html#MPI-Files-and-Data-Types">6.12.1 MPI Files and Data Types</a>
+<li><a href="MPI-Initialization.html#MPI-Initialization">6.12.2 MPI Initialization</a>
+<li><a href="Using-MPI-Plans.html#Using-MPI-Plans">6.12.3 Using MPI Plans</a>
+<li><a href="MPI-Data-Distribution-Functions.html#MPI-Data-Distribution-Functions">6.12.4 MPI Data Distribution Functions</a>
+<li><a href="MPI-Plan-Creation.html#MPI-Plan-Creation">6.12.5 MPI Plan Creation</a>
+<li><a href="MPI-Wisdom-Communication.html#MPI-Wisdom-Communication">6.12.6 MPI Wisdom Communication</a>
+</li></ul>
+<li><a href="FFTW-MPI-Fortran-Interface.html#FFTW-MPI-Fortran-Interface">6.13 FFTW MPI Fortran Interface</a>
+</li></ul>
+<li><a name="toc_Calling-FFTW-from-Modern-Fortran" href="Calling-FFTW-from-Modern-Fortran.html#Calling-FFTW-from-Modern-Fortran">7 Calling FFTW from Modern Fortran</a>
+<ul>
+<li><a href="Overview-of-Fortran-interface.html#Overview-of-Fortran-interface">7.1 Overview of Fortran interface</a>
+<li><a href="Reversing-array-dimensions.html#Reversing-array-dimensions">7.2 Reversing array dimensions</a>
+<li><a href="FFTW-Fortran-type-reference.html#FFTW-Fortran-type-reference">7.3 FFTW Fortran type reference</a>
+<li><a href="Plan-execution-in-Fortran.html#Plan-execution-in-Fortran">7.4 Plan execution in Fortran</a>
+<li><a href="Allocating-aligned-memory-in-Fortran.html#Allocating-aligned-memory-in-Fortran">7.5 Allocating aligned memory in Fortran</a>
+<li><a href="Accessing-the-wisdom-API-from-Fortran.html#Accessing-the-wisdom-API-from-Fortran">7.6 Accessing the wisdom API from Fortran</a>
+<ul>
+<li><a href="Wisdom-File-Export_002fImport-from-Fortran.html#Wisdom-File-Export_002fImport-from-Fortran">7.6.1 Wisdom File Export/Import from Fortran</a>
+<li><a href="Wisdom-String-Export_002fImport-from-Fortran.html#Wisdom-String-Export_002fImport-from-Fortran">7.6.2 Wisdom String Export/Import from Fortran</a>
+<li><a href="Wisdom-Generic-Export_002fImport-from-Fortran.html#Wisdom-Generic-Export_002fImport-from-Fortran">7.6.3 Wisdom Generic Export/Import from Fortran</a>
+</li></ul>
+<li><a href="Defining-an-FFTW-module.html#Defining-an-FFTW-module">7.7 Defining an FFTW module</a>
+</li></ul>
+<li><a name="toc_Calling-FFTW-from-Legacy-Fortran" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">8 Calling FFTW from Legacy Fortran</a>
+<ul>
+<li><a href="Fortran_002dinterface-routines.html#Fortran_002dinterface-routines">8.1 Fortran-interface routines</a>
+<li><a href="FFTW-Constants-in-Fortran.html#FFTW-Constants-in-Fortran">8.2 FFTW Constants in Fortran</a>
+<li><a href="FFTW-Execution-in-Fortran.html#FFTW-Execution-in-Fortran">8.3 FFTW Execution in Fortran</a>
+<li><a href="Fortran-Examples.html#Fortran-Examples">8.4 Fortran Examples</a>
+<li><a href="Wisdom-of-Fortran_003f.html#Wisdom-of-Fortran_003f">8.5 Wisdom of Fortran?</a>
+</li></ul>
+<li><a name="toc_Upgrading-from-FFTW-version-2" href="Upgrading-from-FFTW-version-2.html#Upgrading-from-FFTW-version-2">9 Upgrading from FFTW version 2</a>
+<li><a name="toc_Installation-and-Customization" href="Installation-and-Customization.html#Installation-and-Customization">10 Installation and Customization</a>
+<ul>
+<li><a href="Installation-on-Unix.html#Installation-on-Unix">10.1 Installation on Unix</a>
+<li><a href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems">10.2 Installation on non-Unix systems</a>
+<li><a href="Cycle-Counters.html#Cycle-Counters">10.3 Cycle Counters</a>
+<li><a href="Generating-your-own-code.html#Generating-your-own-code">10.4 Generating your own code</a>
+</li></ul>
+<li><a name="toc_Acknowledgments" href="Acknowledgments.html#Acknowledgments">11 Acknowledgments</a>
+<li><a name="toc_License-and-Copyright" href="License-and-Copyright.html#License-and-Copyright">12 License and Copyright</a>
+<li><a name="toc_Concept-Index" href="Concept-Index.html#Concept-Index">13 Concept Index</a>
+<li><a name="toc_Library-Index" href="Library-Index.html#Library-Index">14 Library Index</a>
 </li></ul>
 </div>
 
@@ -181,7 +221,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="../index.html#dir">(dir)</a>
 
 <p>Welcome to FFTW, the Fastest Fourier Transform in the West.  FFTW is a
 collection of fast C routines to compute the discrete Fourier transform. 
-This manual documents FFTW version 3.2.2.
+This manual documents FFTW version 3.3.
 
 <ul class="menu">
 <li><a accesskey="1" href="Introduction.html#Introduction">Introduction</a>
@@ -189,185 +229,16 @@ This manual documents FFTW version 3.2.2.
 <li><a accesskey="3" href="Other-Important-Topics.html#Other-Important-Topics">Other Important Topics</a>
 <li><a accesskey="4" href="FFTW-Reference.html#FFTW-Reference">FFTW Reference</a>
 <li><a accesskey="5" href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW">Multi-threaded FFTW</a>
-<li><a accesskey="6" href="FFTW-on-the-Cell-Processor.html#FFTW-on-the-Cell-Processor">FFTW on the Cell Processor</a>
-<li><a accesskey="7" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran">Calling FFTW from Fortran</a>
-<li><a accesskey="8" href="Upgrading-from-FFTW-version-2.html#Upgrading-from-FFTW-version-2">Upgrading from FFTW version 2</a>
-<li><a accesskey="9" href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>
+<li><a accesskey="6" href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI">Distributed-memory FFTW with MPI</a>
+<li><a accesskey="7" href="Calling-FFTW-from-Modern-Fortran.html#Calling-FFTW-from-Modern-Fortran">Calling FFTW from Modern Fortran</a>
+<li><a accesskey="8" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">Calling FFTW from Legacy Fortran</a>
+<li><a accesskey="9" href="Upgrading-from-FFTW-version-2.html#Upgrading-from-FFTW-version-2">Upgrading from FFTW version 2</a>
+<li><a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>
 <li><a href="Acknowledgments.html#Acknowledgments">Acknowledgments</a>
 <li><a href="License-and-Copyright.html#License-and-Copyright">License and Copyright</a>
 <li><a href="Concept-Index.html#Concept-Index">Concept Index</a>
 <li><a href="Library-Index.html#Library-Index">Library Index</a>
-
-</li></ul>
-<p>--- The Detailed Node Listing ---
-
-<p>Tutorial
-
-</p>
-<ul class="menu">
-<li><a href="Complex-One_002dDimensional-DFTs.html#Complex-One_002dDimensional-DFTs">Complex One-Dimensional DFTs</a>
-<li><a href="Complex-Multi_002dDimensional-DFTs.html#Complex-Multi_002dDimensional-DFTs">Complex Multi-Dimensional DFTs</a>
-<li><a href="One_002dDimensional-DFTs-of-Real-Data.html#One_002dDimensional-DFTs-of-Real-Data">One-Dimensional DFTs of Real Data</a>
-<li><a href="Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data">Multi-Dimensional DFTs of Real Data</a>
-<li><a href="More-DFTs-of-Real-Data.html#More-DFTs-of-Real-Data">More DFTs of Real Data</a>
-
-</li></ul>
-<p>More DFTs of Real Data
-
-</p>
-<ul class="menu">
-<li><a href="The-Halfcomplex_002dformat-DFT.html#The-Halfcomplex_002dformat-DFT">The Halfcomplex-format DFT</a>
-<li><a href="Real-even_002fodd-DFTs-_0028cosine_002fsine-transforms_0029.html#Real-even_002fodd-DFTs-_0028cosine_002fsine-transforms_0029">Real even/odd DFTs (cosine/sine transforms)</a>
-<li><a href="The-Discrete-Hartley-Transform.html#The-Discrete-Hartley-Transform">The Discrete Hartley Transform</a>
-
-</li></ul>
-<p>Other Important Topics
-
-</p>
-<ul class="menu">
-<li><a href="Data-Alignment.html#Data-Alignment">Data Alignment</a>
-<li><a href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array-Format">Multi-dimensional Array Format</a>
-<li><a href="Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">Words of Wisdom-Saving Plans</a>
-<li><a href="Caveats-in-Using-Wisdom.html#Caveats-in-Using-Wisdom">Caveats in Using Wisdom</a>
-
-</li></ul>
-<p>Data Alignment
-
-</p>
-<ul class="menu">
-<li><a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">SIMD alignment and fftw_malloc</a>
-<li><a href="Stack-alignment-on-x86.html#Stack-alignment-on-x86">Stack alignment on x86</a>
-
-</li></ul>
-<p>Multi-dimensional Array Format
-
-</p>
-<ul class="menu">
-<li><a href="Row_002dmajor-Format.html#Row_002dmajor-Format">Row-major Format</a>
-<li><a href="Column_002dmajor-Format.html#Column_002dmajor-Format">Column-major Format</a>
-<li><a href="Fixed_002dsize-Arrays-in-C.html#Fixed_002dsize-Arrays-in-C">Fixed-size Arrays in C</a>
-<li><a href="Dynamic-Arrays-in-C.html#Dynamic-Arrays-in-C">Dynamic Arrays in C</a>
-<li><a href="Dynamic-Arrays-in-C_002dThe-Wrong-Way.html#Dynamic-Arrays-in-C_002dThe-Wrong-Way">Dynamic Arrays in C-The Wrong Way</a>
-
-</li></ul>
-<p>FFTW Reference
-
-</p>
-<ul class="menu">
-<li><a href="Data-Types-and-Files.html#Data-Types-and-Files">Data Types and Files</a>
-<li><a href="Using-Plans.html#Using-Plans">Using Plans</a>
-<li><a href="Basic-Interface.html#Basic-Interface">Basic Interface</a>
-<li><a href="Advanced-Interface.html#Advanced-Interface">Advanced Interface</a>
-<li><a href="Guru-Interface.html#Guru-Interface">Guru Interface</a>
-<li><a href="New_002darray-Execute-Functions.html#New_002darray-Execute-Functions">New-array Execute Functions</a>
-<li><a href="Wisdom.html#Wisdom">Wisdom</a>
-<li><a href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes">What FFTW Really Computes</a>
-
-</li></ul>
-<p>Data Types and Files
-
-</p>
-<ul class="menu">
-<li><a href="Complex-numbers.html#Complex-numbers">Complex numbers</a>
-<li><a href="Precision.html#Precision">Precision</a>
-<li><a href="Memory-Allocation.html#Memory-Allocation">Memory Allocation</a>
-
-</li></ul>
-<p>Basic Interface
-
-</p>
-<ul class="menu">
-<li><a href="Complex-DFTs.html#Complex-DFTs">Complex DFTs</a>
-<li><a href="Planner-Flags.html#Planner-Flags">Planner Flags</a>
-<li><a href="Real_002ddata-DFTs.html#Real_002ddata-DFTs">Real-data DFTs</a>
-<li><a href="Real_002ddata-DFT-Array-Format.html#Real_002ddata-DFT-Array-Format">Real-data DFT Array Format</a>
-<li><a href="Real_002dto_002dReal-Transforms.html#Real_002dto_002dReal-Transforms">Real-to-Real Transforms</a>
-<li><a href="Real_002dto_002dReal-Transform-Kinds.html#Real_002dto_002dReal-Transform-Kinds">Real-to-Real Transform Kinds</a>
-
-</li></ul>
-<p>Advanced Interface
-
-</p>
-<ul class="menu">
-<li><a href="Advanced-Complex-DFTs.html#Advanced-Complex-DFTs">Advanced Complex DFTs</a>
-<li><a href="Advanced-Real_002ddata-DFTs.html#Advanced-Real_002ddata-DFTs">Advanced Real-data DFTs</a>
-<li><a href="Advanced-Real_002dto_002dreal-Transforms.html#Advanced-Real_002dto_002dreal-Transforms">Advanced Real-to-real Transforms</a>
-
-</li></ul>
-<p>Guru Interface
-
-</p>
-<ul class="menu">
-<li><a href="Interleaved-and-split-arrays.html#Interleaved-and-split-arrays">Interleaved and split arrays</a>
-<li><a href="Guru-vector-and-transform-sizes.html#Guru-vector-and-transform-sizes">Guru vector and transform sizes</a>
-<li><a href="Guru-Complex-DFTs.html#Guru-Complex-DFTs">Guru Complex DFTs</a>
-<li><a href="Guru-Real_002ddata-DFTs.html#Guru-Real_002ddata-DFTs">Guru Real-data DFTs</a>
-<li><a href="Guru-Real_002dto_002dreal-Transforms.html#Guru-Real_002dto_002dreal-Transforms">Guru Real-to-real Transforms</a>
-<li><a href="64_002dbit-Guru-Interface.html#g_t64_002dbit-Guru-Interface">64-bit Guru Interface</a>
-
-</li></ul>
-<p>Wisdom
-
-</p>
-<ul class="menu">
-<li><a href="Wisdom-Export.html#Wisdom-Export">Wisdom Export</a>
-<li><a href="Wisdom-Import.html#Wisdom-Import">Wisdom Import</a>
-<li><a href="Forgetting-Wisdom.html#Forgetting-Wisdom">Forgetting Wisdom</a>
-<li><a href="Wisdom-Utilities.html#Wisdom-Utilities">Wisdom Utilities</a>
-
-</li></ul>
-<p>What FFTW Really Computes
-
-</p>
-<ul class="menu">
-<li><a href="The-1d-Discrete-Fourier-Transform-_0028DFT_0029.html#The-1d-Discrete-Fourier-Transform-_0028DFT_0029">The 1d Discrete Fourier Transform (DFT)</a>
-<li><a href="The-1d-Real_002ddata-DFT.html#The-1d-Real_002ddata-DFT">The 1d Real-data DFT</a>
-<li><a href="1d-Real_002deven-DFTs-_0028DCTs_0029.html#g_t1d-Real_002deven-DFTs-_0028DCTs_0029">1d Real-even DFTs (DCTs)</a>
-<li><a href="1d-Real_002dodd-DFTs-_0028DSTs_0029.html#g_t1d-Real_002dodd-DFTs-_0028DSTs_0029">1d Real-odd DFTs (DSTs)</a>
-<li><a href="1d-Discrete-Hartley-Transforms-_0028DHTs_0029.html#g_t1d-Discrete-Hartley-Transforms-_0028DHTs_0029">1d Discrete Hartley Transforms (DHTs)</a>
-<li><a href="Multi_002ddimensional-Transforms.html#Multi_002ddimensional-Transforms">Multi-dimensional Transforms</a>
-
-</li></ul>
-<p>Multi-threaded FFTW
-
-</p>
-<ul class="menu">
-<li><a href="Installation-and-Supported-Hardware_002fSoftware.html#Installation-and-Supported-Hardware_002fSoftware">Installation and Supported Hardware/Software</a>
-<li><a href="Usage-of-Multi_002dthreaded-FFTW.html#Usage-of-Multi_002dthreaded-FFTW">Usage of Multi-threaded FFTW</a>
-<li><a href="How-Many-Threads-to-Use_003f.html#How-Many-Threads-to-Use_003f">How Many Threads to Use?</a>
-<li><a href="Thread-safety.html#Thread-safety">Thread safety</a>
-
-</li></ul>
-<p>FFTW on the Cell Processor
-
-</p>
-<ul class="menu">
-<li><a href="Cell-Installation.html#Cell-Installation">Cell Installation</a>
-<li><a href="Cell-Caveats.html#Cell-Caveats">Cell Caveats</a>
-<li><a href="FFTW-Accuracy-on-Cell.html#FFTW-Accuracy-on-Cell">FFTW Accuracy on Cell</a>
-
-</li></ul>
-<p>Calling FFTW from Fortran
-
-</p>
-<ul class="menu">
-<li><a href="Fortran_002dinterface-routines.html#Fortran_002dinterface-routines">Fortran-interface routines</a>
-<li><a href="FFTW-Constants-in-Fortran.html#FFTW-Constants-in-Fortran">FFTW Constants in Fortran</a>
-<li><a href="FFTW-Execution-in-Fortran.html#FFTW-Execution-in-Fortran">FFTW Execution in Fortran</a>
-<li><a href="Fortran-Examples.html#Fortran-Examples">Fortran Examples</a>
-<li><a href="Wisdom-of-Fortran_003f.html#Wisdom-of-Fortran_003f">Wisdom of Fortran?</a>
-
-</li></ul>
-<p>Installation and Customization
-
-</p>
-<ul class="menu">
-<li><a href="Installation-on-Unix.html#Installation-on-Unix">Installation on Unix</a>
-<li><a href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems">Installation on non-Unix systems</a>
-<li><a href="Cycle-Counters.html#Cycle-Counters">Cycle Counters</a>
-<li><a href="Generating-your-own-code.html#Generating-your-own-code">Generating your own code</a>
-
-   </ul>
+</ul>
 
 <!-- ************************************************************ -->
    </body></html>

@@ -1,7 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(fftw, 3.2.2, fftw@fftw.org)
+AC_INIT(fftw, 3.3, fftw@fftw.org)
 AC_CONFIG_SRCDIR(kernel/ifftw.h)
-SHARED_VERSION_INFO="5:4:2" # CURRENT:REVISION:AGE
+# fftw-3.1.x was 4:X:1
+# fftw-3.2.x was 5:X:2
+# fftw-3.3.x was 6:X:3
+SHARED_VERSION_INFO="6:0:3" # CURRENT:REVISION:AGE
 
 AM_INIT_AUTOMAKE(1.7)
 AM_CONFIG_HEADER(config.h)
@@ -44,7 +47,13 @@ if test "$ok" = "yes"; then
 	AC_DEFINE(FFTW_DEBUG_ALIGNMENT,1,[Define to enable alignment debugging hacks.])
 fi
 
-AC_ARG_ENABLE(alloca, [AC_HELP_STRING([--enable-alloca],[enable use of the alloca() function (may be broken on mingw64)])], ok=$enableval, ok=yes)
+AC_ARG_ENABLE(random-estimator, [AC_HELP_STRING([--enable-random-estimator],[enable pseudorandom estimator (debugging hack)])], ok=$enableval, ok=no)
+if test "$ok" = "yes"; then
+	AC_DEFINE(FFTW_RANDOM_ESTIMATOR,1,[Define to enable pseudorandom estimate planning for debugging.])
+	CHECK_PL_OPTS="--estimate"
+fi
+
+AC_ARG_ENABLE(alloca, [AC_HELP_STRING([--disable-alloca],[disable use of the alloca() function (may be broken on mingw64)])], ok=$enableval, ok=yes)
 if test "$ok" = "yes"; then
 	AC_DEFINE(FFTW_ENABLE_ALLOCA,1,[Define to enable the use of alloca().])
 fi
@@ -70,53 +79,64 @@ if test "$ok" = "yes"; then
 	PRECISION=l
 fi
 AM_CONDITIONAL(LDOUBLE, test "$ok" = "yes")
-AC_SUBST(PRECISION)
 
-have_simd="no"
-simd_precision="s"
+AC_ARG_ENABLE(quad-precision, [AC_HELP_STRING([--enable-quad-precision],[compile fftw in quadruple precision if available])], ok=$enableval, ok=no)
+if test "$ok" = "yes"; then
+	if test "$PRECISION" != "d"; then
+		AC_MSG_ERROR([conflicting precisions specified])
+	fi
+	AC_DEFINE(FFTW_QUAD,1,[Define to compile in quad precision.])
+	AC_DEFINE(BENCHFFT_QUAD,1,[Define to compile in quad precision.])
+	PRECISION=q
+fi
+AM_CONDITIONAL(QUAD, test "$ok" = "yes")
+
+AC_SUBST(PRECISION)
+AC_SUBST(CHECK_PL_OPTS)
 
 AC_ARG_ENABLE(sse, [AC_HELP_STRING([--enable-sse],[enable SSE optimizations])], have_sse=$enableval, have_sse=no)
 if test "$have_sse" = "yes"; then
-	AC_DEFINE(HAVE_SSE,1,[Define to enable SSE optimizations.])
-	have_simd="yes"
-fi
-
-AC_ARG_ENABLE(sse2, [AC_HELP_STRING([--enable-sse2],[enable SSE2 optimizations])], have_sse2=$enableval, have_sse2=no)
-if test "$have_sse2" = "yes"; then
-	AC_DEFINE(HAVE_SSE2,1,[Define to enable SSE2 optimizations.])
-	have_simd="yes"
-	simd_precision="d"
-	if test "$have_sse" = "yes"; then
-		AC_MSG_ERROR([you cannot use SSE and SSE2 at the same time])
+	if test "$PRECISION" != "s"; then
+		AC_MSG_ERROR([SSE requires single precision])
 	fi
 fi
+
+AC_ARG_ENABLE(sse2, [AC_HELP_STRING([--enable-sse2],[enable SSE/SSE2 optimizations])], have_sse2=$enableval, have_sse2=no)
+if test "$have_sse" = "yes"; then have_sse2=yes; fi
+if test "$have_sse2" = "yes"; then
+	AC_DEFINE(HAVE_SSE2,1,[Define to enable SSE/SSE2 optimizations.])
+	if test "$PRECISION" != "d" -a "$PRECISION" != "s"; then
+		AC_MSG_ERROR([SSE2 requires single or double precision])
+	fi
+fi
+AM_CONDITIONAL(HAVE_SSE2, test "$have_sse2" = "yes")
+
+AC_ARG_ENABLE(avx, [AC_HELP_STRING([--enable-avx],[enable AVX optimizations])], have_avx=$enableval, have_avx=no)
+if test "$have_avx" = "yes"; then
+        AC_DEFINE(HAVE_AVX,1,[Define to enable AVX optimizations.])
+	if test "$PRECISION" != "d" -a "$PRECISION" != "s"; then
+		AC_MSG_ERROR([AVX requires single or double precision])
+	fi
+fi
+AM_CONDITIONAL(HAVE_AVX, test "$have_avx" = "yes")
 
 AC_ARG_ENABLE(altivec, [AC_HELP_STRING([--enable-altivec],[enable Altivec optimizations])], have_altivec=$enableval, have_altivec=no)
 if test "$have_altivec" = "yes"; then
 	AC_DEFINE(HAVE_ALTIVEC,1,[Define to enable Altivec optimizations.])
-	have_simd="yes"
+	if test "$PRECISION" != "s"; then
+		AC_MSG_ERROR([Altivec requires single precision])
+	fi
 fi
+AM_CONDITIONAL(HAVE_ALTIVEC, test "$have_altivec" = "yes")
 
 AC_ARG_ENABLE(mips-ps, [AC_HELP_STRING([--enable-mips-ps],[enable MIPS pair-single optimizations])], have_mips_ps=$enableval, have_mips_ps=no)
 if test "$have_mips_ps" = "yes"; then
 	AC_DEFINE(HAVE_MIPS_PS,1,[Define to enable MIPS paired-single optimizations.])
-	have_simd="yes"
+	if test "$PRECISION" != "s"; then
+		AC_MSG_ERROR([MIPS paired-single requires single precision])
+	fi
 fi
-
-if test "$PRECISION" != "$simd_precision" && test "$have_simd" = "yes"; then
-	AC_MSG_ERROR([requested SIMD type does not match selected precision])
-fi
-
-AC_ARG_ENABLE(cell, [AC_HELP_STRING([--enable-cell],[enable optimizations for the Cell Broadband Engine])], have_cell=$enableval, have_cell=no)
-if test "$have_cell" = "yes"; then
-	AC_DEFINE(HAVE_CELL,1,[Define to enable optimizations for the Cell Broadband Engine])
-	if test "$PRECISION" = "l"; then
-	   AC_MSG_ERROR([Cell does not support long double])
-        fi
-fi
-
-AM_CONDITIONAL(HAVE_CELL, test "$have_cell" = "yes")
-AM_CONDITIONAL(HAVE_SIMD, test "$have_simd" = "yes")
+AM_CONDITIONAL(HAVE_MIPS_PS, test "$have_mips_ps" = "yes")
 
 AC_ARG_WITH(slow-timer, [AC_HELP_STRING([--with-slow-timer],[use low-precision timers (SLOW)])], with_slow_timer=$withval, with_slow_timer=no)
 if test "$with_slow_timer" = "yes"; then
@@ -128,9 +148,10 @@ if test "$have_mips_zbus_timer" = "yes"; then
 	AC_DEFINE(HAVE_MIPS_ZBUS_TIMER,1,[Define to enable use of MIPS ZBus cycle-counter.])
 fi
 
-AC_ARG_WITH(our-malloc16, [AC_HELP_STRING([--with-our-malloc16],[use our 16-byte aligned malloc (helpful for Win32)])], with_our_malloc16=$withval, with_our_malloc16=no)
-if test "$with_our_malloc16" = "yes"; then
-	AC_DEFINE(WITH_OUR_MALLOC16,1,[Use our own 16-byte aligned malloc routine; mainly helpful for Windows systems lacking aligned allocation system-library routines.])
+AC_ARG_WITH(our-malloc, [AC_HELP_STRING([--with-our-malloc],[use our aligned malloc (helpful for Win32)])], with_our_malloc=$withval, with_our_malloc=no)
+AC_ARG_WITH(our-malloc16, [AC_HELP_STRING([--with-our-malloc16],[Obsolete alias for --with-our-malloc16])], with_our_malloc=$withval)
+if test "$with_our_malloc" = "yes"; then
+	AC_DEFINE(WITH_OUR_MALLOC,1,[Use our own aligned malloc routine; mainly helpful for Windows systems lacking aligned allocation system-library routines.])
 fi
 
 AC_ARG_WITH(windows-f77-mangling, [AC_HELP_STRING([--with-windows-f77-mangling],[use common Win32 Fortran interface styles])], with_windows_f77_mangling=$withval, with_windows_f77_mangling=no)
@@ -138,18 +159,20 @@ if test "$with_windows_f77_mangling" = "yes"; then
 	AC_DEFINE(WINDOWS_F77_MANGLING,1,[Use common Windows Fortran mangling styles for the Fortran interfaces.])
 fi
 
-OCAML_INIT_PATHS
+AC_ARG_WITH(incoming-stack-boundary, [AC_HELP_STRING([--with-incoming-stack-boundary=X],[Assume that stack is aligned to (1<<X) bytes])], with_incoming_stack_boundary=$withval, with_incoming_stack_boundary=no)
 
 dnl compute library suffix
 case "$PRECISION" in
      s) PREC_SUFFIX=f;;
      d) PREC_SUFFIX=;;
      l) PREC_SUFFIX=l;;
+     q) PREC_SUFFIX=q;;
 esac
 AC_SUBST(PREC_SUFFIX)
 
 dnl Checks for programs.
 AC_PROG_CC
+AM_PROG_CC_C_O
 AX_COMPILER_VENDOR
 AC_PROG_CC_STDC
 AC_PROG_INSTALL
@@ -158,23 +181,33 @@ AC_PROG_MAKE_SET
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-AC_CHECK_PROG(OCAMLC, ocamlc, ocamlc)
-AC_CHECK_PROG(OCAMLOPT, ocamlopt, ocamlopt)
-AC_CHECK_PROG(OCAMLDEP, ocamldep, ocamldep)
-
-AC_SUBST(OCAMLCFLAGS)
-AC_SUBST(OCAMLOPTCFLAGS)
-AC_SUBST(OCAMLDEFS)
-AC_SUBST(OCAMLLDFLAGS)
+AC_CHECK_PROG(OCAMLBUILD, ocamlbuild, ocamlbuild)
 
 dnl -----------------------------------------------------------------------
 
 AC_ARG_ENABLE(mpi, [AC_HELP_STRING([--enable-mpi],[compile FFTW MPI library])], enable_mpi=$enableval, enable_mpi=no)
 
 if test "$enable_mpi" = "yes"; then
+   if test $PRECISION = q; then
+      AC_MSG_ERROR([quad precision is not supported in MPI])
+   fi
    ACX_MPI([],[AC_MSG_ERROR([could not find mpi library for --enable-mpi])])
    AC_CHECK_PROG(MPIRUN, mpirun, mpirun)
    AC_SUBST(MPIRUN)
+
+   save_CC=$CC
+   CC=$MPICC
+   AC_CHECK_SIZEOF(MPI_Fint, [], [#include <mpi.h>])
+   CC=$save_CC
+   if test 0 = $ac_cv_sizeof_MPI_Fint; then
+      AC_MSG_WARN([sizeof(MPI_Fint) test failed]);
+      dnl As a backup, assume Fortran integer == C int
+      AC_CHECK_SIZEOF(int) 
+      if test 0 = $ac_cv_sizeof_int; then AC_MSG_ERROR([sizeof(int) test failed]); fi
+      ac_cv_sizeof_MPI_Fint=$ac_cv_sizeof_int
+   fi
+   C_MPI_FINT=C_INT`expr $ac_cv_sizeof_MPI_Fint \* 8`_T
+   AC_SUBST(C_MPI_FINT)
 fi
 AM_CONDITIONAL(MPI, test "$enable_mpi" = "yes")
 
@@ -182,45 +215,6 @@ dnl -----------------------------------------------------------------------
 
 dnl determine CFLAGS first
 AX_CC_MAXOPT
-
-# some additional FFTW-specific tweaks to the flags
-if test "$ac_test_CFLAGS" != "set"; then # if user didn't override CFLAGS
-    if test "x$CODELET_OPTIM" = x; then
-
-      case "${ax_cv_c_compiler_vendor}" in
-        gnu)
-            case "${host_cpu}" in
-	       # gcc's ``optimizations'' slow down everything on IA32.
-	       # (not to mention compiler bugs)
-               i?86*) CODELET_OPTIM=-O ;;
-            esac
-
-	    # disable certain other gcc ``optimizations'' that produce worse 
-	    # codelets
-	    AX_CHECK_COMPILER_FLAGS(-fno-schedule-insns,
-		    [CODELET_OPTIM="$CODELET_OPTIM -fno-schedule-insns"])
-	    AX_CHECK_COMPILER_FLAGS(-fno-web,
-		    [CODELET_OPTIM="$CODELET_OPTIM -fno-web"])
-	    AX_CHECK_COMPILER_FLAGS(-fno-loop-optimize,
-		    [CODELET_OPTIM="$CODELET_OPTIM -fno-loop-optimize"])
-
-	    # The gcc-3.4 inliner is totally broken; it does not inline
-	    # small functions like VFMAI.
-	    AX_CHECK_COMPILER_FLAGS(
-		    [--param inline-unit-growth=1000],
-		    [CODELET_OPTIM="$CODELET_OPTIM --param inline-unit-growth=1000"])
-	    AX_CHECK_COMPILER_FLAGS(
-		    [--param large-function-growth=1000],
-		    [CODELET_OPTIM="$CODELET_OPTIM --param large-function-growth=1000"])
-            ;;
-
-        ibm) CODELET_OPTIM=-O;;
-
-      esac
-    fi
-fi
-
-AC_SUBST(CODELET_OPTIM)
 
 case "${ax_cv_c_compiler_vendor}" in
    intel) # Stop icc from defining __GNUC__, except on MacOS where this fails
@@ -243,54 +237,79 @@ case "${ax_cv_c_compiler_vendor}" in
         ;;
 esac
 
-if test "x$SIMD_CFLAGS" = x; then
-if test "${ax_cv_c_compiler_vendor}" = "gnu"; then
-    if test "$have_sse" = "yes"; then
-	AX_CHECK_COMPILER_FLAGS(-msse, [SIMD_CFLAGS="-msse"],
-	    [AC_MSG_ERROR([Need a version of gcc with -msse])])
-    elif test "$have_sse2" = "yes"; then
-	AX_CHECK_COMPILER_FLAGS(-msse2, [SIMD_CFLAGS="-msse2"],
-	    [AC_MSG_ERROR([Need a version of gcc with -msse2])])
-    elif test "$have_altivec" = "yes"; then
-	# -DFAKE__VEC__ is a workaround because gcc-3.3 does not
-	# #define __VEC__ with -maltivec.
-	AX_CHECK_COMPILER_FLAGS(-faltivec, [SIMD_CFLAGS="-faltivec"],
-	    [AX_CHECK_COMPILER_FLAGS(-maltivec -mabi=altivec,
-		[SIMD_CFLAGS="-maltivec -mabi=altivec -DFAKE__VEC__"],
-	        [AX_CHECK_COMPILER_FLAGS(-fvec, [SIMD_CFLAGS="-fvec"],
-		    [AC_MSG_ERROR([Need a version of gcc with -maltivec])])])])
-    elif test "$have_mips_ps" = "yes"; then
-        # Just punt here and use only new 4.2 compiler :(
-	# Should add section for older compilers...
-	AX_CHECK_COMPILER_FLAGS(-mpaired-single,
-	    [SIMD_CFLAGS="-mpaired-single"],
-	    #[AC_MSG_ERROR([Need a version of gcc with -mpaired-single])])
-	    [AX_CHECK_COMPILER_FLAGS(-march=mips64,
-	      [SIMD_CFLAGS="-march=mips64"],
-	        [AC_MSG_ERROR(
-		 [Need a version of gcc with -mpaired-single or -march=mips64])
-		])])
-    fi
+dnl Determine SIMD CFLAGS at least for gcc and icc
+case "${ax_cv_c_compiler_vendor}" in
+    gnu|intel)
+	# SSE/SSE2
+	if test "$have_sse2" = "yes" -a "x$SSE2_CFLAGS" = x; then
+	    if test "$PRECISION" = d; then flag=msse2; else flag=msse; fi
+	    AX_CHECK_COMPILER_FLAGS(-$flag, [SSE2_CFLAGS="-$flag"],
+		[AC_MSG_ERROR([Need a version of gcc with -$flag])])
+	fi
+
+	# AVX
+	if test "$have_avx" = "yes" -a "x$AVX_CFLAGS" = x; then
+	    AX_CHECK_COMPILER_FLAGS(-mavx, [AVX_CFLAGS="-mavx"],
+		[AC_MSG_ERROR([Need a version of gcc with -mavx])])
+	fi
+
+	if test "$have_altivec" = "yes" -a "x$ALTIVEC_CFLAGS" = x; then
+	    # -DFAKE__VEC__ is a workaround because gcc-3.3 does not
+	    # #define __VEC__ with -maltivec.
+	    AX_CHECK_COMPILER_FLAGS(-faltivec, [ALTIVEC_CFLAGS="-faltivec"],
+		[AX_CHECK_COMPILER_FLAGS(-maltivec -mabi=altivec,
+		    [ALTIVEC_CFLAGS="-maltivec -mabi=altivec -DFAKE__VEC__"],
+		    [AX_CHECK_COMPILER_FLAGS(-fvec, [ALTIVEC_CFLAGS="-fvec"],
+			[AC_MSG_ERROR([Need a version of gcc with -maltivec])])])])
+	fi
+
+	dnl FIXME:
+	dnl elif test "$have_mips_ps" = "yes"; then
+	dnl     # Just punt here and use only new 4.2 compiler :(
+	dnl 	# Should add section for older compilers...
+	dnl 	AX_CHECK_COMPILER_FLAGS(-mpaired-single,
+	dnl 	    [SIMD_CFLAGS="-mpaired-single"],
+	dnl 	    #[AC_MSG_ERROR([Need a version of gcc with -mpaired-single])])
+	dnl 	    [AX_CHECK_COMPILER_FLAGS(-march=mips64,
+	dnl 	      [SIMD_CFLAGS="-march=mips64"],
+	dnl 	        [AC_MSG_ERROR(
+	dnl 		 [Need a version of gcc with -mpaired-single or -march=mips64])
+	dnl 		])])
+	dnl fi
+	;;
+esac
+
+AC_SUBST(SSE2_CFLAGS)
+AC_SUBST(AVX_CFLAGS)
+AC_SUBST(ALTIVEC_CFLAGS)
+
+dnl add stack alignment CFLAGS if so requested
+if test "$with_incoming_stack_boundary"x != "no"x; then
+   case "${ax_cv_c_compiler_vendor}" in
+      gnu)
+        tentative_flags="-mincoming-stack-boundary=$with_incoming_stack_boundary";
+        AX_CHECK_COMPILER_FLAGS($tentative_flags, 
+	          [STACK_ALIGN_CFLAGS=$tentative_flags])
+      ;;
+   esac
 fi
-fi
-AC_SUBST(SIMD_CFLAGS)
+AC_SUBST(STACK_ALIGN_CFLAGS)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([libintl.h malloc.h stddef.h stdlib.h string.h strings.h sys/time.h unistd.h limits.h c_asm.h intrinsics.h stdint.h mach/mach_time.h sys/sysctl.h xmmintrin.h])
+AC_CHECK_HEADERS([libintl.h malloc.h stddef.h stdlib.h string.h strings.h sys/time.h unistd.h limits.h c_asm.h intrinsics.h stdint.h mach/mach_time.h sys/sysctl.h])
 dnl c_asm.h: Header file for enabling asm() on Digital Unix  
 dnl intrinsics.h: cray unicos
 dnl sys/sysctl.h: MacOS X altivec detection
 
-dnl altivec.h requires the simd cflags
+dnl altivec.h requires $ALTIVEC_CFLAGS
 save_CFLAGS="$CFLAGS"
 save_CPPFLAGS="$CPPFLAGS"
-CFLAGS="$CFLAGS $SIMD_CFLAGS"
-CPPFLAGS="$CPPFLAGS $SIMD_CFLAGS"
+CFLAGS="$CFLAGS $ALTIVEC_CFLAGS"
+CPPFLAGS="$CPPFLAGS $ALTIVEC_CFLAGS"
 AC_CHECK_HEADERS([altivec.h])
 CFLAGS="$save_CFLAGS"
 CPPFLAGS="$save_CPPFLAGS"
-
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -329,17 +348,33 @@ AC_CHECK_TYPES(uintptr_t, [], [AC_CHECK_SIZEOF(void *)], [$ac_includes_default
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 
+dnl Check sizeof fftw_r2r_kind for Fortran interface [it has == sizeof(int)
+dnl for years, but being paranoid].  Note: the definition here must match
+dnl the one in api/fftw3.h!
+AC_CHECK_SIZEOF(fftw_r2r_kind, [], [typedef enum {
+     FFTW_R2HC=0, FFTW_HC2R=1, FFTW_DHT=2,
+     FFTW_REDFT00=3, FFTW_REDFT01=4, FFTW_REDFT10=5, FFTW_REDFT11=6,
+     FFTW_RODFT00=7, FFTW_RODFT01=8, FFTW_RODFT10=9, FFTW_RODFT11=10
+} fftw_r2r_kind;])
+if test 0 = $ac_cv_sizeof_fftw_r2r_kind; then AC_MSG_ERROR([sizeof(fftw_r2r_kind) test failed]); fi
+C_FFTW_R2R_KIND=C_INT`expr $ac_cv_sizeof_fftw_r2r_kind \* 8`_T
+AC_SUBST(C_FFTW_R2R_KIND)
+
 dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_LIB(m, sin)
-if test "$have_cell" = "yes"; then
-   AC_CHECK_LIB(spe2, spe_context_run, [], [AC_CHECK_LIB(spe, spe_wait)])
+
+if test $PRECISION = q; then
+   AX_GCC_VERSION(4,6,0,[],[AC_MSG_ERROR([gcc 4.6 or later required for quad precision support])])
+   AC_CHECK_LIB(quadmath, sinq, [], [AC_MSG_ERROR([quad precision requires libquadmath for quad-precision trigonometric routines])])
+   LIBQUADMATH=-lquadmath
 fi
+AC_SUBST(LIBQUADMATH)
 
 AC_CHECK_FUNCS([BSDgettimeofday gettimeofday gethrtime read_real_time time_base_to_time drand48 sqrt memset posix_memalign memalign _mm_malloc _mm_free clock_gettime mach_absolute_time sysctl abort sinl cosl snprintf])
-AC_CHECK_DECLS([drand48, memalign, posix_memalign, sinl, cosl])
+AC_CHECK_DECLS([drand48, srand48, memalign, posix_memalign, sinl, cosl, sinq, cosq])
 
 dnl Cray UNICOS _rtc() (real-time clock) intrinsic
 AC_MSG_CHECKING([for _rtc intrinsic])
@@ -421,34 +456,25 @@ have_smp="no"
 AC_ARG_ENABLE(openmp, [AC_HELP_STRING([--enable-openmp],[use OpenMP directives for parallelism])], enable_openmp=$enableval, enable_openmp=no)
 
 if test "$enable_openmp" = "yes"; then
-	AC_DEFINE(HAVE_OPENMP,1,[Define to enable OpenMP])
-	have_smp="yes"
+   AC_DEFINE(HAVE_OPENMP,1,[Define to enable OpenMP])
+   AX_OPENMP([], [AC_MSG_ERROR([don't know how to enable OpenMP])])
 fi
 
 AC_ARG_ENABLE(threads, [AC_HELP_STRING([--enable-threads],[compile FFTW SMP threads library])], enable_threads=$enableval, enable_threads=no)
 
 if test "$enable_threads" = "yes"; then
    AC_DEFINE(HAVE_THREADS,1,[Define to enable SMP threads])
-   if test "$enable_openmp" = "yes"; then
-      AC_MSG_ERROR([--enable-threads/--enable-openmp are mutually exclusive])
-   fi
-   if test "$have_cell" = "yes"; then
-      AC_MSG_ERROR([--enable-threads/--enable-cell are mutually exclusive])
-   fi
-   have_smp="yes"
-fi
-
-if test "$enable_openmp"x != "nox" -a "$enable_threads"x != "nox"; then
-   AC_MSG_ERROR([--enable-threads/--enable-openmp are mutually exclusive])
 fi
 
 AC_ARG_WITH(combined-threads, [AC_HELP_STRING([--with-combined-threads],[combine threads into main libfftw3])], with_combined_threads=$withval, with_combined_threads=no)
 
-if test "$enable_openmp"x != nox; then
-   AX_OPENMP([THREADLIBS=" "
-     AC_DEFINE(USING_OPENMP_THREADS, 1, [Define if we have and are using OpenMP multithreading directives])
-     CFLAGS="$CFLAGS $OPENMP_CFLAGS"],
-     [AC_MSG_ERROR([don't know how to enable OpenMP])])
+if test "$with_combined_threads" = yes; then
+   if test "$enable_openmp" = "yes"; then
+      AC_MSG_ERROR([--with-combined-threads incompatible with --enable-openmp])
+   fi
+   if test "$enable_threads" != "yes"; then
+      AC_MSG_ERROR([--with-combined-threads requires --enable-threads])
+   fi
 fi
 
 dnl Check for threads library...
@@ -457,7 +483,6 @@ if test "$enable_threads" = "yes"; then
 	# POSIX threads, the default choice:
 	if test -z "$THREADLIBS"; then
 		ACX_PTHREAD([THREADLIBS="$PTHREAD_LIBS "
-	                     CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 	                     CC="$PTHREAD_CC"
 	                     AC_DEFINE(USING_POSIX_THREADS, 1, [Define if we have and are using POSIX threads.])])
 	fi
@@ -476,7 +501,9 @@ if test "$enable_threads" = "yes"; then
 	AC_DEFINE(HAVE_THREADS, 1, [Define if we have a threads library.])
 fi
 AC_SUBST(THREADLIBS)
-AM_CONDITIONAL(SMP, test "$have_smp" = "yes")
+AM_CONDITIONAL(THREADS, test "$enable_threads" = "yes")
+AM_CONDITIONAL(OPENMP, test "$enable_openmp" = "yes")
+AM_CONDITIONAL(SMP, test "$enable_threads" = "yes" -o "$enable_openmp" = "yes")
 AM_CONDITIONAL(COMBINED_THREADS, test x"$with_combined_threads" = xyes)
 
 dnl -----------------------------------------------------------------------
@@ -500,21 +527,22 @@ fi
 dnl -----------------------------------------------------------------------
 
 AC_DEFINE_UNQUOTED(FFTW_CC, "$CC $CFLAGS", [C compiler name and flags])
-AC_DEFINE_UNQUOTED(CODELET_OPTIM, "$CODELET_OPTIM", [extra CFLAGS for codelets])
 
 AC_CONFIG_FILES([
    Makefile
    support/Makefile
    genfft/Makefile
    kernel/Makefile
-   simd/Makefile
-   simd/nonportable/Makefile
+   simd-support/Makefile
 
    dft/Makefile
    dft/scalar/Makefile
    dft/scalar/codelets/Makefile
    dft/simd/Makefile
-   dft/simd/codelets/Makefile
+   dft/simd/common/Makefile
+   dft/simd/sse2/Makefile
+   dft/simd/avx/Makefile
+   dft/simd/altivec/Makefile
 
    rdft/Makefile
    rdft/scalar/Makefile
@@ -522,15 +550,18 @@ AC_CONFIG_FILES([
    rdft/scalar/r2cb/Makefile
    rdft/scalar/r2r/Makefile
    rdft/simd/Makefile
-   rdft/simd/codelets/Makefile
+   rdft/simd/common/Makefile
+   rdft/simd/sse2/Makefile
+   rdft/simd/avx/Makefile
+   rdft/simd/altivec/Makefile
 
    reodft/Makefile
 
    threads/Makefile
-   cell/Makefile
-   cell/spu/Makefile
 
    api/Makefile
+
+   mpi/Makefile
 
    libbench2/Makefile
    tests/Makefile

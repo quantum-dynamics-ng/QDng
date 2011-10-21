@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>More DFTs of Real Data - FFTW 3.2.2</title>
+<title>More DFTs of Real Data - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Tutorial.html#Tutorial" title="Tutorial">
@@ -10,7 +10,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -62,7 +62,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Tutorial.html#Tutorial">Tutorial</a>
 
 <p>FFTW supports several other transform types via a unified <dfn>r2r</dfn>
 (real-to-real) interface,
-<a name="index-r2r-64"></a>so called because it takes a real (<code>double</code>) array and outputs a
+<a name="index-r2r-65"></a>so called because it takes a real (<code>double</code>) array and outputs a
 real array of the same size.  These r2r transforms currently fall into
 three categories: DFTs of real input and complex-Hermitian output in
 halfcomplex format, DFTs of real input with even/odd symmetry
@@ -89,7 +89,7 @@ r2r transforms share the same planner interface:
      fftw_plan fftw_plan_r2r(int rank, const int *n, double *in, double *out,
                              const fftw_r2r_kind *kind, unsigned flags);
 </pre>
-   <p><a name="index-fftw_005fplan_005fr2r_005f1d-65"></a><a name="index-fftw_005fplan_005fr2r_005f2d-66"></a><a name="index-fftw_005fplan_005fr2r_005f3d-67"></a><a name="index-fftw_005fplan_005fr2r-68"></a>
+   <p><a name="index-fftw_005fplan_005fr2r_005f1d-66"></a><a name="index-fftw_005fplan_005fr2r_005f2d-67"></a><a name="index-fftw_005fplan_005fr2r_005f3d-68"></a><a name="index-fftw_005fplan_005fr2r-69"></a>
 Just as for the complex DFT, these plan 1d/2d/3d/multi-dimensional
 transforms for contiguous arrays in row-major order, transforming (real)
 input to output of the same size, where <code>n</code> specifies the
@@ -103,7 +103,7 @@ an <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>) algorithm is used even for prime si
    <p>Each dimension has a <dfn>kind</dfn> parameter, of type
 <code>fftw_r2r_kind</code>, specifying the kind of r2r transform to be used
 for that dimension. 
-<a name="index-kind-_0028r2r_0029-69"></a><a name="index-fftw_005fr2r_005fkind-70"></a>(In the case of <code>fftw_plan_r2r</code>, this is an array <code>kind[rank]</code>
+<a name="index-kind-_0028r2r_0029-70"></a><a name="index-fftw_005fr2r_005fkind-71"></a>(In the case of <code>fftw_plan_r2r</code>, this is an array <code>kind[rank]</code>
 where <code>kind[i]</code> is the transform kind for the dimension
 <code>n[i]</code>.)  The kind can be one of a set of predefined constants,
 defined in the following subsections.

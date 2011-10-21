@@ -1,7 +1,7 @@
 (*
  * Copyright (c) 1997-1999 Massachusetts Institute of Technology
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -188,15 +188,15 @@ let generate n =
 	  Decl ("INT", mb);
 	  Decl ("INT", me);
 	  Decl ("INT", ms)],
-         add_constants body)
+         finalize_fcn body)
   in
   let twinstr = 
     Printf.sprintf "static const tw_instr twinstr[] = %s;\n\n" 
       (twinstr_to_string "VL" (twdesc n))
   and desc = 
     Printf.sprintf
-      "static const hc2c_desc desc = {%d, \"%s\", twinstr, &GENUS, %s};\n\n"
-      n name (flops_of tree)
+      "static const hc2c_desc desc = {%d, %s, twinstr, &GENUS, %s};\n\n"
+      n (stringify name) (flops_of tree)
   and register = "X(khc2c_register)"
 
   in

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,5 +67,15 @@ int X(import_wisdom_from_file)(FILE *input_file)
      planner *plnr = X(the_planner)();
      int ret = plnr->adt->imprt(plnr, s);
      X(scanner_destroy)(s);
+     return ret;
+}
+
+int X(import_wisdom_from_filename)(const char *filename)
+{
+     FILE *f = fopen(filename, "r");
+     int ret;
+     if (!f) return 0; /* error opening file */
+     ret = X(import_wisdom_from_file)(f);
+     if (fclose(f)) ret = 0; /* error closing file */
      return ret;
 }

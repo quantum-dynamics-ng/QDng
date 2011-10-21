@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Real-data DFTs - FFTW 3.2.2</title>
+<title>Real-data DFTs - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Basic-Interface.html#Basic-Interface" title="Basic Interface">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -57,7 +57,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Basic-Interface.html#Basic-Interface">B
 
 <h4 class="subsection">4.3.3 Real-data DFTs</h4>
 
-<pre class="example">     fftw_plan fftw_plan_dft_r2c_1d(int n,
+<pre class="example">     fftw_plan fftw_plan_dft_r2c_1d(int n0,
                                     double *in, fftw_complex *out,
                                     unsigned flags);
      fftw_plan fftw_plan_dft_r2c_2d(int n0, int n1,
@@ -70,7 +70,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Basic-Interface.html#Basic-Interface">B
                                  double *in, fftw_complex *out,
                                  unsigned flags);
 </pre>
-   <p><a name="index-fftw_005fplan_005fdft_005fr2c_005f1d-176"></a><a name="index-fftw_005fplan_005fdft_005fr2c_005f2d-177"></a><a name="index-fftw_005fplan_005fdft_005fr2c_005f3d-178"></a><a name="index-fftw_005fplan_005fdft_005fr2c-179"></a><a name="index-r2c-180"></a>
+   <p><a name="index-fftw_005fplan_005fdft_005fr2c_005f1d-185"></a><a name="index-fftw_005fplan_005fdft_005fr2c_005f2d-186"></a><a name="index-fftw_005fplan_005fdft_005fr2c_005f3d-187"></a><a name="index-fftw_005fplan_005fdft_005fr2c-188"></a><a name="index-r2c-189"></a>
 Plan a real-input/complex-output discrete Fourier transform (DFT) in
 zero or more dimensions, returning an <code>fftw_plan</code> (see <a href="Using-Plans.html#Using-Plans">Using Plans</a>).
 
@@ -88,16 +88,16 @@ with a multi-dimensional out-of-place c2r transform (see below).
 <h5 class="subsubheading">Arguments</h5>
 
      <ul>
-<li><code>rank</code> is the dimensionality of the transform (it should be the
-size of the array <code>*n</code>), and can be any non-negative integer.  The
+<li><code>rank</code> is the rank of the transform (it should be the size of the
+array <code>*n</code>), and can be any non-negative integer.  (See <a href="Complex-Multi_002dDimensional-DFTs.html#Complex-Multi_002dDimensional-DFTs">Complex Multi-Dimensional DFTs</a>, for the definition of &ldquo;rank&rdquo;.)  The
 &lsquo;<samp><span class="samp">_1d</span></samp>&rsquo;, &lsquo;<samp><span class="samp">_2d</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">_3d</span></samp>&rsquo; planners correspond to a
-<code>rank</code> of <code>1</code>, <code>2</code>, and <code>3</code>, respectively.  A
-<code>rank</code> of zero is equivalent to a transform of size 1, i.e. a copy
-of one number (with zero imaginary part) from input to output.
+<code>rank</code> of <code>1</code>, <code>2</code>, and <code>3</code>, respectively.  The rank
+may be zero, which is equivalent to a rank-1 transform of size 1, i.e. a
+copy of one real number (with zero imaginary part) from input to output.
 
-     <li><code>n</code>, or <code>n0</code>/<code>n1</code>/<code>n2</code>, or <code>n[rank]</code>,
-respectively, gives the size of the <em>logical</em> transform dimensions. 
-They can be any positive integer.  This is different in general from the
+     <li><code>n0</code>, <code>n1</code>, <code>n2</code>, or <code>n[0..rank-1]</code>, (as appropriate
+for each routine) specify the size of the transform dimensions.  They
+can be any positive integer.  This is different in general from the
 <em>physical</em> array dimensions, which are described in <a href="Real_002ddata-DFT-Array-Format.html#Real_002ddata-DFT-Array-Format">Real-data DFT Array Format</a>.
 
           <ul>
@@ -105,9 +105,7 @@ They can be any positive integer.  This is different in general from the
 2<sup>a</sup> 3<sup>b</sup> 5<sup>c</sup> 7<sup>d</sup>
         11<sup>e</sup> 13<sup>f</sup>,where e+f is either 0 or 1, and the other exponents
 are arbitrary.  Other sizes are computed by means of a slow,
-general-purpose algorithm (which nevertheless retains <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>)
-
-          <p>performance even for prime sizes).  (It is possible to customize FFTW
+general-purpose algorithm (which nevertheless retains <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>) performance even for prime sizes).  (It is possible to customize FFTW
 for different array sizes; see <a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>.) 
 Transforms whose sizes are powers of 2 are especially fast, and
 it is generally beneficial for the <em>last</em> dimension of an r2c/c2r
@@ -116,13 +114,13 @@ transform to be <em>even</em>.
 
      <li><code>in</code> and <code>out</code> point to the input and output arrays of the
 transform, which may be the same (yielding an in-place transform). 
-<a name="index-in_002dplace-181"></a>These arrays are overwritten during planning, unless
+<a name="index-in_002dplace-190"></a>These arrays are overwritten during planning, unless
 <code>FFTW_ESTIMATE</code> is used in the flags.  (The arrays need not be
 initialized, but they must be allocated.)  For an in-place transform, it
 is important to remember that the real array will require padding,
 described in <a href="Real_002ddata-DFT-Array-Format.html#Real_002ddata-DFT-Array-Format">Real-data DFT Array Format</a>. 
-<a name="index-padding-182"></a>
-<li><a name="index-flags-183"></a><code>flags</code> is a bitwise OR (&lsquo;<samp><span class="samp">|</span></samp>&rsquo;) of zero or more planner flags,
+<a name="index-padding-191"></a>
+<li><a name="index-flags-192"></a><code>flags</code> is a bitwise OR (&lsquo;<samp><span class="samp">|</span></samp>&rsquo;) of zero or more planner flags,
 as defined in <a href="Planner-Flags.html#Planner-Flags">Planner Flags</a>.
 
 </ul>
@@ -130,7 +128,7 @@ as defined in <a href="Planner-Flags.html#Planner-Flags">Planner Flags</a>.
    <p>The inverse transforms, taking complex input (storing the non-redundant
 half of a logically Hermitian array) to real output, are given by:
 
-<pre class="example">     fftw_plan fftw_plan_dft_c2r_1d(int n,
+<pre class="example">     fftw_plan fftw_plan_dft_c2r_1d(int n0,
                                     fftw_complex *in, double *out,
                                     unsigned flags);
      fftw_plan fftw_plan_dft_c2r_2d(int n0, int n1,
@@ -143,7 +141,7 @@ half of a logically Hermitian array) to real output, are given by:
                                  fftw_complex *in, double *out,
                                  unsigned flags);
 </pre>
-   <p><a name="index-fftw_005fplan_005fdft_005fc2r_005f1d-184"></a><a name="index-fftw_005fplan_005fdft_005fc2r_005f2d-185"></a><a name="index-fftw_005fplan_005fdft_005fc2r_005f3d-186"></a><a name="index-fftw_005fplan_005fdft_005fc2r-187"></a><a name="index-c2r-188"></a>
+   <p><a name="index-fftw_005fplan_005fdft_005fc2r_005f1d-193"></a><a name="index-fftw_005fplan_005fdft_005fc2r_005f2d-194"></a><a name="index-fftw_005fplan_005fdft_005fc2r_005f3d-195"></a><a name="index-fftw_005fplan_005fdft_005fc2r-196"></a><a name="index-c2r-197"></a>
 The arguments are the same as for the r2c transforms, except that the
 input and output data formats are reversed.
 
@@ -151,7 +149,7 @@ input and output data formats are reversed.
 c2r transform (or vice versa) will result in the original data
 multiplied by the size of the transform (the product of the logical
 dimensions). 
-<a name="index-normalization-189"></a>An r2c transform produces the same output as a <code>FFTW_FORWARD</code>
+<a name="index-normalization-198"></a>An r2c transform produces the same output as a <code>FFTW_FORWARD</code>
 complex DFT of the same input, and a c2r transform is correspondingly
 equivalent to <code>FFTW_BACKWARD</code>.  For more information, see <a href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes">What FFTW Really Computes</a>.
 

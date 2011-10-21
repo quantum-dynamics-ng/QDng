@@ -1,17 +1,17 @@
 <html lang="en">
 <head>
-<title>FFTW Constants in Fortran - FFTW 3.2.2</title>
+<title>FFTW Constants in Fortran - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
-<link rel="up" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran" title="Calling FFTW from Fortran">
+<link rel="up" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran" title="Calling FFTW from Legacy Fortran">
 <link rel="prev" href="Fortran_002dinterface-routines.html#Fortran_002dinterface-routines" title="Fortran-interface routines">
 <link rel="next" href="FFTW-Execution-in-Fortran.html#FFTW-Execution-in-Fortran" title="FFTW Execution in Fortran">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -50,11 +50,11 @@ Copyright (C) 2003 Massachusetts Institute of Technology.
 <p>
 Next:&nbsp;<a rel="next" accesskey="n" href="FFTW-Execution-in-Fortran.html#FFTW-Execution-in-Fortran">FFTW Execution in Fortran</a>,
 Previous:&nbsp;<a rel="previous" accesskey="p" href="Fortran_002dinterface-routines.html#Fortran_002dinterface-routines">Fortran-interface routines</a>,
-Up:&nbsp;<a rel="up" accesskey="u" href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran">Calling FFTW from Fortran</a>
+Up:&nbsp;<a rel="up" accesskey="u" href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">Calling FFTW from Legacy Fortran</a>
 <hr>
 </div>
 
-<h3 class="section">7.2 FFTW Constants in Fortran</h3>
+<h3 class="section">8.2 FFTW Constants in Fortran</h3>
 
 <p>When creating plans in FFTW, a number of constants are used to specify
 options, such as <code>FFTW_MEASURE</code> or <code>FFTW_ESTIMATE</code>.  The
@@ -69,10 +69,11 @@ preprocessor of some sort, you should be able to <code>include</code> or
 <code>#include</code> this file; otherwise, you can paste it directly into
 your code.
 
-   <p><a name="index-flags-337"></a>In C, you combine different flags (like <code>FFTW_PRESERVE_INPUT</code> and
-<code>FFTW_MEASURE</code>) using the &lsquo;<samp><code>|</code></samp>&rsquo; operator; in Fortran you
-should just use &lsquo;<samp><code>+</code></samp>&rsquo;.  (Take care not to add in the same flag
-more than once, though.)
+   <p><a name="index-flags-581"></a>In C, you combine different flags (like <code>FFTW_PRESERVE_INPUT</code> and
+<code>FFTW_MEASURE</code>) using the &lsquo;<samp><code>|</code></samp>&rsquo; operator; in Fortran
+you should just use &lsquo;<samp><code>+</code></samp>&rsquo;.  (Take care not to add in the
+same flag more than once, though.  Alternatively, you can use the
+<code>ior</code> intrinsic function standardized in Fortran 95.)
 
 <!--  -->
    </body></html>

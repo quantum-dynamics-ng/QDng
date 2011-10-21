@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,8 +75,9 @@ static void apply_buf(const plan *ego_, R *ri, R *ii, R *ro, R *io)
      R *buf;
      INT vl = ego->vl, n = ego->n, batchsz = compute_batchsize(n);
      INT i;
+     size_t bufsz = n * batchsz * 2 * sizeof(R);
 
-     STACK_MALLOC(R *, buf, n * batchsz * 2 * sizeof(R));
+     BUF_ALLOC(R *, buf, bufsz);
 
      for (i = 0; i < vl - batchsz; i += batchsz) {
 	  dobatch(ego, ri, ii, ro, io, buf, batchsz);
@@ -85,7 +86,7 @@ static void apply_buf(const plan *ego_, R *ri, R *ii, R *ro, R *io)
      }
      dobatch(ego, ri, ii, ro, io, buf, vl - i);
 
-     STACK_FREE(buf);
+     BUF_FREE(buf, bufsz);
 }
 
 static void apply(const plan *ego_, R *ri, R *ii, R *ro, R *io)

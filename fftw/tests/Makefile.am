@@ -5,12 +5,16 @@ AM_CPPFLAGS = -I$(top_srcdir)/kernel -I$(top_srcdir)/libbench2	\
 noinst_PROGRAMS = bench
 EXTRA_DIST = check.pl README
 
-if SMP
+if THREADS
+bench_CFLAGS = $(PTHREAD_CFLAGS)
 if !COMBINED_THREADS
 LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3@PREC_SUFFIX@_threads.la
 endif
 else
-LIBFFTWTHREADS = 
+if OPENMP
+bench_CFLAGS = $(OPENMP_CFLAGS)
+LIBFFTWTHREADS = $(top_builddir)/threads/libfftw3@PREC_SUFFIX@_omp.la
+endif
 endif
 
 bench_SOURCES = bench.c hook.c fftw-bench.c fftw-bench.h
@@ -19,26 +23,26 @@ $(top_builddir)/libfftw3@PREC_SUFFIX@.la		\
 $(top_builddir)/libbench2/libbench2.a $(THREADLIBS)
 
 check-local: bench$(EXEEXT)
-	perl -w $(srcdir)/check.pl -r -c=30 -v `pwd`/bench
+	perl -w $(srcdir)/check.pl $(CHECK_PL_OPTS) -r -c=30 -v `pwd`/bench
 	@echo "--------------------------------------------------------------"
 	@echo "         FFTW transforms passed basic tests!"
 	@echo "--------------------------------------------------------------"
 if SMP
-	perl -w $(srcdir)/check.pl -r -c=30 -v --nthreads=2 `pwd`/bench
+	perl -w $(srcdir)/check.pl $(CHECK_PL_OPTS) -r -c=30 -v --nthreads=2 `pwd`/bench
 	@echo "--------------------------------------------------------------"
 	@echo "         FFTW threaded transforms passed basic tests!"
 	@echo "--------------------------------------------------------------"
 endif
 
 bigcheck: bench$(EXEEXT)
-	perl -w $(srcdir)/check.pl -a -v `pwd`/bench
+	perl -w $(srcdir)/check.pl $(CHECK_PL_OPTS) -a -v `pwd`/bench
 	@echo "--------------------------------------------------------------"
 	@echo "         FFTW transforms passed big tests!"
 	@echo "--------------------------------------------------------------"
 if SMP
-	perl -w $(srcdir)/check.pl -a -v --nthreads=2 `pwd`/bench
-	perl -w $(srcdir)/check.pl -a -v --nthreads=3 `pwd`/bench
-	perl -w $(srcdir)/check.pl -a -v --nthreads=10 `pwd`/bench
+	perl -w $(srcdir)/check.pl $(CHECK_PL_OPTS) -a -v --nthreads=2 `pwd`/bench
+	perl -w $(srcdir)/check.pl $(CHECK_PL_OPTS) -a -v --nthreads=3 `pwd`/bench
+	perl -w $(srcdir)/check.pl $(CHECK_PL_OPTS) -a -v --nthreads=10 `pwd`/bench
 	@echo "--------------------------------------------------------------"
 	@echo "         FFTW threaded transforms passed big tests!"
 	@echo "--------------------------------------------------------------"

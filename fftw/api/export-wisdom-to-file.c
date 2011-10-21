@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,4 +26,15 @@ void X(export_wisdom_to_file)(FILE *output_file)
      planner *plnr = X(the_planner)();
      plnr->adt->exprt(plnr, p);
      X(printer_destroy)(p);
+}
+
+int X(export_wisdom_to_filename)(const char *filename)
+{
+     FILE *f = fopen(filename, "w");
+     int ret;
+     if (!f) return 0; /* error opening file */
+     X(export_wisdom_to_file)(f);
+     ret = !ferror(f);
+     if (fclose(f)) ret = 0; /* error closing file */
+     return ret;
 }

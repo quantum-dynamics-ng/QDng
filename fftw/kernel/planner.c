@@ -132,6 +132,21 @@ static unsigned slookup(planner *ego, char *nam, int id)
      return INFEASIBLE_SLVNDX;
 }
 
+/* Compute a MD5 hash of the configuration of the planner.
+   We store it into the wisdom file to make absolutely sure that
+   we are reading wisdom that is applicable */
+static void signature_of_configuration(md5 *m, planner *ego)
+{
+     X(md5begin)(m);
+     X(md5unsigned)(m, sizeof(R)); /* so we don't mix different precisions */
+     FORALL_SOLVERS(ego, s, sp, {
+	  UNUSED(s);
+	  X(md5int)(m, sp->reg_id);
+	  X(md5puts)(m, sp->reg_nam);
+     });
+     X(md5end)(m);
+}
+
 /*
   md5-related stuff:
 */
@@ -386,6 +401,28 @@ static void invoke_hook(planner *ego, plan *pln, const problem *p,
 	  ego->hook(ego, pln, p, optimalp);
 }
 
+#ifdef FFTW_RANDOM_ESTIMATOR
+/* a "random" estimate, used for debugging to generate "random"
+   plans, albeit from a deterministic seed. */
+
+unsigned X(random_estimate_seed) = 0;
+
+static double random_estimate(const planner *ego, const plan *pln, 
+			      const problem *p)
+{
+     md5 m;
+     X(md5begin)(&m);
+     X(md5unsigned)(&m, X(random_estimate_seed));
+     X(md5int)(&m, ego->nthr);
+     p->adt->hash(p, &m);
+     X(md5putb)(&m, &pln->ops, sizeof(pln->ops));
+     X(md5putb)(&m, &pln->adt, sizeof(pln->adt));
+     X(md5end)(&m);
+     return ego->cost_hook ? ego->cost_hook(p, m.s[0], COST_MAX) : m.s[0];
+}
+
+#endif
+
 double X(iestimate_cost)(const planner *ego, const plan *pln, const problem *p)
 {
      double cost =
@@ -412,8 +449,13 @@ static void evaluate_plan(planner *ego, plan *pln, const problem *p)
 	  if (ESTIMATEP(ego)) {
 	  estimate:
 	       /* heuristic */
+#ifdef FFTW_RANDOM_ESTIMATOR
+	       pln->pcost = random_estimate(ego, pln, p);
+	       ego->epcost += X(iestimate_cost)(ego, pln, p);
+#else
 	       pln->pcost = X(iestimate_cost)(ego, pln, p);
 	       ego->epcost += pln->pcost;
+#endif
 	  } else {
 	       double t = X(measure_execution_time)(ego, pln, p);
 	       
@@ -608,45 +650,54 @@ static plan *mkplan(planner *ego, const problem *p)
 
      flags_of_solution = ego->flags;
 
-     if ((ego->wisdom_state != WISDOM_IGNORE_ALL) &&
-	 (sol = hlookup(ego, m.s, &flags_of_solution))) { 
-	  /* wisdom is acceptable */
-	  wisdom_state_t owisdom_state = ego->wisdom_state;
-	  slvndx = SLVNDX(sol);
-
-	  if (slvndx == INFEASIBLE_SLVNDX) {
-	       if (ego->wisdom_state == WISDOM_IGNORE_INFEASIBLE)
-		    goto do_search;
-	       else
-		    return 0;   /* known to be infeasible */
+     if (ego->wisdom_state != WISDOM_IGNORE_ALL) {
+	  if ((sol = hlookup(ego, m.s, &flags_of_solution))) { 
+	       /* wisdom is acceptable */
+	       wisdom_state_t owisdom_state = ego->wisdom_state;
+	       
+	       /* this hook is mainly for MPI, to make sure that
+		  wisdom is in sync across all processes for MPI problems */
+	       if (ego->wisdom_ok_hook && !ego->wisdom_ok_hook(p, sol->flags))
+		    goto do_search; /* ignore not-ok wisdom */
+	       
+	       slvndx = SLVNDX(sol);
+	       
+	       if (slvndx == INFEASIBLE_SLVNDX) {
+		    if (ego->wisdom_state == WISDOM_IGNORE_INFEASIBLE)
+			 goto do_search;
+		    else
+			 return 0;   /* known to be infeasible */
+	       }
+	       
+	       flags_of_solution = sol->flags;
+	       
+	       /* inherit blessing either from wisdom
+		  or from the planner */
+	       flags_of_solution.hash_info |= BLISS(ego->flags);
+	       
+	       ego->wisdom_state = WISDOM_ONLY;
+	       
+	       s = ego->slvdescs[slvndx].slv;
+	       if (p->adt->problem_kind != s->adt->problem_kind)
+		    goto wisdom_is_bogus;
+	       
+	       pln = invoke_solver(ego, p, s, &flags_of_solution);
+	       
+	       CHECK_FOR_BOGOSITY; 	  /* catch error in child solvers */
+	       
+	       sol = 0; /* Paranoia: SOL may be dangling after
+			   invoke_solver(); make sure we don't accidentally
+			   reuse it. */
+	       
+	       if (!pln)
+		    goto wisdom_is_bogus;
+	       
+	       ego->wisdom_state = owisdom_state;
+	       
+	       goto skip_search;
 	  }
-
-	  flags_of_solution = sol->flags;
-
-	  /* inherit blessing either from wisdom
-	     or from the planner */
-	  flags_of_solution.hash_info |= BLISS(ego->flags);
-
-	  ego->wisdom_state = WISDOM_ONLY;
-
-	  s = ego->slvdescs[slvndx].slv;
-	  if (p->adt->problem_kind != s->adt->problem_kind)
-	       goto wisdom_is_bogus;
-	  
-	  pln = invoke_solver(ego, p, s, &flags_of_solution);
-
-	  CHECK_FOR_BOGOSITY; 	  /* catch error in child solvers */
-
-	  sol = 0; /* Paranoia: SOL may be dangling after
-		      invoke_solver(); make sure we don't accidentally
-		      reuse it. */
-
-	  if (!pln)
-	       goto wisdom_is_bogus;
-
-	  ego->wisdom_state = owisdom_state;
-
-	  goto skip_search;
+	  else if (ego->nowisdom_hook) /* for MPI, make sure lack of wisdom */
+	       ego->nowisdom_hook(p);  /*   is in sync across all processes */
      }
 
  do_search:
@@ -738,8 +789,14 @@ static void exprt(planner *ego, printer *p)
 {
      unsigned h;
      hashtab *ht = &ego->htab_blessed;
+     md5 m;
 
-     p->print(p, "(" WISDOM_PREAMBLE "\n");
+     signature_of_configuration(&m, ego);
+
+     p->print(p, 
+	      "(" WISDOM_PREAMBLE " #x%M #x%M #x%M #x%M\n",
+	      m.s[0], m.s[1], m.s[2], m.s[3]);
+
      for (h = 0; h < ht->hashsiz; ++h) {
 	  solution *l = ht->solutions + h;
 	  if (LIVEP(l)) {
@@ -778,10 +835,20 @@ static int imprt(planner *ego, scanner *sc)
      unsigned slvndx;
      hashtab *ht = &ego->htab_blessed;
      hashtab old;
+     md5 m;
 
-     if (!sc->scan(sc, "(" WISDOM_PREAMBLE))
+     if (!sc->scan(sc, 
+		   "(" WISDOM_PREAMBLE " #x%M #x%M #x%M #x%M\n",
+		   sig + 0, sig + 1, sig + 2, sig + 3))
 	  return 0; /* don't need to restore hashtable */
 
+     signature_of_configuration(&m, ego);
+     if (m.s[0] != sig[0] || m.s[1] != sig[1] ||
+	 m.s[2] != sig[2] || m.s[3] != sig[3]) {
+	  /* invalid configuration */
+	  return 0;
+     }
+     
      /* make a backup copy of the hash table (cache the hash) */
      {
 	  unsigned h, hsiz = ht->hashsiz;
@@ -854,6 +921,8 @@ planner *X(mkplanner)(void)
      p->pcost = p->epcost = 0.0;
      p->hook = 0;
      p->cost_hook = 0;
+     p->wisdom_ok_hook = 0;
+     p->nowisdom_hook = 0;
      p->cur_reg_nam = 0;
      p->wisdom_state = WISDOM_NORMAL;
 

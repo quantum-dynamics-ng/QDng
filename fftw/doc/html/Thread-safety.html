@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Thread safety - FFTW 3.2.2</title>
+<title>Thread safety - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW" title="Multi-threaded FFTW">
@@ -10,7 +10,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -54,12 +54,12 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Multi_002dthreaded-FFTW.html#Multi_002d
 
 <h3 class="section">5.4 Thread safety</h3>
 
-<p><a name="index-threads-327"></a><a name="index-thread-safety-328"></a>Users writing multi-threaded programs must concern themselves with the
-<dfn>thread safety</dfn> of the libraries they use&mdash;that is, whether it is
-safe to call routines in parallel from multiple threads.  FFTW can be
-used in such an environment, but some care must be taken because the
-planner routines share data (e.g. wisdom and trigonometric tables)
-between calls and plans.
+<p><a name="index-threads-341"></a><a name="index-OpenMP-342"></a><a name="index-thread-safety-343"></a>Users writing multi-threaded programs (including OpenMP) must concern
+themselves with the <dfn>thread safety</dfn> of the libraries they
+use&mdash;that is, whether it is safe to call routines in parallel from
+multiple threads.  FFTW can be used in such an environment, but some
+care must be taken because the planner routines share data
+(e.g. wisdom and trigonometric tables) between calls and plans.
 
    <p>The upshot is that the only thread-safe (re-entrant) routine in FFTW is
 <code>fftw_execute</code> (and the new-array variants thereof).  All other routines
@@ -77,10 +77,17 @@ threads.  However, since a given plan operates by default on a fixed
 array, you need to use one of the new-array execute functions (see <a href="New_002darray-Execute-Functions.html#New_002darray-Execute-Functions">New-array Execute Functions</a>) so that different threads compute the transform of different data.
 
    <p>(Users should note that these comments only apply to programs using
-shared-memory threads.  Parallelism using MPI or forked processes
+shared-memory threads or OpenMP.  Parallelism using MPI or forked processes
 involves a separate address-space and global variables for each process,
 and is not susceptible to problems of this sort.)
 
-<!-- ************************************************************ -->
+   <p>If you are configured FFTW with the <code>--enable-debug</code> or
+<code>--enable-debug-malloc</code> flags (see <a href="Installation-on-Unix.html#Installation-on-Unix">Installation on Unix</a>),
+then <code>fftw_execute</code> is not thread-safe.  These flags are not
+documented because they are intended only for developing
+and debugging FFTW, but if you must use <code>--enable-debug</code> then you
+should also specifically pass <code>--disable-debug-malloc</code> for
+<code>fftw_execute</code> to be thread-safe.
+
    </body></html>
 

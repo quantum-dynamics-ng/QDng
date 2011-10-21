@@ -3,11 +3,11 @@
 /* Define to compile in long-double precision. */
 #undef BENCHFFT_LDOUBLE
 
+/* Define to compile in quad precision. */
+#undef BENCHFFT_QUAD
+
 /* Define to compile in single precision. */
 #undef BENCHFFT_SINGLE
-
-/* extra CFLAGS for codelets */
-#undef CODELET_OPTIM
 
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
@@ -55,6 +55,12 @@
 /* Define to compile in long-double precision. */
 #undef FFTW_LDOUBLE
 
+/* Define to compile in quad precision. */
+#undef FFTW_QUAD
+
+/* Define to enable pseudorandom estimate planning for debugging. */
+#undef FFTW_RANDOM_ESTIMATOR
+
 /* Define to compile in single precision. */
 #undef FFTW_SINGLE
 
@@ -74,11 +80,11 @@
 /* Define to 1 if you have the <altivec.h> header file. */
 #undef HAVE_ALTIVEC_H
 
+/* Define to enable AVX optimizations. */
+#undef HAVE_AVX
+
 /* Define to 1 if you have the `BSDgettimeofday' function. */
 #undef HAVE_BSDGETTIMEOFDAY
-
-/* Define to enable optimizations for the Cell Broadband Engine */
-#undef HAVE_CELL
 
 /* Define to 1 if you have the `clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
@@ -92,6 +98,10 @@
 /* Define to 1 if you have the declaration of `cosl', and to 0 if you don't.
    */
 #undef HAVE_DECL_COSL
+
+/* Define to 1 if you have the declaration of `cosq', and to 0 if you don't.
+   */
+#undef HAVE_DECL_COSQ
 
 /* Define to 1 if you have the declaration of `drand48', and to 0 if you
    don't. */
@@ -108,6 +118,14 @@
 /* Define to 1 if you have the declaration of `sinl', and to 0 if you don't.
    */
 #undef HAVE_DECL_SINL
+
+/* Define to 1 if you have the declaration of `sinq', and to 0 if you don't.
+   */
+#undef HAVE_DECL_SINQ
+
+/* Define to 1 if you have the declaration of `srand48', and to 0 if you
+   don't. */
+#undef HAVE_DECL_SRAND48
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -145,11 +163,8 @@
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
-/* Define to 1 if you have the `spe' library (-lspe). */
-#undef HAVE_LIBSPE
-
-/* Define to 1 if you have the `spe2' library (-lspe2). */
-#undef HAVE_LIBSPE2
+/* Define to 1 if you have the `quadmath' library (-lquadmath). */
+#undef HAVE_LIBQUADMATH
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
@@ -184,7 +199,7 @@
 /* Define if you have the MPI library. */
 #undef HAVE_MPI
 
-/* Define to enable OpenMP */
+/* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
 
 /* Define to 1 if you have the `posix_memalign' function. */
@@ -205,10 +220,7 @@
 /* Define to 1 if you have the `sqrt' function. */
 #undef HAVE_SQRT
 
-/* Define to enable SSE optimizations. */
-#undef HAVE_SSE
-
-/* Define to enable SSE2 optimizations. */
+/* Define to enable SSE/SSE2 optimizations. */
 #undef HAVE_SSE2
 
 /* Define to 1 if you have the <stddef.h> header file. */
@@ -259,9 +271,6 @@
 /* Define to 1 if you have the `vprintf' function. */
 #undef HAVE_VPRINTF
 
-/* Define to 1 if you have the <xmmintrin.h> header file. */
-#undef HAVE_XMMINTRIN_H
-
 /* Define to 1 if you have the `_mm_free' function. */
 #undef HAVE__MM_FREE
 
@@ -274,6 +283,9 @@
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
 
 /* Name of package */
 #undef PACKAGE
@@ -290,6 +302,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -299,6 +314,9 @@
 
 /* The size of `double', as computed by sizeof. */
 #undef SIZEOF_DOUBLE
+
+/* The size of `fftw_r2r_kind', as computed by sizeof. */
+#undef SIZEOF_FFTW_R2R_KIND
 
 /* The size of `float', as computed by sizeof. */
 #undef SIZEOF_FLOAT
@@ -311,6 +329,9 @@
 
 /* The size of `long long', as computed by sizeof. */
 #undef SIZEOF_LONG_LONG
+
+/* The size of `MPI_Fint', as computed by sizeof. */
+#undef SIZEOF_MPI_FINT
 
 /* The size of `ptrdiff_t', as computed by sizeof. */
 #undef SIZEOF_PTRDIFF_T
@@ -344,9 +365,6 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
 
-/* Define if we have and are using OpenMP multithreading directives */
-#undef USING_OPENMP_THREADS
-
 /* Define if we have and are using POSIX threads. */
 #undef USING_POSIX_THREADS
 
@@ -360,9 +378,9 @@
    */
 #undef WITH_G77_WRAPPERS
 
-/* Use our own 16-byte aligned malloc routine; mainly helpful for Windows
-   systems lacking aligned allocation system-library routines. */
-#undef WITH_OUR_MALLOC16
+/* Use our own aligned malloc routine; mainly helpful for Windows systems
+   lacking aligned allocation system-library routines. */
+#undef WITH_OUR_MALLOC
 
 /* Use low-precision timers, making planner very slow */
 #undef WITH_SLOW_TIMER

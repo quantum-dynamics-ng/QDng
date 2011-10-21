@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>New-array Execute Functions - FFTW 3.2.2</title>
+<title>New-array Execute Functions - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="FFTW-Reference.html#FFTW-Reference" title="FFTW Reference">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -57,10 +57,10 @@ Up:&nbsp;<a rel="up" accesskey="u" href="FFTW-Reference.html#FFTW-Reference">FFT
 
 <h3 class="section">4.6 New-array Execute Functions</h3>
 
-<p><a name="index-execute-256"></a><a name="index-new_002darray-execution-257"></a>
+<p><a name="index-execute-264"></a><a name="index-new_002darray-execution-265"></a>
 Normally, one executes a plan for the arrays with which the plan was
 created, by calling <code>fftw_execute(plan)</code> as described in <a href="Using-Plans.html#Using-Plans">Using Plans</a>. 
-<a name="index-fftw_005fexecute-258"></a>However, it is possible for sophisticated users to apply a given plan
+<a name="index-fftw_005fexecute-266"></a>However, it is possible for sophisticated users to apply a given plan
 to a <em>different</em> array using the &ldquo;new-array execute&rdquo; functions
 detailed below, provided that the following conditions are met:
 
@@ -80,7 +80,7 @@ condition is automatically satisfied for interleaved arrays.)
      <li>The <dfn>alignment</dfn> of the new input/output arrays is the same as that
 of the input/output arrays when the plan was created, unless the plan
 was created with the <code>FFTW_UNALIGNED</code> flag. 
-<a name="index-FFTW_005fUNALIGNED-259"></a>Here, the alignment is a platform-dependent quantity (for example, it is
+<a name="index-FFTW_005fUNALIGNED-267"></a>Here, the alignment is a platform-dependent quantity (for example, it is
 the address modulo 16 if SSE SIMD instructions are used, but the address
 modulo 4 for non-SIMD single-precision FFTW on the same machine).  In
 general, only arrays allocated with <code>fftw_malloc</code> are guaranteed to
@@ -88,7 +88,7 @@ be equally aligned (see <a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-al
 
    </ul>
 
-   <p><a name="index-alignment-260"></a>The alignment issue is especially critical, because if you don't use
+   <p><a name="index-alignment-268"></a>The alignment issue is especially critical, because if you don't use
 <code>fftw_malloc</code> then you may have little control over the alignment
 of arrays in memory.  For example, neither the C++ <code>new</code> function
 nor the Fortran <code>allocate</code> statement provide strong enough
@@ -133,7 +133,7 @@ probably go use the advanced interface instead (see <a href="Advanced-Interface.
           const fftw_plan p,
           double *in, double *out);
 </pre>
-   <p><a name="index-fftw_005fexecute_005fdft-261"></a><a name="index-fftw_005fexecute_005fsplit_005fdft-262"></a><a name="index-fftw_005fexecute_005fdft_005fr2c-263"></a><a name="index-fftw_005fexecute_005fsplit_005fdft_005fr2c-264"></a><a name="index-fftw_005fexecute_005fdft_005fc2r-265"></a><a name="index-fftw_005fexecute_005fsplit_005fdft_005fc2r-266"></a><a name="index-fftw_005fexecute_005fdft_005fr2r-267"></a>
+   <p><a name="index-fftw_005fexecute_005fdft-269"></a><a name="index-fftw_005fexecute_005fsplit_005fdft-270"></a><a name="index-fftw_005fexecute_005fdft_005fr2c-271"></a><a name="index-fftw_005fexecute_005fsplit_005fdft_005fr2c-272"></a><a name="index-fftw_005fexecute_005fdft_005fc2r-273"></a><a name="index-fftw_005fexecute_005fsplit_005fdft_005fc2r-274"></a><a name="index-fftw_005fexecute_005fdft_005fr2r-275"></a>
 These execute the <code>plan</code> to compute the corresponding transform on
 the input/output arrays specified by the subsequent arguments.  The
 input/output array arguments have the same meanings as the ones passed

@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Fixed-size Arrays in C - FFTW 3.2.2</title>
+<title>Fixed-size Arrays in C - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array-Format" title="Multi-dimensional Array Format">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -57,7 +57,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Multi_002ddimensional-Array-Format.html
 
 <h4 class="subsection">3.2.3 Fixed-size Arrays in C</h4>
 
-<p><a name="index-C-multi_002ddimensional-arrays-117"></a>
+<p><a name="index-C-multi_002ddimensional-arrays-120"></a>
 A multi-dimensional array whose size is declared at compile time in C
 is <em>already</em> in row-major order.  You don't have to do anything
 special to transform it.  For example:
@@ -80,7 +80,7 @@ arrays in this way, for two reasons.  First, this allocates the array
 on the stack (&ldquo;automatic&rdquo; storage), which has a very limited size on
 most operating systems (declaring an array with more than a few
 thousand elements will often cause a crash).  (You can get around this
-limitation on man1 systems by declaring the array as
+limitation on many systems by declaring the array as
 <code>static</code> and/or global, but that has its own drawbacks.) 
 Second, it may not optimally align the array for use with a SIMD
 FFTW (see <a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">SIMD alignment and fftw_malloc</a>).  Instead, we recommend

@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Introduction - FFTW 3.2.2</title>
+<title>Introduction - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="prev" href="index.html#Top" title="Top">
@@ -10,7 +10,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -55,7 +55,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
 
 <h2 class="chapter">1 Introduction</h2>
 
-<p>This manual documents version 3.2.2 of FFTW, the
+<p>This manual documents version 3.3 of FFTW, the
 <em>Fastest Fourier Transform in the West</em>.  FFTW is a comprehensive
 collection of fast C routines for computing the discrete Fourier
 transform (DFT) and various special cases thereof. 
@@ -72,12 +72,12 @@ transform (DFT) and various special cases thereof.
 
      <li>FFTW supports arbitrary multi-dimensional data.
 
-     <li>FFTW supports the SSE, SSE2, Altivec, and MIPS PS instruction
+     <li>FFTW supports the SSE, SSE2, AVX, Altivec, and MIPS PS instruction
        sets.
 
-     <li>FFTW 3.2.2 includes parallel (multi-threaded) transforms
+     <li>FFTW 3.3 includes parallel (multi-threaded) transforms
   for shared-memory systems. 
-  FFTW 3.2.2 does not include distributed-memory parallel
+  FFTW 3.3 does not include distributed-memory parallel
   transforms, but we plan to implement an MPI version soon.  (Meanwhile,
   you can use the MPI implementation from FFTW 2.1.3.) 
 </ul>
@@ -102,7 +102,7 @@ information online.
 <!-- for more than one machine.  An extensive comparison of FFTW's -->
 <!-- performance with that of other Fourier transform codes has been made, -->
 <!-- and the results are available on the Web at -->
-<!-- @uref{http://fftw.org/~benchfft, the benchFFT home page}. -->
+<!-- @uref{http://fftw.org/benchfft, the benchFFT home page}. -->
 <!-- @cindex benchmark -->
 <!-- @fpindex benchfft -->
 
@@ -141,7 +141,8 @@ generality.
 whereas the guru interface requires careful attention to the
 documentation to avoid problems. 
 <a name="index-basic-interface-7"></a><a name="index-advanced-interface-8"></a><a name="index-guru-interface-9"></a>
-Besides the automatic performance adaptation performed by the planner,
+
+   <p>Besides the automatic performance adaptation performed by the planner,
 it is also possible for advanced users to customize FFTW manually.  For
 example, if code space is a concern, we provide a tool that links only
 the subset of FFTW needed by your application.  Conversely, you may need
@@ -170,28 +171,28 @@ FFTW, the FAQ, benchmarks, and other links, are available at
    <p>The current version of FFTW incorporates many good ideas from the past
 thirty years of FFT literature.  In one way or another, FFTW uses the
 Cooley-Tukey algorithm, the prime factor algorithm, Rader's algorithm
-for prime sizes, and a split-radix algorithm (with a variation due to
-Dan Bernstein).  FFTW's code generator also produces new algorithms
-that we do not completely understand. 
+for prime sizes, and a split-radix algorithm (with a
+&ldquo;conjugate-pair&rdquo; variation pointed out to us by Dan Bernstein). 
+FFTW's code generator also produces new algorithms that we do not
+completely understand. 
 <a name="index-algorithm-13"></a>The reader is referred to the cited papers for the appropriate
 references.
 
    <p>The rest of this manual is organized as follows.  We first discuss the
 sequential (single-processor) implementation.  We start by describing
-the basic interface/features of FFTW in <a href="Tutorial.html#Tutorial">Tutorial</a>.  The following
-chapter discusses <a href="Other-Important-Topics.html#Other-Important-Topics">Other Important Topics</a>, including <a href="Data-Alignment.html#Data-Alignment">Data Alignment</a>, the storage scheme of multi-dimensional arrays
+the basic interface/features of FFTW in <a href="Tutorial.html#Tutorial">Tutorial</a>. 
+Next, <a href="Other-Important-Topics.html#Other-Important-Topics">Other Important Topics</a> discusses data alignment
+(see <a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">SIMD alignment and fftw_malloc</a>),
+the storage scheme of multi-dimensional arrays
 (see <a href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array-Format">Multi-dimensional Array Format</a>), and FFTW's mechanism for
 storing plans on disk (see <a href="Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">Words of Wisdom-Saving Plans</a>).  Next,
 <a href="FFTW-Reference.html#FFTW-Reference">FFTW Reference</a> provides comprehensive documentation of all
 FFTW's features.  Parallel transforms are discussed in their own
-chapters: <a href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW">Multi-threaded FFTW</a>.  Fortran programmers can also use
-FFTW, as described in <a href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran">Calling FFTW from Fortran</a>. 
-<a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a> explains how to install FFTW in
-your computer system and how to adapt FFTW to your needs.  License and
-copyright information is given in <a href="License-and-Copyright.html#License-and-Copyright">License and Copyright</a>. 
-Finally, we thank all the people who helped us in
+chapters: <a href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW">Multi-threaded FFTW</a> and <a href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI">Distributed-memory FFTW with MPI</a>.  Fortran programmers can also use FFTW, as described in
+<a href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">Calling FFTW from Legacy Fortran</a> and <a href="Calling-FFTW-from-Modern-Fortran.html#Calling-FFTW-from-Modern-Fortran">Calling FFTW from Modern Fortran</a>.  <a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a> explains how to
+install FFTW in your computer system and how to adapt FFTW to your
+needs.  License and copyright information is given in <a href="License-and-Copyright.html#License-and-Copyright">License and Copyright</a>.  Finally, we thank all the people who helped us in
 <a href="Acknowledgments.html#Acknowledgments">Acknowledgments</a>.
 
-<!-- ************************************************************ -->
    </body></html>
 

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,9 @@
 
 static const solvtab s =
 {
-#if defined(HAVE_THREADS) || defined(HAVE_OPENMP)
-
      SOLVTAB(X(dft_thr_vrank_geq1_register)),
      SOLVTAB(X(rdft_thr_vrank_geq1_register)),
      SOLVTAB(X(rdft2_thr_vrank_geq1_register)),
-
-#endif 
 
      SOLVTAB_END
 };

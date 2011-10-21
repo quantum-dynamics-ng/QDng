@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Basic Interface - FFTW 3.2.2</title>
+<title>Basic Interface - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="FFTW-Reference.html#FFTW-Reference" title="FFTW Reference">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -56,10 +56,13 @@ Up:&nbsp;<a rel="up" accesskey="u" href="FFTW-Reference.html#FFTW-Reference">FFT
 
 <h3 class="section">4.3 Basic Interface</h3>
 
-<p><a name="index-basic-interface-153"></a>
-The basic interface, which we expect to satisfy the needs of most users,
-provides planner routines for transforms of a single contiguous array
-with any of FFTW's supported transform types.
+<p><a name="index-basic-interface-160"></a>
+Recall that the FFTW API is divided into three parts<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>: the <dfn>basic interface</dfn>
+computes a single transform of contiguous data, the <dfn>advanced
+interface</dfn> computes transforms of multiple or strided arrays, and the
+<dfn>guru interface</dfn> supports the most general data layouts,
+multiplicities, and strides.  This section describes the the basic
+interface, which we expect to satisfy the needs of most users.
 
 <ul class="menu">
 <li><a accesskey="1" href="Complex-DFTs.html#Complex-DFTs">Complex DFTs</a>
@@ -71,5 +74,12 @@ with any of FFTW's supported transform types.
 </ul>
 
 <!-- =========> -->
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> <i>Gallia est
+omnis divisa in partes tres</i> (Julius Caesar).</p>
+
+   <hr></div>
+
    </body></html>
 

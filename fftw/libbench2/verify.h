@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,6 +86,15 @@ void accuracy_r2r(bench_problem *p, int rounds, int impulse_rounds,
 #  define SIN sinl
 #  define TAN tanl
 #  define KTRIG(x) (x##L)
+#elif defined(BENCHFFT_QUAD) && HAVE_LIBQUADMATH
+   typedef __float128 trigreal;
+#  define COS cosq
+#  define SIN sinq
+#  define TAN tanq
+#  define KTRIG(x) (x##Q)
+extern trigreal cosq(trigreal);
+extern trigreal sinq(trigreal);
+extern trigreal tanq(trigreal);
 #else
    typedef double trigreal;
 #  define COS cos

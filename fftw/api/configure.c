@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003, 2007-8 Matteo Frigo
- * Copyright (c) 2003, 2007-8 Massachusetts Institute of Technology
+ * Copyright (c) 2003, 2007-11 Matteo Frigo
+ * Copyright (c) 2003, 2007-11 Massachusetts Institute of Technology
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,4 @@ void X(configure_planner)(planner *plnr)
      X(dft_conf_standard)(plnr);
      X(rdft_conf_standard)(plnr);
      X(reodft_conf_standard)(plnr);
-#if HAVE_CELL
-     X(dft_conf_cell)(plnr);
-#endif
 }

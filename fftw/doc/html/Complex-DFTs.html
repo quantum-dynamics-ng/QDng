@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Complex DFTs - FFTW 3.2.2</title>
+<title>Complex DFTs - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Basic-Interface.html#Basic-Interface" title="Basic Interface">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -56,7 +56,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Basic-Interface.html#Basic-Interface">B
 
 <h4 class="subsection">4.3.1 Complex DFTs</h4>
 
-<pre class="example">     fftw_plan fftw_plan_dft_1d(int n,
+<pre class="example">     fftw_plan fftw_plan_dft_1d(int n0,
                                 fftw_complex *in, fftw_complex *out,
                                 int sign, unsigned flags);
      fftw_plan fftw_plan_dft_2d(int n0, int n1,
@@ -69,7 +69,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Basic-Interface.html#Basic-Interface">B
                              fftw_complex *in, fftw_complex *out,
                              int sign, unsigned flags);
 </pre>
-   <p><a name="index-fftw_005fplan_005fdft_005f1d-154"></a><a name="index-fftw_005fplan_005fdft_005f2d-155"></a><a name="index-fftw_005fplan_005fdft_005f3d-156"></a><a name="index-fftw_005fplan_005fdft-157"></a>
+   <p><a name="index-fftw_005fplan_005fdft_005f1d-161"></a><a name="index-fftw_005fplan_005fdft_005f2d-162"></a><a name="index-fftw_005fplan_005fdft_005f3d-163"></a><a name="index-fftw_005fplan_005fdft-164"></a>
 Plan a complex input/output discrete Fourier transform (DFT) in zero or
 more dimensions, returning an <code>fftw_plan</code> (see <a href="Using-Plans.html#Using-Plans">Using Plans</a>).
 
@@ -78,27 +78,28 @@ parameters, then creating another plan of the same type and parameters,
 but for different arrays, is fast and shares constant data with the
 first plan (if it still exists).
 
-   <p>The planner returns <code>NULL</code> if the plan cannot be created.  A
-non-<code>NULL</code> plan is always returned by the basic interface unless
-you are using a customized FFTW configuration supporting a restricted
-set of transforms.
+   <p>The planner returns <code>NULL</code> if the plan cannot be created.  In the
+standard FFTW distribution, the basic interface is guaranteed to return
+a non-<code>NULL</code> plan.  A plan may be <code>NULL</code>, however, if you are
+using a customized FFTW configuration supporting a restricted set of
+transforms.
 
 <h5 class="subsubheading">Arguments</h5>
 
      <ul>
-<li><code>rank</code> is the dimensionality of the transform (it should be the
-size of the array <code>*n</code>), and can be any non-negative integer.  The
+<li><code>rank</code> is the rank of the transform (it should be the size of the
+array <code>*n</code>), and can be any non-negative integer.  (See <a href="Complex-Multi_002dDimensional-DFTs.html#Complex-Multi_002dDimensional-DFTs">Complex Multi-Dimensional DFTs</a>, for the definition of &ldquo;rank&rdquo;.)  The
 &lsquo;<samp><span class="samp">_1d</span></samp>&rsquo;, &lsquo;<samp><span class="samp">_2d</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">_3d</span></samp>&rsquo; planners correspond to a
-<code>rank</code> of <code>1</code>, <code>2</code>, and <code>3</code>, respectively.  A
-<code>rank</code> of zero is equivalent to a transform of size 1, i.e. a copy
-of one number from input to output.
+<code>rank</code> of <code>1</code>, <code>2</code>, and <code>3</code>, respectively.  The rank
+may be zero, which is equivalent to a rank-1 transform of size 1, i.e. a
+copy of one number from input to output.
 
-     <li><code>n</code>, or <code>n0</code>/<code>n1</code>/<code>n2</code>, or <code>n[rank]</code>,
-respectively, gives the size of the transform dimensions.  They can be
-any positive integer.
+     <li><code>n0</code>, <code>n1</code>, <code>n2</code>, or <code>n[0..rank-1]</code> (as appropriate
+for each routine) specify the size of the transform dimensions.  They
+can be any positive integer.
 
           <ul>
-<li><a name="index-row_002dmajor-158"></a>Multi-dimensional arrays are stored in row-major order with dimensions:
+<li><a name="index-row_002dmajor-165"></a>Multi-dimensional arrays are stored in row-major order with dimensions:
 <code>n0</code> x <code>n1</code>; or <code>n0</code> x <code>n1</code> x <code>n2</code>; or
 <code>n[0]</code> x <code>n[1]</code> x ... x <code>n[rank-1]</code>. 
 See <a href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array-Format">Multi-dimensional Array Format</a>. 
@@ -106,16 +107,14 @@ See <a href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array
 2<sup>a</sup> 3<sup>b</sup> 5<sup>c</sup> 7<sup>d</sup>
         11<sup>e</sup> 13<sup>f</sup>,where e+f is either 0 or 1, and the other exponents
 are arbitrary.  Other sizes are computed by means of a slow,
-general-purpose algorithm (which nevertheless retains <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>)
-
-          <p>performance even for prime sizes).  It is possible to customize FFTW
+general-purpose algorithm (which nevertheless retains <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>) performance even for prime sizes).  It is possible to customize FFTW
 for different array sizes; see <a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>. 
 Transforms whose sizes are powers of 2 are especially fast. 
 </ul>
 
      <li><code>in</code> and <code>out</code> point to the input and output arrays of the
 transform, which may be the same (yielding an in-place transform). 
-<a name="index-in_002dplace-159"></a>These arrays are overwritten during planning, unless
+<a name="index-in_002dplace-166"></a>These arrays are overwritten during planning, unless
 <code>FFTW_ESTIMATE</code> is used in the flags.  (The arrays need not be
 initialized, but they must be allocated.)
 
@@ -123,11 +122,11 @@ initialized, but they must be allocated.)
 array is overwritten. If <code>in != out</code>, the two arrays must
 not overlap (but FFTW does not check for this condition).
 
-     <li><code>sign</code> is the sign of the exponent in the formula that defines the
+     <li><a name="index-FFTW_005fFORWARD-167"></a><a name="index-FFTW_005fBACKWARD-168"></a><code>sign</code> is the sign of the exponent in the formula that defines the
 Fourier transform.  It can be -1 (= <code>FFTW_FORWARD</code>) or
 +1 (= <code>FFTW_BACKWARD</code>).
 
-     <li><a name="index-flags-160"></a><code>flags</code> is a bitwise OR (&lsquo;<samp><span class="samp">|</span></samp>&rsquo;) of zero or more planner flags,
+     <li><a name="index-flags-169"></a><code>flags</code> is a bitwise OR (&lsquo;<samp><span class="samp">|</span></samp>&rsquo;) of zero or more planner flags,
 as defined in <a href="Planner-Flags.html#Planner-Flags">Planner Flags</a>.
 
 </ul>
@@ -135,7 +134,7 @@ as defined in <a href="Planner-Flags.html#Planner-Flags">Planner Flags</a>.
    <p>FFTW computes an unnormalized transform: computing a forward followed by
 a backward transform (or vice versa) will result in the original data
 multiplied by the size of the transform (the product of the dimensions). 
-<a name="index-normalization-161"></a>For more information, see <a href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes">What FFTW Really Computes</a>.
+<a name="index-normalization-170"></a>For more information, see <a href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes">What FFTW Really Computes</a>.
 
 <!-- =========> -->
    </body></html>

@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-<title>Installation on non-Unix systems - FFTW 3.2.2</title>
+<title>Installation on non-Unix systems - FFTW 3.3</title>
 <meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.2.2">
+<meta name="description" content="FFTW 3.3">
 <meta name="generator" content="makeinfo 4.13">
 <link title="Top" rel="start" href="index.html#Top">
 <link rel="up" href="Installation-and-Customization.html#Installation-and-Customization" title="Installation and Customization">
@@ -11,7 +11,7 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
 This manual is for FFTW
-(version 3.2.2, 12 July 2009).
+(version 3.3, 26 July 2011).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -55,7 +55,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="Installation-and-Customization.html#Ins
 <hr>
 </div>
 
-<h3 class="section">9.2 Installation on non-Unix systems</h3>
+<h3 class="section">10.2 Installation on non-Unix systems</h3>
 
 <p>It should be relatively straightforward to compile FFTW even on non-Unix
 systems lacking the niceties of a <code>configure</code> script.  Basically,
@@ -83,8 +83,8 @@ that you want to share.
 <code>rdft/scalar/r2r</code>, <code>reodft</code>, and <code>api</code> directories. 
 If you are compiling with SIMD support (e.g. you defined
 <code>HAVE_SSE2</code> in <code>config.h</code>), then you also need to compile
-the <code>.c</code> files in the <code>simd</code>, <code>simd/nonportable</code>,
-<code>dft/simd</code>, and <code>dft/simd/codelets</code> directories.
+the <code>.c</code> files in the <code>simd-support</code>,
+<code>{dft,rdft}/simd</code>, <code>{dft,rdft}/simd/*</code> directories.
 
    <p>Once these files are all compiled, link them into a library, or a shared
 library, or directly into your program.
