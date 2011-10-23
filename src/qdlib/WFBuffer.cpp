@@ -6,8 +6,6 @@
 #include <sys/mman.h>
 
 
-
-
 namespace QDLIB {
 
    WFBuffer::WFBuffer() : _size(0), _wfsize(0), _LastLocks(WFBUFFER_LOCK_LAST),
@@ -17,47 +15,15 @@ namespace QDLIB {
             
       if (gp.isPresent("MaxBufferSize")){
          string s;
-         long int factor;
          
          gp.GetValue("MaxBufferSize", s);
-         
-         /* Search for unit suffix K, M or G and convert to factor */
-         char suffix = s[s.length()-1];
-         switch(suffix){
-            case 'K':
-               factor = 1024;
-               break;
-            case 'M':
-               factor = 1024*1024;
-               break;
-            case 'G':
-               factor = 1024*1024*1024;
-               break;
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-               factor = 1;
-               break;
-            default:
-               factor = 0;
-         }
-         if (factor > 1)
-            s.erase(s.length()-1, 1); /* Remove suffix */
-         
-         sscanf(s.c_str(), "%ld", (long int*) &_MaxBuf);
-         _MaxBuf *= factor;
-         
+         _MaxBuf = Memory::ReadFromString(s);
+
          if (_MaxBuf == 0)
             throw(EParamProblem("Invalid buffer size given"));
-         
-         
+      } else {
+         /* Use two third for free space for buffering */
+         _MaxBuf = Memory::Instance().CurrentSizeAvail() * 2 / 3;
       }
    }
 

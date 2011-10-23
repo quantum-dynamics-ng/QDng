@@ -29,8 +29,7 @@
 #include <cmath>
 #include <string.h>
 
-
-#define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
+#include "tools/Memory.h"
 
 using namespace std;
 
@@ -88,8 +87,6 @@ class Vector
     {
       // adjust pointers so that they are 1-offset:
       // v_[] is the internal contiguous array, it is still 0-offset
-       
-      int ret;
       
       nstrides_ = strides;
       stride_size_ = N / strides;
@@ -102,11 +99,10 @@ class Vector
       for (lint i=0; i < nstrides_; i++){
          if (stride_size_ == 0)
             v_[i] = NULL;
-         else
-            if (align_)
-	       ret = posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
-	    else
-	       v_[i] = new T[stride_size_];
+         else {
+            Memory& mem = Memory::Instance();
+            mem.Align((void**) &(v_[i]), sizeof(T)*stride_size_);
+         }
       }
       
       
@@ -168,11 +164,7 @@ class Vector
        if (v_ != NULL && !isRef_){  /* Only destroy data if it's our own*/
          for (lint s=0; s < nstrides_; s++){
             if(v_[s] != NULL){
-	       if (align_)
-                  free(v_[s]);
-	       else
-		  delete[] v_[s];
-	       
+               Memory::Instance().Free(v_[s]);
                v_[s] = NULL;
             }
          }

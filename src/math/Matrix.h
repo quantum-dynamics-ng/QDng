@@ -79,12 +79,9 @@ namespace QDLIB {
       _m = m;
       _n = n;
       
-#ifdef HAVE_STDLIB_H
-      if (posix_memalign((void**) (&_v), QDLIB_DATA_ALIGNMENT, sizeof(T) * _mn ) !=0)
-         _aligned = false;
-#else
-      _v = new T[_nm]; 
-#endif
+      Memory& mem = Memory::Instance();
+      mem.Align((void**) (&_v), sizeof(T) * _mn);
+
       _col = new T*[_n];
       
       /* init col pointers */
@@ -98,11 +95,7 @@ namespace QDLIB {
 	 void Matrix<T>::_destroy()
    {
       if (_v != NULL) {
-   #ifdef HAVE_STDLIB_H
-         free( (void*) _v);
-   #else
-         delete[] _v;
-   #endif
+         Memory::Instance().Free( (void*) _v);
          delete[] _col;
       }
       _mn=0;

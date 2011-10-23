@@ -67,6 +67,20 @@ void show_version()
 }
 
 /**
+ * Show initial Memory informations
+ **/
+void show_memory_info()
+{
+   Memory& mem = Memory::Instance();
+   Logger& log = Logger::InstanceRef();
+
+   log.cout() << endl;
+   log.cout() << "Maximum Memory available for data: " << mem.Format(mem.MaximumSize()) << endl;
+   log.cout() << endl;
+   log.flush();
+}
+
+/**
  * Check input format type & convert if needed.
  */
 void CheckInput(string &name)
@@ -253,12 +267,15 @@ int main(int argc, char **argv)
 	       dir += "/";
 	    gp.SetValue("dir", dir);
       }
+
+	 if (gp.Size() > 0) {
+         log.cout() << endl;
+         log.Header("Global Parameters", Logger::SubSection);
+         log.cout() << gp;
+         log.cout() << endl;
+         log.flush();
+      }
       
-      log.cout() <<  endl;
-      log.Header("Global Parameters", Logger::SubSection);
-      log.cout() << gp;
-      log.cout() << endl;
-      log.flush();
       if (log.Debug())
 	 log.cout() << "Debug output on\n";
 #ifdef _OPENMP
@@ -268,6 +285,8 @@ int main(int argc, char **argv)
       log.cout() << "Using SSE2 optimizations.\n";
 #endif
       
+      show_memory_info();
+
       if (prognodes == NULL)
 	 throw ( EParamProblem ("Empty parameter file provided") );
       
@@ -334,6 +353,9 @@ int main(int argc, char **argv)
 	    throw ( EParamProblem ("Programm type not known ", progname) );
 	 }
 	 
+	 /* Show memory consumption */
+	 log.cout() << "\nMaximum amount of memory used: " << Memory::Format(Memory::Instance().MaximumSizeUsed()) << endl;
+
 	 /* Show time consumption */
 	 log.cout().precision(0);
 	 log.cout() << "\nWall time: " << fixed << difftime(time(NULL), wall_time) << " s";

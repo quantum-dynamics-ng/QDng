@@ -100,6 +100,16 @@ namespace QDLIB {
    };
    
    /**
+    * Indicate a memory problem.
+    */
+   class EMemory : public Exception {
+      public:
+         EMemory() : Exception ("Out of memory") {}
+         EMemory(const char *message) : Exception(message) {}
+   };
+
+
+   /**
     * MPI Exception.
     * 
     * This indicates a fatal MPI Problem.
