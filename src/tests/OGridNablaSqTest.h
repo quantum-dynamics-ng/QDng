@@ -1,7 +1,7 @@
 #ifndef OGRIDNABLASQTEST_H
 #define OGRIDNABLASQTEST_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "qdlib/OGridNablaSq.h"

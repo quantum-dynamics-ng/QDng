@@ -1,7 +1,7 @@
 #ifndef WFGRIDCARTESIANTEST_H
 #define WFGRIDCARTESIANTEST_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "qdlib/WFGridCartesian.h"

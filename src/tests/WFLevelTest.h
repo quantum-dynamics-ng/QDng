@@ -1,7 +1,7 @@
 #ifndef WFLEVELTEST_H
 #define WFLEVELTEST_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "qdlib/WFLevel.h"

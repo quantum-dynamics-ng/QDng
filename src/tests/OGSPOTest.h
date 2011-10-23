@@ -2,7 +2,7 @@
 #define OGSPOTEST_H_
 
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "qdlib/OGSPO.h"

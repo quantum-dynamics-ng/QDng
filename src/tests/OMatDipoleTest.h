@@ -2,7 +2,7 @@
 #define OMATDIPOLETEST_H_
 
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 class OMatDipoleTest : public CppUnit::TestFixture

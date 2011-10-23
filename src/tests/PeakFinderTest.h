@@ -1,7 +1,7 @@
 #ifndef PEAKFINDERTEST_H
 #define PEAKFINDERTEST_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 /**

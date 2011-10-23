@@ -2,7 +2,7 @@
 #define COMPLEXNUMBERS_H
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "TestFixture.h"
+#include <cppunit/TestFixture.h>
 
 #include "math/dcomplex.h"
 

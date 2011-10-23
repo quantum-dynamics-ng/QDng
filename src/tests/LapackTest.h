@@ -1,7 +1,7 @@
 #ifndef LAPACKTEST_H
 #define LAPACKTEST_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "linalg/LapackDiag.h"

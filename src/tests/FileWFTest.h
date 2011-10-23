@@ -1,7 +1,7 @@
 #ifndef FILEWFTEST_H
 #define FILEWFTEST_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "qdlib/FileWF.h"

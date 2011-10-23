@@ -8,7 +8,7 @@
 #ifndef FFTNTEST_H_
 #define FFTNTEST_H_
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 
