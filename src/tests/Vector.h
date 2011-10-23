@@ -1,7 +1,7 @@
 #ifndef TVECTOR_H
 #define tVECTOR_H
 
-#include "cppunit/TestFixture.h"
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 /**

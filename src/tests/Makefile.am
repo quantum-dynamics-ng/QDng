@@ -15,10 +15,10 @@ noinst_HEADERS = ComplexNumbers.h TmpFileTest.h MatrixTest.h LapackTest.h GridSy
 	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
 	Vector.h WFGridCartesian.h WFGridHarmonic.h WFGridSystemTest.h \
 	WaveFunctionTest.h defs.h function_gens.h OHermitianMatrixTest.h WFLevelTest.h OMatDipoleTest.h OGSPOTest.h \
-	WFBufferTest.h
+	WFBufferTest.h MemoryTest.h
 
 noinst_PROGRAMS = runtest
-runtest_SOURCES = ComplexNumbers.cpp TmpFileTest.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
+runtest_SOURCES = ComplexNumbers.cpp MemoryTest.cpp TmpFileTest.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
 	dVecMinMax.cpp dVecMinMax.h PeakFinderTest.cpp MatrixTest.cpp LapackTest.cpp GridSystem.cpp FileWFTest.cpp QDClock.cpp \
 	FFTnTest.cpp \
 	WFLevelTest.cpp WFBufferTest.cpp OHermitianMatrixTest.cpp OMatDipoleTest.cpp OGridNablaSqTest.cpp OGridNablaTest.cpp \
