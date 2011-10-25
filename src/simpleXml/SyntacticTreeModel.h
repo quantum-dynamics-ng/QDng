@@ -88,7 +88,7 @@ class varstring
       string& GetString()
       {
          string *s = new string();
-         for (int i = 0; i < seqlist.size(); i++) {
+         for (size_t i = 0; i < seqlist.size(); i++) {
             if (seqtype[i] == str)
                *s += seqlist[i];
             else
@@ -99,13 +99,12 @@ class varstring
 
       void print()
       {
-         for (int i = 0; i < seqlist.size(); i++) {
+         for (size_t i = 0; i < seqlist.size(); i++) {
             if (seqtype[i] == str)
                fprintf(_yyout, fmtlist[i].c_str(), seqlist[i].c_str());
             else {
                string& s = fmtlist[i];
                char& fmt = s[s.length() - 1];
-               char prnt[128];
                switch (fmt) {
                   case 'd':
                      fprintf(_yyout, fmtlist[i].c_str(), Str2Int(varlist[seqlist[i]]));
@@ -172,13 +171,13 @@ class block
        */
       virtual void execute()
       {
-         for (int i = 0; i < children.size(); i++)
+         for (uint i = 0; i < children.size(); i++)
             children[i]->execute();
       }
 
       virtual ~block()
       {
-         for (int i = 0; i < children.size(); i++)
+         for (uint i = 0; i < children.size(); i++)
             delete children[i];
       }
 
@@ -235,7 +234,7 @@ class forloop: public block
          Indent();
          fprintf(_yyout, "<!-- for %s = %g %g %g -->\n", loopvar.c_str(), begin, end, step );
          double d = begin;
-         for (int i; i <= int(fabs((begin-end)/step)); i++){
+         for (uint i=0; i <= int(fabs((begin-end)/step)); i++){
             char s[64];
             sprintf(s, "%g", d);
             varlist[loopvar] = s;
@@ -273,7 +272,7 @@ class xmlnode: public block
       {
          Indent();
          fprintf(_yyout, "<%s", name.c_str());
-         for (int i = 0; i < attributes.size(); i++) {
+         for (uint i = 0; i < attributes.size(); i++) {
             fprintf(_yyout, " ");
             attributes[i].print();
             fprintf(_yyout, "=\"");
