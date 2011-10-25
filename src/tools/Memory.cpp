@@ -9,7 +9,6 @@
 #include <sstream>
 #include "tools/GlobalParams.h"
 
-/** \todo autoconfig */
 #include <sys/sysinfo.h>
 
 #ifdef HAVE_AVX

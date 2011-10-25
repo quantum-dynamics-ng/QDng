@@ -96,7 +96,7 @@ namespace QDLIB
          im = _mm_mul_pd(v,im);                /* a.re * b.im, a.re * a.im */
 
 #ifdef HAVE_SSE3
-         return m128d(_mm_hadd_pd(re,im));       /* a.re * b.re -(a.im * a.im) ; a.re * b.im + a.re * a.im */
+         return m128dc(_mm_hadd_pd(re,im));       /* a.re * b.re -(a.im * a.im) ; a.re * b.im + a.re * a.im */
 #else
          __m128d rei, imi;
          rei = _mm_unpacklo_pd(re,im);

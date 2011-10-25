@@ -213,4 +213,31 @@ void ComplexNumbers::NUMERIC_Test()
    CPPUNIT_ASSERT_DOUBLES_EQUAL(-M_PI/2, phase(dcomplex(0,-1)), LOOSE_EPS );
 }
 
+#ifdef HAVE_SSE2
+
+#include "math/m128dc.h"
+
+void ComplexNumbers::NUMERIC_Test()
+{
+   dcomplex val[32];
+
+   /** Make array is aligned to 16 byte boundary */
+   int align = (int)  ((unsigned long int) val) % 16;
+
+   val = ((char*) val) + align;
+
+   val[0] = dcomplex(1,2);
+   val[1] = dcomplex(5,6);
+
+   m128dc va(val[0]), vb(val[1]), vc;
+
+   vc = va * vb;
+
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-7, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(16, val[2].imag(), TIGHT_EPS );
+
+}
+#endif
+
 
