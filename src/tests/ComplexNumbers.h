@@ -15,6 +15,9 @@ class ComplexNumbers : public CppUnit::TestFixture
    CPPUNIT_TEST_SUITE( ComplexNumbers );
    CPPUNIT_TEST( API_Test );
    CPPUNIT_TEST( NUMERIC_Test );
+#ifdef HAVE_SSE2
+   CPPUNIT_TEST( SSE2_Test );
+#endif
    CPPUNIT_TEST_SUITE_END();
    
    public:
@@ -24,6 +27,10 @@ class ComplexNumbers : public CppUnit::TestFixture
    protected:
       void API_Test();
       void NUMERIC_Test();
+
+#ifdef HAVE_SSE2
+      void SSE2_Test();
+#endif
 
 };
 
