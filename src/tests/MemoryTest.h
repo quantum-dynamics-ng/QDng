@@ -15,6 +15,7 @@ class MemoryTest : public CppUnit::TestFixture
 {
    CPPUNIT_TEST_SUITE( MemoryTest );
    CPPUNIT_TEST( CORE_Test );
+   CPPUNIT_TEST( COPY_Test );
    CPPUNIT_TEST( API_Test );
    CPPUNIT_TEST_SUITE_END();
    public:
@@ -23,6 +24,7 @@ class MemoryTest : public CppUnit::TestFixture
 
    protected:
       void CORE_Test();
+      void COPY_Test();
       void API_Test();
 };
 

@@ -13,6 +13,16 @@
 #include <sys/sysinfo.h>
 
 #ifdef HAVE_AVX
+#include <immintrin.h>
+#endif
+
+#ifdef HAVE_SSE2
+#include <emmintrin.h>
+#endif
+
+
+
+#ifdef HAVE_AVX
  #define QDLIB_DATA_ALIGNMENT 32    /* 32 byte - Alignment for SIMD (AVX) */
 #else
  #define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
@@ -38,10 +48,28 @@ namespace QDLIB
 
    Memory::~Memory()
    {
-      // TODO Auto-generated destructor stub
+      /* Free all memory still in use. */
+      list<SlotEntry>::iterator it;
+      for ( it = Slots.begin(); it != Slots.end(); it++) { /* find  free slots */
+         if ( it->free )
+            free(it->p);
+      }
    }
 
-    /* */
+
+   /**
+    * Comparison function for slot sorting.
+    *
+    */
+   bool Memory::Compare_SlotEntry(const SlotEntry &a, const SlotEntry &b)
+   {
+      if ( a.free && !b.free ) return true;
+      else return false;
+   }
+
+    /**
+     * Get an instance of the singleton.
+     */
     Memory& Memory::Instance()
     {
        static Memory ref; /* Make it singleton */
@@ -175,6 +203,53 @@ namespace QDLIB
 
 
     /**
+     * Memcopy on speed.
+     *
+     * If data is aligned to QDLIB_DATA_ALIGNMENT boundaries
+     * then an optimized copy procedure can be applied.
+     */
+    void Memory::Copy(char *dst, char* src, size_t size)
+    {
+       /** Check for alignment */
+       int alignsrc = (int)( ((unsigned long int) src) % QDLIB_DATA_ALIGNMENT);
+       int aligndst = (int)( ((unsigned long int) src) % QDLIB_DATA_ALIGNMENT);
+
+
+       if ( alignsrc == 0 && aligndst == 0) {
+          size_t chunk;
+#ifdef HAVE_AVX
+          chunk = QDLIB_DATA_ALIGNMENT;
+
+          for(size_t i=0; i < size / chunk; i++){
+             __m256i tmp = _mm256_load_si256( (__m256i*) &(src[i]));
+             _mm256_store_si256( (__m256i*) &(dst[i]), tmp);
+          }
+
+#elif HAVE_SSE2
+          chunk = QDLIB_DATA_ALIGNMENT;
+
+          for(size_t i=0; i < size / chunk; i++){
+             __m128i tmp = _mm_load_si128( (__m128i*) &(src[i]));
+             _mm_store_si128( (__m128i*) &(dst[i]), tmp);
+          }
+#else
+          chunk =  sizeof(unsigned long int);
+          unsigned long int* s = (unsigned long int*) src;
+          unsigned long int* d = (unsigned long int*) dst;
+          for (size_t i=0; i < size / chunk; i++)
+             d[i] = s[i];
+
+#endif
+          for (size_t i=size-size/chunk; i < size; i++) /* do the rest */
+             dst[i] = src[i];
+
+       } else { /* Unaligned version */
+          for (size_t i=0; i < size; i++)
+             dst[i] = src[i];
+       }
+    }
+
+    /**
      * Allocate Aligned Memory.
      */
     void Memory::Align(void **p, size_t size)
@@ -192,6 +267,9 @@ namespace QDLIB
 
        SlotEntry* slot;
        if (it == Slots.end()){ /* create a new slot */
+
+          Slots.sort(Compare_SlotEntry ); /* sort free slots to front*/
+
           Slots.push_back(SlotEntry(size));
           slot = &(Slots.back());
 

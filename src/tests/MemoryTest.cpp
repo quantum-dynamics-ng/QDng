@@ -64,7 +64,27 @@ void MemoryTest::CORE_Test()
    CPPUNIT_ASSERT( mem.MaximumSizeUsed() == 512 );
 }
 
-/* Check static members for formating */
+
+/**
+ * Internal memcopy test. Vecotor support
+ */
+void MemoryTest::COPY_Test()
+{
+   Memory& mem = Memory::Instance();
+
+   char *src, *dst;
+
+   mem.Align((void**) &src, 68);
+   mem.Align((void**) &dst, 68);
+
+   sprintf(src, "It's the string for the test. Should be 67 bytes + terminating zero.");
+   mem.Copy(dst, src, 68);
+
+   CPPUNIT_ASSERT( string(dst) == "It's the string for the test. Should be 67 bytes + terminating zero.");
+
+}
+
+/** Check static members for formating */
 void MemoryTest::API_Test()
 {
    Memory& mem = Memory::Instance();
