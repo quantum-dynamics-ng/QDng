@@ -8,6 +8,9 @@ using QDLIB::dcomplex;
 
 namespace QDSSE {
 
+
+
+
     /**
      * Packed complex format for SSE2.
      */

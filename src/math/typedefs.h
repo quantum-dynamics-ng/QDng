@@ -26,6 +26,7 @@ namespace QDLIB {
                
 #ifdef HAVE_SSE2
  #include "cplx_sse2.h"
+ #include "m128dc.h"
 #endif
                
 using namespace std;
@@ -249,17 +250,16 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
-
 #ifdef HAVE_SSE2
-         __m128d ma, mb;
+         m128dc va, vb;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,ma,mb)
+#pragma omp parallel for default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
-            ma = _mm_set_pd(a[i]._imag, a[i]._real);
-            mb = _mm_set_pd(b[i]._imag, b[i]._real);
-            ma = _mm_add_pd(ma, mb);
-            QDSSE::Store(a[i], ma);
+            va = a[i];
+            vb = b[i];
+            va += vb;
+            va.Store(a[i]);
          }
 #else
 #ifdef _OPENMP
@@ -292,17 +292,15 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef HAVE_SSE2
-         __m128d ma, mb, md;
-         md = _mm_set1_pd(d);
+         m128dc v;
+         m128dd vd(d);
  #ifdef _OPENMP
- #pragma omp parallel for default(shared) private(i,ma,mb)
+ #pragma omp parallel for default(shared) private(i,v)
  #endif
          for (i=0; i < size; i++){
-            ma = _mm_set_pd(a[i]._imag, a[i]._real);
-            mb = _mm_set_pd(b[i]._imag, b[i]._real);
-            mb = _mm_mul_pd(mb, md);
-            ma = _mm_add_pd(ma, mb);
-            QDSSE::Store(a[i], ma);
+            v = m128dc(b[i]) * vd;
+            v += m128dc(a[i]);
+            v.Store(a[i]);
          }
 #else
 #ifdef _OPENMP

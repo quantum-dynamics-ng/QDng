@@ -20,8 +20,8 @@ namespace QDLIB
    /**
     * Memory management class.
     *
-    * This class is intended to be uses for allocating memory
-    * for numerical storage. Large scale is efficiently handled here.
+    * This class is intended to be used for allocating memory
+    * for numerical storage. Large scale memory is efficiently handled here.
     * Also Limitations are handled here.
     */
    class Memory
@@ -35,6 +35,8 @@ namespace QDLIB
                SlotEntry() : p(NULL), size(0), free(true) {}
                SlotEntry(size_t s) : p(NULL), size(s), free(false) {}
          };
+
+         static bool Compare_SlotEntry(const SlotEntry &a, const SlotEntry &b);
 
          Memory();
          Memory(Memory &ref) {};
@@ -60,6 +62,7 @@ namespace QDLIB
          static size_t ReadFromString(string s);
          static string Format(size_t value);
 
+         void Copy(char *dst, char* src, size_t size);
          void Align(void **p, size_t size);
          void Free(void *p);
          void Cleanup();
