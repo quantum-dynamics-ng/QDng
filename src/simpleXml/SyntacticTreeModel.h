@@ -88,7 +88,7 @@ class varstring
       string& GetString()
       {
          string *s = new string();
-         for (uint i = 0; i < seqlist.size(); i++) {
+         for (size_t i = 0; i < seqlist.size(); i++) {
             if (seqtype[i] == str)
                *s += seqlist[i];
             else
@@ -99,7 +99,7 @@ class varstring
 
       void print()
       {
-         for (uint i = 0; i < seqlist.size(); i++) {
+         for (size_t i = 0; i < seqlist.size(); i++) {
             if (seqtype[i] == str)
                fprintf(_yyout, fmtlist[i].c_str(), seqlist[i].c_str());
             else {
@@ -234,7 +234,7 @@ class forloop: public block
          Indent();
          fprintf(_yyout, "<!-- for %s = %g %g %g -->\n", loopvar.c_str(), begin, end, step );
          double d = begin;
-         for (int i; i <= int(fabs((begin-end)/step)); i++){
+         for (uint i=0; i <= int(fabs((begin-end)/step)); i++){
             char s[64];
             sprintf(s, "%g", d);
             varlist[loopvar] = s;
