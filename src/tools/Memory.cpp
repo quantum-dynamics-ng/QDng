@@ -209,43 +209,7 @@ namespace QDLIB
      */
     void Memory::Copy(char *dst, char* src, size_t size)
     {
-       /** Check for alignment */
-       int alignsrc = (int)( ((unsigned long int) src) % QDLIB_DATA_ALIGNMENT);
-       int aligndst = (int)( ((unsigned long int) src) % QDLIB_DATA_ALIGNMENT);
-
-
-       if ( alignsrc == 0 && aligndst == 0) {
-          size_t chunk;
-#ifdef HAVE_AVX
-          chunk = QDLIB_DATA_ALIGNMENT;
-
-          for(size_t i=0; i < size / chunk; i++){
-             __m256i tmp = _mm256_load_si256( (__m256i*) &(src[i]));
-             _mm256_store_si256( (__m256i*) &(dst[i]), tmp);
-          }
-
-#elif HAVE_SSE2
-          chunk = QDLIB_DATA_ALIGNMENT;
-
-          for(size_t i=0; i < size / chunk; i++){
-             __m128i tmp = _mm_load_si128( (__m128i*) &(src[i]));
-             _mm_store_si128( (__m128i*) &(dst[i]), tmp);
-          }
-#else
-          chunk =  sizeof(unsigned long int);
-          unsigned long int* s = (unsigned long int*) src;
-          unsigned long int* d = (unsigned long int*) dst;
-          for (size_t i=0; i < size / chunk; i++)
-             d[i] = s[i];
-
-#endif
-          for (size_t i=size-size/chunk; i < size; i++) /* do the rest */
-             dst[i] = src[i];
-
-       } else { /* Unaligned version */
-          for (size_t i=0; i < size; i++)
-             dst[i] = src[i];
-       }
+       memcpy(dst, src, size);
     }
 
     /**
