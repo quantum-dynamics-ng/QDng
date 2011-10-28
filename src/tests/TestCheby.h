@@ -3,46 +3,31 @@
 
 #include "cppunit/extensions/HelperMacros.h"
 #include "qdlib/OCheby.h"
-#include "qdlib/OGridNablaSq.h"
-#include "qdlib/OGridPotential.h"
-#include "qdlib/OSum.h"
-#include "OGridHarmonic.h"
-#include "WFGridHarmonic.h"
+#include "qdlib/OHermitianMatrix.h"
+#include "qdlib/WFLevel.h"
 
 /**
  *	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
  */
 class TestCheby : public CPPUNIT_NS::TestFixture {
    CPPUNIT_TEST_SUITE( TestCheby );
-   CPPUNIT_TEST( Init );
-   CPPUNIT_TEST( HarmonicGroundstate1D );
-   CPPUNIT_TEST( NablaStability1D );
-   CPPUNIT_TEST( HarmonicGroundstate2D );
-   CPPUNIT_TEST( Propagation1D );
-   CPPUNIT_TEST( Functions );
+   CPPUNIT_TEST( API_Test );
+   CPPUNIT_TEST( NUMERIC_Test );
    CPPUNIT_TEST_SUITE_END();
    public:
       TestCheby();
-   
       ~TestCheby();
-      virtual void setUp();
-      virtual void tearDown(); 
-	 
-      void Init();
-      void HarmonicGroundstate1D();
-      void NablaStability1D();
-      void HarmonicGroundstate2D();
-      void Functions();
-      void Propagation1D();
-      void Propagation2D();
+
+      void setUp();
+      void tearDown();
+
+      void API_Test();
+      void NUMERIC_Test();
    private:
-      QDLIB::OCheby U;
-      QDLIB::OGridNablaSq T;
-      QDLIB::OGridPotential V;
-      QDLIB::OSum H;
-      QDLIB::WFGridHarmonic psi;
-      QDLIB::OGridHarmonic Vh;
-	   
+      QDLIB::OCheby *U;
+      QDLIB::Operator *H;
+      QDLIB::WaveFunction *psi0, *psi1;
+      QDLIB::QDClock TheClock;
 };
 
 #endif

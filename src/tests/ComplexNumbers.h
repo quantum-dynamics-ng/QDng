@@ -5,7 +5,7 @@
 #include <cppunit/TestFixture.h>
 
 #include "math/dcomplex.h"
-
+#include "config.h"
 
 /**
 	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>

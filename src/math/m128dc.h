@@ -115,6 +115,22 @@ namespace QDLIB
       }
 
       /**
+       * Complex * I * real
+       */
+      inline m128dc MulImag(const m128dd &a)
+      {
+         __m128d res;
+         static const __m128d SIGNMASK128 =
+                       _mm_castsi128_pd(_mm_set_epi32(0x80000000,0,0,0));
+
+         res = _mm_xor_pd(v, SIGNMASK128);
+         res = _mm_mul_pd(res, a.v);
+         res = _mm_shuffle_pd(res, res, 0x1);
+
+         return m128dc(res);
+      }
+
+      /**
        * Scalar multiplication
        */
       inline m128dc operator*(const m128dd &a)

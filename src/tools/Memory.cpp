@@ -19,6 +19,7 @@
 #include <emmintrin.h>
 #endif
 
+#include <string.h>
 
 
 #ifdef HAVE_AVX
