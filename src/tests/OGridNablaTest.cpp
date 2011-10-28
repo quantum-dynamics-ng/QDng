@@ -149,8 +149,9 @@ void OGridNablaTest::NUMERIC_Test_Odd()
    fgen_sin(*wfo,-5,5);
    *wf2o = wfo;
    Oo->Apply(wf2o);
-   
+
    fgen_cos(*wfo,-5,5);
+
    for (lint i=0; i < WF_TEST_SIZE; i++){
       CPPUNIT_ASSERT_DOUBLES_EQUAL( pre * (*wfo)[i].real(), (*wf2o)[i].real() , LOOSE_EPS);
       CPPUNIT_ASSERT_DOUBLES_EQUAL( pre * (*wfo)[i].imag(), (*wf2o)[i].imag() , LOOSE_EPS);

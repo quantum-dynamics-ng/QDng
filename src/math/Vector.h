@@ -261,28 +261,28 @@ class Vector
        return true;
     }
     
-    void FastCopy(Vector<T> &A)
-    {
-       if (n_ == A.n_ && nstrides_ == A.nstrides_){
-	  /* no need to re-alloc */
-	  for (lint s=0; s < nstrides_; s++){
+   void FastCopy(Vector<T> &A)
+   {
+      if (n_ == A.n_ && nstrides_ == A.nstrides_) {
+         /* no need to re-alloc */
+         lint s;
 #ifdef _OPENMP  
-	     lint i;
-#pragma omp parallel for default(shared) private(i)
-	     for (i=0; i < stride_size_; i++)
-		v_[s][i] =  A.v_[s][i];
-#else
-	     memcpy(v_[s], A.v_[s], sizeof(T) *  stride_size_);
+#pragma omp parallel for default(shared) private(s)
 #endif
-	  }
-       } else {
-	  if (!isRef_) destroy();
-	  initialize(A.n_, A.nstrides_);
+         for (s = 0; s < nstrides_; s++) {
+            Memory::Copy( (char*) v_[s], (char*) A.v_[s], sizeof(T) * stride_size_);
 
-	  for (lint s=0; s < nstrides_; s++)
-	     memcpy(v_[s], A.v_[s], sizeof(T) *  stride_size_);
-       }
-    }
+         }
+      } else {
+         if (!isRef_)
+            destroy();
+
+         initialize(A.n_, A.nstrides_);
+
+         for (lint s = 0; s < nstrides_; s++)
+            Memory::Copy((char*) v_[s], (char*) A.v_[s], sizeof(T) * stride_size_);
+      }
+   }
     
     // destructor
     ~Vector() 

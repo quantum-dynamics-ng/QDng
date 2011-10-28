@@ -332,12 +332,25 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va, vb, vc(c);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,va,vb)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            va += vb * c;
+            va.Store(a[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] += b[i] * c;
          }
+#endif
       }
    }
    
@@ -408,12 +421,29 @@ namespace QDLIB {
          b = B->begin(s);
          c = C->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va,vc;
+         m128dd vb,vd(d);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,va,vb,vc)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            vc = c[i];
+            vc *= va;
+            vc = vc.MulImag(vb);
+            vc *= vd;
+            vc.Store(c[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             c[i] *= a[i] * I * b[i] * d;
          }
+#endif
       }
    }
    
@@ -516,17 +546,16 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef HAVE_SSE2
-         __m128d ma, mb, md;
-         md = _mm_set1_pd( d );
+         m128dc va;
+         m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,ma,mb)
+#pragma omp parallel for default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
-            mb = _mm_set1_pd( b[i] );
-            ma = _mm_set_pd( a[i]._real, -1*a[i]._imag);
-            ma = _mm_mul_pd(ma, mb);
-            ma = _mm_mul_pd(ma, md);
-            QDSSE::Store(a[i], ma);
+            vb = b[i];
+            va = a[i];
+            va = va.MulImag(vb) * vd;
+            va.Store(a[i]);
          }
 #else
 #ifdef _OPENMP
@@ -564,12 +593,27 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+//#ifdef HAVE_SSE2
+//         m128dc va, vb;
+//         m128dd vd(d);
+//#ifdef _OPENMP
+//#pragma omp parallel for default(shared) private(i, va, vb)
+//#endif
+//         for (i=0; i < size; i++){
+//            va = a[i];
+//            vb = b[i];
+//            va.MulImag(vd);
+//            va *= vb;
+//            va.Store(a[i]);
+//         }
+//#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] = (a[i] * I) * b[i] * d;
          }
+//#endif
       }
    }
    
@@ -625,14 +669,25 @@ namespace QDLIB {
          b = B->begin(s);
          c = C->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc vc, va, vb;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i, va, vc, vb)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            vc = va * vb;
+            vc.Store(c[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
-            {
-               c[i] = a[i] * b[i];
-            }
+            c[i] = a[i] * b[i];
          }
+#endif
       }
 
    }
@@ -716,16 +771,16 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef HAVE_SSE2
-         __m128d ma, mb;
+         m128dc va, vb;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,ma,mb)
+#pragma omp parallel for default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++)
          {
-            ma = _mm_set_pd(a[i]._imag, a[i]._real);
-            mb = _mm_load1_pd(&(b[i]));
-            ma = _mm_mul_pd(ma, mb);
-            QDSSE::Store(a[i], ma);
+            va = a[i];
+            vb = b[i];
+            va *= vb;
+            va.Store(a[i]);
          }
 #else
 #ifdef _OPENMP
@@ -760,6 +815,20 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va,vb;
+         m128dd vc(c);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            va *= vb * vc;
+            va.Store(a[i]);
+         }
+
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -767,6 +836,7 @@ namespace QDLIB {
          {
             a[i] *= b[i] * c;
          }
+#endif
       }
    }
    
@@ -822,6 +892,20 @@ namespace QDLIB {
          b = B->begin(s);
          c = C->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va;
+         m128dd vb, vd(d);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,vc,va,vb)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            va *= vb;
+            va *= vd;
+            va.Store(c[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -829,6 +913,7 @@ namespace QDLIB {
          {
             c[i] = a[i] * b[i] * d;
          }
+#endif
       }
    }
    
@@ -857,16 +942,17 @@ namespace QDLIB {
          lint i;
 
 #ifdef HAVE_SSE2
-         __m128d ma, mb;
+         m128dc va;
+         m128dd vb;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,ma,mb)
+#pragma omp parallel for default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++)
          {
-            ma = _mm_set_pd(a[i]._imag, a[i]._real);
-            mb = _mm_set1_pd(b[i]);
-            ma = _mm_mul_pd(ma, mb);
-            QDSSE::Store(c[i], ma);
+            va = a[i];
+            vb = b[i];
+            va *= vb;
+            va.Store(c[i]);
          }
 #else
 #ifdef _OPENMP
@@ -901,6 +987,18 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va, vb, vc(c);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,va,vb)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            va *= vb * vc;
+            va.Store(a[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -908,6 +1006,7 @@ namespace QDLIB {
          {
             a[i] *= b[i] * c;
          }
+#endif
       }
    }
    
@@ -954,6 +1053,21 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         __m128d vc = _mm_set1_pd(c);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i)
+#endif
+         if (size % 2 == 0)
+            for (i=0; i < size; i+=2){
+               __m128d va = _mm_load_pd(&(a[i]));
+               va = _mm_mul_pd(va, vc);
+               _mm_store_pd( &(a[i]), va );
+            }
+         else
+            for (i=0; i < size; i++)
+               a[i] *= c;
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -961,6 +1075,7 @@ namespace QDLIB {
          {
             a[i] *= c;
          }
+#endif
       }
    }
    
@@ -981,6 +1096,18 @@ namespace QDLIB {
       for (s=0; s < strides; s++){
          a = A->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va, vc(c);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,va)
+#endif
+         for (i=0; i < size; i++)
+         {
+            va = a[i];
+            va *= vc;
+            va.Store(a[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -988,6 +1115,7 @@ namespace QDLIB {
          {
             a[i] *= c;
          }
+#endif
       }
    }
    /**
@@ -1009,6 +1137,19 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va,vb;
+         m128dd vd(d);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,va,vb)
+#endif
+         for (i=0; i < size; i++){
+            vb = b[i];
+            va = vb * vd;
+            va.Store(a[i]);
+         }
+
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -1017,6 +1158,7 @@ namespace QDLIB {
                a[i] = d * b[i];
             }
          }
+#endif
       }
 
    }
@@ -1040,14 +1182,27 @@ namespace QDLIB {
          a = A->begin(s);
          b = B->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc va,vb,vc(c);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,va,vb)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            va += vb * vc;
+            va.Store(a[i]);
+         }
+
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
-            {
-               a[i] += c * b[i];
-            }
+            a[i] += c * b[i];
+
          }
+#endif
       }
 
    }
@@ -1103,6 +1258,17 @@ namespace QDLIB {
          a = A->begin(s);
          c = C->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc vc,va,vd(d);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,vc,va)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vc = va * vd;
+            vc.Store(c[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -1110,6 +1276,7 @@ namespace QDLIB {
          {
             c[i] = a[i] * d;
          }
+#endif
       }
    }
    
@@ -1167,6 +1334,19 @@ namespace QDLIB {
          b = B->begin(s);
          c = C->begin(s);
          lint i;
+#ifdef HAVE_SSE2
+         m128dc vc, va;
+         m128dd vb, vd(d);
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i,vc,va,vb)
+#endif
+         for (i=0; i < size; i++){
+            va = a[i];
+            vb = b[i];
+            vc = va * vb * d;
+            vc.Store(c[i]);
+         }
+#else
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(i)
 #endif
@@ -1174,6 +1354,7 @@ namespace QDLIB {
          {
             c[i] = a[i] * b[i] * d;
          }
+#endif
       }
    }
    

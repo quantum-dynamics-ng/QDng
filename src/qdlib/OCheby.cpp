@@ -115,10 +115,10 @@ namespace QDLIB
 	       vk1 = k1[j];
 	       vpsi = psi[j];
 
-	       vbf = (vbf - v_o * vk1) * v_s;
+	       vbf = vbf - vk1 * v_o;
+	       vbf *= v_s;
 	       vbf *= v_exp2;
-	       vk2 = vk0;
-	       vk2 += vbf;
+	       vk2 = vk0 + vbf;
 	       vk0 = vk2;
 	       vpsi += vk2 * v_coeff;
 

@@ -62,7 +62,7 @@ namespace QDLIB
          static size_t ReadFromString(string s);
          static string Format(size_t value);
 
-         void Copy(char *dst, char* src, size_t size);
+         static void Copy(char *dst, char* src, size_t size);
          void Align(void **p, size_t size);
          void Free(void *p);
          void Cleanup();

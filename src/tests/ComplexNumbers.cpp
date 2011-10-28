@@ -217,14 +217,9 @@ void ComplexNumbers::NUMERIC_Test()
 
 #include "math/m128dc.h"
 
-void ComplexNumbers::NUMERIC_Test()
+void ComplexNumbers::SSE2_Test()
 {
-   dcomplex val[32];
-
-   /** Make array is aligned to 16 byte boundary */
-   int align = (int)  ((unsigned long int) val) % 16;
-
-   val = ((char*) val) + align;
+   dcomplex val[32] __attribute__((__aligned__));
 
    val[0] = dcomplex(1,2);
    val[1] = dcomplex(5,6);
@@ -237,6 +232,13 @@ void ComplexNumbers::NUMERIC_Test()
    CPPUNIT_ASSERT_DOUBLES_EQUAL(-7, val[2].real(), TIGHT_EPS );
    CPPUNIT_ASSERT_DOUBLES_EQUAL(16, val[2].imag(), TIGHT_EPS );
 
+   m128dd vd(5.0);
+
+   vc = va.MulImag(vd);
+   vc.Store(val[2]);
+
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-10, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(5, val[2].imag(), TIGHT_EPS );
 }
 #endif
 
