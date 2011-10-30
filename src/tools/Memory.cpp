@@ -28,11 +28,14 @@
  #define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
 #endif
 
+#define MEMORY_SLOTS 1024    /* Size of slot array */
+
 namespace QDLIB
 {
 
-   Memory::Memory() : _used(0), _MaxUsed(0)
+   Memory::Memory() : _nslots(MEMORY_SLOTS), _nused(0), _nfree(0), _used(0), _MaxUsed(0)
    {
+      /* Set Limits */
       ParamContainer& params = GlobalParams::Instance();
 
       if ( params.isPresent("MaxMem") ){ /* Get limit from user defined entry */
@@ -44,17 +47,53 @@ namespace QDLIB
          sysinfo(&info);
          _MaxMem = info.totalram / 2;
       }
+
+      /* Initialize Slot DB */
+      _Slots = new SlotEntry[MEMORY_SLOTS];
+      _SlotsF = new SlotEntry*[MEMORY_SLOTS];
+      for (int i=0; i < MEMORY_SLOTS; i++)
+         _SlotsF[i] = NULL;
    }
 
    Memory::~Memory()
    {
       /* Free all memory still in use. */
-      list<SlotEntry>::iterator it;
-      for ( it = Slots.begin(); it != Slots.end(); it++) { /* find  free slots */
-         free(it->p);
+      for (int i=0; i < _nslots; i++) {
+         if (_Slots[i].p != NULL) free(_Slots[i].p);
       }
+      delete[] _Slots;
+      delete[] _SlotsF;
    }
 
+   /**
+    *  Elongate the slot buffer
+    */
+   void Memory::ResizeSlotBuffer()
+   {
+      SlotEntry *newbuf = new SlotEntry[_nslots+MEMORY_SLOTS];
+      SlotEntry **newindex = new SlotEntry*[_nslots+MEMORY_SLOTS];
+
+      for (int i=0; i < _nslots+MEMORY_SLOTS; i++)
+        newindex[i] = NULL;
+
+
+      /* Copy to new storage */
+      int ind = 0;
+      for (int i=0; i < _nslots; i++) {
+         newbuf[i] = _Slots[i];
+         if ( newbuf[i].free && newbuf[i].p != NULL ){
+            newindex[ind] = &(newbuf[i]);
+            ind++;
+         }
+      }
+
+      _nslots += MEMORY_SLOTS;
+
+      delete[] _Slots;
+      delete[] _SlotsF;
+      _Slots = newbuf;
+      _SlotsF = newindex;
+   }
 
    /**
     * Comparison function for slot sorting.
@@ -221,32 +260,44 @@ namespace QDLIB
        if ( CurrentSizeAvail() < size )
           throw(EMemory());
 
-       list<SlotEntry>::iterator it;
+       if (_nused == _nslots)
+          ResizeSlotBuffer();
 
-       for( it = Slots.begin(); it != Slots.end(); it++) { /* find a free slot*/
-          if ( it->free && it->size == size)
-             break;
+       SlotEntry *entry = NULL;
+
+       /* look for a free slot in the index */
+       for(int i=0; i < _nslots; i++) {
+          if (_SlotsF[i] != NULL)
+             if ( _SlotsF[i]->size == size ){
+                entry = _SlotsF[i];
+                _SlotsF[i] = NULL;      /* remove from "free index" */
+                _nfree--;
+                break;
+             }
        }
 
+       /* create a new slot */
+       if (entry == NULL){
+          /* search usable entry for allocation */
+          for(int i=0; i < _nslots; i++) {
+             if (_Slots[i].free && _Slots[i].p == NULL){
+                entry = &_Slots[i];
+                _nused++;
+                break;
+             }
+          }
 
-       if (it == Slots.end()){ /* create a new slot */
-          SlotEntry slot(size);
-
-          Slots.sort(Compare_SlotEntry ); /* sort free slots to front*/
-
-          int ret = posix_memalign( & (slot.p), QDLIB_DATA_ALIGNMENT, size);
-          slot.free = false;
-          Slots.push_back(slot);
-          *p = slot.p;
+          int ret = posix_memalign( & (entry->p), QDLIB_DATA_ALIGNMENT, size);
 
           if (ret != 0)
              throw(EMemory());
-       } else {
-          *p = (*it).p;
-          (*it).free = false;
+
+          entry->size = size;
        }
 
        /* book-keeping */
+       *p = entry->p;
+       entry->free = false;
        _used += size;
        if (_used > _MaxUsed)
           _MaxUsed = _used;
@@ -259,15 +310,21 @@ namespace QDLIB
      */
     void Memory::Free(void *p)
     {
-       list<SlotEntry>::iterator it;
-
-       for( it = Slots.begin(); it != Slots.end(); it++) { /* find the corresponding slot */
-          if ( it->p == p) {
-             it->free = true;
-             _used -= it->size;
+       for (int i=_nused-1; i >= 0; i--){
+          if (_Slots[i].p == p){
+             _Slots[i].free = true;
+             _used -= _Slots[i].size;
+             _nfree++;
+             /* push free slot on index */
+             for (int j=0; j < _nslots; j++){
+                if (_SlotsF[j] == NULL){
+                   _SlotsF[j] = &(_Slots[i]);
+                   break;
+                }
+             }
+             break;
           }
        }
-
     }
 
     /**
@@ -275,14 +332,17 @@ namespace QDLIB
      */
     void Memory::Cleanup()
     {
-       list<SlotEntry>::iterator it;
-
-       for( it = Slots.begin(); it != Slots.end(); it++) { /* find  free slots */
-          if ( it->free ){
-             free(it->p);
-             _used -= it->size;
-             Slots.erase(it);
+       for (int i=0; i < _nslots; i++){
+          if ( _Slots[i].free && _Slots[i].size > 0){
+             free(_Slots[i].p);
+             _used -= _Slots[i].size;
+             _Slots[i].size = 0;
+             _Slots[i].p = NULL;
+             _Slots[i].free = true;
+             _nused--;
           }
+
+          _SlotsF[i] = NULL;
        }
     }
 

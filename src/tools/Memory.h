@@ -38,11 +38,18 @@ namespace QDLIB
 
          static bool Compare_SlotEntry(const SlotEntry &a, const SlotEntry &b);
 
+         void ResizeSlotBuffer();
+
          Memory();
          Memory(Memory &ref) {};
          ~Memory();
 
-         list<SlotEntry> Slots;   /* Memory slots allocated with OS*/
+         SlotEntry *_Slots;      /* Memory slots allocated with OS  */
+         SlotEntry **_SlotsF;      /* Memory slots allocated with OS* - Free slots index */
+         int _nslots;             /* Size of slots array */
+         int _nused;              /* num of used slots */
+         int _nfree;              /* num of free slots */
+         int _freemax;            /* maximum of free index */
          size_t _used;            /* amount of allocated mem */
          size_t _MaxMem;          /* upper bound set user or default value */
          size_t _MaxUsed;         /* Maximum used memory (peak value) */
