@@ -95,6 +95,7 @@ namespace QDLIB {
       }
       
       _buf = Psi->NewInstance();
+      _buf->Retire();
    }
 
    /** \todo extend to N-D */
@@ -125,6 +126,8 @@ namespace QDLIB {
 
    void OGridNAC::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
+      _buf->Reaquire();
+
       for (int i=0; i < Dim(); i++ ){
          /* 1/2 f del psi*/
          _Nabla[i].PreFactor(0.5 * _sign / _mass);
@@ -143,6 +146,8 @@ namespace QDLIB {
    
          *destPsi += _buf;
       }
+
+      _buf->Retire();
    }
 
    void OGridNAC::Apply(WaveFunction * Psi)

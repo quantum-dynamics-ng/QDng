@@ -68,6 +68,11 @@ namespace QDLIB
    {
       WaveFunction *swap;
       
+      ket0->Reaquire();
+      ket1->Reaquire();
+      ket2->Reaquire();
+      buf->Reaquire();
+
       _exp  = OPropagator::Exponent()/clock->Dt();
 
       ket0->FastCopy(*Psi);   /* phi_0 */
@@ -201,8 +206,12 @@ namespace QDLIB
       ket1 = Psi->NewInstance();
       ket2 = Psi->NewInstance();
       buf =  Psi->NewInstance();
-
       
+      ket0->Retire();
+      ket1->Retire();
+      ket2->Retire();
+      buf->Retire();
+
       /* Energy range & offset */
       _offset._real =  (H->Emax() + H->Emin()).real()/2; /* [-i:i] */
       _offset._imag =  (H->Emax() + H->Emin()).imag();   /* [-1:0] */
@@ -241,7 +250,7 @@ namespace QDLIB
 	 throw (EParamProblem("Chebychev propagator doesn't support mixed real/complex exponents") );
       }
       
-      
+
       /* Remove tailing zeroes (from underflow) */
       _order -= zeroes;
       

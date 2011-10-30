@@ -45,8 +45,10 @@ namespace QDLIB {
 	 throw( EOverflow("Projector has reached max capaticity: MAX_WFSPACE"));
 	 
       if (Psi != NULL){
-         if (_buf == NULL)
-	    _buf = Psi->NewInstance();
+         if (_buf == NULL){
+            _buf = Psi->NewInstance();
+            _buf->Retire();
+         }
 		  
 	 _wfbuf[_size] = Psi->NewInstance();
 	 *(_wfbuf[_size]) = Psi;
@@ -76,6 +78,7 @@ namespace QDLIB {
       if (_size > 0) return;
       
       _buf = Psi->NewInstance();
+      _buf->Retire();
             
       /* Read a WF sequence from disk (Has to be here because we need to know the WF type) */
       if (_params.isPresent("files")){
@@ -135,7 +138,7 @@ namespace QDLIB {
       return this;
    }
    
-   Operator * QDLIB::OProjection::Copy(Operator * O)
+   Operator * OProjection::Copy(Operator * O)
    {
       OProjection* o;
       
@@ -155,15 +158,20 @@ namespace QDLIB {
       return this;
    }
       
-   void QDLIB::OProjection::Apply( WaveFunction * Psi )
+   void OProjection::Apply( WaveFunction * Psi )
    {
+      _buf->Reaquire();
+
       *_buf = Psi;
       Apply( Psi, _buf );
+
+      _buf->Retire();
    }
    
-   void QDLIB::OProjection::Apply( WaveFunction * destPsi, WaveFunction * sourcePsi )
+   void OProjection::Apply( WaveFunction * destPsi, WaveFunction * sourcePsi )
    {
       *destPsi = dcomplex(0,0);
+      _buf->Reaquire();
       
       int i;
 #ifdef _OPENMP
@@ -177,6 +185,8 @@ namespace QDLIB {
          AddElements(_buf, destPsi, -1);
          *destPsi = _buf;
       }
+
+      _buf->Retire();
    }
 
 

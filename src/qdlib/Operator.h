@@ -60,6 +60,7 @@ namespace QDLIB {
 
       private:
          bool _recalc; /* Indicates if operator internal should be recalculted or not. */
+         WaveFunction *_buf;
       protected:
 	 /**
           * Parameter storage for the implementation.
@@ -76,15 +77,18 @@ namespace QDLIB {
 	  */
 	 QDClock *clock;
       public:
-	 /**
+          /**
           * Make class pure virtual
           */
-         virtual ~Operator() {}
+         virtual ~Operator()
+         {
+            DELETE_WF(_buf);
+         }
          
 	 /**
 	  * Standard constructor
 	  */
-         Operator() : _recalc(true), _isTimedependent(false), clock(NULL)
+         Operator() : _recalc(true), _buf(NULL), _isTimedependent(false), clock(NULL)
 	 {
          }
 	  
@@ -169,12 +173,15 @@ namespace QDLIB {
 	  */
 	 virtual dcomplex MatrixElement(WaveFunction *PsiBra, WaveFunction *PsiKet)
 	 {
-	    WaveFunction *opPsi = PsiKet->NewInstance();
+	    if (_buf == NULL) _buf = PsiKet->NewInstance();
+	    else _buf->Reaquire();
+
 	    dcomplex result;
 
-	    Apply(opPsi, PsiKet);
-	    result = *PsiBra * opPsi;
-	    DELETE_WF(opPsi);
+	    Apply(_buf, PsiKet);
+	    result = *PsiBra * _buf;
+
+	    _buf->Retire();
 
 	    return result;
 	 }

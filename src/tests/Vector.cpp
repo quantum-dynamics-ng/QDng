@@ -96,6 +96,12 @@ void VectorTest::API_Test_SingleStride()
    }
    
 
+   /* Storage test */
+   CPPUNIT_ASSERT( d1.begin(0) != NULL);
+   d1.RetireStorage();
+   CPPUNIT_ASSERT( d1.begin(0) == NULL);
+   d1.ReaquireStorage();
+   CPPUNIT_ASSERT( d1.begin(0) != NULL);
 }
 
 void VectorTest::API_Test_MultiStride()
@@ -175,7 +181,7 @@ void VectorTest::API_Test_MultiStride()
 	    return StrideRef(vec, source, dest);
 	 }
    };
-   
+
    dVecStrides ds(0,VEC_TEST_STRIDES);
    
    for (lint s=0; s < VEC_TEST_STRIDES; s++){
@@ -188,6 +194,21 @@ void VectorTest::API_Test_MultiStride()
 	 CPPUNIT_ASSERT(v[s][j] == double(s));
       }
    }
+
+   /* Storage test */
+   for (lint s=0; s < VEC_TEST_STRIDES; s++)
+      CPPUNIT_ASSERT( ds.begin(s) != NULL);
+
+   ds.RetireStorage();
+
+   for (lint s=0; s < VEC_TEST_STRIDES; s++){
+      CPPUNIT_ASSERT( ds.begin(s) == NULL);
+   }
+
+   ds.ReaquireStorage();
+   for (lint s=0; s < VEC_TEST_STRIDES; s++)
+      CPPUNIT_ASSERT( ds.begin(s) != NULL);
+
 }
 
 void VectorTest::NUMERIC_Test_Strides()
@@ -215,6 +236,7 @@ void VectorTest::NUMERIC_Test_Strides()
    CPPUNIT_ASSERT_DOUBLES_EQUAL( 21.0, C[0], LOOSE_EPS);
    CPPUNIT_ASSERT_DOUBLES_EQUAL( 21.0, C[23], LOOSE_EPS);
    
+
 }
 
 

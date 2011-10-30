@@ -109,7 +109,10 @@ namespace QDLIB
       if (_buf1 != NULL) return; // Avoid init twice
       
       _buf1 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
+      _buf1->Retire();
+
       _buf2 = dynamic_cast<WFMultistate*>(Psi->NewInstance());
+      _buf2->Retire();
       
       if (_hermitian){
 	 for(int i=0; i< _nstates; i++){
@@ -202,6 +205,8 @@ namespace QDLIB
       psi = dynamic_cast<WFMultistate*>(sourcePsi);
       dPsi = dynamic_cast<WFMultistate*>(destPsi);
       
+      _buf1->Reaquire();
+
       *((cVec*) dPsi) = dcomplex(0,0);
       
       for(int i=0; i< _nstates; i++){ 
@@ -214,13 +219,19 @@ namespace QDLIB
             }
 	 }
       }
+
+      _buf1->Retire();
    }
 
 
    void OMultistate::Apply( WaveFunction *Psi )
    {
+      _buf2->Reaquire();
+
       Apply( _buf2, Psi);
       *Psi = _buf2;
+
+      _buf2->Retire();
    }
    
    void OMultistate::ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
@@ -228,6 +239,8 @@ namespace QDLIB
       WFMultistate *psi, *dPsi;
       psi = dynamic_cast<WFMultistate*>(sourcePsi);
       dPsi = dynamic_cast<WFMultistate*>(destPsi);
+      _buf1->Reaquire();
+
       
       *((cVec*) dPsi) = dcomplex(0,0);
       
@@ -241,6 +254,8 @@ namespace QDLIB
             }
          }
       }
+
+      _buf1->Retire();
    }
 
    
@@ -264,7 +279,10 @@ namespace QDLIB
       _nstates = o->_nstates;
 
       _buf1 =  dynamic_cast<WFMultistate*>(o->_buf1->NewInstance());
+      _buf1->Retire();
+
       _buf2 =  dynamic_cast<WFMultistate*>(o->_buf2->NewInstance());
+      _buf2->Retire();
 
       
       if (_hermitian){

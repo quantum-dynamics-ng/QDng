@@ -51,8 +51,7 @@ namespace QDLIB
       /* Free all memory still in use. */
       list<SlotEntry>::iterator it;
       for ( it = Slots.begin(); it != Slots.end(); it++) { /* find  free slots */
-         if ( it->free )
-            free(it->p);
+         free(it->p);
       }
    }
 
@@ -229,29 +228,30 @@ namespace QDLIB
              break;
        }
 
-       SlotEntry* slot;
+
        if (it == Slots.end()){ /* create a new slot */
+          SlotEntry slot(size);
 
           Slots.sort(Compare_SlotEntry ); /* sort free slots to front*/
 
-          Slots.push_back(SlotEntry(size));
-          slot = &(Slots.back());
-
-          int ret = posix_memalign(& (slot->p), QDLIB_DATA_ALIGNMENT, size);
+          int ret = posix_memalign( & (slot.p), QDLIB_DATA_ALIGNMENT, size);
+          slot.free = false;
+          Slots.push_back(slot);
+          *p = slot.p;
 
           if (ret != 0)
              throw(EMemory());
        } else {
-          slot = &(*it);
+          *p = (*it).p;
+          (*it).free = false;
        }
 
        /* book-keeping */
-       slot->free = false;
        _used += size;
        if (_used > _MaxUsed)
           _MaxUsed = _used;
 
-       *p = slot->p;
+
     }
 
     /**

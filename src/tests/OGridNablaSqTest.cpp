@@ -108,7 +108,7 @@ void OGridNablaSqTest::NUMERIC_Test_Even()
    
    *wf2 = wf;
    
-   O->Apply(wf2);
+   O->Apply(wf2, wf);
    
    for (lint i=0; i < WF_TEST_SIZE; i++){
       CPPUNIT_ASSERT_DOUBLES_EQUAL( pre * (*wf)[i].real(), (*wf2)[i].real() , LOOSE_EPS);

@@ -97,6 +97,7 @@ namespace QDLIB
 	    *((cVec*) _states[i]) = dcomplex(0,0);
 	 }
       }
+
       /* same thing again to refill lower states */
       for (int i=0; i < _nstates; i++){
 	 if (_states[i] != NULL)
@@ -106,7 +107,7 @@ namespace QDLIB
 	    *((cVec*) _states[i]) = dcomplex(0,0);
 	 }
       }
-      
+
       if (wflast == NULL)
 	 throw (EParamProblem("Empty multi state wave function"));
       
@@ -220,6 +221,24 @@ namespace QDLIB
       }
       IsKspace(false); /* Set our self also to x-space representation */
    }
+
+   void WFMultistate::Retire()
+   {
+      for(lint i=0; i < _nstates; i++)
+         _states[i]->Retire();
+
+      RetireStorage();
+   }
+
+   void WFMultistate::Reaquire()
+   {
+      for(lint i=0; i < _nstates; i++)
+         _states[i]->Reaquire();
+
+      ReaquireStorage();
+   }
+
+
 }
 
 /* namespace QDLIB */

@@ -96,7 +96,7 @@ namespace QDLIB {
           */
          void IsKspace(bool is)
          {  
-            if (!_spacebuffer) _spacebuffer = new cVec(size());
+            if (!_spacebuffer) _spacebuffer = new cVec(size(),strides());
             if (_IsKspace != is){
                cVec::swap(*_spacebuffer);
                _IsKspace = is;
@@ -131,6 +131,27 @@ namespace QDLIB {
           */
          virtual void Restore() = 0;
          
+         /**
+          * Retire the storage of the wave function.
+          *
+          * This should be used for local scope buffers.
+          */
+         virtual void Retire()
+         {
+            /* Retire all our vectors */
+            RetireStorage();
+            if (_spacebuffer != NULL) _spacebuffer->RetireStorage();
+         }
+
+         /**
+          * Reactivate a retired wave function.
+          */
+         virtual void Reaquire()
+         {
+            ReaquireStorage();
+            if (_spacebuffer != NULL) _spacebuffer->ReaquireStorage();
+         }
+
          /** Copy. */
          virtual WaveFunction* operator=(WaveFunction* Psi) = 0;
          

@@ -66,21 +66,21 @@ void MemoryTest::CORE_Test()
 
 
 /**
- * Internal memcopy test. Vecotor support
+ * Internal memcopy test. Vector support
  */
 void MemoryTest::COPY_Test()
 {
    Memory& mem = Memory::Instance();
 
-   char *src, *dst;
+   char *src=NULL, *dst=NULL;
 
    mem.Align((void**) &src, 68);
    mem.Align((void**) &dst, 68);
 
-   sprintf(src, "It's the string for the test. Should be 67 bytes + terminating zero.");
+   sprintf(src, "It's the string for the test. Should be 67 bytes + terminatin zero.");
    mem.Copy(dst, src, 68);
 
-   CPPUNIT_ASSERT( string(dst) == "It's the string for the test. Should be 67 bytes + terminating zero.");
+   CPPUNIT_ASSERT( string(dst) == "It's the string for the test. Should be 67 bytes + terminatin zero.");
 
 }
 

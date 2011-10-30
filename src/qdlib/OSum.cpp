@@ -49,35 +49,43 @@ namespace QDLIB {
    void OSum::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       if (_WFbuf[0] == NULL) _WFbuf[0] = sourcePsi->NewInstance();
+      else _WFbuf[0]->Reaquire();
 
       Get(0)->Apply(destPsi, sourcePsi);
       
-      for (int i=1; i < Size(); i++)
-      {
-	 Get(i)->Apply(_WFbuf[0], sourcePsi);
-	 AddElements(destPsi, _WFbuf[0]);
+      for (int i = 1; i < Size(); i++) {
+         Get(i)->Apply(_WFbuf[0], sourcePsi);
+         AddElements(destPsi, _WFbuf[0]);
       }
+
+      _WFbuf[0]->Retire();
    }
    
    void OSum::Apply(WaveFunction *Psi)
    {
       
       if (_WFbuf[0] == NULL) _WFbuf[0] = Psi->NewInstance();
+      else _WFbuf[0]->Reaquire();
+
       if (_WFbuf[1] == NULL) _WFbuf[1] = Psi->NewInstance();
+      else _WFbuf[1]->Reaquire();
       
       _WFbuf[0]->FastCopy(*Psi);
       Get(0)->Apply(Psi);
             
-      for (int i=1; i < Size(); i++)
-      {
-	 Get(i)->Apply(_WFbuf[1], _WFbuf[0]);
-	 AddElements(Psi, _WFbuf[1]);
+      for (int i=1; i < Size(); i++){
+         Get(i)->Apply(_WFbuf[1], _WFbuf[0]);
+         AddElements(Psi, _WFbuf[1]);
       }
+
+      _WFbuf[0]->Retire();
+      _WFbuf[1]->Retire();
    }
    
    void OSum::ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
       if (_WFbuf[0] == NULL) _WFbuf[0] = sourcePsi->NewInstance();
+      else _WFbuf[0]->Reaquire();
 
       Get(0)->ApplyParent(destPsi, sourcePsi);
       
@@ -86,6 +94,8 @@ namespace QDLIB {
          Get(i)->ApplyParent(_WFbuf[0], sourcePsi);
          AddElements(destPsi, _WFbuf[0]);
       }
+
+      _WFbuf[0]->Retire();
    }
    
    void OSum::Apply(Operator * destOp, Operator * sourceOp)
@@ -105,7 +115,7 @@ namespace QDLIB {
       
       r = dynamic_cast<OSum*> (O);
       if (r == NULL)
-	 throw( EIncompatible ("Incompatible in Assignment", this->Name(), O->Name() ) );
+         throw( EIncompatible ("Incompatible in Assignment", this->Name(), O->Name() ) );
       
       OList::Copy(O);
       
