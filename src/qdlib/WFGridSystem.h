@@ -17,28 +17,30 @@ namespace QDLIB {
    {
       private:
          bool _isKspace;
-         FFT *fft;
-         friend class TransformFFT;
-         
+         FFT *_fft;
+
          void CheckFFT();
       public:
+         FFT& fft();
          WFGridSystem();
- 
+
          ~WFGridSystem();
-	 
-	 virtual void Init(ParamContainer &params);
-	 	 
-	 void operator=(WFGridSystem *G);
+
+         virtual void Init(ParamContainer &params);
+
+         void operator=(WFGridSystem *G);
 
          virtual void Reduce(double tolerance);
-         
+
          virtual void Restore();
-         
+
+         virtual void Reaquire();
+
          /**
           * Integrates over the WaveFunction.
           */
          virtual dcomplex Integral() = 0;
-         
+
    }; /* class WFGridSystem */
    
 } /* namespace QDLIB */

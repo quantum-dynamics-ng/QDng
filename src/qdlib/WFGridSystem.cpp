@@ -6,30 +6,38 @@
 namespace QDLIB {
          
    WFGridSystem::WFGridSystem() :
-	 _isKspace(false),  fft(NULL)
+	 _isKspace(false),  _fft(NULL)
    {}
 	    
    WFGridSystem::~WFGridSystem()
    {
-      if (fft != NULL) delete fft;
+      if (_fft != NULL) delete _fft;
    }
    
-   void QDLIB::WFGridSystem::CheckFFT()
+   void WFGridSystem::CheckFFT()
    {
-      if (fft == NULL){
-         fft = new FFT(*((GridSystem*) this), *((cVec*) this), *GetSpaceBuffer());
+      if (_fft == NULL){
+         if (IsKspace())
+            /* Take care - the buffers are switched in this constellation! */
+            _fft = new FFT(*((GridSystem*) this), *GetSpaceBuffer(), *((cVec*) this));
+         else
+            _fft = new FFT(*((GridSystem*) this), *((cVec*) this), *GetSpaceBuffer());
       }
    }
    
+   /**
+    * Return a reference to internal FFT object.
+    */
+   FFT& WFGridSystem::fft()
+   {
+      CheckFFT();
+      return *_fft;
+   }
+
    void WFGridSystem::Init(ParamContainer &params)
    {
       if (GridSystem::Dim() == 0 || GridSystem::Dim() > MAX_DIMS)
-	 throw( EParamProblem("Dims not initialized or to large") );
-
-      bool nofft;
-      params.GetValue("NoFFT", nofft, false);
-      /* Initialize FFT */
-      if (!nofft) CheckFFT();
+         throw(EParamProblem("Dims not initialized or to large"));
    }
 
    
@@ -45,6 +53,20 @@ namespace QDLIB {
       *((cVec*) this) = *((cVec*) G);
    }
 
+   void WFGridSystem::Reaquire()
+   {
+      WaveFunction::Reaquire();
+
+      /* Tell the fft about new buffers. */
+      if (_fft != NULL){
+         if (IsKspace())
+            _fft->ReplaceBuffers(GetSpaceBuffer(), (cVec*) this);
+         else
+            _fft->ReplaceBuffers((cVec*) this, GetSpaceBuffer());
+      }
+
+   }
+
    void WFGridSystem::Reduce(double tolerance)
    {
       double norm;
@@ -52,7 +74,7 @@ namespace QDLIB {
  
       CheckFFT();
       
-      fft->forward();
+      _fft->forward();
       IsKspace(true);
       
       norm = VecMax(*this) * tolerance; /* This is the cut-off criteria */
@@ -77,7 +99,7 @@ namespace QDLIB {
    {
       CheckFFT();
       
-      fft->backward();
+      _fft->backward();
       IsKspace(false);
       
       *this *= 1./sqrt(double(cVec::size())); /* Normalize */

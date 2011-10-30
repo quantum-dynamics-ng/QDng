@@ -92,9 +92,11 @@ namespace QDLIB {
       if (buf != NULL) return;  // Avoid init twice
      
      buf = dynamic_cast<WFGridSystem*>(Psi->NewInstance());
+     buf->Retire();
      
       for (int i=0; i < _size; i++){
-	 _wfbuf[i] = dynamic_cast<WFGridSystem*> (Psi->NewInstance());
+         _wfbuf[i] = dynamic_cast<WFGridSystem*> (Psi->NewInstance());
+         _wfbuf[i]->Retire();
       }
       
       _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
@@ -224,9 +226,13 @@ namespace QDLIB {
    void OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       /* Make a copy from Psi */
-      for (int i=0; i < GridSystem::Dim(); i++)
-	 _wfbuf[i]->FastCopy (*sourcePsi);
+      for (int i=0; i < GridSystem::Dim(); i++){
+         _wfbuf[i]->Reaquire();
+         _wfbuf[i]->FastCopy (*sourcePsi);
+      }
       
+      buf->Reaquire();
+
       *destPsi = dcomplex(0,0);
       
       lint i;
@@ -262,6 +268,11 @@ namespace QDLIB {
 	    }
  	 }
       }
+
+      for (int i=0; i < GridSystem::Dim(); i++){
+         _wfbuf[i]->Retire();
+      }
+      buf->Retire();
    }
 
    void OGridGMat::Apply( WaveFunction * Psi )

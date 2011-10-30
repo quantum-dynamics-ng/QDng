@@ -325,26 +325,26 @@ void FileWFTest::IO_Test_Multistate()
    p.SetValue("xmin0", -5);
    p.SetValue("xmax0", 5);
    
-   
+
    psi0->Init(p);
    fgen_sin_norm(*psi0, -5, 5);
    *psi0 *= cexpI(M_PI);
-   
+
    p.SetValue("xmax0", 6);
    psi1->Init(p);
    fgen_sin_norm(*psi1, -5, 6);
    *psi1 *= cexpI(M_PI/3);
-   
+
    CPPUNIT_ASSERT_NO_THROW( wfm->Add(psi0, 0) );
    CPPUNIT_ASSERT_NO_THROW( wfm->Add(psi1, 1) );
-      
+
    /* Setup file writer */
    file.Compress(false);
    file.Name("TESTMS");
    file.Suffix(".wftest");
-   
+
    CPPUNIT_ASSERT_NO_THROW(wfm->Init(p));
-            
+
    /* Write File */
    CPPUNIT_ASSERT_NO_THROW(file << wfm);
    
@@ -356,7 +356,7 @@ void FileWFTest::IO_Test_Multistate()
    psi1_in = new WFGridCartesian();
    Cwf->Register(psi1_in);
    
-   
+
    psi0_in->Init(p);  /* At least one vector must be initialzed */
    
    p.clear();
@@ -373,7 +373,7 @@ void FileWFTest::IO_Test_Multistate()
    CPPUNIT_ASSERT( wfm->States() == 2);
    
    /* Check state 0 */
-   
+
    /* both wfs should match */
    psi0_in = wfm_in->State(0);
    p_in.clear();
@@ -398,7 +398,7 @@ void FileWFTest::IO_Test_Multistate()
       CPPUNIT_ASSERT( (*psi0_in)[i].imag() == (*psi0)[i].imag() );
    }
    
-   
+
    /* Check state 1 */
    
    /* both wfs should match */

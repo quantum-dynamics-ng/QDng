@@ -19,7 +19,7 @@ namespace QDLIB {
     * Interface to the FFTW library.
     * 
     * Note that you have use the Align method of the vector class.
-    * fftw relies on aligned memory for accelleration.
+    * fftw relies on aligned memory for acceleration.
     * 
     */
    class FFT {
@@ -31,7 +31,12 @@ namespace QDLIB {
          int _ndims; /* number of dims */
          bool _oneway;
          cVec *_in;
-         cVec *_out;
+         enum {c2c, r2c, r2r} _type;
+         dcomplex *_cin;
+         double *_din;
+         dcomplex *_cout;
+         double *_dout;
+
 
          void _initplans();
          void _CreatePlanDim(int dim);
@@ -43,10 +48,12 @@ namespace QDLIB {
          FFT(dVec &in, cVec &out, bool oneway = false);
 
          ~FFT();
-         void forward();
-         void forward(int dim);
-         void backward();
-         void backward(int dim);
+
+         void ReplaceBuffers(cVec *in, cVec *out);
+         void ReplaceBuffers(dVec *in, cVec *out);
+
+         void forward(int dim = -1);
+         void backward(int dim = -1);
       };
 
 

@@ -50,14 +50,16 @@ namespace QDLIB {
    * \param out    output
    * \param oneway If true only the forward plan will be created
    */
-   FFT::FFT(cVec &in, cVec &out, bool oneway) : _dims(NULL), _rdims(NULL), _ndims(1), _oneway(oneway), _in(NULL), _out(NULL)
+   FFT::FFT(cVec &in, cVec &out, bool oneway) :
+            _dims(NULL), _rdims(NULL), _ndims(1), _oneway(oneway), _in(&in),
+            _type(c2c), _cin(in.begin(0)), _din(NULL), _cout(out.begin(0)), _dout(NULL)
    {
       cVec inbuf = in;
       _initplans();
       
-      _planf[0] = fftw_plan_dft_1d(in.size(), (fftw_complex*) in.begin(0), (fftw_complex*) out.begin(0), FFTW_FORWARD, FFTW_MEASURE);
+      _planf[0] = fftw_plan_dft_1d(in.size(), (fftw_complex*) _cin, (fftw_complex*) _cout, FFTW_FORWARD, FFTW_MEASURE);
       if (!(_oneway = oneway)){
-         _planb[0] = fftw_plan_dft_1d(in.size(), (fftw_complex*) out.begin(0), (fftw_complex*) in.begin(0), FFTW_BACKWARD, FFTW_MEASURE);
+         _planb[0] = fftw_plan_dft_1d(in.size(), (fftw_complex*) _cout, (fftw_complex*) _cin, FFTW_BACKWARD, FFTW_MEASURE);
       }
       in = inbuf;
       
@@ -73,7 +75,9 @@ namespace QDLIB {
    * \param out    output (content maybe destroyed)
    * \param oneway If true only the forward plan will be created
    */
-   FFT::FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway) : _ndims(grid.Dim()), _oneway(oneway), _in(&in), _out(&out)
+   FFT::FFT(GridSystem &grid, cVec &in, cVec &out, bool oneway) :
+            _ndims(grid.Dim()), _oneway(oneway), _in(&in),
+            _type(c2c), _cin(in.begin(0)), _din(NULL), _cout(out.begin(0)), _dout(NULL)
    {
 
       int optflag = FFTGlobal::Instance().OptimizeFlag();
@@ -87,27 +91,27 @@ namespace QDLIB {
       }
 
       /* Create fftw plans */
-      _planf[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) in.begin(0),
-               (fftw_complex*) out.begin(0), FFTW_FORWARD, optflag | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
+      _planf[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) _cin, (fftw_complex*) _cout,
+               FFTW_FORWARD, optflag | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
 
       if (_planf[0] == NULL){ /* Create fresh, optimized plan */
          cVec inbuf;
          inbuf = in; /* Save for planning */
-         _planf[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) in.begin(0),
-                  (fftw_complex*) out.begin(0), FFTW_FORWARD, optflag);
+         _planf[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) _cin, (fftw_complex*) _cout,
+                  FFTW_FORWARD, optflag);
 
          in = inbuf;
       }
 
       /* backward plan */
       if (!(_oneway = oneway)) {
-         _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
-                  (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
+         _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) _cout, (fftw_complex*) _cin,
+                  FFTW_BACKWARD, optflag | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
          if (_planb[0] == NULL){
             cVec inbuf;
             inbuf = in; /* Save for planning */
-            _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) out.begin(0),
-                     (fftw_complex*) in.begin(0), FFTW_BACKWARD, optflag);
+            _planb[0] = fftw_plan_dft(grid.Dim(), _rdims, (fftw_complex*) _cout, (fftw_complex*) _cin,
+                     FFTW_BACKWARD, optflag);
             in = inbuf;
          }
       }
@@ -118,10 +122,12 @@ namespace QDLIB {
    * 1D real-to-complex FFT.
    * 
    * \param in     input.
-   * \param out    output. Note that the outputsize must be n/2+1.
+   * \param out    output. Note that the output size must be n/2+1.
    * \param oneway If true only the forward plan will be created.
    */
-   FFT::FFT(dVec &in, cVec &out, bool oneway) : _dims(NULL), _rdims(NULL), _ndims(1), _oneway(oneway), _in(NULL), _out(NULL)
+   FFT::FFT(dVec &in, cVec &out, bool oneway) :
+            _dims(NULL), _rdims(NULL), _ndims(1), _oneway(oneway), _in(NULL),
+            _type(r2c), _cin(NULL), _din(in.begin(0)), _cout(out.begin(0)), _dout(NULL)
    {
       _initplans();
       _planf[0] = fftw_plan_dft_r2c_1d(in.size(), in.begin(0), (fftw_complex*) out.begin(0), FFTW_ESTIMATE);
@@ -174,8 +180,8 @@ namespace QDLIB {
 
       /* Create plans for the specific dimension */
       _planf[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
-                                       (fftw_complex*) _in->begin(0),
-                                       (fftw_complex*) _out->begin(0),
+                                       (fftw_complex*) _cin,
+                                       (fftw_complex*) _cout,
                                        FFTW_FORWARD, FFTW_PATIENT | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
 
 
@@ -184,8 +190,8 @@ namespace QDLIB {
          cVec inbuf;
          inbuf = *_in; /* Save for planning */
          _planf[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
-                                          (fftw_complex*) _in->begin(0),
-                                          (fftw_complex*) _out->begin(0),
+                                          (fftw_complex*) _cin,
+                                          (fftw_complex*) _cout,
                                           FFTW_FORWARD, optflag);
          *_in = inbuf;
       }
@@ -195,16 +201,16 @@ namespace QDLIB {
       if (!_oneway){
 
          _planb[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
-                                          (fftw_complex*) _out->begin(0),
-                                          (fftw_complex*) _in->begin(0),
+                                          (fftw_complex*) _cout,
+                                          (fftw_complex*) _cin,
                                           FFTW_BACKWARD, FFTW_PATIENT | FFTW_PRESERVE_INPUT | FFTW_WISDOM_ONLY);
 
          if (_planb[dim+1] == NULL){ /* Create fresh, optimized plan */
             cVec inbuf;
             inbuf = *_in; /* Save for planning */
             _planb[dim+1] = fftw_plan_guru_dft(1, &datadim, _ndims - 1, loopdim,
-                                             (fftw_complex*) _out->begin(0),
-                                             (fftw_complex*) _in->begin(0),
+                                             (fftw_complex*) _cout,
+                                             (fftw_complex*) _cin,
                                              FFTW_BACKWARD, optflag);
            *_in = inbuf;
          }
@@ -214,39 +220,66 @@ namespace QDLIB {
       delete[] loopdim;
    }
 
+
    /**
-   * Execute forward FFT.
-   */
-   void FFT::forward()
+    * Replace the buffers.
+    *
+    * Properties must be exactly the same!
+    */
+   void FFT::ReplaceBuffers(cVec *in, cVec *out)
    {
-      fftw_execute(_planf[0]);
+      _cin = in->begin(0);
+      _cout = out->begin(0);
    }
-   
-   
-   /**
-   * Execute backward FFT.
-   */
-   void FFT::backward()
+
+   void FFT::ReplaceBuffers(dVec *in, cVec *out)
    {
-      fftw_execute(_planb[0]);
+      _din = in->begin(0);
+      _cout = out->begin(0);
    }
 
    /**
-    * Execute fft along specified dimension
+    * Execute forward fft.
+    *
+    * If dim is specified the transform is carried out along the specified dimension
     */
    void FFT::forward(int dim)
    {
-      if (_planf[dim+1] == NULL) _CreatePlanDim(dim);
-      fftw_execute(_planf[dim+1]);
+      if (_planf[dim+1] == NULL && dim > -1) _CreatePlanDim(dim);
+      switch (_type){
+         case c2c:
+            fftw_execute_dft(_planf[dim+1], (fftw_complex*) _cin, (fftw_complex*) _cout);
+           break;
+         case r2c:
+            fftw_execute_dft_r2c(_planf[dim+1], _din, (fftw_complex*) _cout);
+           break;
+         case r2r:
+            /* Not implemented */
+            break;
+      }
+
    }
 
    /**
-    * Execute fft along specified dimension
+    * Execute backward FFT.
+    *
+    * If dim is specified the transform is carried out along the specified dimension.
+    * Note that this call is only valid if oneway isn't specified.
     */
    void FFT::backward(int dim)
    {
-      if (_planb[dim+1] == NULL) _CreatePlanDim(dim);
-      fftw_execute(_planb[dim+1]);
+      if (_planb[dim+1] == NULL && dim > -1) _CreatePlanDim(dim);
+      switch (_type){
+         case c2c:
+            fftw_execute_dft(_planb[dim+1], (fftw_complex*) _cout, (fftw_complex*) _cin);
+           break;
+         case r2c:
+            fftw_execute_dft_c2r(_planb[dim+1], (fftw_complex*) _cout, _din);
+           break;
+         case r2r:
+            /* Not implemented */
+            break;
+      }
    }
    
 } /* namespace QDLIB */

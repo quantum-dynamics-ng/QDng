@@ -50,6 +50,10 @@ namespace QDLIB
          virtual void Reduce(double tolerance);
          
          virtual void Restore();
+
+         virtual void Retire();
+
+         virtual void Reaquire();
    };
 
 }

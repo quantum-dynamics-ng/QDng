@@ -68,6 +68,10 @@ class Vector
     T** v_;
     lint n_;
 
+    Vector<T> **_StrideRefObj; /** If a stride is just reference, the pointer to master instance is here */
+    lint *_SourceStride;       /** Stride Ref source */
+    bool _StorageLocked;       /** Storage can not be retired */
+
     size_type nstrides_;
     size_type stride_size_;
     
@@ -93,8 +97,11 @@ class Vector
       n_ = N;
       
       v_ = new T*[strides];
+      _StrideRefObj = new Vector<T>*[strides];
+      _SourceStride = new lint[strides];
       
       isRef_ = false;
+      _StorageLocked = false;
       
       for (lint i=0; i < nstrides_; i++){
          if (stride_size_ == 0)
@@ -103,6 +110,8 @@ class Vector
             Memory& mem = Memory::Instance();
             mem.Align((void**) &(v_[i]), sizeof(T)*stride_size_);
          }
+         _StrideRefObj[i] = NULL;
+         _SourceStride[i] = -1;
       }
       
       
@@ -173,6 +182,12 @@ class Vector
           delete[] v_;
           v_ = NULL;
        }
+       if (_StrideRefObj != NULL) {
+          delete[] _StrideRefObj;
+          delete[] _SourceStride;
+          _StrideRefObj = NULL;
+          _SourceStride = NULL;
+       }
     }
 
 
@@ -189,27 +204,33 @@ class Vector
         * \param dest   The destination stride (Number must be larger!!!)
         */
        bool StrideRef(Vector<T> &vec, lint source, lint dest = 0)
-       {
-	  if ( isRef_  && vec.stride_size_ != stride_size_ )
-	     return false;
-	  
-	  if (!isRef_){
-	     if (dest >= nstrides_) return false;
-	     if (stride_size_ > 0) destroy();
-	     
-             initialize(0, nstrides_);
-             
-	     stride_size_ = vec.stride_size_;
-	     isRef_ = true;
-	     align_ = false;
-	     
-	  }
-	  if (nstrides_ <= dest+1) nstrides_ = dest + 1;
-	  n_ = nstrides_ * stride_size_;
-	  v_[dest] = vec.v_[source];
-	  
-	  return true;
-       }
+         {
+            if (isRef_ && vec.stride_size_ != stride_size_)
+               return false;
+
+            if (!isRef_) {
+               if (dest >= nstrides_)
+                  return false;
+               if (stride_size_ > 0)
+                  destroy();
+
+               initialize(0, nstrides_);
+
+               stride_size_ = vec.stride_size_;
+               isRef_ = true;
+               align_ = false;
+
+            }
+            if (nstrides_ <= dest + 1)
+               nstrides_ = dest + 1;
+
+            n_ = nstrides_ * stride_size_;
+            v_[dest] = vec.v_[source];
+            _StrideRefObj[dest] = &vec;
+            _SourceStride[dest] = source;
+
+            return true;
+         }
         
        /**
         * Reduce the size of the vector.
@@ -223,6 +244,49 @@ class Vector
        
   public:
 
+       /**
+        * Lock the internal storage against retirement.
+        */
+       void LockStorage() { _StorageLocked = true; }
+       void UnLockStorage() { _StorageLocked = false; }
+
+       /**
+        * Frees the data storage but not the properties.
+        *
+        * Use this feature to save memory. Advantegous if
+        * the object is used as temporary buffer.
+        */
+       void RetireStorage()
+       {
+          if (_StorageLocked)  return;
+          for (int s=0; s < nstrides_; s++){
+             if (_StrideRefObj[s] == NULL)
+                Memory::Instance().Free(v_[s]);
+             else
+                _StrideRefObj[s]->RetireStorage();
+
+             v_[s] = NULL; /* Invalidate pointer */
+          }
+       }
+
+       /**
+        * Get back storage freed with RetireStorage.
+        */
+       void ReaquireStorage()
+       {
+          if (_StorageLocked)  return;
+          for (int s=0; s < nstrides_; s++){
+             if (v_[s] == NULL){ /* Check if reaquire is needed*/
+                if ( _StrideRefObj[s] == NULL )
+                   Memory::Instance().Align((void**) &(v_[s]), sizeof(T)*stride_size_);
+                else {
+                   _StrideRefObj[s]->ReaquireStorage();
+                   v_[s] = _StrideRefObj[s]->v_[_SourceStride[s]];  /* Re-link the stride */
+                }
+             }
+          }
+
+       }
     
    /**
     * Return a pointer to the local stride.
@@ -230,7 +294,7 @@ class Vector
     inline T* begin(lint stride) const { return v_[stride];}
     
     /**
-     * Return a pointer to the tride set.
+     * Return a pointer to the stride set.
      * 
      * This is a 2D array with sizes [strides][stride_size]
      */

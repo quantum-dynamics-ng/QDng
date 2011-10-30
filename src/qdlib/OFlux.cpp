@@ -30,6 +30,8 @@ namespace QDLIB {
       if  (_buf != NULL) return;  // Avoid init twice
       
       _buf = Psi->NewInstance();
+      _buf->Retire();
+
       _one = Psi->NewInstance();
       
       *_one = -2;
@@ -41,6 +43,8 @@ namespace QDLIB {
 
    dcomplex OFlux::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
    {
+      _buf->Reaquire();
+
       /* Im( Psi* T Psi )*/
       Get(_indT)->Apply(_buf, PsiKet);
       _buf->DirectProductConjugate(PsiBra);
@@ -48,7 +52,11 @@ namespace QDLIB {
       
       /* Integrate over inner Volume */
       Get(_indG)->Apply(_buf);
-      return dcomplex(*_one * _buf);
+
+      dcomplex res (*_one * _buf);
+      _buf->Retire();
+
+      return res;
    }
 
    void OFlux::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
