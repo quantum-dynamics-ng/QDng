@@ -17,7 +17,7 @@
  #include "m128dc.h"
 #endif
 
-
+namespace QDLIB {
 
    /**
     * Exponentiate elements.
@@ -1467,6 +1467,6 @@
       }
    }
 
-
+}
 
 #endif /* VECTORPRIMITIVES_H_ */
