@@ -46,6 +46,9 @@ namespace QDLIB {
 	 lint sizeBytes();
 	 lint strides() {return 1;}
 	 void SyncStrides() {}
+
+	 int MPIsize() { return 0; }
+	 int MPIrank() { return 0; }
          
 	 Vector<T>* coloumn(lint c) const;
 	 Vector<T>* diag() const;

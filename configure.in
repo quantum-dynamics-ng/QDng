@@ -179,12 +179,16 @@ AC_ARG_ENABLE([mods],
 	      AC_DEFINE([USE_DYNMODS], [1], [Enable dynamic loadable modules]))
 
 
-dnl AC_ARG_ENABLE([mpi],
-dnl	    [AS_HELP_STRING([--enable-mpi],[Build with support for mpi parallization])],
-dnl	    [],enable_mpi=no)
+AC_ARG_ENABLE([mpi],
+	    [AS_HELP_STRING([--enable-mpi],[Build with support for mpi parallization])],
+	    [enable_mpi=yes; AC_DEFINE([HAVE_MPI], [1], [Compile with MPI support]) ], enable_mpi=no)
+
+dnl AC_ARG_WITH([mpi-libs],
+dnl	    [AS_HELP_STRING([--with-mpi-libs=PATH],[Compiler/linker flags for mpi libs])],
+dnl	    
 
 dnl AC_ARG_WITH([mpi-prefix],
-dnl	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation])],
+dnl 	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installation])],
 dnl	    [],with_mpi-prefix=no)
 
 

@@ -15,10 +15,11 @@ noinst_HEADERS = ComplexNumbers.h TmpFileTest.h MatrixTest.h LapackTest.h GridSy
 	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
 	Vector.h WFGridCartesian.h WFGridHarmonic.h WFGridSystemTest.h \
 	WaveFunctionTest.h defs.h function_gens.h OHermitianMatrixTest.h WFLevelTest.h OMatDipoleTest.h OGSPOTest.h \
-	WFBufferTest.h MemoryTest.h 
+	WFBufferTest.h MemoryTest.h ThreadTest.h
 
-noinst_PROGRAMS = runtest
-runtest_SOURCES = ComplexNumbers.cpp MemoryTest.cpp TmpFileTest.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
+noinst_PROGRAMS = runtest mpitest
+
+runtest_SOURCES = ComplexNumbers.cpp MemoryTest.cpp ThreadTest.cpp TmpFileTest.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
 	dVecMinMax.cpp dVecMinMax.h PeakFinderTest.cpp MatrixTest.cpp LapackTest.cpp GridSystem.cpp FileWFTest.cpp QDClock.cpp \
 	FFTnTest.cpp \
 	WFLevelTest.cpp WFBufferTest.cpp OHermitianMatrixTest.cpp OMatDipoleTest.cpp OGridNablaSqTest.cpp OGridNablaTest.cpp \
@@ -26,3 +27,6 @@ runtest_SOURCES = ComplexNumbers.cpp MemoryTest.cpp TmpFileTest.cpp Vector.cpp T
 	function_gens.cpp main.cpp
 runtest_LDADD = $(top_builddir)/src/lib/libqdng.la \
 	 -lcppunit
+	
+mpitest_SOURCES = mpitest.cpp
+mpitest_LDADD = $(top_builddir)/src/lib/libqdng.la
