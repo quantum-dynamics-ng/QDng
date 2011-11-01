@@ -10,6 +10,19 @@
 namespace QDLIB {
    
    /**
+    * Exception Guard for parallel exception handling.
+    */
+   class ExceptionGuard {
+      private:
+         ExceptionGuard() {}
+         ExceptionGuard(ExceptionGuard &a) {}
+         ~ExceptionGuard() {}
+      public:
+         ExceptionGuard& Instance();
+         void Init();
+   };
+
+   /**
     * Base class for exceptions.
     * 
     * Every dervied class should also provide a construcotor with a message.
@@ -20,15 +33,32 @@ namespace QDLIB {
    {
       private:
          string _message;
-      public:
-         Exception(){}
-         Exception(const char *message) : _message(message) {}
-            
-	 void SetMessage(const string &message)
-	 {
-	    _message = message;
-	 }
+
+      protected:
+         /**
+          * When running in a parallel mode tell rest of the universe.
+          */
+         void GlobalSignal()
+         {
+#ifdef HAVE_MPI
+            //MPI::COMM_WORLD
+#endif
+         }
          
+      public:
+         Exception()
+         {
+         }
+         Exception(const char *message) :
+            _message(message)
+         {
+         }
+
+         void SetMessage(const string &message)
+         {
+            _message = message;
+         }
+
          string& GetMessage()
          {
             return _message;

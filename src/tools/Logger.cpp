@@ -222,6 +222,10 @@ namespace QDLIB {
     */
    void Logger::Header(const string &title, SectionType type)
    {
+#ifdef HAVE_MPI
+      if (MPI::COMM_WORLD.Get_rank() != 0) /* Only root can print */
+         return;
+#endif
       flush();
       switch(type){
 	 case Chapter:

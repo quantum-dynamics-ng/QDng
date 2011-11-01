@@ -76,9 +76,9 @@ namespace QDLIB {
    /** 
     * Read a single WF from file and handle compression.
     */
-   void QDLIB::FileWF::_ReadFromFile(WaveFunction * data)
+   void FileWF::_ReadFromFile(WaveFunction * data)
    {
-      FileSingle<WaveFunction>::ReadFile(data);
+      FileSingle<WaveFunction>::ReadFile(data); /* Read the raw data set */
       
       /* Check if file is compressed */
       string zlibmagic(ZLIB_MAGIC);
@@ -391,6 +391,8 @@ namespace QDLIB {
          }
          wfm->Init(p); 
          wf = wfm;
+         //cout << "rank : " << rank << endl << *wf<< endl;
+         wf->SyncStrides();
       } else { /* handling for Single state WFs */
          wf = mods->LoadWF(classname);
          _ReadFromFile(wf); /* Load data */
@@ -420,7 +422,7 @@ namespace QDLIB {
             throw ( EParamProblem("Reading WaveFunction: Invalid number of states", wfm->States()) );
          
          int counter = Counter();
-         for (int i=0; i < wfm->States(); i++){ /* Loop over States */
+         for (int i=wfm->MPIrank(); i < wfm->States(); i += wfm->MPIsize()){ /* Loop over States */
             Counter(counter);    /* Every ReadFile() increases counter => restore it when using it diff. states */
             stringstream ss;
             ss << "-" << i;
@@ -433,6 +435,7 @@ namespace QDLIB {
          ReadMeta(p);
          
          wfm->Init(p);
+         wfm->SyncStrides();
       } else { /* Load Single WaveFunction */
          _ReadFromFile(data);
       }

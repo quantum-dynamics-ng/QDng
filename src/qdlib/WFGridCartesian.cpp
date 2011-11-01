@@ -90,24 +90,23 @@ namespace QDLIB {
       int s;
       lint size = lsize();
       dcomplex *a, *b;
-      for (s=0; s < strides(); s++){
-	 a = begin(s);
+      for (s = MPIrank(); s < strides(); s += MPIsize()) {
+         a = begin(s);
          b = Psi->begin(s);
-	 int i;
+         int i;
 #ifdef _OPENMP
 #pragma omp parallel shared(cglob) private(i) firstprivate(c)
-{   
+         {
 #pragma omp  for nowait
 #endif
-	 for(i=0; i < size; i++){
-	    c += a[i].conj() * b[i];
-	 }
+            for (i = 0; i < size; i++)
+               c += a[i].conj() * b[i];
 #ifdef _OPENMP
 #pragma omp critical
-	 {
-	 cglob += c;
-	 }
-}
+            {
+               cglob += c;
+            }
+         }
 #else
          cglob = c;
 #endif
@@ -164,7 +163,7 @@ namespace QDLIB {
 
 #ifdef HAVE_MPI
       if (GetComm() != NULL){
-         GetComm()->Allreduce(&cglob, &c, 1, MPIdcomplex::Instance(), MPI::SUM);
+         GetComm()->Allreduce(&cglob, &c, 2, MPI::DOUBLE, MPI::SUM);
          cglob = c;
       }
 #endif

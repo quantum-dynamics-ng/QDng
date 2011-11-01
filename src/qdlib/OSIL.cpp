@@ -60,18 +60,15 @@ namespace QDLIB {
         buf1 = Psi->NewInstance();
         buf2 = Psi->NewInstance();
         
+        buf0->Retire();
+        buf1->Retire();
+        buf2->Retire();
+
         _Lzb.Size(_order);
         _Lzb.Init(Psi);
         _Lzb.AutoLock(3);
 
         H->Clock(Operator::Clock());
-    }
-
-
-    dcomplex OSIL::MatrixElement(WaveFunction * PsiBra, WaveFunction * PsiKet)
-    {
-        Apply(buf2, PsiKet);
-        return (*PsiBra) * buf2;
     }
 
     /**
@@ -80,6 +77,9 @@ namespace QDLIB {
     void OSIL::BuildLZB(WaveFunction* Psi)
     {
         int it;
+
+        buf0->Reaquire();
+        buf1->Reaquire();
 
         _Lzb.Set(0, Psi);
         H->Apply(buf0,  _Lzb[0]);           /* H*q_0 */
@@ -114,6 +114,9 @@ namespace QDLIB {
 
         _alpha[it-1] = H->Expec(_Lzb[it-1]);
         H->RecalcInternals(true); /* turn it on again */
+
+        buf0->Retire();
+        buf1->Retire();
     }
 
     /**

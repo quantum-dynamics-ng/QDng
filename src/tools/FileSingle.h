@@ -505,8 +505,8 @@ namespace QDLIB {
       if (data->sizeBytes() <= 0) throw( EParamProblem("Wrong size") ) ;
       
 #ifdef HAVE_MPI
-      int rank = MPI::COMM_WORLD.Get_rank();
-      int size = MPI::COMM_WORLD.Get_size();
+      int rank = data->MPIrank();
+      int size = data->MPIsize();
 #endif
       /* Read multiple strides */
       for (int i = 0; i < data->strides(); i++) {
@@ -539,14 +539,16 @@ namespace QDLIB {
 #ifdef HAVE_MPI
          if (i%size == rank){ /* This is our stride */
 #endif
-         file.read((char*) data->begin(i), data->sizeBytes());
-         _freadsize = file.gcount();
+            file.read((char*) data->begin(i), data->sizeBytes());
+            _freadsize = file.gcount();
+
+            if (_freadsize <= 0) {
+               throw(EIOError("Can not read binary file", s));
+            }
+
 #ifdef HAVE_MPI
          }
 #endif
-         if (_freadsize <= 0) {
-            throw(EIOError("Can not read binary file", s));
-         }
 
          file.close();
       }

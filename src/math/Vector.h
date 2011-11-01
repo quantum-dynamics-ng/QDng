@@ -333,9 +333,9 @@ class Vector
        void SyncStrides()
        {
 #ifdef HAVE_MPI
-          for (int s=0; s < nstrides_; s++){
-             MPI::COMM_WORLD.Bcast( (void*) v_[s], sizeof(T) * stride_size_, MPI_BYTE, s % _mpisize);
-          }
+          if (_mpisize > 1 && _comm != NULL)
+             for (int s=0; s < nstrides_; s++)
+                _comm->Bcast( (void*) v_[s], sizeof(T) * stride_size_, MPI_BYTE, s % _mpisize);
 #endif
        }
     
@@ -384,7 +384,7 @@ class Vector
 #ifdef _OPENMP  
 #pragma omp parallel for default(shared) private(s)
 #endif
-         for (s = 0; s < nstrides_; s++) {
+         for (s = _mpirank; s < nstrides_; s += _mpisize) {
             Memory::Copy( (char*) v_[s], (char*) A.v_[s], sizeof(T) * stride_size_);
 
          }
@@ -392,8 +392,10 @@ class Vector
          if (!isRef_)
             destroy();
 
+#ifdef HAVE_MPI
+         _comm = A._comm;
+#endif
          initialize(A.n_, A.nstrides_);
-
          for (lint s = 0; s < nstrides_; s++)
             Memory::Copy((char*) v_[s], (char*) A.v_[s], sizeof(T) * stride_size_);
       }
@@ -461,6 +463,19 @@ class Vector
        initialize(N, strides);
     }
     
+#ifdef HAVE_MPI
+    Vector(lint N, lint strides, MPI::Intracomm& comm) : n_(0),
+             nstrides_(0),
+             stride_size_(0),
+             isRef_(false),
+             _mpirank(0),
+             _mpisize(1),
+             _comm(&comm)
+    {
+       initialize(N, strides);
+    }
+#endif
+
     Vector(lint N, const T& value) : n_(0),
                                      nstrides_(1),
                                      stride_size_(0),

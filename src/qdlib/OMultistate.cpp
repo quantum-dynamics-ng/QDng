@@ -206,11 +206,12 @@ namespace QDLIB
       
       _buf1->Reaquire();
 
-      sourcePsi->SyncStrides();
+      psi->SyncStrides();
 
       *((cVec*) dPsi) = dcomplex(0, 0);
       int rank = sourcePsi->MPIrank();
       int msize = sourcePsi->MPIsize();
+
       for (int i = rank; i < _nstates; i += msize) {
          for (int j = 0; j < _nstates; j++) {
             if (_matrix[i][j] != NULL) {
@@ -221,7 +222,6 @@ namespace QDLIB
             }
          }
       }
-      //dPsi->SyncStrides();
       _buf1->Retire();
    }
 

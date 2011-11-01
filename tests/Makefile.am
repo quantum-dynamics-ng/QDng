@@ -49,7 +49,7 @@ TGO:
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
 	 echo "Running test $$name"; \
-	 ../src/qdng $${name}.qdi > $${name}.log;\
+	../src/qdng $${name}.qdi > $${name}.log;\
 	done; \
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 

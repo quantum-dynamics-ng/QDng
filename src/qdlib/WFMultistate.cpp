@@ -67,11 +67,15 @@ namespace QDLIB
    {
       WFMultistate *r = new WFMultistate();
       
-      r->_nstates=_nstates;
-      r->newsize(0,_nstates);
-      for (int i=0; i < _nstates; i++){
-	 r->_states[i] =  _states[i]->NewInstance();
-	 r->StrideRef(*(r->_states[i]), 0, i);
+      r->_nstates = _nstates;
+#ifdef HAVE_MPI
+      r->newsize(0, _nstates, GetComm());
+#else
+      r->newsize(0, _nstates);
+#endif
+      for (int i = 0; i < _nstates; i++) {
+         r->_states[i] = _states[i]->NewInstance();
+         r->StrideRef(*(r->_states[i]), 0, i);
       }
       CollectorWF::Instance()->Register(r);
       r->_params = _params;
@@ -202,7 +206,8 @@ namespace QDLIB
 #ifdef HAVE_MPI
       dcomplex sum(0);
       if (GetComm() != NULL){
-         GetComm()->Allreduce(&c, &sum, 1, MPIdcomplex::Instance(), MPI::SUM);
+         //GetComm()->Allreduce(&c, &sum, 1, MPIdcomplex::Instance(), MPI::SUM);
+         GetComm()->Allreduce(&c, &sum, 2, MPI::DOUBLE, MPI::SUM);
          c = sum;
       }
 #endif
