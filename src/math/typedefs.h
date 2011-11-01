@@ -107,9 +107,8 @@ namespace QDLIB {
    /** Multidimensional view on dVec */
    typedef QDLIB::VectorView<dcomplex> cVecView;
    
-#include "math/VectorPrimitives.h"
-   
-   
+
+
 /*   inline void MultMatTranspose(dMat *A, cVec* B)
    {
       int rows = A->num_rows();
@@ -132,6 +131,7 @@ namespace QDLIB {
    
 }
 
+#include "math/VectorPrimitives.h"
 
 
 #endif /* TYPEDEFS_H */ 
