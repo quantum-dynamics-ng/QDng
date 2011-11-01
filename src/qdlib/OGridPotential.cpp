@@ -77,7 +77,6 @@ namespace QDLIB
 	 sprintf (c, "%d", i);
       }
       
-      dVec::Align();
       dVec::newsize(GridSystem::Size());
    }
 	 

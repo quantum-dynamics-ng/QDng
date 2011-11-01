@@ -49,7 +49,6 @@ namespace QDLIB {
 	 sprintf (c, "%d", i);
       }
       
-      cVec::Align();
       cVec::newsize(GridSystem::Size());
       
       WFGridSystem::Init(_params);
@@ -88,8 +87,6 @@ namespace QDLIB {
       dcomplex c(0,0);
       dcomplex cglob(0,0);
       
-   
-      /** \todo make mpi-save */
       int s;
       lint size = lsize();
       dcomplex *a, *b;
@@ -140,11 +137,10 @@ namespace QDLIB {
       dcomplex cglob(0,0);
       
    
-      /** \todo make mpi-save */
-      int s;
       lint size = lsize();
       dcomplex *a;
-      for (s=0; s < strides(); s++){
+
+      for (int s = MPIrank(); s < strides(); s += MPIsize()) {
          a = begin(s);
          int i;
 #ifdef _OPENMP
@@ -165,7 +161,14 @@ namespace QDLIB {
          cglob = c;
 #endif
       }
-   
+
+#ifdef HAVE_MPI
+      if (GetComm() != NULL){
+         GetComm()->Allreduce(&cglob, &c, 1, MPIdcomplex::Instance(), MPI::SUM);
+         cglob = c;
+      }
+#endif
+
       /* k-space has different Norm! */
       if (IsKspace())
       {

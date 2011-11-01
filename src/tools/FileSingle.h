@@ -504,45 +504,53 @@ namespace QDLIB {
       /* We need some parameters for reading */
       if (data->sizeBytes() <= 0) throw( EParamProblem("Wrong size") ) ;
       
-      
+#ifdef HAVE_MPI
+      int rank = MPI::COMM_WORLD.Get_rank();
+      int size = MPI::COMM_WORLD.Get_size();
+#endif
       /* Read multiple strides */
-      for (int i=0; i < data->strides(); i++){
-	 /* Build file name */
-	 if (_sequence) {
-	    stringstream ss;
-	    
-	    if (data->strides() > 1)
-	       ss << "-" << i << "_" << _counter;
-	     else 
-	       ss << "_" << _counter;
+      for (int i = 0; i < data->strides(); i++) {
+         /* Build file name */
+         if (_sequence) {
+            stringstream ss;
 
-	    s = _name +  ss.str() + _suffix;
+            if (data->strides() > 1)
+               ss << "-" << i << "_" << _counter;
+            else ss << "_" << _counter;
+
+            s = _name + ss.str() + _suffix;
             _counter_last = _counter;
-	    _counter += _increment;
-	 } else {
-	    if (data->strides() > 1){
-	       stringstream ss;
-	       ss << "-" << i;
-	       s = _name + ss.str() + _suffix;
-	    } else {
-	       s = _name + _suffix;
-	    }
-	 }
-	 
-	 file.open(s.c_str(), ios::binary);
-	 if( file.fail() ) {
-	    throw ( EIOError("Can not open binary file for reading", s) );
-	 }
-         
-	 file.read((char*) data->begin(i), data->sizeBytes());
+            _counter += _increment;
+         } else {
+            if (data->strides() > 1) {
+               stringstream ss;
+               ss << "-" << i;
+               s = _name + ss.str() + _suffix;
+            } else {
+               s = _name + _suffix;
+            }
+         }
+
+         file.open(s.c_str(), ios::binary);
+         if (file.fail()) {
+            throw(EIOError("Can not open binary file for reading", s));
+         }
+
+#ifdef HAVE_MPI
+         if (i%size == rank){ /* This is our stride */
+#endif
+         file.read((char*) data->begin(i), data->sizeBytes());
          _freadsize = file.gcount();
-         if( _freadsize <= 0 ){
-	    throw( EIOError("Can not read binary file", s) );
-	 }
-	 
-	 file.close();
+#ifdef HAVE_MPI
+         }
+#endif
+         if (_freadsize <= 0) {
+            throw(EIOError("Can not read binary file", s));
+         }
+
+         file.close();
       }
-   
+      data->SyncStrides();
    }
 
    /**

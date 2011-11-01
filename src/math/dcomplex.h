@@ -4,6 +4,9 @@
 #include <iostream>
 #include <math.h>
 
+#ifdef HAVE_MPI
+#include <mpi.h>
+#endif
 
 namespace QDLIB {
    
@@ -81,6 +84,37 @@ namespace QDLIB {
     
   }; /*struct dcomplex*/
   
+#ifdef HAVE_MPI
+  /**
+   * Own mapping from dcomplex to MPI datatypes.
+   * This class is a singleton.
+   */
+  class MPIdcomplex
+  {
+     private:
+        MPI::Datatype _type;
+        MPIdcomplex(MPIdcomplex &c) {}
+        MPIdcomplex()
+        {
+           _type = MPI::DOUBLE.Create_contiguous(2);
+           _type.Commit();
+        }
+        ~MPIdcomplex()
+        {
+           _type.Free();
+        }
+     public:
+        /**
+         * Get an Instance of the datatype.
+         */
+        static MPI::Datatype& Instance()
+        {
+           static MPIdcomplex ref;
+           return ref._type;
+        }
+  };
+#endif
+
   /* Dummies to allow carry out complex conjugation no matter if real or complex */
   inline double conj(double d){return d;}
   inline dcomplex conj(dcomplex c){return c.conj();}

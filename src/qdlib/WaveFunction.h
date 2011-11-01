@@ -10,6 +10,9 @@
 #define DELETE_WF(WF) Collector<WaveFunction>::Instance()->Delete(WF)
 #define DELETE_ALL_WF() Collector<WaveFunction>::Instance()->Delete()
 
+/**
+ * Macro for implementing the NewInstance() method.
+ */
 #define QDNG_WAVEFUNCTION_NEW_INSTANCE_FUNCTION(CLASSNAME) \
    WaveFunction* CLASSNAME::NewInstance() \
 { \
@@ -118,8 +121,8 @@ namespace QDLIB {
           * Reduce/Clean up the wavefunction as preparation to compression.
           * 
           * The result must be stored in the k-space buffer as
-          * in most cases the reduction will be combinded with a transformation.
-          * The orginal Wavefunction must not be affected by this operation.
+          * in most cases the reduction will be combined with a transformation.
+          * The original Wavefunction must not be affected by this operation.
           */
          virtual void Reduce(double tolerance) = 0;
          

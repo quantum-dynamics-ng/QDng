@@ -5,6 +5,7 @@
 #ifdef _OPENMP
    #include <omp.h>
 #endif
+#include "mpi.h"
 
 namespace QDLIB {
    
@@ -95,6 +96,9 @@ namespace QDLIB {
     */
    void Logger::FileOutput(string & filename)
    {
+#ifdef HAVE_MPI
+      if (MPI::COMM_WORLD.Get_rank() != 0) return;
+#endif
       _ofile.open(filename.c_str());
       if( _ofile.fail() ) {
 	 string msg;
@@ -110,6 +114,9 @@ namespace QDLIB {
     */
    void Logger::FileClose()
    {
+#ifdef HAVE_MPI
+      if (MPI::COMM_WORLD.Get_rank() != 0) return;
+#endif
       flush();
       _ofile.close();
       _global_out = &std::cout;
@@ -166,11 +173,17 @@ namespace QDLIB {
     */
    void Logger::flush()
    {
+<<<<<<< HEAD
 #ifdef _OPENMP
       /* Ensure that buffer flushing is done only once */
 #pragma omp single
 #endif
       {
+         if (MPI::COMM_WORLD.Get_rank() != 0){ /* Only root can print */
+            _sout->str("");
+            _soutdbg->str("");
+            return;
+         }
          if (_supress)
          {
             _sout->str("");
