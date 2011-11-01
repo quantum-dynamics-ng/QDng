@@ -27,12 +27,13 @@ void VectorTest::API_Test_SingleStride()
    CPPUNIT_ASSERT(d1.strides() == 1);
    CPPUNIT_ASSERT(d1.sizeBytes() == VEC_TEST_SIZE * sizeof(double));
    
-   dVec d2(VEC_TEST_SIZE, true);
+   dVec d2(VEC_TEST_SIZE);
    CPPUNIT_ASSERT(d2.size() == VEC_TEST_SIZE);
    CPPUNIT_ASSERT(d2.strides() == 1);
    CPPUNIT_ASSERT(d2.sizeBytes() == VEC_TEST_SIZE * sizeof(double));
    
-   dVec d3(VEC_TEST_SIZE, true, 5);
+   dVec d3(VEC_TEST_SIZE);
+   d3 = 5.;
    CPPUNIT_ASSERT(d3.size() == VEC_TEST_SIZE);
    CPPUNIT_ASSERT(d3.strides() == 1);
    CPPUNIT_ASSERT(d3.sizeBytes() == VEC_TEST_SIZE * sizeof(double));

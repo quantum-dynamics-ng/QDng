@@ -23,7 +23,7 @@
     * Exponentiate elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void ExpElements(cVec *A, cVec *B, dcomplex c)
    {
@@ -34,7 +34,10 @@
       dcomplex *b=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -53,7 +56,7 @@
     * Exponentiate elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
        */
    inline void ExpElements(cVec *A, dVec *B, dcomplex c)
    {
@@ -64,7 +67,10 @@
       double *b=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -83,7 +89,7 @@
     * Add vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void AddElementsEq(cVec *C, cVec *A, cVec *B)
    {
@@ -96,7 +102,10 @@
 
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -116,7 +125,7 @@
     * Add vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void AddElements(cVec *A, cVec *B)
    {
@@ -127,7 +136,10 @@
       dcomplex *b;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -157,7 +169,7 @@
     * Add vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void AddElements(cVec *A, cVec *B, double d)
    {
@@ -168,7 +180,10 @@
       dcomplex *b;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -198,7 +213,7 @@
     * Add up vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void AddElements(cVec *A, cVec *B, dcomplex c)
    {
@@ -209,7 +224,10 @@
       dcomplex *b;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -245,7 +263,7 @@
     * \param d    Scale the whole vector by d
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElementsComplexEq(cVec *C ,cVec *A, dVec *B, double d)
    {
@@ -259,7 +277,10 @@
       dcomplex comp(0,0);
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -283,7 +304,7 @@
     * \param d    Scale the whole vector by d
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
    */
    inline void MultElementsComplex(cVec *C ,cVec *A, dVec *B, double d)
    {
@@ -297,7 +318,10 @@
       dcomplex comp(0,0);
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -338,7 +362,7 @@
     * \param d    Scale the whole vector by d
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
    */
    inline void MultElementsConjugate(cVec *C ,cVec *A, cVec *B, double d)
    {
@@ -352,7 +376,10 @@
       dcomplex comp(0,0);
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -375,7 +402,7 @@
     * \param d    Scale the whole vector by d
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
        */
    inline void MultElementsConjugate(cVec *A, cVec *B, double d)
    {
@@ -388,7 +415,10 @@
       dcomplex comp(0,0);
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -409,7 +439,7 @@
     * \param d    Scale the whole vector by d
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
        */
    inline void MultElementsComplex(cVec *A, dVec *B, double d)
    {
@@ -422,7 +452,10 @@
       dcomplex comp(0,0);
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -457,7 +490,7 @@
     * \param d    Scale the whole vector by d
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
        */
    inline void MultElementsComplex(cVec *A, cVec *B, double d)
    {
@@ -470,7 +503,10 @@
       dcomplex comp(0,0);
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -502,7 +538,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *A, cVec *B)
    {
@@ -513,7 +549,10 @@
       dcomplex *b=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -533,7 +572,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElementsCopy(cVec *C, cVec *A, cVec *B)
    {
@@ -545,7 +584,10 @@
       dcomplex *c=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -577,7 +619,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
        */
    inline void MultElementsCopy(cVec *C, cVec *A, cVec *B, double d)
    {
@@ -589,7 +631,10 @@
       dcomplex *c=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -610,7 +655,7 @@
     * Multiply vectors by elements.
     *
     * You strongly encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
 /*   inline void MultElements(Vector<double> *A, Vector<double> *B)
    {
@@ -635,7 +680,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *A, dVec *B)
    {
@@ -647,7 +692,10 @@
 
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -680,7 +728,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *A, cVec *B, double c)
    {
@@ -692,7 +740,10 @@
 
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -725,7 +776,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *A, dVec *B, double c)
    {
@@ -735,9 +786,11 @@
       dcomplex *a;
       double *b;
 
-
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -755,7 +808,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *C, cVec *A, dVec *B, double d)
    {
@@ -767,8 +820,10 @@
       double *b;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -802,7 +857,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
        */
    inline void MultElements(cVec *C, cVec *A, dVec *B)
    {
@@ -815,8 +870,10 @@
 
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -852,7 +909,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *A, dVec *B, dcomplex c)
    {
@@ -864,7 +921,10 @@
 
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -895,7 +955,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *A, double c)
    {
@@ -905,7 +965,10 @@
       dcomplex *a;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          lint i;
 #ifdef _OPENMP
@@ -922,7 +985,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(dVec *A, double c)
    {
@@ -931,7 +994,10 @@
 
       double *a;
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          lint i;
 #ifdef HAVE_SSE2
@@ -964,7 +1030,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElements(cVec *A, dcomplex c)
    {
@@ -974,7 +1040,10 @@
       dcomplex *a;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          lint i;
 #ifdef HAVE_SSE2
@@ -1003,7 +1072,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElementsCopy(cVec *A, cVec *B, double d)
    {
@@ -1014,7 +1083,10 @@
       dcomplex *b=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -1048,7 +1120,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElementsAdd(cVec *A, cVec *B, dcomplex c)
    {
@@ -1059,7 +1131,10 @@
       dcomplex *b=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -1092,7 +1167,7 @@
     * Multiply + Add vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElementsAdd(cVec *A, cVec *B, double d)
    {
@@ -1103,7 +1178,10 @@
       dcomplex *b=NULL;
 
       lint s;
-      for (s=0; s < strides; s++){
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          lint i;
@@ -1123,7 +1201,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
     */
    inline void MultElementsCopy(cVec *C, cVec *A, dcomplex d)
    {
@@ -1134,8 +1212,10 @@
       dcomplex *c;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          c = C->begin(s);
          lint i;
@@ -1165,7 +1245,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
        */
    inline void MultElementsCopy(cVec *C, cVec *A, dVec *B)
    {
@@ -1177,8 +1257,10 @@
       dcomplex *c;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -1197,7 +1279,7 @@
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
-    * parallelistation will be done here.
+    * parallelisation will be done here.
           */
    inline void MultElementsCopy(cVec *C, cVec *A, dVec *B, double d)
    {
@@ -1209,8 +1291,10 @@
       dcomplex *c;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
@@ -1251,8 +1335,10 @@
       dcomplex *a;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          lint i;
 #ifdef _OPENMP
@@ -1277,8 +1363,10 @@
       dcomplex *c;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          c = C->begin(s);
          lint i;
@@ -1304,8 +1392,10 @@
       dcomplex *a;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          lint i;
 #ifdef _OPENMP
@@ -1330,8 +1420,10 @@
       dcomplex *c;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          c = C->begin(s);
          lint i;
@@ -1358,8 +1450,10 @@
       double *c;
 
       lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
 
-      for (s=0; s < strides; s++){
+      for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          c = C->begin(s);
          lint i;

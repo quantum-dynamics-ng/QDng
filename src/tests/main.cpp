@@ -7,10 +7,18 @@
 
 #include "ComplexNumbers.h"
 
+#ifdef HAVE_MPI
+#include "mpi.h"
+#endif
+
 using namespace std;
 int
 main( int argc, char* argv[] )
 {
+#ifdef HAVE_MPI
+   MPI::Init();
+#endif
+
   // Create the event manager and test controller
    CPPUNIT_NS::TestResult controller;
 
@@ -32,6 +40,9 @@ main( int argc, char* argv[] )
    CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
    outputter.write();
 
+#ifdef HAVE_MPI
+   MPI::Finalize();
+#endif
    return result.wasSuccessful() ? 0 : 1;
 }
 

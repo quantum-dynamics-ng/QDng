@@ -155,7 +155,6 @@ namespace QDLIB
       }
    }
    
-   /** \todo Diagonalize Matrix => allow large couplings with Cheby */
    dcomplex OMultistate::Emax()
    {
       dMat Mmax;
@@ -207,19 +206,22 @@ namespace QDLIB
       
       _buf1->Reaquire();
 
-      *((cVec*) dPsi) = dcomplex(0,0);
-      
-      for(int i=0; i< _nstates; i++){ 
-	 for(int j=0; j< _nstates; j++){
-	    if (_matrix[i][j] != NULL){
-	       _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
-	       AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
-	    } else if (i==j && _unity) { /* Diagonal without operator means 1 */
+      sourcePsi->SyncStrides();
+
+      *((cVec*) dPsi) = dcomplex(0, 0);
+      int rank = sourcePsi->MPIrank();
+      int msize = sourcePsi->MPIsize();
+      for (int i = rank; i < _nstates; i += msize) {
+         for (int j = 0; j < _nstates; j++) {
+            if (_matrix[i][j] != NULL) {
+               _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
+               AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
+            } else if (i == j && _unity) { /* Diagonal without operator means 1 */
                AddElements((cVec*) (dPsi->State(i)), (cVec*) (psi->State(j)));
             }
-	 }
+         }
       }
-
+      //dPsi->SyncStrides();
       _buf1->Retire();
    }
 
@@ -241,10 +243,13 @@ namespace QDLIB
       dPsi = dynamic_cast<WFMultistate*>(destPsi);
       _buf1->Reaquire();
 
+      sourcePsi->SyncStrides();
       
       *((cVec*) dPsi) = dcomplex(0,0);
       
-      for(int i=0; i< _nstates; i++){ 
+      int rank = sourcePsi->MPIrank();
+      int msize = sourcePsi->MPIsize();
+      for (int i = rank; i < _nstates; i += msize) {
          for(int j=0; j< _nstates; j++){
             if (_matrix[i][j] != NULL){
                _matrix[i][j]->ApplyParent(_buf1->State(i), psi->State(j));

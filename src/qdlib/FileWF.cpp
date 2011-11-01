@@ -101,7 +101,7 @@ namespace QDLIB {
       }
 #else
       if (zlibmagic == lastbytes)
-         throw (EIncompatible ("Reading of compressed wave functions is not supported. Please recompile with bzip2 support") );
+         throw (EIncompatible ("Reading of zlib compressed wave functions is not supported. Please recompile with zlib support") );
 #endif
 
 #ifdef HAVE_LIBBZ2
@@ -111,7 +111,7 @@ namespace QDLIB {
       }
 #else
       if (bzipmagic == lastbytes)
-         throw (EIncompatible ("Reading of compressed wave functions is not supported. Please recompile with bzip2 support") );
+         throw (EIncompatible ("Reading of bzip compressed wave functions is not supported. Please recompile with bzip2 support") );
 #endif
       if (FileSize() < data->sizeBytes()&& !runcomp)  /* Check if size OK if using uncompressed WF*/
          throw(EIOError("WaveFunction truncated!"));
@@ -371,6 +371,7 @@ namespace QDLIB {
       
       if (classname == "WFMultistate"){ /* Excplicit Multistate handling */
          WFMultistate *wfm = new WFMultistate();
+         /** \todo register WF with collector? */
          
          int states;
          p.GetValue("states", states); /* Grab the states from params. wfm->Init() must be executed after wfm->Add() ! */
@@ -378,7 +379,10 @@ namespace QDLIB {
             throw ( EParamProblem("Init from meta file: Invalid number of states", wfm->States()) );
          
          int counter = Counter();
-         for (int i=0; i < states; i++){ /* Loop over States */
+         int rank =  MPI::COMM_WORLD.Get_rank();
+         int msize = MPI::COMM_WORLD.Get_size();
+
+         for (int i=rank; i < states; i +=msize ){/* Loop over states */
             Counter(counter);    /* Every ReadFile() increases counter => restore it when using it diff. states */
             stringstream ss;
             ss << "-" << i;
@@ -452,7 +456,7 @@ namespace QDLIB {
         
          string basename = _name;
          int counter = Counter();
-         for (int i=0; i < wfm->States(); i++){
+         for (int i=wfm->MPIrank(); i < wfm->States(); i+=wfm->MPIsize()){
             Counter(counter);    /* Every WriteFile() increases counter => restore it when using it diff. states */
             stringstream ss;
             ss << "-" << i;
@@ -461,10 +465,12 @@ namespace QDLIB {
          }
          _name = basename; /* We modfied the name => switch back to original */
          /* Write meta file for Multistate container */
-         ParamContainer p;
-         p = wfm->Params();
-         p.SetValue("CLASS", wfm->Name() );
-         WriteMeta(p);
+         if (wfm->MPIrank() == 0){
+            ParamContainer p;
+            p = wfm->Params();
+            p.SetValue("CLASS", wfm->Name() );
+            WriteMeta(p);
+         }
       } else { /* Write single file */
 #if defined(HAVE_LIBZ) || defined(HAVE_LIBBZ2)
          /* Compression */
@@ -493,7 +499,7 @@ namespace QDLIB {
    void operator>>(FileWF &file,  WaveFunction *data)
    {
       if (data == NULL)
-	 throw EIncompatible("Can't WF read into NULL pointer");
+         throw EIncompatible("Can't WF read into NULL pointer");
 	       
       file.ReadFile(data);
    }

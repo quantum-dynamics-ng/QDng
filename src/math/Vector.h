@@ -29,6 +29,10 @@
 #include <cmath>
 #include <string.h>
 
+#ifdef HAVE_MPI
+#include "mpi.h"
+#endif
+
 #include "tools/Memory.h"
 
 using namespace std;
@@ -74,13 +78,17 @@ class Vector
 
     size_type nstrides_;
     size_type stride_size_;
-    
-    bool isRef_;
-    
-    bool align_;
-    // internal helper function to create the array
-    // of row pointers
 
+    bool isRef_;
+
+    int _mpirank;
+    int _mpisize;
+
+#ifdef HAVE_MPI
+    MPI::Intracomm *_comm;
+#endif
+    
+    
     /**
      * Initialize/allocate memory for the vector.
      * 
@@ -89,9 +97,12 @@ class Vector
      */
     void initialize(lint N, lint strides)
     {
-      // adjust pointers so that they are 1-offset:
-      // v_[] is the internal contiguous array, it is still 0-offset
-      
+#ifdef HAVE_MPI
+       if (_comm != NULL){
+          _mpirank = _comm->Get_rank();
+          _mpisize = _comm->Get_size();
+       }
+#endif
       nstrides_ = strides;
       stride_size_ = N / strides;
       n_ = N;
@@ -218,8 +229,6 @@ class Vector
 
                stride_size_ = vec.stride_size_;
                isRef_ = true;
-               align_ = false;
-
             }
             if (nstrides_ <= dest + 1)
                nstrides_ = dest + 1;
@@ -286,6 +295,48 @@ class Vector
              }
           }
 
+       }
+
+       /**
+        * Returns the rank in the stride distribution.
+        */
+       int MPIrank()
+       {
+          return _mpirank;
+       }
+
+       /**
+        * Returns the number of procs over which the strides are distributed.
+        */
+       int MPIsize()
+       {
+          return _mpisize;
+       }
+
+#ifdef HAVE_MPI
+       /**
+        * Returns the communicator over which the strides are spread.
+        *
+        * \return NULL the vector is pure local.
+        */
+       MPI::Intracomm* GetComm()
+       {
+          return _comm;
+       }
+#endif
+       /**
+        * Sync Strides between processes.
+        *
+        * The strides of the local rank are broadcasted to all other ranks.
+        * Function is empty if mpi is not used.
+        */
+       void SyncStrides()
+       {
+#ifdef HAVE_MPI
+          for (int s=0; s < nstrides_; s++){
+             MPI::COMM_WORLD.Bcast( (void*) v_[s], sizeof(T) * stride_size_, MPI_BYTE, s % _mpisize);
+          }
+#endif
        }
     
    /**
@@ -356,61 +407,100 @@ class Vector
 
     // constructors
 
-    Vector() : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
+    Vector() : n_(0),
+               nstrides_(1),
+               stride_size_(0),
+               isRef_(false),
+               _mpirank(0),
+               _mpisize(1)
+#ifdef HAVE_MPI
+              ,_comm(NULL)
+#endif
     {
        initialize(n_, nstrides_);
     }
 
     
-    Vector(const Vector<T> &A) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
+    Vector(const Vector<T> &A) : n_(0),
+                                 nstrides_(1),
+                                 stride_size_(0),
+                                 isRef_(false),
+                                 _mpirank(0),
+                                 _mpisize(1)
+#ifdef HAVE_MPI
+                                 , _comm(NULL)
+#endif
     {
        initialize(A.n_, A.nstrides_);
         copy(A.v_);
     }
    
-    Vector(lint N) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
+    Vector(lint N) : n_(0),
+                     nstrides_(1),
+                     stride_size_(0),
+                     isRef_(false),
+                     _mpirank(0),
+                     _mpisize(1)
+#ifdef HAVE_MPI
+                    ,_comm(NULL)
+#endif
     {
        initialize(N, nstrides_);
     }
     
-    Vector(lint N, lint strides) : n_(0), nstrides_(0), stride_size_(0), isRef_(false), align_(true)
+    Vector(lint N, lint strides) : n_(0),
+                                   nstrides_(0),
+                                   stride_size_(0),
+                                   isRef_(false),
+                                   _mpirank(0),
+                                   _mpisize(1)
+#ifdef HAVE_MPI
+                                   ,_comm(NULL)
+#endif
     {
        initialize(N, strides);
     }
-
     
-    Vector(lint N, const bool align) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(align)
-    {
-       initialize(N, nstrides_);
-    }
-    
-    Vector(lint N, const bool align, const T& value) : n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(align)
+    Vector(lint N, const T& value) : n_(0),
+                                     nstrides_(1),
+                                     stride_size_(0),
+                                     isRef_(false),
+                                     _mpirank(0),
+                                     _mpisize(1)
+#ifdef HAVE_MPI
+                                     ,_comm(NULL)
+#endif
     {
         initialize(N, nstrides_);
         set(value);
     }
 
-    Vector(lint N, lint strides, const T** v) :  n_(N), nstrides_(strides), stride_size_(0), isRef_(false), align_(true)
+    Vector(lint N, lint strides, const T** v) :  n_(N),
+                                                 nstrides_(strides),
+                                                 stride_size_(0),
+                                                 isRef_(false),
+                                                 _mpirank(0),
+                                                 _mpisize(1)
+#ifdef HAVE_MPI
+                                                 ,_comm(NULL)
+#endif
     {
         initialize(N, strides);
         copy(v);
     }
 
-    Vector(lint N, const T* v) :  n_(0), nstrides_(1), stride_size_(0), isRef_(false), align_(true)
+    Vector(lint N, const T* v) :  n_(0),
+                                  nstrides_(1),
+                                  stride_size_(0),
+                                  isRef_(false),
+                                  _mpirank(0),
+                                  _mpisize(1)
+#ifdef HAVE_MPI
+                                  ,_comm(NULL)
+#endif
     {
        initialize(N, nstrides_);
        copy(v);
-    }
-
-
-    /**
-     * Turn on data alignment.
-     * 
-     * This works only for non-class type
-     */
-    void Align()
-    {
-       align_ = true;
     }
     
     /**
@@ -431,9 +521,17 @@ class Vector
      * 
      * \param N   Total size
      * \param s   Number of strides
+     * \param comm Intracommunicator for stride split.
      */
+#ifdef HAVE_MPI
+    Vector<T>& newsize(lint N, lint s, MPI::Intracomm* comm = NULL)
+    {
+       _comm = comm;
+#else
     Vector<T>& newsize(lint N, lint s)
     {
+#endif
+
        if (n_ == N && nstrides_ == s) return *this;
 
        destroy();

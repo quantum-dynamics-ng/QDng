@@ -1,6 +1,11 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
+
+#ifdef HAVE_MPI
+#include "mpi.h"
+#endif
+
 #include "Getopt.h"
 
 
@@ -128,6 +133,9 @@ namespace QDLIB {
    */
    void Getopt::ShowHelp()
    {
+#ifdef HAVE_MPI
+      if (MPI::COMM_WORLD.Get_rank() != 0) return;
+#endif
       /* Header */
       cerr << endl;
       cerr << _description  << endl;

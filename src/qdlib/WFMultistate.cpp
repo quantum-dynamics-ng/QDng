@@ -123,12 +123,18 @@ namespace QDLIB
       _params.SetValue("states", _nstates);
       
       /* Link states into our vector space */
+
+#ifdef HAVE_MPI
+      cVec::newsize(0, _nstates, &MPI::COMM_WORLD);
+#else
       cVec::newsize(0,_nstates);
+#endif
       for (int i=0; i < _nstates; i++){
          if (! cVec::StrideRef(*((cVec*) (_states[i])), 0, i))
          throw(Exception("Stride Failure"));
       }
       
+      SyncStrides();
    }
 
    const string & WFMultistate::Name( )
@@ -140,18 +146,25 @@ namespace QDLIB
    {
       dcomplex d=0;
       
-      for(lint i=0; i < _nstates; i++){
-	 d += *(_states[i]) * _states[i];
+      for(lint i=MPIrank(); i < _nstates; i += MPIsize()){
+         d += *(_states[i]) * _states[i];
       }
       
+#ifdef HAVE_MPI
+      if (GetComm() != NULL){
+         double sum;
+         GetComm()->Allreduce(&(d._real), &sum, 1, MPI::DOUBLE, MPI::SUM);
+         d._real = sum;
+      }
+#endif
       return sqrt(d.real());
    }
 
    void WFMultistate::Normalize( )
    {
       double norm=Norm();
-      for(lint i=0; i < _nstates; i++){
-	 MultElements( (cVec*) _states[i] , 1/norm );
+      for(lint i=MPIrank(); i < _nstates; i += MPIsize()){
+         MultElements( (cVec*) _states[i] , 1/norm );
       }
    }
 
@@ -181,12 +194,18 @@ namespace QDLIB
       psi = dynamic_cast<WFMultistate*>(Psi);
       
       if (psi == NULL)
-	 throw( EIncompatible("Not a Multistate wave function", Psi->Name()) ) ;
+         throw( EIncompatible("Not a Multistate wave function", Psi->Name()) ) ;
       
-      for(lint i=0; i < _nstates; i++){
-	 c += *(_states[i]) * psi->_states[i];
+      for(lint i=MPIrank(); i < _nstates; i+=MPIsize()){
+         c += *(_states[i]) * psi->_states[i];
       }
-      
+#ifdef HAVE_MPI
+      dcomplex sum(0);
+      if (GetComm() != NULL){
+         GetComm()->Allreduce(&c, &sum, 1, MPIdcomplex::Instance(), MPI::SUM);
+         c = sum;
+      }
+#endif
       return c;
    }
    

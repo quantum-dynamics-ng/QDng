@@ -31,6 +31,8 @@
 #include "ProgEigen.h"
 #include "ProgOCT.h"
 
+#include "mpi.h"
+
 using namespace std;
 using namespace QDLIB;
 
@@ -119,6 +121,10 @@ int main(int argc, char **argv)
    
    int retval = EXIT_SUCCESS;
    
+#ifdef HAVE_MPI
+   MPI::Init();
+#endif
+
    Logger& log = Logger::InstanceRef();
    ParamContainer& gp = GlobalParams::Instance();
    
@@ -377,5 +383,10 @@ int main(int argc, char **argv)
    }
   
   log.Close();
+
+#ifdef HAVE_MPI
+   MPI::Finalize();
+#endif
+
   exit(retval);
 }
