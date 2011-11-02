@@ -7,8 +7,13 @@
  *      Author: markus
  */
 
+#ifdef HAVE_MPI
 #include <mpi.h>
+#endif
 #include "config.h"
+#ifdef HAVE_MPI
+#include <mpi.h>
+#endif
 #include "tools/Logger.h"
 #include "qdlib/WFLevel.h"
 #include "qdlib/WFMultistate.h"

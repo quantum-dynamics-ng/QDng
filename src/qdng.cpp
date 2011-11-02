@@ -31,7 +31,9 @@
 #include "ProgEigen.h"
 #include "ProgOCT.h"
 
+#ifdef HAVE_MPI
 #include "mpi.h"
+#endif
 
 using namespace std;
 using namespace QDLIB;

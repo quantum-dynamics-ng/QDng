@@ -42,6 +42,8 @@ namespace QDLIB
 	 virtual dcomplex Emin();
 	 
 	 virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
+
+	 virtual void ApplyAdd(WaveFunction *destPsi, WaveFunction *sourcePsi);
 	
 	 virtual void Apply(WaveFunction *Psi);
 	 

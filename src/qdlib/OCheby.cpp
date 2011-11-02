@@ -76,8 +76,7 @@ namespace QDLIB
 
       ket0->FastCopy(*Psi); /* phi_0 */
 
-      ket1->FastCopy(*Psi);
-      H->Apply(ket1);
+      H->Apply(ket1, Psi);
       H->RecalcInternals(false); /* Non-linear operator should not recalulate internal WF specfic values until end of recursion */
 
       AddElements((cVec*) ket1, (cVec*) Psi, -1 * _offset); /* Offset*/

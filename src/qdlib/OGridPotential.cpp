@@ -107,7 +107,13 @@ namespace QDLIB
    {
       MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
    }
-	 
+
+   void OGridPotential::ApplyAdd(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   {
+      MultElementsAdd((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
+   }
+
+
    void OGridPotential::Apply(WaveFunction *Psi)
    {
       MultElements((cVec*) Psi, (dVec*) this);

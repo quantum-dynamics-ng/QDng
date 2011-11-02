@@ -204,8 +204,6 @@ namespace QDLIB
       psi = dynamic_cast<WFMultistate*>(sourcePsi);
       dPsi = dynamic_cast<WFMultistate*>(destPsi);
       
-      _buf1->Reaquire();
-
       psi->SyncStrides();
 
       *((cVec*) dPsi) = dcomplex(0, 0);
@@ -215,14 +213,12 @@ namespace QDLIB
       for (int i = rank; i < _nstates; i += msize) {
          for (int j = 0; j < _nstates; j++) {
             if (_matrix[i][j] != NULL) {
-               _matrix[i][j]->Apply(_buf1->State(i), psi->State(j));
-               AddElements((cVec*) (dPsi->State(i)), (cVec*) (_buf1->State(i)));
+               _matrix[i][j]->ApplyAdd(dPsi->State(i), psi->State(j));
             } else if (i == j && _unity) { /* Diagonal without operator means 1 */
                AddElements((cVec*) (dPsi->State(i)), (cVec*) (psi->State(j)));
             }
          }
       }
-      _buf1->Retire();
    }
 
 

@@ -60,7 +60,7 @@ namespace QDLIB {
 
       private:
          bool _recalc; /* Indicates if operator internal should be recalculted or not. */
-         WaveFunction *_buf;
+         WaveFunction *_buf, *_buf1;
       protected:
 	 /**
           * Parameter storage for the implementation.
@@ -83,12 +83,13 @@ namespace QDLIB {
          virtual ~Operator()
          {
             DELETE_WF(_buf);
+            DELETE_WF(_buf1);
          }
          
 	 /**
 	  * Standard constructor
 	  */
-         Operator() : _recalc(true), _buf(NULL), _isTimedependent(false), clock(NULL)
+         Operator() : _recalc(true), _buf(NULL), _buf1(NULL), _isTimedependent(false), clock(NULL)
 	 {
          }
 	  
@@ -228,16 +229,32 @@ namespace QDLIB {
 	  */
 	 virtual void Apply(WaveFunction *Psi) = 0;
 	 	 
-         /**
-          * Use the Apply method of the parent operator.
-          * 
-          * This is needed for the OCT-Coupling operator.
-          */
-         virtual void ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
-         {
-            Apply(destPsi, sourcePsi);
-         }
-         
+    /**
+     * Use the Apply method of the parent operator.
+     *
+     * This is needed for the OCT-Coupling operator.
+     */
+    virtual void ApplyParent(WaveFunction *destPsi, WaveFunction *sourcePsi)
+    {
+       Apply(destPsi, sourcePsi);
+    }
+
+    /**
+     * Apply operator to wavefunction and add to destPsi.
+     *
+     * This method is for optimization purposes.
+     */
+    virtual void ApplyAdd(WaveFunction *destPsi, WaveFunction *sourcePsi)
+    {
+       if (_buf1 == NULL) _buf1 = sourcePsi->NewInstance();
+       else _buf1->Reaquire();
+
+       Apply(_buf1, sourcePsi);
+       AddElements(destPsi, _buf1);
+
+       _buf1->Retire();
+    }
+
 	 /**
 	  * Copy operator.
 	  */

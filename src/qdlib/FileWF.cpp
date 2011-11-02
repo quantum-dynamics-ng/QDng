@@ -379,9 +379,12 @@ namespace QDLIB {
             throw ( EParamProblem("Init from meta file: Invalid number of states", wfm->States()) );
          
          int counter = Counter();
+#ifdef HAVE_MPI
          int rank =  MPI::COMM_WORLD.Get_rank();
          int msize = MPI::COMM_WORLD.Get_size();
-
+#else
+         int rank = 0; int msize = 1;
+#endif
          for (int i=rank; i < states; i +=msize ){/* Loop over states */
             Counter(counter);    /* Every ReadFile() increases counter => restore it when using it diff. states */
             stringstream ss;

@@ -44,6 +44,12 @@ namespace QDLIB {
       MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, (-1) * GetLaser()->Get());
    }
 
+   void OGridDipole::ApplyAdd(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   {
+      MultElementsAdd((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, (-1) * GetLaser()->Get());
+   }
+
+
    void OGridDipole::Apply(WaveFunction *Psi)
    {
       MultElements((cVec*) Psi, (dVec*) this, (-1) * GetLaser()->Get());

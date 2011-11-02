@@ -2,7 +2,9 @@
 
 #include "Exception.h"
 
+#ifdef HAVE_MPI
 #include "mpi.h"
+#endif
 
 namespace QDLIB {
    

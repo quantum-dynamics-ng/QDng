@@ -1198,6 +1198,83 @@ namespace QDLIB {
    }
 
    /**
+    * Multiply + Add vectors by elements.
+    *
+    * A += B * C
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelisation will be done here.
+    */
+   inline void MultElementsAdd(cVec *A, cVec *B, dVec *C)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+
+      dcomplex *a=NULL;
+      dcomplex *b=NULL;
+      double *c=NULL;
+
+      lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
+         a = A->begin(s);
+         b = B->begin(s);
+         c = C->begin(s);
+         lint i;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i)
+#endif
+         for (i=0; i < size; i++){
+            {
+               a[i] += b[i] * c[i];
+            }
+         }
+      }
+
+   }
+
+
+   /**
+    * Multiply + Add vectors by elements.
+    *
+    * A += B * C * d
+    * You strongly to encouraged to use this, since all optimizations and
+    * parallelisation will be done here.
+    */
+   inline void MultElementsAdd(cVec *A, cVec *B, dVec *C, double d)
+   {
+      lint size = A->lsize();
+      lint strides = A->strides();
+
+      dcomplex *a=NULL;
+      dcomplex *b=NULL;
+      double *c=NULL;
+
+      lint s;
+      int rank = A->MPIrank();
+      int msize = A->MPIsize();
+
+      for (s=rank; s < strides; s +=msize ){
+         a = A->begin(s);
+         b = B->begin(s);
+         c = C->begin(s);
+         lint i;
+#ifdef _OPENMP
+#pragma omp parallel for default(shared) private(i)
+#endif
+         for (i=0; i < size; i++){
+            {
+               a[i] += b[i] * c[i] * d;
+            }
+         }
+      }
+
+   }
+
+
+
+   /**
     * Multiply vectors by elements.
     *
     * You strongly to encouraged to use this, since all optimizations and
