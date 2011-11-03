@@ -101,6 +101,9 @@ namespace QDLIB
          int s, j;
          int rank = Psi->MPIrank();
          int msize = Psi->MPIsize();
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(s,j,k0,k1,k2,bf,psi)
+#endif
          for (s = rank; s < strides; s += msize) {
             k2 = ket2->begin(s);
             bf = buf->begin(s);
@@ -111,7 +114,7 @@ namespace QDLIB
             m128dc vk2, vbf, vk0, vk1, vpsi, v_o(_offset), v_exp2(exp2), v_coeff(coeff);
             m128dd v_s(1/_scaling);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(j,vk2, vbf, vk0, vk1, vpsi)
+#pragma omp parallel for schedule(static) default(shared) private(j,vk2, vbf, vk0, vk1, vpsi)
 #endif
             for(j=0; j< size; j++) {
                vbf = bf[j];
@@ -135,7 +138,7 @@ namespace QDLIB
          }
 #else
 #ifdef _OPENMP    
-#pragma omp parallel for default(shared) private(j)
+#pragma omp parallel for schedule(static) default(shared) private(j)
 #endif
             for (j = 0; j < size; j++) {
                bf[j] = (bf[j] - _offset * k1[j]) / _scaling; /* Offset + Scaling */

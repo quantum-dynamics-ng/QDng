@@ -135,11 +135,11 @@ fi
 
 AC_ARG_ENABLE([sse2],
 	      [AS_HELP_STRING([--enable-sse2],[Explictly enable SSE2 optimizations])],
-	      [enable_sse2 = "xyes" ; AC_DEFINE([HAVE_SSE2], [1], [Explictly enable SSE2 optimizations])])
+	      [enable_sse2 = yes; AC_DEFINE([HAVE_SSE2], [1], [Explictly enable SSE2 optimizations])])
 	      
 AC_ARG_ENABLE([sse3],
 	      [AS_HELP_STRING([--enable-sse2],[Explictly enable SSE3 optimizations])],
-	      [enable_sse3 = "xyes" ; enable_sse2 = "xyes" ; OPT_FLAGS="$OPT_FLAGS -msse3" ; 
+	      [enable_sse3=yes; enable_sse2=yes; OPT_FLAGS="$OPT_FLAGS -msse3" ; 
 	          AC_DEFINE([HAVE_SSE2], [1], [Explictly enable SSE2 optimizations])
 	          AC_DEFINE([HAVE_SSE3], [1], [Explictly enable SSE3 optimizations])])
 

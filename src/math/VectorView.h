@@ -120,7 +120,7 @@ namespace QDLIB
 	 lint i,j;
 	 
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,j)
+#pragma omp parallel for schedule(static) default(shared) private(i,j)
 #endif
 	 for (i=0; i < _dims[dim]; i++){ /* Loop over points in dim */
 	    _view[dim][i] = new T*[_nothers];
@@ -161,7 +161,7 @@ namespace QDLIB
    {
       lint i,j;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,j)
+#pragma omp parallel for schedule(static) default(shared) private(i,j)
 #endif
       for (i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
 	 for (j=0; j < _nothers; j++) /* Loop over other dim */
@@ -180,7 +180,7 @@ namespace QDLIB
    {
       lint i,j;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,j)
+#pragma omp parallel for schedule(static) default(shared) private(i,j)
 #endif
       for (i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
 	 for (j=0; j < _nothers; j++) /* Loop over other dim */
@@ -198,7 +198,7 @@ namespace QDLIB
    {
       lint i,j;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,j)
+#pragma omp parallel for schedule(static) default(shared) private(i,j)
 #endif
       for (i=0; i < _dims[_adim]; i++){ /* Loop over points in dim */
 	 for (j=0; j < _nothers; j++) /* Loop over other dim */

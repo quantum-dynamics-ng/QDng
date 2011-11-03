@@ -42,7 +42,7 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -75,7 +75,7 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -112,7 +112,7 @@ namespace QDLIB {
          lint i;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             c[i] = a[i] + b[i];
@@ -146,7 +146,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc va, vb;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -156,7 +156,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] += b[i];
@@ -191,7 +191,7 @@ namespace QDLIB {
          m128dc v;
          m128dd vd(d);
  #ifdef _OPENMP
- #pragma omp parallel for default(shared) private(i,v)
+ #pragma omp parallel for schedule(static) default(shared) private(i,v)
  #endif
          for (i=0; i < size; i++){
             v = m128dc(b[i]) * vd;
@@ -200,7 +200,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] += b[i] * d;
@@ -234,7 +234,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc va, vb, vc(c);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -244,7 +244,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] += b[i] * c;
@@ -286,7 +286,7 @@ namespace QDLIB {
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             c[i] = a[i] * (I * b[i]) * d;
@@ -330,7 +330,7 @@ namespace QDLIB {
          m128dc va,vc;
          m128dd vb,vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb,vc)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb,vc)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -343,7 +343,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             c[i] *= a[i] * I * b[i] * d;
@@ -385,7 +385,7 @@ namespace QDLIB {
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             c[i] = a[i].conj()  * b[i] * d;
@@ -423,7 +423,7 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] = a[i].conj() * b[i] * d;
@@ -463,7 +463,7 @@ namespace QDLIB {
          m128dc va;
          m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
             vb = b[i];
@@ -473,7 +473,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] = a[i] * I * b[i] * d;
@@ -514,7 +514,7 @@ namespace QDLIB {
 //         m128dc va, vb;
 //         m128dd vd(d);
 //#ifdef _OPENMP
-//#pragma omp parallel for default(shared) private(i, va, vb)
+//#pragma omp parallel for schedule(static) default(shared) private(i, va, vb)
 //#endif
 //         for (i=0; i < size; i++){
 //            va = a[i];
@@ -525,7 +525,7 @@ namespace QDLIB {
 //         }
 //#else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] = (a[i] * I) * b[i] * d;
@@ -557,7 +557,7 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -595,7 +595,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc vc, va, vb;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i, va, vc, vb)
+#pragma omp parallel for schedule(static) default(shared) private(i, va, vc, vb)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -605,7 +605,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             c[i] = a[i] * b[i];
@@ -640,7 +640,7 @@ namespace QDLIB {
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -702,7 +702,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc va, vb;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++)
          {
@@ -713,7 +713,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
 
          for (i=0; i < size; i++)
@@ -751,7 +751,7 @@ namespace QDLIB {
          m128dc va,vb;
          m128dd vc(c);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -762,7 +762,7 @@ namespace QDLIB {
 
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -795,7 +795,7 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -823,6 +823,9 @@ namespace QDLIB {
       int rank = A->MPIrank();
       int msize = A->MPIsize();
 
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(s,a,b,c)
+#endif
       for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
@@ -832,7 +835,7 @@ namespace QDLIB {
          m128dc va;
          m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,vc,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb,vd)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -843,7 +846,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -873,6 +876,9 @@ namespace QDLIB {
       int rank = A->MPIrank();
       int msize = A->MPIsize();
 
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(s,a,b,c)
+#endif
       for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
@@ -883,7 +889,7 @@ namespace QDLIB {
          m128dc va;
          m128dd vb;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++)
          {
@@ -894,7 +900,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -931,7 +937,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc va, vb, vc(c);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -941,7 +947,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -972,7 +978,7 @@ namespace QDLIB {
          a = A->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1002,21 +1008,24 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          __m128d vc = _mm_set1_pd(c);
-#ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
-#endif
          if (size % 2 == 0)
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(i)
+#endif
             for (i=0; i < size; i+=2){
                __m128d va = _mm_load_pd(&(a[i]));
                va = _mm_mul_pd(va, vc);
                _mm_store_pd( &(a[i]), va );
             }
          else
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(i)
+#endif
             for (i=0; i < size; i++)
                a[i] *= c;
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1049,7 +1058,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc va, vc(c);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va)
+#pragma omp parallel for schedule(static) default(shared) private(i,va)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1059,7 +1068,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1094,7 +1103,7 @@ namespace QDLIB {
          m128dc va,vb;
          m128dd vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
             vb = b[i];
@@ -1104,7 +1113,7 @@ namespace QDLIB {
 
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -1141,7 +1150,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc va,vb,vc(c);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -1152,7 +1161,7 @@ namespace QDLIB {
 
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             a[i] += c * b[i];
@@ -1186,7 +1195,7 @@ namespace QDLIB {
          b = B->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -1217,13 +1226,16 @@ namespace QDLIB {
       int rank = A->MPIrank();
       int msize = A->MPIsize();
 
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(s,a,b,c)
+#endif
       for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -1255,13 +1267,16 @@ namespace QDLIB {
       int rank = A->MPIrank();
       int msize = A->MPIsize();
 
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(s,a,b,c)
+#endif
       for (s=rank; s < strides; s +=msize ){
          a = A->begin(s);
          b = B->begin(s);
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             {
@@ -1299,7 +1314,7 @@ namespace QDLIB {
 #ifdef HAVE_SSE2
          m128dc vc,va,vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,vc,va)
+#pragma omp parallel for schedule(static) default(shared) private(i,vc,va)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -1308,7 +1323,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1343,7 +1358,7 @@ namespace QDLIB {
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1380,7 +1395,7 @@ namespace QDLIB {
          m128dc vc, va;
          m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i,vc,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,vc,va,vb)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
@@ -1390,7 +1405,7 @@ namespace QDLIB {
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1419,7 +1434,7 @@ namespace QDLIB {
          a = A->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1448,7 +1463,7 @@ namespace QDLIB {
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1476,7 +1491,7 @@ namespace QDLIB {
          a = A->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1505,7 +1520,7 @@ namespace QDLIB {
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {
@@ -1535,7 +1550,7 @@ namespace QDLIB {
          c = C->begin(s);
          lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++)
          {

@@ -141,7 +141,7 @@ class Vector
 	for (lint s=0; s < nstrides_; s++){
            lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
 	   for (i=0; i< stride_size_; i++)
             v_[s][i] = v[s][i];
@@ -153,7 +153,7 @@ class Vector
        for (lint s=0; s < nstrides_; s++){
           lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
 	  for (i=0; i< stride_size_; i++)
 	     v_[s][i] = v[i];
@@ -166,7 +166,7 @@ class Vector
        for (lint s=0; s < nstrides_; s++){
           lint i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
 	  for (i=0; i< stride_size_; i++){
 	     v_[s][i] = val;
@@ -382,7 +382,7 @@ class Vector
          /* no need to re-alloc */
          lint s;
 #ifdef _OPENMP  
-#pragma omp parallel for default(shared) private(s)
+#pragma omp parallel for schedule(static) default(shared) private(s)
 #endif
          for (s = _mpirank; s < nstrides_; s += _mpisize) {
             Memory::Copy( (char*) v_[s], (char*) A.v_[s], sizeof(T) * stride_size_);
@@ -561,7 +561,7 @@ class Vector
        for (lint s=0; s < nstrides_; s++){
 	  lint i;
 #ifdef _OPENMP    
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif	  
           for (i=0; i< stride_size_; i++){
              v_[s][i] *= scalar;

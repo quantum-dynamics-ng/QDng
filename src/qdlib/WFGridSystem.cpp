@@ -81,7 +81,7 @@ namespace QDLIB {
       
       int i;
 #ifdef _OPENMP
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
       for (i=0; i <  size; i++){
          /* cut down real & imag seperately */
