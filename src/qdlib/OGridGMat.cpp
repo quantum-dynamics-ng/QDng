@@ -275,6 +275,57 @@ namespace QDLIB {
       buf->Retire();
    }
 
+   void OGridGMat::ApplyAdd(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   {
+      /* Make a copy from Psi */
+      for (int i = 0; i < GridSystem::Dim(); i++) {
+         _wfbuf[i]->Reaquire();
+         _wfbuf[i]->FastCopy(*sourcePsi);
+      }
+
+      buf->Reaquire();
+
+      lint i;
+      for (i = 0; i < _size; i++) { /* Loop over dims*/
+         /* d/dx from WF */
+         _FFT.Forward(_wfbuf[i], i);
+         MultElementsComplex((cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(GridSystem::DimSize(i)));
+         _FFT.Backward(_wfbuf[i], i);
+
+         for (lint j = 0; j < _size; j++) {
+            if ((i == j) | _KinCoup) { /* Kinetic coupling ?*/
+               buf->FastCopy(*(_wfbuf[i]));
+               /* Multiply Gmatrix element */
+               if (_GmatC[i][j] != 0) { /* Constant G-Element*/
+                  /* d/dx from G* d/dx WF */
+                  _FFT.Forward(buf, j);
+                  MultElementsComplex((cVec*) buf, (dVec*) &(_kspace[j]), -.5
+                           / double(GridSystem::DimSize(j)) * _GmatC[i][j]);
+                  _FFT.Backward(buf, j);
+
+               } else { /* Coordinate dependent lu*/
+                  if (j > i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
+                     MultElements((cVec*) buf, (dVec*) _Gmat[j][i]);
+                  else MultElements((cVec*) buf, (dVec*) _Gmat[i][j]);
+
+                  /* d/dx from G* d/dx WF */
+                  _FFT.Forward(buf, j);
+                  MultElementsComplex((cVec*) buf, (dVec*) &(_kspace[j]), -.5/ double(GridSystem::DimSize(j)));
+                  _FFT.Backward(buf, j);
+
+               }
+               *destPsi += buf;
+            }
+         }
+      }
+
+      for (int i = 0; i < GridSystem::Dim(); i++) {
+         _wfbuf[i]->Retire();
+      }
+      buf->Retire();
+   }
+
+
    void OGridGMat::Apply( WaveFunction * Psi )
    {
      
