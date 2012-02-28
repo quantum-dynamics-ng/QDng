@@ -64,7 +64,7 @@ pkglib_LTLIBRARIES = libget_wf_handle.la \
 	libinit_wf_file.la libwrite_wf_file.la libdelete_wf_handle.la \
 	libinit_wf_struct.la libwf_mod.la libget_all_wf_handle.la \
 	libinit_op.la libdelete_op_handle.la libapply_op.la  \
-	libexpec_op.la libget_all_op_handle.la libPeakFinder.la libQDParams.la \ 
+	libexpec_op.la libget_all_op_handle.la libPeakFinder.la libQDParams.la \
 	libQDReadMeta.la libQDWriteMeta.la
 
 pkglib_DATA = apply_op.m delete_wf_handle.m  get_all_op_handle.m  get_wf_handle.m  init_wf_file.m  wf_mod.m \

@@ -100,7 +100,6 @@ int main(int argc, char **argv)
    string fname, dir;
    
    time_t wall_time;
-   clock_t cpu_time;
    struct tms proc_time, proc_time_new;
    
    int retval = EXIT_SUCCESS;
@@ -288,7 +287,7 @@ int main(int argc, char **argv)
                } else {
                   throw(EParamProblem("Unknown definition type: ", opdefs->Name()));
                }
-               
+               O = O;
                log.IndentDec();
                opdefs->NextNode();
                log.cout() << endl;
@@ -305,7 +304,7 @@ int main(int argc, char **argv)
       
       /* Loop over program nodes */
       while (prognodes->EndNode()) {
-	 cpu_time = times(&proc_time);
+    wall_time = times(&proc_time);
 	 wall_time = time(NULL);
 	 progname = prognodes->Name();
 	 if (progname == "propa"){
@@ -338,7 +337,7 @@ int main(int argc, char **argv)
 	 log.cout().precision(0);
 	 log.cout() << "\nWall time: " << fixed << difftime(time(NULL), wall_time) << " s";
 	 
-	 cpu_time = times(&proc_time_new);
+	 wall_time = times(&proc_time_new);
 	 log.cout() << "\tCPU time: " << double(proc_time_new.tms_utime - proc_time.tms_utime)/double(sysconf(_SC_CLK_TCK)) << " s";
 	 log.cout() << "\tSYS time: " << double(proc_time_new.tms_stime - proc_time.tms_stime)/double(sysconf(_SC_CLK_TCK)) << " s \n\n";
 	 

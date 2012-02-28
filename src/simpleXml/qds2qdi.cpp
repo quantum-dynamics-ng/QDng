@@ -30,7 +30,6 @@ int main(int argc, char** argv)
 {
    Getopt cmdline;
    string fname;
-   bool series;
    int retval = EXIT_SUCCESS;
 
    PrepareCmdline(cmdline);

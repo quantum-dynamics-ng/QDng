@@ -51,7 +51,7 @@ namespace QDLIB {
          /** Set momentum mode */
          void Momentum(bool on) { _momentum = on; }
          /** Get momentum mode */
-         double Momentum() { return _momentum; }
+         bool Momentum() { return _momentum; }
          
          /* Interface implementation, Operator */
          virtual Operator* NewInstance();

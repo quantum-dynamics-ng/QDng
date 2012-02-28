@@ -1,5 +1,5 @@
-This is ../../../../src/fftw/doc/fftw3.info, produced by makeinfo
-version 4.13 from ../../../../src/fftw/doc/fftw3.texi.
+This is ../../../fftw/doc/fftw3.info, produced by makeinfo version 4.13
+from ../../../fftw/doc/fftw3.texi.
 
 This manual is for FFTW (version 3.2.2, 27 January 2010).
 
@@ -4876,97 +4876,97 @@ File: fftw3.info,  Node: Library Index,  Prev: Concept Index,  Up: Top
 
 
 Tag Table:
-Node: Top1125
-Node: Introduction4100
-Node: Tutorial10387
-Ref: Tutorial-Footnote-111631
-Node: Complex One-Dimensional DFTs11725
-Node: Complex Multi-Dimensional DFTs17345
-Node: One-Dimensional DFTs of Real Data19914
-Node: Multi-Dimensional DFTs of Real Data24155
-Node: More DFTs of Real Data27727
-Node: The Halfcomplex-format DFT31229
-Node: Real even/odd DFTs (cosine/sine transforms)33838
-Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-139448
-Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-239637
-Node: The Discrete Hartley Transform40572
-Ref: The Discrete Hartley Transform-Footnote-142916
-Node: Other Important Topics43165
-Node: Data Alignment43442
-Node: SIMD alignment and fftw_malloc43943
-Node: Stack alignment on x8645801
-Node: Multi-dimensional Array Format47445
-Node: Row-major Format48062
-Node: Column-major Format49755
-Node: Fixed-size Arrays in C50725
-Node: Dynamic Arrays in C52161
-Node: Dynamic Arrays in C-The Wrong Way53799
-Node: Words of Wisdom-Saving Plans55546
-Node: Caveats in Using Wisdom58153
-Node: FFTW Reference60241
-Node: Data Types and Files60729
-Node: Complex numbers61161
-Node: Precision62898
-Node: Memory Allocation64081
-Node: Using Plans65091
-Node: Basic Interface68028
-Node: Complex DFTs68527
-Node: Planner Flags72326
-Node: Real-data DFTs77658
-Node: Real-data DFT Array Format82560
-Node: Real-to-Real Transforms84815
-Node: Real-to-Real Transform Kinds88795
-Node: Advanced Interface91263
-Node: Advanced Complex DFTs92003
-Node: Advanced Real-data DFTs94750
-Node: Advanced Real-to-real Transforms97077
-Node: Guru Interface98183
-Node: Interleaved and split arrays99106
-Node: Guru vector and transform sizes100149
-Node: Guru Complex DFTs102714
-Node: Guru Real-data DFTs105550
-Node: Guru Real-to-real Transforms108473
-Node: 64-bit Guru Interface109792
-Node: New-array Execute Functions112115
-Node: Wisdom116113
-Node: Wisdom Export116472
-Node: Wisdom Import118072
-Node: Forgetting Wisdom119850
-Node: Wisdom Utilities120222
-Node: What FFTW Really Computes121589
-Node: The 1d Discrete Fourier Transform (DFT)122414
-Node: The 1d Real-data DFT123773
-Node: 1d Real-even DFTs (DCTs)125427
-Node: 1d Real-odd DFTs (DSTs)128636
-Node: 1d Discrete Hartley Transforms (DHTs)131578
-Node: Multi-dimensional Transforms132254
-Node: Multi-threaded FFTW134857
-Node: Installation and Supported Hardware/Software136320
-Node: Usage of Multi-threaded FFTW137757
-Node: How Many Threads to Use?140397
-Node: Thread safety141421
-Node: FFTW on the Cell Processor143162
-Node: Cell Installation144310
-Node: Cell Caveats145325
-Node: FFTW Accuracy on Cell147024
-Node: Calling FFTW from Fortran148056
-Node: Fortran-interface routines148878
-Ref: Fortran-interface routines-Footnote-1152275
-Ref: Fortran-interface routines-Footnote-2152478
-Node: FFTW Constants in Fortran152611
-Node: FFTW Execution in Fortran153674
-Node: Fortran Examples156409
-Node: Wisdom of Fortran?159821
-Node: Upgrading from FFTW version 2161494
-Ref: Upgrading from FFTW version 2-Footnote-1171110
-Node: Installation and Customization171293
-Node: Installation on Unix172935
-Node: Installation on non-Unix systems181671
-Node: Cycle Counters183893
-Node: Generating your own code185643
-Node: Acknowledgments187721
-Node: License and Copyright191378
-Node: Concept Index193222
-Node: Library Index219499
+Node: Top1111
+Node: Introduction4086
+Node: Tutorial10373
+Ref: Tutorial-Footnote-111617
+Node: Complex One-Dimensional DFTs11711
+Node: Complex Multi-Dimensional DFTs17331
+Node: One-Dimensional DFTs of Real Data19900
+Node: Multi-Dimensional DFTs of Real Data24141
+Node: More DFTs of Real Data27713
+Node: The Halfcomplex-format DFT31215
+Node: Real even/odd DFTs (cosine/sine transforms)33824
+Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-139434
+Ref: Real even/odd DFTs (cosine/sine transforms)-Footnote-239623
+Node: The Discrete Hartley Transform40558
+Ref: The Discrete Hartley Transform-Footnote-142902
+Node: Other Important Topics43151
+Node: Data Alignment43428
+Node: SIMD alignment and fftw_malloc43929
+Node: Stack alignment on x8645787
+Node: Multi-dimensional Array Format47431
+Node: Row-major Format48048
+Node: Column-major Format49741
+Node: Fixed-size Arrays in C50711
+Node: Dynamic Arrays in C52147
+Node: Dynamic Arrays in C-The Wrong Way53785
+Node: Words of Wisdom-Saving Plans55532
+Node: Caveats in Using Wisdom58139
+Node: FFTW Reference60227
+Node: Data Types and Files60715
+Node: Complex numbers61147
+Node: Precision62884
+Node: Memory Allocation64067
+Node: Using Plans65077
+Node: Basic Interface68014
+Node: Complex DFTs68513
+Node: Planner Flags72312
+Node: Real-data DFTs77644
+Node: Real-data DFT Array Format82546
+Node: Real-to-Real Transforms84801
+Node: Real-to-Real Transform Kinds88781
+Node: Advanced Interface91249
+Node: Advanced Complex DFTs91989
+Node: Advanced Real-data DFTs94736
+Node: Advanced Real-to-real Transforms97063
+Node: Guru Interface98169
+Node: Interleaved and split arrays99092
+Node: Guru vector and transform sizes100135
+Node: Guru Complex DFTs102700
+Node: Guru Real-data DFTs105536
+Node: Guru Real-to-real Transforms108459
+Node: 64-bit Guru Interface109778
+Node: New-array Execute Functions112101
+Node: Wisdom116099
+Node: Wisdom Export116458
+Node: Wisdom Import118058
+Node: Forgetting Wisdom119836
+Node: Wisdom Utilities120208
+Node: What FFTW Really Computes121575
+Node: The 1d Discrete Fourier Transform (DFT)122400
+Node: The 1d Real-data DFT123759
+Node: 1d Real-even DFTs (DCTs)125413
+Node: 1d Real-odd DFTs (DSTs)128622
+Node: 1d Discrete Hartley Transforms (DHTs)131564
+Node: Multi-dimensional Transforms132240
+Node: Multi-threaded FFTW134843
+Node: Installation and Supported Hardware/Software136306
+Node: Usage of Multi-threaded FFTW137743
+Node: How Many Threads to Use?140383
+Node: Thread safety141407
+Node: FFTW on the Cell Processor143148
+Node: Cell Installation144296
+Node: Cell Caveats145311
+Node: FFTW Accuracy on Cell147010
+Node: Calling FFTW from Fortran148042
+Node: Fortran-interface routines148864
+Ref: Fortran-interface routines-Footnote-1152261
+Ref: Fortran-interface routines-Footnote-2152464
+Node: FFTW Constants in Fortran152597
+Node: FFTW Execution in Fortran153660
+Node: Fortran Examples156395
+Node: Wisdom of Fortran?159807
+Node: Upgrading from FFTW version 2161480
+Ref: Upgrading from FFTW version 2-Footnote-1171096
+Node: Installation and Customization171279
+Node: Installation on Unix172921
+Node: Installation on non-Unix systems181657
+Node: Cycle Counters183879
+Node: Generating your own code185629
+Node: Acknowledgments187707
+Node: License and Copyright191364
+Node: Concept Index193208
+Node: Library Index219485
 
 End Tag Table

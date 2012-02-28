@@ -32,7 +32,7 @@ qdng_LDADD =  $(FFTW_LIBS) $(top_builddir)/src/lib/libqdng.la  $(top_builddir)/s
 qdng_LDFLAGS = -Wl,-export-dynamic
 
 qdz_SOURCES = qdz.cpp
-qdz_LDADD = $(FFTW_LIBS) $(top_builddir)/src/lib/libqdng.la
+qdz_LDADD = $(FFTW_LIBS) $(DL_LIBS) $(top_builddir)/src/lib/libqdng.la
 
 noinst_HEADERS = GlobalOpList.h ChainLoader.h FiltersList.h ProgAutocorr.h \
 	ProgEigen.h ProgPropa.h Reporter.h ProgOCT.h ProgFilter.h

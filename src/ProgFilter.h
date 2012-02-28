@@ -39,6 +39,8 @@ namespace QDLIB
 
          FiltersList _filter;
 
+         int _start;
+
          void Init();
 
       public:

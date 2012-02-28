@@ -88,8 +88,8 @@ class Vector
     {
       // adjust pointers so that they are 1-offset:
       // v_[] is the internal contiguous array, it is still 0-offset
-       
-      int ret;
+
+//      int ret;
       
       nstrides_ = strides;
       stride_size_ = N / strides;
@@ -103,13 +103,15 @@ class Vector
          if (stride_size_ == 0)
             v_[i] = NULL;
          else
-            if (align_)
-	       ret = posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
+            if (align_) {
+               if (!posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_)){
+                  v_[i] = new T[stride_size_];
+                  align_ = false;
+               }
+            }
 	    else
 	       v_[i] = new T[stride_size_];
       }
-      
-      
     }
    
     /** copy only part out of the strides. */
