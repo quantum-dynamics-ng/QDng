@@ -19,6 +19,7 @@
 #include "qdlib/OGridNAC.h"
 #include "qdlib/OGridKick.h"
 #include "qdlib/OGridStokes.h"
+#include "qdlib/OGridGStokes.h"
 
 #include "qdlib/OHermitianMatrix.h"
 #include "qdlib/OMatDipole.h"
@@ -89,6 +90,7 @@ namespace QDLIB
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNAC)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridKick)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridStokes)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridGStokes)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGobbler)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OFlux)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OProjection)
@@ -132,6 +134,7 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(OGridNAC)
       QDNG_STRING_TO_INSTANCE_PTR(OGridKick)
       QDNG_STRING_TO_INSTANCE_PTR(OGridStokes)
+      QDNG_STRING_TO_INSTANCE_PTR(OGridGStokes)
 
       QDNG_STRING_TO_INSTANCE_PTR(OHermitianMatrix)
       QDNG_STRING_TO_INSTANCE_PTR(OMatDipole)

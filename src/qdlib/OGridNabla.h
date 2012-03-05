@@ -38,9 +38,15 @@ namespace QDLIB {
       public:
          OGridNabla();
          
+         /** Intialize with dimension */
+         OGridNabla(int dim);
+
          /** Set to momentum mode */
          OGridNabla(bool momentum);
          
+         /** Set to momentum mode and init with number of dims */
+         OGridNabla(bool momentum, int dim);
+
          ~OGridNabla();
          
          /** Set prefactor a */

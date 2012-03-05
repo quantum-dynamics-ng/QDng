@@ -10,8 +10,18 @@ namespace QDLIB {
    {
    }
 
+   OGridNabla::OGridNabla(int dim) : ODSpaceCplx(), GridSystem(), _name("OGridNabla"), _fac(1), _kspace(NULL),  _momentum(false), _dim(dim)
+   {
+   }
+
+
    OGridNabla::OGridNabla(bool momentum) :
          ODSpaceCplx(), GridSystem(),_name("OGridNabla"), _fac(1), _kspace(NULL), _momentum(momentum), _dim(-1)
+   {
+   }
+
+   OGridNabla::OGridNabla(bool momentum, int dim) :
+         ODSpaceCplx(), GridSystem(),_name("OGridNabla"), _fac(1), _kspace(NULL), _momentum(momentum), _dim(dim)
    {
    }
 

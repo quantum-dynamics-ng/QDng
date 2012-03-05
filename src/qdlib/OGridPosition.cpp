@@ -10,6 +10,7 @@ namespace QDLIB {
    {
    }
    
+   OGridPosition::OGridPosition(int dim) : _name("OGridPosition"), _dim(dim) {}
    
    OGridPosition::~OGridPosition()
    {

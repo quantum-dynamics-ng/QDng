@@ -17,10 +17,12 @@ namespace QDLIB {
    {
       private:
          string _name;
-         int _dim;
+         int _dim;         /* The dimension to operate on */
          void _InitDim(dVecView &view, const int dim);
       public:
          OGridPosition();
+
+         OGridPosition(int dim);
       
          ~OGridPosition();
    
