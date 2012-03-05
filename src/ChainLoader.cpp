@@ -113,20 +113,25 @@ namespace QDLIB
             log.IndentInc();
             log.flush();
             child = Onode->NextChild();
-            child->AdjustElementNode();
+
+            O->Init(pm);
+
+            if (child != NULL){ /* Check if sub operators are given */
+               child->AdjustElementNode();
          
-            Operator *osub;
-            OList *list = dynamic_cast<OList*>(O);
-         
-         
-            while (child->EndNode()){
-               osub = LoadOperatorChain( child, persist );
-               if (osub == NULL)
-                  throw ( EParamProblem("Can't load operator") );
-               list->Add( osub );
-               child->NextNode();
+               Operator *osub;
+               OList *list = dynamic_cast<OList*>(O);
+
+
+               while (child->EndNode()){
+                  osub = LoadOperatorChain( child, persist );
+                  if (osub == NULL)
+                     throw ( EParamProblem("Can't load operator") );
+                  list->Add( osub );
+                  child->NextNode();
+               }
             }
-         
+
             log.flush();
             log.IndentDec();
          } else {
