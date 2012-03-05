@@ -29,6 +29,7 @@
 #include <cmath>
 #include <string.h>
 
+#include "tools/Exception.h"
 
 #define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
 
@@ -89,7 +90,7 @@ class Vector
       // adjust pointers so that they are 1-offset:
       // v_[] is the internal contiguous array, it is still 0-offset
 
-//      int ret;
+      int ret;
       
       nstrides_ = strides;
       stride_size_ = N / strides;
@@ -104,13 +105,11 @@ class Vector
             v_[i] = NULL;
          else
             if (align_) {
-               if (!posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_)){
-                  v_[i] = new T[stride_size_];
-                  align_ = false;
-               }
-            }
-	    else
-	       v_[i] = new T[stride_size_];
+               ret = posix_memalign((void**) &(v_[i]), QDLIB_DATA_ALIGNMENT, sizeof(T)*stride_size_);
+               if ( ret != 0 )
+                  throw ( EMemError(ret,"posix_memalign") );
+            } else
+               v_[i] = new T[stride_size_];
       }
     }
    
@@ -526,7 +525,14 @@ class Vector
     }
 
 
+    inline T Norm() const
+    {
+       T sum=0;
+       for (lint i=0; i < n_; i++)
+          sum += conj((*this)[i]) * (*this)[i];
 
+       return sqrt(sum);
+    }
 };
 
 
@@ -568,6 +574,24 @@ std::istream & operator>>(std::istream &s, Vector<T> &A)
 }
 
 // *******************[ basic matrix algorithms ]***************************
+
+template <class T>
+void operator+=(Vector<T> &A, const T val)
+{
+   lint N = A.size();
+
+   for (int i=0; i<N; i++)
+      A[i] += val;
+}
+
+template <class T>
+void operator-=(Vector<T> &A, const T val)
+{
+   lint N = A.size();
+
+   for (int i=0; i<N; i++)
+      A[i] -= val;
+}
 
 
 template <class T>

@@ -35,6 +35,17 @@ namespace QDLIB {
          }
    };
    
+
+   /**
+    * Indicates a memory problem
+    */
+   class EMemError : public Exception
+   {
+      public:
+         EMemError(const char *message) : Exception(message) {}
+         EMemError(int cerrno, const char *message);
+   };
+
    /**
     * Indicates an I/O Error.
     */

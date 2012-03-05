@@ -30,6 +30,23 @@ namespace QDLIB{
    }
    
 
+   EMemError::EMemError(int cerrno, const char *message) : Exception()
+   {
+      string s;
+
+      switch(cerrno){
+         case EINVAL:
+            s = "EINVAL";
+            break;
+         case ENOMEM:
+            s = "Out of memory";
+            break;
+         default:
+            s = "Error in system call";
+      }
+      SetMessage(string(message) + " - " + s);
+   }
+
    EIOError::EIOError( const char * message, const string &fname ) : Exception()
    {
       SetMessage(string(message) + ": " + fname);
