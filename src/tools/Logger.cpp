@@ -2,6 +2,10 @@
 
 #include "Exception.h"
 
+#ifdef _OPENMP
+   #include <omp.h>
+#endif
+
 namespace QDLIB {
    
    
@@ -162,32 +166,42 @@ namespace QDLIB {
     */
    void Logger::flush()
    {
-      if (_supress){
-         _sout->str("");
-         _soutdbg->str("");
-         return;
+#ifdef _OPENMP
+      /* Ensure that buffer flushing is done only once */
+#pragma omp single
+#endif
+      {
+         if (_supress)
+         {
+            _sout->str("");
+            _soutdbg->str("");
+            return;
+         }
+
+         string s;
+
+         if (_laststream == 1)
+         { /* Write standard output stream */
+            s = _sout->str();
+            _IndentString(s);
+            *_global_out << s;
+            _sout->str("");
+         }
+         if (_laststream == 2)
+         {/* Write debug output stream */
+            s = _soutdbg->str();
+            _IndentString(s);
+            if (_debug)
+            {
+               s = _soutdbg->str();
+               _IndentString(s);
+               *_global_out << s;
+            }
+            _soutdbg->str("");
+         }
+         _global_out->flush();
+         _laststream = 0;
       }
-      
-      string s;
-      
-      if (_laststream == 1){ /* Write standard output stream */
-	 s = _sout->str();
-	 _IndentString(s);
-	 *_global_out << s;
-	 _sout->str("");
-      }
-      if (_laststream == 2){/* Write debug output stream */
-	 s = _soutdbg->str();
-	 _IndentString(s);
-         if (_debug) {
-	    s = _soutdbg->str();
-	    _IndentString(s);
-	    *_global_out << s;
-	 }
-	 _soutdbg->str("");
-      }
-      _global_out->flush();
-      _laststream = 0;
    }
    
    /**

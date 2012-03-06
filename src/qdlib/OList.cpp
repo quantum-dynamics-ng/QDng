@@ -17,17 +17,28 @@ namespace QDLIB {
    }
 
    /**
-    * Access elements.
+    * Access elements by index.
     * 
-    * Note this is read only. For assingning use Add()
+    * Note this is read only. For assigning use Add()
     */
    Operator* OList::operator[](int i)
    {
       return Get(i);
    }
-   
+
    /**
-    * Access elements.
+    * Access elements by name.
+    *
+    * Note this is read only. For assigning use Add()
+    */
+   Operator* OList::operator[](const string& name)
+   {
+      return Get(name);
+   }
+
+   /**
+    * Access elements by index.
+    * This is pretty fast.
     */
    Operator * OList::Get(int index)
    {
@@ -36,7 +47,28 @@ namespace QDLIB {
       return _O[index];
    }
    
-   void QDLIB::OList::Set(int index, Operator *O)
+   /**
+    * Access elements by key.
+    * This is done via a lookpup map and thus slower than get-by-index.
+    * Should only be used during init stage.
+    */
+   Operator* OList::Get(const string& name)
+   {
+      return _O[GetIndex(name)];
+   }
+
+   int OList::GetIndex(const string& name)
+   {
+      if (_NamedEntries.find(name) == _NamedEntries.end())
+         throw( EIncompatible("Element not found", name) );
+
+      return _NamedEntries[name];
+   }
+
+   /**
+    * Set
+    */
+   void OList::Set(int index, Operator *O)
    {
       if (index >= _size)
          throw( EIncompatible("Access to empty element") );
@@ -44,6 +76,11 @@ namespace QDLIB {
       _O[index] = O;
    }
    
+   void OList::Set(const string& name, Operator *O)
+   {
+      _O[GetIndex(name)] = O;
+   }
+
    /**
     * Number of operators.
     */
@@ -53,7 +90,9 @@ namespace QDLIB {
    }
    
    /**
-    * Add a new operator.
+    * Add a new, anonymous operator.
+    *
+    * The added operator will have no name.
     */
    void OList::Add(Operator *O)
    {
@@ -68,8 +107,20 @@ namespace QDLIB {
      
       _O[_size] = O;
       _size++;
-      
-      
+   }
+
+
+   /**
+    * Add a new, named operator.
+    */
+   void OList::Add(const string& name, Operator *O)
+   {
+      if ( _NamedEntries.find(name)  != _NamedEntries.end() )
+         throw ( EParamProblem("Operator name already exists in list", name) );
+
+      Add(O);
+
+      _NamedEntries[name] = _size-1;
    }
    
    void OList::Clock( QDClock * cl )
