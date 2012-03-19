@@ -1,7 +1,7 @@
 #ifndef TQDCLOCK_H
 #define TQDCLOCK_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 /**
