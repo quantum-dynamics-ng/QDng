@@ -19,7 +19,6 @@ namespace QDLIB
       : OPropagator(), _name("OCheby"),
       _order(0), _coeff(0), _scaling(1.), _offset(0), ket0(NULL), ket1(NULL), ket2(NULL), buf(NULL)
    {
-      _needs.SetValue("hamiltonian", 0);
    }
 
 
@@ -211,29 +210,19 @@ namespace QDLIB
       return this;
    }
    
-   ParamContainer & OCheby::TellNeeds( )
-   {      
-      return _needs;
-   }
-
-   
-   void OCheby::AddNeeds( string & Key, Operator * O )
-   {
-      if (Key == "hamiltonian") H = O;
-      else throw ( EParamProblem("Unknown operator key") );
-   }
-
-   
    void OCheby::Init( WaveFunction *Psi )
    {
-            
+      H = Get("hamiltonian");
+      H->Clock(Operator::Clock());
+      H->Init(Psi);
+
       if (H == NULL)
-	 throw ( EParamProblem("Chebychev Progagator is missing a hamiltonian") );
-      if (clock == NULL)
-	 throw ( EParamProblem("Chebychev Progagator is missing a clock") );
-      if (clock->Dt() == 0)
-	 throw ( EParamProblem("No time step defined") );
-      
+         throw ( EParamProblem("Chebychev Progagator is missing a hamiltonian") );
+
+      /* Parent Initalization */
+      OPropagator::Init(Psi);
+
+
       if (ket0 != NULL) return;  // Avoid init twice
       ket0 = Psi->NewInstance();
       ket1 = Psi->NewInstance();

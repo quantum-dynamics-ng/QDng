@@ -1,7 +1,7 @@
 #ifndef OHERMITIANMATRIX_H
 #define OHERMITIANMATRIX_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 /**

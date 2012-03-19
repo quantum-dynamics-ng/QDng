@@ -1,7 +1,7 @@
 #ifndef TGRIDSYSTEM_H
 #define TGRIDSYSTEM_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "qdlib/GridSystem.h"
 

@@ -32,6 +32,8 @@ namespace QDLIB {
 
          int GetIndex(const string& name);
 
+         bool Exists(const string& name);
+
          void Set(int index, Operator *O);
          
          void Set(const string& name, Operator *O);

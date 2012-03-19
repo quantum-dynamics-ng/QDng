@@ -1,7 +1,7 @@
 #ifndef MULTELEMENTSTEST_H
 #define MULTELEMENTSTEST_H
 
-#include <TestFixture.h>
+#include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "math/typedefs.h"
 

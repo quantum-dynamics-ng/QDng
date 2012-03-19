@@ -4,7 +4,7 @@
 	  <hamiltonian name="Sum">
 	      <A name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
 	      <Vpot name="Gobbler" dims="1" rp0="5.5" order="5" gain="0.02" nip="true"/>
-              <Vpot name="Gobbler" dims="1" lp0="2" order="20" gain="0.3" nip="false" key="V"/>
+              <VpotIm name="Gobbler" dims="1" lp0="2" order="20" gain="0.3" nip="false" key="V"/>
 	  </hamiltonian>
 	</propagator>
         <wf file="@srcdir@/GridPot0_ef_0" normalize="true"/>

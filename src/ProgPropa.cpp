@@ -257,21 +257,20 @@ namespace QDLIB {
       
       
       QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
-           
-      /* Make sure our hamiltonian is initalized */
-      _H->Clock( clock );
-      GlobalOpList::Instance().Init(_H, Psi);
+
+      /* Let the Propagator do it's initalisation */
+      _U->Clock( clock );
+      _U->Init(Psi);
+      _H = _U->Hamiltonian();
+      _H->UpdateTime();
+
+
       log.cout() << "Initial energy: " << _H->Expec(Psi) << endl;
             
       /* Give the reporter module what it needs */
       _reporter.PsiInitial( Psi );
       _reporter.Hamilton( _H );
-      
-      /* Let the Propagator do it's initalisation */
-      _U->Clock( clock );
-      _H->UpdateTime();
-      GlobalOpList::Instance().Init(_U, Psi);
-      
+
       /* Report what the propagator has chosen */
       ParamContainer Upm;
     

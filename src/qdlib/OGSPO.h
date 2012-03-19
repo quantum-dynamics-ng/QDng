@@ -12,8 +12,6 @@
 #include "qdlib/ODSpace.h"
 #include "qdlib/OSum.h"
 
-#define GSPO_MAX_LEN 4
-
 namespace QDLIB
 {
 
@@ -31,15 +29,12 @@ namespace QDLIB
    {
       private:
          string _name;
-         ParamContainer _needs;
-         
-         OSum* _H;
          
          int _spoLen;                  /* Number of split elements */
-         ODSpace* _ops[GSPO_MAX_LEN];  /* operator list */
-         cVec _exp[GSPO_MAX_LEN];     /* storage for exponentials */
-         int _laststep;                 /* Remember last time step for update */
-         dcomplex _lastexp;                /* Last exponential factor used */
+         ODSpace* _ops[MAX_OPS];       /* operator list */
+         cVec _exp[MAX_OPS];           /* storage for exponentials */
+         int _laststep;                /* Remember last time step for update */
+         dcomplex _lastexp;            /* Last exponential factor used */
 
          void InitExp();
       public:
@@ -57,14 +52,6 @@ namespace QDLIB
          virtual Operator* operator=(Operator* O);
          virtual Operator* Copy(Operator* O);
          virtual bool Valid(WaveFunction *Psi);
-
-         /* Interface implementation, Propagator */
-         virtual ParamContainer& TellNeeds()
-         {
-            return _needs;
-         }
-
-         virtual void AddNeeds(string &Key, Operator *O);
    };
 
 }

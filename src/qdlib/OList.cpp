@@ -65,8 +65,16 @@ namespace QDLIB {
       return _NamedEntries[name];
    }
 
+   bool OList::Exists(const string& name)
+   {
+      if (_NamedEntries.find(name) == _NamedEntries.end())
+         return false;
+      else
+         return true;
+   }
+
    /**
-    * Set
+    * Replace an element.
     */
    void OList::Set(int index, Operator *O)
    {
