@@ -69,7 +69,7 @@ namespace QDLIB
          Get(1)->Apply(_psi); /* x*(T*psi) */
          double xT = (*sourcePsi * _psi).imag();
 
-         _ve = - 2 * xT;
+         _ve = 2 * xT;
          cout << "<v> :" << _ve << endl;
       }
 
