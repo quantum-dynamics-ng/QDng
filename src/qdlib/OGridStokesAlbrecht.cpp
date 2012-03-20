@@ -69,11 +69,7 @@ namespace QDLIB
          Get(1)->Apply(_psi); /* x*(T*psi) */
          double xT = (*sourcePsi * _psi).imag();
 
-         Get(1)->Apply(_psi, sourcePsi); /* x*psi */
-         Get(0)->Apply(_psi); /* T*(x*psi) */
-         double Tx = (*sourcePsi * _psi).imag();
-
-         _ve = - (Tx - xT);
+         _ve = - 2 * xT;
          cout << "<v> :" << _ve << endl;
       }
 
@@ -81,7 +77,7 @@ namespace QDLIB
       MultElementsCopy((cVec*) _psi, (cVec*) sourcePsi, -_xe);
       AddElementsEq ((cVec*) destPsi, (cVec*) _psi, (cVec*) destPsi);
 
-      *destPsi *= _eta;
+      *destPsi *= _eta * _ve;
    }
 
    void OGridStokesAlbrecht::Apply(WaveFunction *Psi)
