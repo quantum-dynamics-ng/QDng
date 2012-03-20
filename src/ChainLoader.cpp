@@ -108,25 +108,30 @@ namespace QDLIB
       } else { 
 	 O = mods->LoadOp( name );
          
-         if (dynamic_cast<OList*>(O) != NULL){ /* Sum/Product operator */
+         if (dynamic_cast<OList*>(O) != NULL){ /* Sum/Product operator and propagators */
             log.cout() << O->Name()<<endl;
             log.IndentInc();
             log.flush();
             child = Onode->NextChild();
-            child->AdjustElementNode();
+
+            O->Init(pm);
+
+            if (child != NULL){ /* Check if sub operators are given */
+               child->AdjustElementNode();
          
-            Operator *osub;
-            OList *list = dynamic_cast<OList*>(O);
-         
-         
-            while (child->EndNode()){
-               osub = LoadOperatorChain( child, persist );
-               if (osub == NULL)
-                  throw ( EParamProblem("Can't load operator") );
-               list->Add( osub );
-               child->NextNode();
+               Operator *osub;
+               OList *list = dynamic_cast<OList*>(O);
+
+
+               while (child->EndNode()){
+                  osub = LoadOperatorChain( child, persist );
+                  if (osub == NULL)
+                     throw ( EParamProblem("Can't load operator") );
+                  list->Add(child->Name(), osub );
+                  child->NextNode();
+               }
             }
-         
+
             log.flush();
             log.IndentDec();
          } else {
@@ -337,78 +342,12 @@ namespace QDLIB
     */
    OPropagator* ChainLoader::LoadPropagator( XmlNode *Unode, bool persist)
    {
-      ModuleLoader* mods = ModuleLoader::Instance();
-      Logger& log = Logger::InstanceRef();
-      GlobalOpList& OpList = GlobalOpList::Instance();
-      
-      ParamContainer pm, needs;
-      string name, s, key, ref;
-      
-      Operator *h=NULL;
-      OPropagator *U=NULL;
-      
-      /* get the Parameters for the propagator */
-      pm = Unode->Attributes();
+      Operator* O = LoadOperatorChain(Unode, persist);
+      OPropagator* U = dynamic_cast<OPropagator*>(O);
 
-      if (pm.isPresent("ref")) {
-         pm.GetValue("ref", ref);
-         U = dynamic_cast<OPropagator*>(OpList[ref]);
-         
-         if (U == NULL)
-            throw (EIncompatible("Operator in reference is not a propagator", ref));
-         
-	 log.cout() << "Reference to " << ref << endl;
-         return U;
-      }
-      
-      if (!pm.isPresent("name"))
-	 throw (EParamProblem ("Missing propagator name") );
-      
-      pm.GetValue("name", name);
-      pm.GetValue("key", key);
-      
-      /* Load the module */
-      h = mods->LoadOp( name );
-      U = dynamic_cast<OPropagator*>(h);
       if (U == NULL)
-         throw ( EIncompatible("This is not a propagator", h->Name()) );
-      
-      h = NULL;
-      
-      /* Initialize */
-      U->Init( pm );
-      needs = U->TellNeeds();
-      needs.ResetPosition();
-      
-      /* For the logfile... */
-      log.cout() << "Loading : " << U->Name() << endl << endl;
-      
-      
-      XmlNode *child = Unode->NextChild();
-      XmlNode *ops;
-      
-      /* Search for needs and add it */
-      log.cout() << "Intialize Operators:\n\n";
-      
-      while (needs.GetNextValue( name, s )){
-	 ops = child->FindNode( name );
-	 if ( ops == NULL && s != "opt") /* N error if need is an option */
-	    throw ( EParamProblem ("Can't find an operator for the propagation", name) );
-	 if ( ops != NULL ) { 
-	    log.Header( name, Logger::SubSection );
-	    log.IndentInc();
-            h = LoadOperatorChain( ops, persist);
-	    log.IndentDec();
-	    log.cout() << endl;
-	    U->AddNeeds( name, h );
-	    delete ops;
-	 }
-      }
-      OpList.Add(key, U, persist);
-      
-      log.flush();
-      log.IndentDec();
-      
+         throw (EIncompatible("This is not a propagator!"), O->Name());
+
       return U;
    }
    

@@ -18,7 +18,7 @@
 namespace QDLIB
 {
 
-   ProgFilter::ProgFilter(XmlNode &FilterNode) : _FilterNode(FilterNode)
+   ProgFilter::ProgFilter(XmlNode &FilterNode) : _FilterNode(FilterNode), _start(0)
    {
 
 
@@ -75,6 +75,11 @@ namespace QDLIB
 
       p.GetValue("dt", d);
       clock->Dt(d);
+
+      if (p.isPresent("start"))
+         p.GetValue("start", _start);
+
+
 
       /* Rescale the by write cycle */
       p.GetValue("Wcycle", i );

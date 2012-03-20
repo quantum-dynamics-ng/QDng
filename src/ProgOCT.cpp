@@ -818,11 +818,8 @@ namespace QDLIB
          throw(EParamProblem("No propagator found"));
 
       _U = ChainLoader::LoadPropagator(section);
-      _H = _U->Hamiltonian();
-      delete section;
 
-      if (_H == NULL)
-         throw(EParamProblem("Propagator has no hamiltonian"));
+      delete section;
          
       log.cout() << endl;
       /* Load Initial Wavefunctions */
@@ -893,6 +890,15 @@ namespace QDLIB
       log.IndentDec();
 
       /* Make sure our hamiltonian is initalized */
+      /* Let the Propagator do it's initalisation */
+      _U->Clock(clock);
+      _U->Init(PsiI[0]);
+
+      _H = _U->Hamiltonian();
+      if (_H == NULL)
+         throw(EParamProblem("Propagator has no hamiltonian"));
+
+      _H->UpdateTime();
       _H->Clock(clock);
       OpList.Init(_H, PsiI[0]);
       log.cout() << "Initial energy (first initial wf): " << _H->Expec(PsiI[0]) << endl;
@@ -963,12 +969,6 @@ namespace QDLIB
 	 OpList.Init(_Gobbler, PsiI[0]);
          delete section;
       }
-
-      /* Let the Propagator do it's initalisation */
-      _U->Clock(clock);
-      
-      _H->UpdateTime();
-      OpList.Init(_U, PsiI[0]);
 
       /* Report what the propagator has chosen */
       ParamContainer Upm;

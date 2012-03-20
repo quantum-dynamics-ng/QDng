@@ -9,7 +9,6 @@ namespace QDLIB {
     OSIL::OSIL()
             : OPropagator(), _name("OSIL"), _order(0), buf0(NULL), buf1(NULL), buf2(NULL)
     {
-        _needs.SetValue("hamiltonian", 0);
     }
 
 
@@ -51,10 +50,12 @@ namespace QDLIB {
 
     void OSIL::Init(WaveFunction * Psi)
     {
-        if (Psi == NULL)
-            throw(EParamProblem("SIL: Invalid WaveFunction"));
+       OPropagator::Init(Psi);
 
         if (buf0 != NULL) return; //Avoid init twice
+
+        H = Get("hamiltonian");
+
         buf0 = Psi->NewInstance();
         buf1 = Psi->NewInstance();
         buf2 = Psi->NewInstance();
@@ -66,6 +67,8 @@ namespace QDLIB {
         _Lzb.Size(_order);
         _Lzb.Init(Psi);
         _Lzb.AutoLock(3);
+
+        H->Clock(Operator::Clock());
     }
 
     /**
@@ -190,22 +193,6 @@ namespace QDLIB {
         if (H == NULL) return false;
 
         return H->Valid(Psi);
-    }
-
-    ParamContainer & QDLIB::OSIL::TellNeeds()
-    {
-        return _needs;
-    }
-
-    void QDLIB::OSIL::AddNeeds(string & Key, Operator * O)
-    {
-        if (Key == "hamiltonian"){
-            if (O == NULL)
-                throw(EParamProblem("SIL: Invalid hamiltonian"));
-            
-            H = O;
-        } else
-            throw(EParamProblem("SIL: Unknown operator key"));
     }
 }
 

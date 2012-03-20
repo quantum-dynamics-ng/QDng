@@ -53,6 +53,8 @@ namespace QDLIB {
       for (int i = 1; i < Size(); i++) {
          Get(i)->ApplyAdd(destPsi, sourcePsi);
       }
+
+      _WFbuf[0]->Retire();
    }
    
    void OSum::Apply(WaveFunction *Psi)

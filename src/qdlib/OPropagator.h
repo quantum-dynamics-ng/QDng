@@ -1,9 +1,8 @@
 #ifndef QDLIBOPROPAGATOR_H
 #define QDLIBOPROPAGATOR_H
 
-#include "qdlib/Operator.h"
-#include "tools/QDClock.h"
-#include "math/dcomplex.h"
+#include "qdlib/OList.h"
+
 
 namespace QDLIB {
 
@@ -17,7 +16,7 @@ namespace QDLIB {
     * 
     * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
-   class OPropagator : public Operator
+   class OPropagator : public OList
    {
       private:
 	 dcomplex _c0;
@@ -37,23 +36,6 @@ namespace QDLIB {
       
 	 ~OPropagator() { DELETE_OP(H); }
 	    
-	 /**
-	 * Should return a ParameterContainer reference which contains some keywords.
-	 * 
-	 * This keywords are thougt to distinguish between different parts
-	 * of the Hamilton. Only the keys are important. The values can be empty.
-	 * The rest of the parameters are done as usual with Init().
-	 */
-	 virtual ParamContainer& TellNeeds() = 0;
-	 
-	 /**
-	  * Now we can add the needs of the propagator.
-	  * 
-	  * \param Key One of the access keys which was returned from TellNeeds()
-	  * \param O   An operator associated with Key
-	  */
-	 virtual void AddNeeds(string &Key, Operator *O) = 0;
-	 
 	 
 	 virtual void Clock(QDClock *cl)
 	 {
@@ -146,10 +128,26 @@ namespace QDLIB {
 	    forward = P->forward;
 	    imaginary = P->imaginary;
 	   
+	    OList::Copy(O);
 	    return this;
 	 }	 
 	 
 	 Operator* Hamiltonian() { return H; }
+
+	 void Init(WaveFunction* Psi)
+    {
+      if (clock == NULL)
+         throw(EParamProblem("Progagator is missing a clock"));
+
+      if (clock->Dt() == 0)
+         throw(EParamProblem("No time step defined"));
+
+      if (Psi == NULL)
+          throw(EParamProblem("Invalid WaveFunction"));
+
+      OList::Init(Psi);
+    }
+
    };
 
 }

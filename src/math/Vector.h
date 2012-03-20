@@ -29,6 +29,9 @@
 #include <cmath>
 #include <string.h>
 
+
+#define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
+
 #ifdef HAVE_MPI
 #include "mpi.h"
 #endif
@@ -124,8 +127,6 @@ class Vector
          _StrideRefObj[i] = NULL;
          _SourceStride[i] = -1;
       }
-      
-      
     }
    
     /** copy only part out of the strides. */
@@ -693,7 +694,14 @@ class Vector
     }
 
 
+    inline T Norm() const
+    {
+       T sum=0;
+       for (lint i=0; i < n_; i++)
+          sum += conj((*this)[i]) * (*this)[i];
 
+       return sqrt(sum);
+    }
 };
 
 
@@ -735,6 +743,24 @@ std::istream & operator>>(std::istream &s, Vector<T> &A)
 }
 
 // *******************[ basic matrix algorithms ]***************************
+
+template <class T>
+void operator+=(Vector<T> &A, const T val)
+{
+   lint N = A.size();
+
+   for (int i=0; i<N; i++)
+      A[i] += val;
+}
+
+template <class T>
+void operator-=(Vector<T> &A, const T val)
+{
+   lint N = A.size();
+
+   for (int i=0; i<N; i++)
+      A[i] -= val;
+}
 
 
 template <class T>

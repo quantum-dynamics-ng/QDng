@@ -13,7 +13,6 @@ namespace QDLIB
 
    ORK4::ORK4() : _name("ORK4")
    {
-      _needs.SetValue("hamiltonian", 0);
       for (int i=0; i < 5; i++)
          _buf[i] = NULL;
    }
@@ -31,10 +30,14 @@ namespace QDLIB
 
       if (_buf[0] != NULL) return; // Avoid init twice
       
+      H = Get("hamiltonian");
+
       for (int i=0; i < 5; i++){
          _buf[i] = Psi->NewInstance();
       }
 
+      OPropagator::Init(Psi);
+      H->Init(Psi);
    }
 
    void ORK4::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
@@ -117,19 +120,4 @@ namespace QDLIB
       return H->Valid(Psi);
    }
 
-   ParamContainer & ORK4::TellNeeds()
-   {
-       return _needs;
-   }
-
-   void ORK4::AddNeeds(string & Key, Operator * O)
-   {
-       if (Key == "hamiltonian"){
-           if (O == NULL)
-               throw(EParamProblem("RK4: Invalid hamiltonian"));
-
-           H = O;
-       } else
-           throw(EParamProblem("RK4: Unknown operator key"));
-   }
 }

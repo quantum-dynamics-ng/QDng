@@ -463,7 +463,7 @@ namespace QDLIB {
          m128dc va;
          m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)d
 #endif
          for (i=0; i < size; i++){
             vb = b[i];

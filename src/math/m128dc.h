@@ -155,7 +155,7 @@ namespace QDLIB
        */
       inline m128dc operator*(const double a)
       {
-         return m128dc( _mm_mul_pd(v, _mm_load1_pd( (double*) &a ).v) );
+         return m128dc( _mm_mul_pd(v, _mm_load1_pd( (double*) &a )) );
       }
 
 
@@ -172,7 +172,7 @@ namespace QDLIB
        */
       inline void operator*=(const double a)
       {
-         v = _mm_mul_pd(v, _mm_load1_pd( (double*) &a ).v);
+         v = _mm_mul_pd(v, _mm_load1_pd( (double*) &a ));
       }
 
       /**
@@ -199,7 +199,6 @@ namespace QDLIB
       {
          return m128dc( _mm_sub_pd(v, a.v) );
       }
-
 
       /**
        * Subtraction

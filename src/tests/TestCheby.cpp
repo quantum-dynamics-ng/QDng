@@ -80,11 +80,7 @@ void TestCheby::API_Test( )
 
 
    /* Needs - Hamiltonian */
-   pm = U->TellNeeds();
-
-   CPPUNIT_ASSERT(pm.isPresent("hamiltonian"));
-   
-   CPPUNIT_ASSERT_NO_THROW(U->AddNeeds(s= "hamiltonian", H));
+   CPPUNIT_ASSERT_NO_THROW(U->Add(s= "hamiltonian", H));
 
    /* Initalization */
    CPPUNIT_ASSERT_NO_THROW(U->Init(psi0));
@@ -110,7 +106,7 @@ void TestCheby::NUMERIC_Test( )
 
    /* Init */
    string s("hamiltonian");
-   CPPUNIT_ASSERT_NO_THROW(U->AddNeeds(s, H));
+   CPPUNIT_ASSERT_NO_THROW(U->Add(s, H));
    CPPUNIT_ASSERT_NO_THROW(U->Init(psi0));
 
    /* psi = (1,0) - nothing should happen */

@@ -84,7 +84,7 @@ namespace QDLIB {
     */
    void XmlNode::AdjustElementNode()
    {
-      if ( _cur_node->type != XML_ELEMENT_NODE ) NextNode();
+      if ( _cur_node->type != XML_ELEMENT_NODE && _cur_node->next != NULL) NextNode();
    }   
    
    /**

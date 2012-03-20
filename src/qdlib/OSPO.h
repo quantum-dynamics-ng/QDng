@@ -35,7 +35,6 @@ namespace QDLIB {
    {
       private:
 	 string _name;
-	 ParamContainer *_needs;
 	 
          OSum* _H;                  /* The Hamiltonian  as a sum of all components */
          
@@ -90,10 +89,6 @@ namespace QDLIB {
 	 virtual Operator* Copy(Operator* O);
 	 
 	 /* Interface implementation, Propagator */
-	 virtual ParamContainer& TellNeeds();
-      
-	 virtual void AddNeeds(string &Key, Operator *O);
-         
          virtual bool Valid(WaveFunction *Psi);
       };
 

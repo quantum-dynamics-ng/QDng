@@ -8,7 +8,7 @@ namespace QDLIB {
 
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OSPO)
    
-   OSPO::OSPO() : OPropagator(), _name("OSPO"), _needs(NULL),
+   OSPO::OSPO() : OPropagator(), _name("OSPO"),
                   _Tkin(NULL), _Tkin_kspace(NULL), _Vcoup(NULL),
                         _expT(NULL), _expV(NULL), _V1(NULL), _expVcoup(NULL), _expVcoupI(NULL),_buf(NULL), _buf2(NULL),
                         _coupling(false), _coupdiag(false),_cT(0,0), _cV(0,0), _last_time(0)
@@ -24,7 +24,6 @@ namespace QDLIB {
       DELETE_WF(_expV);
       DELETE_WF(_expVcoup);
       DELETE_WF(_V1);
-      if (_needs != NULL) delete _needs;
       DELETE_WF(_buf);
       DELETE_WF(_buf2);
       DELETE_OP(_H);
@@ -78,7 +77,81 @@ namespace QDLIB {
       }
    }
    
+//   void OSPO::AddNeeds( string &Key, Operator *O )
+//   {
+//      /* Generate sum for mother class */
+//      if (H == NULL){
+//         _H = new OSum();
+//         H = _H;
+//      }
+//
+//      _H->Add(O);
+//
+//      if (Key != "Tkin" && Key != "Vpot"  && Key != "Vcoup" && Key != "VcoupI")
+//    throw ( EParamProblem("SPO only knows Tkin, Vpot or Vcoup") );
+//
+//      if (Key == "Tkin") {
+//    OMultistate *om = dynamic_cast<OMultistate*>(O);
+//         if ( om != NULL)
+//       _Tkin = dynamic_cast<ODSpace*>(om->State(0,0));
+//    else
+//       _Tkin = dynamic_cast<ODSpace*>(O);
+//    if (_Tkin == NULL)
+//       throw ( EParamProblem("Tkin is invalid", O->Name()) );
+//      }
+//
+//      /* Check for Potentials: 1 or 2 */
+//      if (Key == "Vpot") {
+//    OMultistate *mpot = dynamic_cast<OMultistate*>(O);
+//    if (mpot == NULL) { /* Single state */
+//       _Vpot[0] = dynamic_cast<OGridSystem*>(O);
+//       if (_Vpot[0] == NULL)
+//          throw ( EParamProblem("Vpot is invalid", O->Name()) );
+//       if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
+//    } else { /* Multistate */
+//       if (mpot->States() > 2)
+//          throw ( EParamProblem("SPO only supports two states") );
+//
+//       _Vpot[0] = dynamic_cast<OGridSystem*>(mpot->State(0,0));
+//       if (_Vpot[0] == NULL)
+//          throw ( EParamProblem("Vpot is invalid", O->Name()) );
+//       if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
+//       if (mpot->States() == 2){
+//          _Vpot[1] = dynamic_cast<OGridSystem*>(mpot->State(1,1));
+//          if (_Vpot[1] == NULL)
+//        throw ( EParamProblem("Vpot is invalid", O->Name()) );
+//          _coupling = true;
+//          if (_Vpot[1]->isTimeDep()) _isTimedependent=true;
+//       }
+//    }
+//      }
+//
+//      if (Key == "Vcoup") {
+//    OMultistate *mcoup = dynamic_cast<OMultistate*>(O);
+//    if (mcoup == NULL)
+//       throw ( EParamProblem("SPO: Expected a Multistate operator for the coupling ", O->Name()) );
+//    else {
+//       _Vcoup = dynamic_cast<OGridSystem*>(mcoup->State(0,1));
+//       if (_Vcoup == NULL)
+//          _Vcoup = dynamic_cast<OGridSystem*>(mcoup->State(1,0));
+//       if (_Vcoup == NULL)
+//          throw ( EParamProblem("Vcoup is invalid ", mcoup->Name()) );
+//    }
+//    if (_Vcoup->isTimeDep()) _isTimedependent=true;
+//    _coupling = true;
+//      }
+//
+//      /* IR coupling */
+//      if (Key == "VcoupI") {
+//         _VcoupI = dynamic_cast<OGridSystem*>(O);
+//         if (_VcoupI == NULL)
+//            throw ( EParamProblem("VcoupI is invalid", O->Name()) );
+//         if (_VcoupI->isTimeDep()) _isTimedependent=true;
+//         _coupdiag = true;
+//      }
+//   }
    
+
    void OSPO::Init( WaveFunction * Psi)
    {
       if (clock == NULL)
@@ -99,7 +172,97 @@ namespace QDLIB {
       }
             
       if (_buf != NULL) return; //Avoid init twice
-      
+
+
+      /* Generate sum for mother class */
+      if (H == NULL){
+         _H = new OSum();
+         CollectorOp::Instance()->Register(_H);
+         H = _H;
+      }
+
+      /* Parse Operator List */
+
+      /* Check Tkin */
+      OMultistate *om = dynamic_cast<OMultistate*> (Get("Tkin"));
+      if (om != NULL)
+         _Tkin = dynamic_cast<ODSpace*> (om->State(0, 0));
+      else
+         _Tkin = dynamic_cast<ODSpace*> (Get("Tkin"));
+
+      if (_Tkin == NULL)
+         throw(EParamProblem("Tkin is invalid", Get("Tkin")->Name()));
+
+      _H->Add(_Tkin);
+
+      /* Check Vpot */
+      OMultistate *mpot = dynamic_cast<OMultistate*>(Get("Vpot"));
+      if (mpot == NULL) { /* Single state */
+         _Vpot[0] = dynamic_cast<OGridSystem*>(Get("Vpot"));
+         if (_Vpot[0] == NULL)
+            throw ( EParamProblem("Vpot is invalid", Get("Vpot")->Name()) );
+
+         if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
+      } else { /* Multistate */
+         if (mpot->States() > 2)
+            throw ( EParamProblem("SPO only supports two states") );
+
+         _Vpot[0] = dynamic_cast<OGridSystem*>(mpot->State(0,0));
+         if (_Vpot[0] == NULL)
+            throw ( EParamProblem("Vpot is invalid", Get("Vpot")->Name()) );
+
+         if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
+
+         if (mpot->States() == 2){
+            _Vpot[1] = dynamic_cast<OGridSystem*>(mpot->State(1,1));
+            if (_Vpot[1] == NULL)
+               throw ( EParamProblem("Vpot is invalid", Get("Vpot")->Name()) );
+
+            _coupling = true;
+            if (_Vpot[1]->isTimeDep()) _isTimedependent=true;
+         }
+      }
+
+      _H->Add(Get("Vpot"));
+
+      /* Check for electronic coupling */
+      if ( Exists("Vcoup") )
+      {
+         OMultistate *mcoup = dynamic_cast<OMultistate*>(Get("Vcoup"));
+         if (mcoup == NULL)
+            throw(EParamProblem("SPO: Expected a Multistate operator for the coupling ", Get("Vcoup")->Name()));
+         else
+         {
+            _Vcoup = dynamic_cast<OGridSystem*> (mcoup->State(0, 1));
+            if (_Vcoup == NULL)
+               _Vcoup = dynamic_cast<OGridSystem*> (mcoup->State(1, 0));
+
+            if (_Vcoup == NULL)
+               throw(EParamProblem("Vcoup is invalid ", mcoup->Name()));
+         }
+         if (_Vcoup->isTimeDep()) _isTimedependent = true;
+         _coupling = true;
+
+         _H->Add(_Vcoup);
+      }
+
+      /* Check for IR-Coupling */
+      if (Exists("VcoupI"))
+      {
+         _VcoupI = dynamic_cast<OGridSystem*> (Get("VcoupI"));
+         if (_VcoupI == NULL)
+            throw(EParamProblem("VcoupI is invalid", Get("VcoupI")->Name()));
+         if (_VcoupI->isTimeDep())
+            _isTimedependent = true;
+         _coupdiag = true;
+
+         _H->Add(_VcoupI);
+      }
+
+
+      _H->Clock(Operator::Clock());
+      _H->Init(Psi);
+
       if (_coupling) {
          _cV = OPropagator::Exponent();
 	 _cT = OPropagator::Exponent()/2;
@@ -298,95 +461,6 @@ namespace QDLIB {
       OPropagator::Copy(O);
       
       return this;
-   }
-      
-   ParamContainer& OSPO::TellNeeds( )
-   {
-      
-      if (_needs == NULL)
-         _needs = new ParamContainer();
-      
-      _needs->SetValue( "Tkin", "");
-      _needs->SetValue( "Vpot", "");
-      _needs->SetValue( "Vcoup", "opt");
-      _needs->SetValue( "VcoupI", "opt");
-      
-      return *_needs;
-   }
-
-   
-   void OSPO::AddNeeds( string &Key, Operator *O )
-   {
-      /* Generate sum for mother class */
-      if (H == NULL){
-         _H = new OSum();
-         H = _H;
-      }
-      
-      _H->Add(O);
-      
-      if (Key != "Tkin" && Key != "Vpot"  && Key != "Vcoup" && Key != "VcoupI")
-	 throw ( EParamProblem("SPO only knows Tkin, Vpot or Vcoup") );
-      
-      if (Key == "Tkin") {
-	 OMultistate *om = dynamic_cast<OMultistate*>(O);
-         if ( om != NULL)
-	    _Tkin = dynamic_cast<ODSpace*>(om->State(0,0));
-	 else
-	    _Tkin = dynamic_cast<ODSpace*>(O);
-	 if (_Tkin == NULL)
-	    throw ( EParamProblem("Tkin is invalid", O->Name()) );
-      }
-      
-      /* Check for Potentials: 1 or 2 */
-      if (Key == "Vpot") {
-	 OMultistate *mpot = dynamic_cast<OMultistate*>(O);
-	 if (mpot == NULL) { /* Single state */
-	    _Vpot[0] = dynamic_cast<OGridSystem*>(O);
-	    if (_Vpot[0] == NULL)
-	       throw ( EParamProblem("Vpot is invalid", O->Name()) );
-	    if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
-	 } else { /* Multistate */
-	    if (mpot->States() > 2)
-	       throw ( EParamProblem("SPO only supports two states") );
-	
-	    _Vpot[0] = dynamic_cast<OGridSystem*>(mpot->State(0,0));
-	    if (_Vpot[0] == NULL)
-	       throw ( EParamProblem("Vpot is invalid", O->Name()) );
-	    if (_Vpot[0]->isTimeDep()) _isTimedependent=true;
-	    if (mpot->States() == 2){
-	       _Vpot[1] = dynamic_cast<OGridSystem*>(mpot->State(1,1));
-	       if (_Vpot[1] == NULL)
-		  throw ( EParamProblem("Vpot is invalid", O->Name()) );
-	       _coupling = true;
-	       if (_Vpot[1]->isTimeDep()) _isTimedependent=true;
-	    }
-	 }
-      }
-	  
-      if (Key == "Vcoup") {
-	 OMultistate *mcoup = dynamic_cast<OMultistate*>(O);
-	 if (mcoup == NULL)
-	    throw ( EParamProblem("SPO: Expected a Multistate operator for the coupling ", O->Name()) );
-	 else {
-	    _Vcoup = dynamic_cast<OGridSystem*>(mcoup->State(0,1));
-	    if (_Vcoup == NULL)
-	       _Vcoup = dynamic_cast<OGridSystem*>(mcoup->State(1,0));
-	    if (_Vcoup == NULL)
-	       throw ( EParamProblem("Vcoup is invalid ", mcoup->Name()) );
-	 }
-	 if (_Vcoup->isTimeDep()) _isTimedependent=true;
-	 _coupling = true;
-      }
-      
-      /* IR coupling */
-      if (Key == "VcoupI") {
-         _VcoupI = dynamic_cast<OGridSystem*>(O);
-         if (_VcoupI == NULL)
-            throw ( EParamProblem("VcoupI is invalid", O->Name()) );
-         if (_VcoupI->isTimeDep()) _isTimedependent=true;
-         _coupdiag = true;
-      }
    }
 
    bool OSPO::Valid(WaveFunction * Psi)

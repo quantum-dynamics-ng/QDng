@@ -10,14 +10,22 @@
  * Vector Classes
  * Matrix Classes
  * Check loops over elements
- * transparent task/calc level scheme
+ * transparent task/calc level scheme (how can this work?)
+ * First step: MPI support for Multistates - split stride support
+ * MTOCT - Split target support
+ * Second Step: Split data support (needs special fft handling)
+
+* CUDA support
+ * Memory mangement
+ * CuFFT integration
+
 
 * I/O
  * MPI-IO
  * HDF5
 
 * Programm types
- * Pump Probe Spectroscopy simulation
+ * Pump Probe Spectroscopy simulation ?
 
 * Matrix Class
  * Efficient Storage Scheme for Symmetric

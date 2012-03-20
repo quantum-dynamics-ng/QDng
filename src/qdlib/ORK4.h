@@ -15,12 +15,13 @@ namespace QDLIB
 
    /**
     * Runge-Kutta fourth order propgator.
+    *
+    * This an experimental piece. Use better propagators for production work.
     */
-   class ORK4: public QDLIB::OPropagator
+   class ORK4 : public QDLIB::OPropagator
    {
       private:
          string _name;
-         ParamContainer _needs;
          WaveFunction* _buf[5];
       public:
          ORK4();
@@ -36,11 +37,6 @@ namespace QDLIB
          virtual Operator* operator=(Operator* O);
          virtual Operator* Copy(Operator* O);
          virtual bool Valid(WaveFunction *Psi);
-
-         /* Interface implementation, Propagator */
-         virtual ParamContainer& TellNeeds();
-
-         virtual void AddNeeds(string &Key, Operator *O);
    };
 
 }

@@ -204,6 +204,8 @@ namespace QDLIB
       psi = dynamic_cast<WFMultistate*>(sourcePsi);
       dPsi = dynamic_cast<WFMultistate*>(destPsi);
       
+      _buf1->Reaquire();
+
       psi->SyncStrides();
 
       *((cVec*) dPsi) = dcomplex(0, 0);
@@ -219,6 +221,7 @@ namespace QDLIB
             }
          }
       }
+      _buf1->Retire();
    }
 
 

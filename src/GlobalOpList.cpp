@@ -34,7 +34,7 @@ namespace QDLIB {
     *
     * \param key String identifier. May be empty, in this case an internal name is generated
     * \param op  A parameter initialized operator
-    * \param maintain Register also for destruction
+    * \param persist Register also for destruction
     */
    void GlobalOpList::Add(string &key, Operator* Op, bool persist)
    {
@@ -42,9 +42,9 @@ namespace QDLIB {
       /* Check if key exists */
       if (_OpStore.find(key) != _OpStore.end())
          throw (EIncompatible("Key already exists in operator list: ", key));
-      
+
       if (Op == NULL)
-         throw (EIncompatible("Operator not initalized"));
+         throw (EIncompatible("GlobalOpList: Operator is NULL!"));
       
        if (strlen(key.c_str()) < 1) { /* If no key is given, we produce an internal key with a serial number */
           stringstream ss;
@@ -137,7 +137,7 @@ namespace QDLIB {
          }
       }
 
-      /* If the operator was not found, we register it and do the initialization */
+      /* If the operator was not found, we register it and keep track of the initialization */
       if (!found) {
          string key;
          Add(key, Op);

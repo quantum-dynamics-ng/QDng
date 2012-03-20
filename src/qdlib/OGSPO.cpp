@@ -8,19 +8,14 @@ namespace QDLIB
    OGSPO::OGSPO() :
       _name("OGSPO"), _spoLen(0), _laststep(-1), _lastexp(0)
    {
-      _needs.SetValue("A", "");
-      _needs.SetValue("B", "opt");
-      _needs.SetValue("C", "opt");
-      _needs.SetValue("D", "opt");
-
-      for (int i = 0; i < GSPO_MAX_LEN; i++) {
+      for (int i = 0; i < MAX_OPS; i++) {
          _ops[i] = NULL;
       }
    }
 
    OGSPO::~OGSPO()
    {
-      DELETE_OP(_H);
+      DELETE_OP(H);
    }
 
    /**
@@ -61,13 +56,38 @@ namespace QDLIB
 
    void OGSPO::Init(WaveFunction *Psi)
    {
+      if (_exp[0].size() > 0) return; // Avoid init twice
+
+
+      /* Initalize with all elements hamiltonian */
+      if (H == NULL) {
+         H = new OSum();
+         CollectorOp::Instance()->Register(H);
+      }
+
+      /* Grab and check operators from list */
+      for (int i=0; i < OList::Size(); i++) {
+         char base[2] = "A";
+         base[0] += i;
+
+         Operator* O = Get(string(base));
+
+         ODSpace *op = dynamic_cast<ODSpace*> (O);
+         if (op == NULL)
+            throw(EIncompatible("GSPO: Operator has no diagonal representation", O->Name()));
+
+         _ops[int(i)] = op;
+         _spoLen++;
+         dynamic_cast<OSum*>(H)->Add(string(base), op);
+      }
+
+      _spoLen = OList::Size();
+
       if (clock == NULL)
          throw(EParamProblem("Propagator has no clock!"));
 
       if (_spoLen < 1)
          throw(EParamProblem("GSPO is empty!"));
-
-      if (_exp[0].size() > 0) return; // Avoid init twice
       
       for (int i = 0; i < _spoLen; i++) {
          if (_ops[i] == NULL)
@@ -76,6 +96,9 @@ namespace QDLIB
          _exp[i].newsize(Psi->size(), Psi->strides());
       }
 
+      OPropagator::Init(Psi);
+      H->Init(Psi);
+      H->Clock(Operator::Clock());
    }
 
    void OGSPO::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
@@ -148,36 +171,6 @@ namespace QDLIB
       }
 
       return valid;
-   }
-
-   void OGSPO::AddNeeds(string &Key, Operator *O)
-   {
-      char base = 'A';
-      const char *key = Key.c_str();
-
-      char i = key[0] - base;
-      	 
-      if (i < GSPO_MAX_LEN && i > -1) {
-	 if (int(i) < _spoLen)
-	    throw(EParamProblem("GSPO: SPO-key already given ", key)); 
-
-         ODSpace *op = dynamic_cast<ODSpace*> (O);
-
-         if (op == NULL)
-            throw(EIncompatible("GSPO: Operator has no diagonal representation", O->Name()));
-
-         _ops[int(i)] = op;
-         _spoLen++;
-      } else {
-         throw(EParamProblem("GSPO: Invalid SPO - key given ", key));
-      }
-      
-      if (H == NULL) {
-         _H = new OSum();
-         CollectorOp::Instance()->Register(_H);
-         H = _H;
-      }   
-      _H->Add(O);
    }
 
 }

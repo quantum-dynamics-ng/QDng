@@ -24,7 +24,6 @@ namespace QDLIB
    {
       private:
 	 string _name;
-	 ParamContainer _needs;
 	 
 	 int _order;          /* Recursion depth */
 	 cVec _coeff;         /* Coefficients including the Bessel functions at k'th order */
@@ -59,12 +58,7 @@ namespace QDLIB
          virtual Operator* operator=(Operator* O);
 	 
 	 virtual Operator* Copy(Operator* O);
-	 
-	 /* Interface implementation, Propagator */
-	 virtual ParamContainer& TellNeeds();
-	 
-	 virtual void AddNeeds(string &Key, Operator *O);
-         
+
          virtual bool Valid(WaveFunction *Psi);
 
    };

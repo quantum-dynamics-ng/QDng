@@ -79,22 +79,8 @@ void OGSPOTest::tearDown()
 
 void OGSPOTest::API_Test()
 {
-   ParamContainer pm;
-   string key, value;
-   char a = 'A';
-   char abc[] = " \0";
-
    /* Name */
    CPPUNIT_ASSERT(U->Name() == "OGSPO");
-
-   /* Needs - expect at least A,B,C */
-   pm = U->TellNeeds();
-   pm.ResetPosition();
-   for (char i = 0; i < 3; i++) {
-      pm.GetNextValue(key, value);
-      abc[0] = a + i;
-      CPPUNIT_ASSERT_MESSAGE(abc, key == string(abc));
-   }
 
 }
 
@@ -104,7 +90,7 @@ void OGSPOTest::NUMERIC_Test_H0()
    ParamContainer pm;
    string s = "A";
 
-   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Add Operator", U->AddNeeds(s, H));
+   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Add Operator", U->Add(s, H));
    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Init PM", U->Init(pm));
    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Init Psi", U->Init(psi0));
 
@@ -124,9 +110,9 @@ void OGSPOTest::NUMERIC_Test_Ht()
    ParamContainer pm;
    string s = "A";
 
-   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Add Operator", U->AddNeeds(s, H));
+   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Add Operator", U->Add(s, H));
    s = "B";
-   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Add Operator", U->AddNeeds(s, Ht));
+   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Add Operator", U->Add(s, Ht));
 
    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Init PM", U->Init(pm));
    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Init Psi", U->Init(psi0));

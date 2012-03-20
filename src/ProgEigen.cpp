@@ -248,7 +248,7 @@ namespace QDLIB
       /* Force backward imaginary time */
       _U->ImaginaryTime();
       _U->Backward();
-      GlobalOpList::Instance().Init(_U, _PsiInitial);
+      _U->Init(_PsiInitial);
       
       /* Report what the propagator has chosen */
       ParamContainer Upm;
@@ -510,8 +510,9 @@ namespace QDLIB
          _Energies_raw[i] = _H->Expec(Psi);
          
          log.cout() << i;
+         log.cout().precision(8);
          log.coutdbg() << "\t" << index << "\t" << energy;
-         log.cout() << "\t" << _Energies_raw[i] << endl;
+         log.cout() << "\t" << fixed << _Energies_raw[i] << endl;
          log.flush();
          _efile << Psi;
          if (_diag) /* the diag proc. takes the basis from the Projector */
@@ -547,7 +548,6 @@ namespace QDLIB
 	 throw ( EParamProblem ("No propagator found") );
       
       _U = ChainLoader::LoadPropagator( section );
-      _H = _U->Hamiltonian();
       delete section;
       
       /* Load the initial Wavefunction */
@@ -560,9 +560,14 @@ namespace QDLIB
       delete section;
       log.IndentDec();
       
-      /* Make sure our hamiltonian is initalized */
-      GlobalOpList::Instance().Init(_H, _PsiInitial);
+      /* Make sure our Propagator is initalized */
+      _U->Clock(clock);
+      _U->Init(_PsiInitial);
+
+      _H = _U->Hamiltonian();
+
       _P->Init(_PsiInitial);
+
       log.cout() << "Initial Norm & energy: " << _PsiInitial->Norm() << "\t" << _H->Expec(_PsiInitial) << endl;
       
       _PsiInitial->Normalize();

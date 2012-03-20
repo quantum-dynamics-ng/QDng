@@ -20,7 +20,6 @@ namespace QDLIB {
     {
         private:
             string _name;
-            ParamContainer _needs;
             int _order;       /* Recursion depth, size of basis */
             WFBuffer _Lzb;  /* Buffer for Lanczos basis */
             WaveFunction *buf0, *buf1, *buf2;   /* Buffers */ 
@@ -49,11 +48,6 @@ namespace QDLIB {
             virtual Operator* operator=(Operator* O);
             virtual Operator* Copy(Operator* O);
             virtual bool Valid(WaveFunction *Psi);
-
-            /* Interface implementation, Propagator */
-            virtual ParamContainer& TellNeeds();
-
-            virtual void AddNeeds(string &Key, Operator *O);
     };
 
 }

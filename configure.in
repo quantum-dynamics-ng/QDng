@@ -57,7 +57,7 @@ dnl Compiler flags for development
 dnl
 AC_ARG_ENABLE([devel],
               [AS_HELP_STRING([--enable-devel],[Enable gcc pedantic code checking])],
-              [enable_devel=yes; DEVEL_FLAGS="-Werror -pedantic -pedantic-errors -Wall -Wdiv-by-zero -ansi -Wall"],
+              [enable_devel=yes; DEVEL_FLAGS="-Werror -pedantic -pedantic-errors -Wall -Wdiv-by-zero -ansi -Wall -Wno-error=unused-function"],
               [enable_devel=no; DEVEL_FLAGS=""])
 
 AC_SUBST(DEVEL_FLAGS)
@@ -176,8 +176,17 @@ AC_F77_WRAPPERS
 
 AC_ARG_ENABLE([mods],
 	      [AS_HELP_STRING([--enable-mods],[Enable dynamic loadable modules])],
-	      AC_DEFINE([USE_DYNMODS], [1], [Enable dynamic loadable modules]))
+	      [
+	       if test "x$enableval" = "xyes"; then
+	         AC_DEFINE([USE_DYNMODS], [1], [Enable dynamic loadable modules])
+	         DL_LIBS="-ldl";
+	       else
+	         DL_LIBS="";
+	       fi
+              ],
+	      [DL_LIBS="";])
 
+AC_SUBST(DL_LIBS)
 
 AC_ARG_ENABLE([mpi],
 	    [AS_HELP_STRING([--enable-mpi],[Build with support for mpi parallization])],

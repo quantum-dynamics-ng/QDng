@@ -180,6 +180,10 @@ namespace QDLIB {
          if (attr.isPresent("value"))
             attr.GetValue("value", value);
 
+         /* Check if value should be integrated over time */
+         if (attr.isPresent("int"))
+            attr.GetValue("int", integrate);
+
          Operator* O=NULL;
          if (faction != "normalize")
          {
