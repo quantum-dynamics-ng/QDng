@@ -239,7 +239,7 @@ namespace QDLIB {
          for (i=0; i < size; i++){
             va = a[i];
             vb = b[i];
-            va += vb * c;
+            va += vb * vc;
             va.Store(a[i]);
          }
 #else
@@ -1400,7 +1400,7 @@ namespace QDLIB {
          for (i=0; i < size; i++){
             va = a[i];
             vb = b[i];
-            vc = va * vb * d;
+            vc = va * vb * vd;
             vc.Store(c[i]);
          }
 #else

@@ -63,6 +63,9 @@ namespace QDLIB
       /** Initializer with native type. */
       m128dc(const __m128d &a) { v = a; }
 
+      /** length of vector **/
+      static uint len() { return 1; }
+
       m128dc(const dcomplex &a)
       {
          v = _mm_load_pd( (double*) &a );
@@ -75,10 +78,19 @@ namespace QDLIB
       }
 
       /** Store. */
-      inline void Store( dcomplex &a )
+      inline void Store( dcomplex &a ) const
       {
          _mm_store_pd( (double*) &a, v );
       }
+
+
+      inline operator dcomplex() const
+      {
+         dcomplex ret;
+         _mm_store_pd( (double*) &ret, v );
+         return ret;
+      }
+
 
       /**
        * Complex multiplication.
@@ -141,9 +153,26 @@ namespace QDLIB
       /**
        * Scalar multiplication
        */
+      inline m128dc operator*(const double a)
+      {
+         return m128dc( _mm_mul_pd(v, _mm_load1_pd( (double*) &a ).v) );
+      }
+
+
+      /**
+       * Scalar multiplication
+       */
       inline void operator*=(const m128dd &a)
       {
          v = _mm_mul_pd(v, a.v);
+      }
+
+      /**
+       * Scalar multiplication
+       */
+      inline void operator*=(const double a)
+      {
+         v = _mm_mul_pd(v, _mm_load1_pd( (double*) &a ).v);
       }
 
       /**
@@ -171,8 +200,16 @@ namespace QDLIB
          return m128dc( _mm_sub_pd(v, a.v) );
       }
 
-   };
 
+      /**
+       * Subtraction
+       */
+      inline void operator-=(const m128dc &a)
+      {
+         v = _mm_sub_pd(v, a.v) ;
+      }
+
+   };
 }
 
 
