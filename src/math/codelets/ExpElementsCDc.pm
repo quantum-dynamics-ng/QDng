@@ -1,5 +1,5 @@
 NAME ExpElements
 VAR cVec* A
-VAR cVec* B
-VAR dcomplex c
-EXP A = cexp(B * c)
+VAR dVec* B
+VAR dcomplex d
+EXP A = cexp( B * d )

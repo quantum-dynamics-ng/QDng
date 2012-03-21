@@ -2,7 +2,7 @@
 #define DCOMPLEX_H 
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #ifdef HAVE_MPI
 #include <mpi.h>
@@ -269,6 +269,7 @@ namespace QDLIB {
     return d;
   }
   
+
   /** Absolute value of complex number.*/
   inline double cabs(dcomplex z)
   {

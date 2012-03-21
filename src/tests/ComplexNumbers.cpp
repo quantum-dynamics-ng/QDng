@@ -279,7 +279,7 @@ void ComplexNumbers::SSE2_Test()
    CPPUNIT_ASSERT_DOUBLES_EQUAL(-4, val[2].imag(), TIGHT_EPS );
 
    /* dcomplex  * I * double */
-   vc = va.MulImag(5.0);
+   vc = va.MultImag(5.0);
    vc.Store(val[2]);
 
    CPPUNIT_ASSERT_DOUBLES_EQUAL(-10, val[2].real(), TIGHT_EPS );

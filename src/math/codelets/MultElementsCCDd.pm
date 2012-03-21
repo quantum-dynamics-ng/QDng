@@ -1,6 +1,6 @@
-NAME MultElementsAdd
+NAME MultElements
 VAR cVec* A
 VAR cVec* B
 VAR dVec* C
 VAR double d
-EXP A = A + B * C * d;
+EXP A =  B * C * d;

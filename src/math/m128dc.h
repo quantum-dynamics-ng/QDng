@@ -23,34 +23,6 @@
 namespace QDLIB
 {
 
-
-   /**
-    * SSE2/3 representation of a twin double
-    */
-//   struct m128dd
-//   {
-//      __m128d v;  /* a,a */
-//
-//      /** Nothing is set! */
-//      m128dd() {}
-//
-//      /** Initializer with native type. */
-//      m128dd(const __m128d &a) { v = a; }
-//
-//      /** initializer with designated type */
-//      m128dd(const double a)
-//      {
-//         v = _mm_load1_pd( (double*) &a );
-//      }
-//
-//      /** Load. */
-//      inline void operator=(const double &a)
-//      {
-//         v = _mm_load1_pd( (double*) &a );
-//      }
-//
-//   };
-
    /**
     * SSE2/3 representation of dcomplex
     */
@@ -127,26 +99,11 @@ namespace QDLIB
          *this = (*this) * a;
       }
 
-      /**
-       * Complex * I * real
-       */
-//      inline m128dc MulImag(const m128dd &a) const
-//      {
-//         __m128d res;
-//         static const __m128d SIGNMASK128 =
-//                       _mm_castsi128_pd(_mm_set_epi32(0x80000000,0,0,0));
-//
-//         res = _mm_xor_pd(v, SIGNMASK128);
-//         res = _mm_mul_pd(res, a.v);
-//         res = _mm_shuffle_pd(res, res, 0x1);
-//
-//         return m128dc(res);
-//      }
 
       /**
        * Complex * I * real
        */
-      inline m128dc MulImag(const double &a) const
+      inline m128dc MultImag(const double &a) const
       {
          __m128d res;
          __m128d sd = _mm_load1_pd( (double*) &a );
@@ -157,35 +114,58 @@ namespace QDLIB
          res = _mm_mul_pd(res, sd);
          res = _mm_shuffle_pd(res, res, 0x1);
 
-
-
          return m128dc(res);
       }
 
-//      /**
-//       * Scalar multiplication
-//       */
-//      inline m128dc operator*(const m128dd &a) const
-//      {
-//         return m128dc( _mm_mul_pd(v, a.v) );
-//      }
+      inline m128dc conj()
+      {
+         static const __m128d SIGNMASK128 =
+                       _mm_castsi128_pd(_mm_set_epi32(0x80000000,0,0,0));
+
+         return m128dc(_mm_xor_pd(v, SIGNMASK128));
+      }
+
+      inline m128dc imag()
+      {
+         static const __m128d IMAGMASK128 =
+                       _mm_castsi128_pd(_mm_set_epi32(0xFFFFFFFF,0xFFFFFFFF,0,0));
+
+         return m128dc( _mm_and_pd(v, IMAGMASK128) );
+      }
+
+      inline m128dc real()
+      {
+         static const __m128d REALMASK128 =
+                       _mm_castsi128_pd(_mm_set_epi32(0,0,0xFFFFFFFF,0xFFFFFFFF));
+
+         return m128dc( _mm_and_pd(v, REALMASK128) );
+      }
+
+
+      /* Return imag as scalar */
+      inline double imags()
+      {
+         double res;
+        _mm_store_sd( (double*) &res, v);
+        return res;
+      }
+
+      /* Return real as scalar */
+      inline double reals()
+      {
+         double res;
+        _mm_store_sd( (double*) &res, v);
+        return res;
+      }
 
       /**
        * Scalar multiplication
        */
-      inline m128dc operator*(const double a) const
+      inline m128dc operator*(const double& a) const
       {
          return m128dc( _mm_mul_pd(v, _mm_load1_pd( (double*) &a )) );
       }
 
-
-//      /**
-//       * Scalar multiplication
-//       */
-//      inline void operator*=(const m128dd &a)
-//      {
-//         v = _mm_mul_pd(v, a.v);
-//      }
 
       /**
        * Scalar multiplication
@@ -230,14 +210,6 @@ namespace QDLIB
 
    };
 
-
-//   inline std::ostream& operator<<(std::ostream& s, m128dd dd)
-//   {
-//      double a[2];
-//      _mm_store_pd( (double*) a, dd.v );
-//      s << a[0] << "," << a[1] << std::endl;
-//      return s;
-//   }
 
    inline std::ostream& operator<<(std::ostream& s, m128dc dc)
    {
