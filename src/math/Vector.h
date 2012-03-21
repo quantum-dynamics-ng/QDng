@@ -30,8 +30,6 @@
 #include <string.h>
 
 
-#define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
-
 #ifdef HAVE_MPI
 #include "mpi.h"
 #endif
