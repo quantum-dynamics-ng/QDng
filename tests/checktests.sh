@@ -122,7 +122,6 @@ CheckT-Expec()
 # Test list
 CheckTGE Cheby
 CheckTGE GSPO
-CheckTGE SPO
 CheckTGE SIL
 
 
