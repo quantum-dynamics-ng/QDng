@@ -111,7 +111,6 @@ namespace QDLIB
             psi = Psi->begin(s);
 #ifdef HAVE_SSE2
             m128dc vk2, vbf, vk0, vk1, vpsi, v_o(_offset), v_exp2(exp2), v_coeff(coeff);
-            m128dd v_s(1/_scaling);
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) default(shared) private(j,vk2, vbf, vk0, vk1, vpsi)
 #endif
@@ -122,7 +121,7 @@ namespace QDLIB
                vpsi = psi[j];
 
                vbf = vbf - vk1 * v_o;
-               vbf *= v_s;
+               vbf *= (1/_scaling);
                vbf *= v_exp2;
                vk2 = vk0 + vbf;
                vk0 = vk2;
@@ -155,6 +154,11 @@ namespace QDLIB
          ket0 = swap;
       }
       H->RecalcInternals(true); /* turn it on again */
+
+      ket0->ReaquireStorage();
+      ket1->ReaquireStorage();
+      ket2->ReaquireStorage();
+      buf->ReaquireStorage();
    }
 
    Operator * OCheby::operator =(Operator * O)

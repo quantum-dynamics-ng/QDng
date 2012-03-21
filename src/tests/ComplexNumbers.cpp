@@ -226,19 +226,81 @@ void ComplexNumbers::SSE2_Test()
 
    m128dc va(val[0]), vb(val[1]), vc;
 
-   vc = va * vb;
+   /* Load & Store */
+   vc = va;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(val[0].real(), val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(val[0].imag(), val[2].imag(), TIGHT_EPS );
 
+   /* operator* */
+   vc = va * vb;
+   val[2] = 0;
    vc.Store(val[2]);
    CPPUNIT_ASSERT_DOUBLES_EQUAL(-7, val[2].real(), TIGHT_EPS );
    CPPUNIT_ASSERT_DOUBLES_EQUAL(16, val[2].imag(), TIGHT_EPS );
 
-   m128dd vd(5.0);
+   /* operator*= */
+   vc = va;
+   vc *= vb;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-7, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(16, val[2].imag(), TIGHT_EPS );
 
-   vc = va.MulImag(vd);
+   /* operator+ */
+   vc = va + vb;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(6, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(8, val[2].imag(), TIGHT_EPS );
+
+   /* operator+= */
+   vc = va;
+   vc += vb;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(6, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(8, val[2].imag(), TIGHT_EPS );
+
+   /* operator- */
+   vc = va - vb;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-4, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-4, val[2].imag(), TIGHT_EPS );
+
+   /* operator-= */
+   vc = va;
+   vc -= vb;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-4, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(-4, val[2].imag(), TIGHT_EPS );
+
+   /* dcomplex  * I * double */
+   vc = va.MulImag(5.0);
    vc.Store(val[2]);
 
    CPPUNIT_ASSERT_DOUBLES_EQUAL(-10, val[2].real(), TIGHT_EPS );
    CPPUNIT_ASSERT_DOUBLES_EQUAL(5, val[2].imag(), TIGHT_EPS );
+
+   /* Scalar multiplication */
+   vc = va * 3.0;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(3, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(6, val[2].imag(), TIGHT_EPS );
+
+   /* Scalar multiplication */
+   vc = va;
+   vc *= 3.0;
+   val[2] = 0;
+   vc.Store(val[2]);
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(3, val[2].real(), TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(6, val[2].imag(), TIGHT_EPS );
+
+
 }
 #endif
 

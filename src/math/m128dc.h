@@ -8,7 +8,7 @@
 #ifndef M128DC_H_
 #define M128DC_H_
 
-#include "dcomplex.h"
+#include <iostream>
 
 #ifdef HAVE_SSE2
 #include <emmintrin.h>
@@ -18,6 +18,7 @@
 #endif
 
 
+#include "dcomplex.h"
 
 namespace QDLIB
 {
@@ -26,29 +27,29 @@ namespace QDLIB
    /**
     * SSE2/3 representation of a twin double
     */
-   struct m128dd
-   {
-      __m128d v;  /* a,a */
-
-      /** Nothing is set! */
-      m128dd() {}
-
-      /** Initializer with native type. */
-      m128dd(const __m128d &a) { v = a; }
-
-      /** initializer with designated type */
-      m128dd(const double a)
-      {
-         v = _mm_load1_pd( (double*) &a );
-      }
-
-      /** Load. */
-      inline void operator=(const double &a)
-      {
-         v = _mm_load1_pd( (double*) &a );
-      }
-
-   };
+//   struct m128dd
+//   {
+//      __m128d v;  /* a,a */
+//
+//      /** Nothing is set! */
+//      m128dd() {}
+//
+//      /** Initializer with native type. */
+//      m128dd(const __m128d &a) { v = a; }
+//
+//      /** initializer with designated type */
+//      m128dd(const double a)
+//      {
+//         v = _mm_load1_pd( (double*) &a );
+//      }
+//
+//      /** Load. */
+//      inline void operator=(const double &a)
+//      {
+//         v = _mm_load1_pd( (double*) &a );
+//      }
+//
+//   };
 
    /**
     * SSE2/3 representation of dcomplex
@@ -95,7 +96,7 @@ namespace QDLIB
       /**
        * Complex multiplication.
        */
-      inline m128dc operator*(const m128dc &b)
+      inline m128dc operator*(const m128dc &b) const
       {
          __m128d re, im;
          static const __m128d SIGNMASK128 =
@@ -129,43 +130,62 @@ namespace QDLIB
       /**
        * Complex * I * real
        */
-      inline m128dc MulImag(const m128dd &a)
+//      inline m128dc MulImag(const m128dd &a) const
+//      {
+//         __m128d res;
+//         static const __m128d SIGNMASK128 =
+//                       _mm_castsi128_pd(_mm_set_epi32(0x80000000,0,0,0));
+//
+//         res = _mm_xor_pd(v, SIGNMASK128);
+//         res = _mm_mul_pd(res, a.v);
+//         res = _mm_shuffle_pd(res, res, 0x1);
+//
+//         return m128dc(res);
+//      }
+
+      /**
+       * Complex * I * real
+       */
+      inline m128dc MulImag(const double &a) const
       {
          __m128d res;
+         __m128d sd = _mm_load1_pd( (double*) &a );
          static const __m128d SIGNMASK128 =
                        _mm_castsi128_pd(_mm_set_epi32(0x80000000,0,0,0));
 
          res = _mm_xor_pd(v, SIGNMASK128);
-         res = _mm_mul_pd(res, a.v);
+         res = _mm_mul_pd(res, sd);
          res = _mm_shuffle_pd(res, res, 0x1);
+
+
 
          return m128dc(res);
       }
 
-      /**
-       * Scalar multiplication
-       */
-      inline m128dc operator*(const m128dd &a)
-      {
-         return m128dc( _mm_mul_pd(v, a.v) );
-      }
+//      /**
+//       * Scalar multiplication
+//       */
+//      inline m128dc operator*(const m128dd &a) const
+//      {
+//         return m128dc( _mm_mul_pd(v, a.v) );
+//      }
 
       /**
        * Scalar multiplication
        */
-      inline m128dc operator*(const double a)
+      inline m128dc operator*(const double a) const
       {
          return m128dc( _mm_mul_pd(v, _mm_load1_pd( (double*) &a )) );
       }
 
 
-      /**
-       * Scalar multiplication
-       */
-      inline void operator*=(const m128dd &a)
-      {
-         v = _mm_mul_pd(v, a.v);
-      }
+//      /**
+//       * Scalar multiplication
+//       */
+//      inline void operator*=(const m128dd &a)
+//      {
+//         v = _mm_mul_pd(v, a.v);
+//      }
 
       /**
        * Scalar multiplication
@@ -178,7 +198,7 @@ namespace QDLIB
       /**
        * Addition
        */
-      inline m128dc operator+(const m128dc &a)
+      inline m128dc operator+(const m128dc &a) const
       {
          return m128dc( _mm_add_pd(v, a.v) );
       }
@@ -195,7 +215,7 @@ namespace QDLIB
       /**
        * Subtraction
        */
-      inline m128dc operator-(const m128dc &a)
+      inline m128dc operator-(const m128dc &a) const
       {
          return m128dc( _mm_sub_pd(v, a.v) );
       }
@@ -209,6 +229,24 @@ namespace QDLIB
       }
 
    };
+
+
+//   inline std::ostream& operator<<(std::ostream& s, m128dd dd)
+//   {
+//      double a[2];
+//      _mm_store_pd( (double*) a, dd.v );
+//      s << a[0] << "," << a[1] << std::endl;
+//      return s;
+//   }
+
+   inline std::ostream& operator<<(std::ostream& s, m128dc dc)
+   {
+      dcomplex c;
+      dc.Store(c);
+      s << c << std::endl;
+      return s;
+   }
+
 }
 
 

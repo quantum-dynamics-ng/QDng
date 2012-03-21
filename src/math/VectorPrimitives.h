@@ -189,12 +189,11 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          m128dc v;
-         m128dd vd(d);
  #ifdef _OPENMP
  #pragma omp parallel for schedule(static) default(shared) private(i,v)
  #endif
          for (i=0; i < size; i++){
-            v = m128dc(b[i]) * vd;
+            v = m128dc(b[i]) * d;
             v += m128dc(a[i]);
             v.Store(a[i]);
          }
@@ -328,17 +327,15 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          m128dc va,vc;
-         m128dd vb,vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(i,va,vb,vc)
+#pragma omp parallel for schedule(static) default(shared) private(i,va,vc)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
-            vb = b[i];
             vc = c[i];
             vc *= va;
-            vc = vc.MulImag(vb);
-            vc *= vd;
+            vc = vc.MulImag(b[i]);
+            vc *= d;
             vc.Store(c[i]);
          }
 #else
@@ -461,14 +458,12 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          m128dc va;
-         m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)d
+#pragma omp parallel for schedule(static) default(shared) private(i,va)
 #endif
          for (i=0; i < size; i++){
-            vb = b[i];
             va = a[i];
-            va = va.MulImag(vb) * vd;
+            va = va.MulImag(b[i]) * d;
             va.Store(a[i]);
          }
 #else
@@ -749,14 +744,13 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          m128dc va,vb;
-         m128dd vc(c);
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) default(shared) private(i)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
             vb = b[i];
-            va *= vb * vc;
+            va *= vb * c;
             va.Store(a[i]);
          }
 
@@ -815,9 +809,9 @@ namespace QDLIB {
       lint size = A->lsize();
       lint strides = A->strides();
 
-      dcomplex *a;
-      dcomplex *c;
-      double *b;
+      dcomplex *a __attribute__((aligned(16)));
+      dcomplex *c __attribute__((aligned(16)));
+      double *b __attribute__((aligned(16)));
 
       lint s;
       int rank = A->MPIrank();
@@ -833,15 +827,12 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          m128dc va;
-         m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(i,va,vb,vd)
+#pragma omp parallel for schedule(static) default(shared) private(i,va)
 #endif
          for (i=0; i < size; i++){
-            va = a[i];
-            vb = b[i];
-            va *= vb;
-            va *= vd;
+            va = m128dc(a[i]) * b[i];
+            va *= d;
             va.Store(c[i]);
          }
 #else
@@ -887,15 +878,13 @@ namespace QDLIB {
 
 #ifdef HAVE_SSE2
          m128dc va;
-         m128dd vb;
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,va)
 #endif
          for (i=0; i < size; i++)
          {
             va = a[i];
-            vb = b[i];
-            va *= vb;
+            va *= b[i];
             va.Store(c[i]);
          }
 #else
@@ -1101,13 +1090,12 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          m128dc va,vb;
-         m128dd vd(d);
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) default(shared) private(i,va,vb)
 #endif
          for (i=0; i < size; i++){
             vb = b[i];
-            va = vb * vd;
+            va = vb * d;
             va.Store(a[i]);
          }
 
@@ -1393,14 +1381,12 @@ namespace QDLIB {
          lint i;
 #ifdef HAVE_SSE2
          m128dc vc, va;
-         m128dd vb, vd(d);
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(i,vc,va,vb)
+#pragma omp parallel for schedule(static) default(shared) private(i,vc,va)
 #endif
          for (i=0; i < size; i++){
             va = a[i];
-            vb = b[i];
-            vc = va * vb * vd;
+            vc = va * b[i] * d;
             vc.Store(c[i]);
          }
 #else

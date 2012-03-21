@@ -46,6 +46,9 @@ while($line = <DEF>) {
 
 $cod =~ s/\@DESC\@/$exp/g;
 
+#
+# Replace Variables
+#
 for ($i = 0; $i < $varcount; $i++) {
   if ($i > 0) {
     $params = sprintf("%s, ", $params);    
