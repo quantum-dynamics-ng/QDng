@@ -20,7 +20,6 @@ void WFLevelTest::API_Test()
 {
    ParamContainer pm;
    WFLevel *wf = new WFLevel();
-   CollectorWF::Instance()->Register(wf);
    WaveFunction *wf2 = NULL;
    
    /* The name */
@@ -52,7 +51,6 @@ void WFLevelTest::NUMERIC_Test()
 {
    ParamContainer pm;
    WFLevel *wf = new WFLevel();
-   CollectorWF::Instance()->Register(wf);
    
    pm.SetValue("size", 2);
    wf->Init(pm);

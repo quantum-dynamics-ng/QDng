@@ -14,7 +14,6 @@
 { \
       CLASSNAME *p; \
       p = new CLASSNAME (); \
-      CollectorOp::Instance()->Register(p); \
       return p; \
 } \
    const string& CLASSNAME::Name() \
@@ -22,14 +21,13 @@
       return _name; \
 }
 
-
+// CollectorOp::Instance()->Register(p);
 
 #define QDNG_OPERATOR_NAME_FUNCTION(CLASSNAME) \
    Operator* CLASSNAME::NewInstance() \
 { \
       CLASSNAME *p; \
       p = new CLASSNAME (); \
-      CollectorOp::Instance()->Register(p); \
       return p; \
 }
 
@@ -99,7 +97,27 @@ namespace QDLIB {
 	 Operator(ParamContainer &params):  _params(params), _isTimedependent(false)
 	 {
          }
-         
+
+
+	 /**
+	  * Overloaded new Operator.
+	  * Registers the object with the collector.
+	  */
+	 void* operator new(size_t size)
+	 {
+	    Operator* p = (Operator*) malloc(size);
+	    Collector<Operator>::Instance()->Register(p);
+	    return(p);
+	 }
+
+	 /**
+	  * Removes Object from memory
+	  */
+	 void operator delete(void *ptr)
+	 {
+	    free(ptr);
+	 }
+
 	 /**
 	  * This method should create a new instance.
 	  * 

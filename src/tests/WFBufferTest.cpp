@@ -36,7 +36,6 @@ void WFBufferTest::API_Test_DiskBuf()
    
    wf0 = new WFLevel();
    wf0->Init(pm);
-   CollectorWF::Instance()->Register(wf0);
   
    CPPUNIT_ASSERT_NO_THROW(buf = new WFBuffer());
    

@@ -23,10 +23,8 @@ OMatDipoleTest::~OMatDipoleTest()
 
 void OMatDipoleTest::API_Test()
 {
-   CollectorOp *Cop = CollectorOp::Instance();
-   
    OMatDipole *M = new OMatDipole();
-   Cop->Register(M);
+   
    
    Laser* laser;
    ParamContainer pm;
@@ -78,15 +76,11 @@ void OMatDipoleTest::API_Test()
 
 void OMatDipoleTest::NUMERIC_Test()
 {
-   CollectorOp *Cop = CollectorOp::Instance();
-   CollectorWF *Cwf = CollectorWF::Instance();
 
    
    OMatDipole *M = new OMatDipole();
-   Cop->Register(M);
    WaveFunction *wf = new WFLevel();
    WaveFunction *wf2;
-   Cwf->Register(wf);
    
    Laser* laser;
    ParamContainer pm;

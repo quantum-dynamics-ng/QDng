@@ -101,7 +101,6 @@ namespace QDLIB
             ss << base << "_" << i << j;
             file.Name(ss.str());
             _GnnG[i][j] = new OGridPotential();
-            CollectorOp::Instance()->Register(_GnnG[i][j]);
             file >> ((OGridSystem*) _GnnG[i][j]);
          }
       }
@@ -109,12 +108,10 @@ namespace QDLIB
       /* Create Momentum Operators */
       for (int i=0; i < Dim(); i++){
          OList::Add( new OGridNabla(true, i) );
-         CollectorOp::Instance()->Register(Get(i));
       }
       /* Create Position Operators */
       for (int i=0; i < Dim(); i++){
          OList::Add( new OGridPosition(i) );
-         CollectorOp::Instance()->Register(Get(i));
       }
 
 

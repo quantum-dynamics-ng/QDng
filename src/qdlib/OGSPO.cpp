@@ -62,7 +62,6 @@ namespace QDLIB
       /* Initalize with all elements hamiltonian */
       if (H == NULL) {
          H = new OSum();
-         CollectorOp::Instance()->Register(H);
       }
 
       /* Grab and check operators from list */

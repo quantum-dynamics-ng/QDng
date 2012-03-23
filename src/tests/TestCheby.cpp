@@ -54,12 +54,6 @@ void TestCheby::setUp()
 
    *psi1 = dcomplex(0);
 
-   CollectorOp *Cop = CollectorOp::Instance();
-   Cop->Register(U);
-   Cop->Register(H);
-
-   CollectorWF *Cwf = CollectorWF::Instance();
-   Cwf->Register(psi0);
 }
 
 void TestCheby::tearDown()

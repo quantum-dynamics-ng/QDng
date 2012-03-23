@@ -18,14 +18,10 @@ WaveFunctionTest::~WaveFunctionTest()
 
 void WaveFunctionTest::setUp()
 {
-   CollectorWF *Cwf = CollectorWF::Instance();
    wfr = new WFT();
    wfc = new WFT();
    wfbuf = new WFT();
 
-   Cwf->Register(wfr);
-   Cwf->Register(wfc);
-   Cwf->Register(wfbuf);
    
    wfr->newsize(WF_TEST_SIZE);
    wfc->newsize(WF_TEST_SIZE);

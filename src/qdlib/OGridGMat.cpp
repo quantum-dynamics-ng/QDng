@@ -133,7 +133,6 @@ namespace QDLIB {
 	 _GmatC[i] = new double[n];
 	 for (int j=0; j <= i; j++){
 	    _Gmat[i][j] = new OGridPotential();
-	    CollectorOp::Instance()->Register(_Gmat[i][j]);
 	 }
 	 for (int j=0; j < n; j++)
 	    _GmatC[i][j] = 0;

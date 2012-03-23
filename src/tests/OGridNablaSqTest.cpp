@@ -35,15 +35,6 @@ void OGridNablaSqTest::setUp()
    
    wf2 = new WFGridCartesian();
    wf2->Init(p);
-
-   
-   
-   CollectorOp *Cop = CollectorOp::Instance();
-   Cop->Register(O);
-   
-   CollectorWF *Cwf = CollectorWF::Instance();   
-   Cwf->Register(wf);
-   Cwf->Register(wf2);
    
    /* Odd number of points */
    p.SetValue("N0", WF_TEST_SIZE + 1);
@@ -52,12 +43,8 @@ void OGridNablaSqTest::setUp()
    
    wf2o = new WFGridCartesian();
    wf2o->Init(p);
-   
-   Cwf->Register(wfo);
-   Cwf->Register(wf2o);
-   
+
    Oo = new OGridNablaSq();
-   Cop->Register(Oo);
    
    p.clear();
 }

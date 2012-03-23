@@ -177,7 +177,6 @@ namespace QDLIB {
       /* Generate sum for mother class */
       if (H == NULL){
          _H = new OSum();
-         CollectorOp::Instance()->Register(_H);
          H = _H;
       }
 

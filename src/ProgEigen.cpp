@@ -31,7 +31,6 @@ namespace QDLIB
                                       _diag(true), _start(0), _tol(1), _win(true)
    {
       _P = new OProjection();
-      CollectorOp::Instance()->Register(_P);
    }
 
 

@@ -35,15 +35,6 @@ void OGridNablaTest::setUp()
    
    wf2 = new WFGridCartesian();
    wf2->Init(p);
-
-   
-   
-   CollectorOp *Cop = CollectorOp::Instance();
-   Cop->Register(O);
-   
-   CollectorWF *Cwf = CollectorWF::Instance();
-   Cwf->Register(wf);
-   Cwf->Register(wf2);
    
    /* Odd grid */
    p.SetValue("N0", WF_TEST_SIZE+1);
@@ -55,9 +46,6 @@ void OGridNablaTest::setUp()
 
    
    Oo = new OGridNabla();
-   Cop->Register(Oo);
-   Cwf->Register(wfo);
-   Cwf->Register(wf2o);
    
    p.clear();
 }
@@ -78,7 +66,7 @@ void OGridNablaTest::API_Test()
    
    p.SetValue("dims", 1);
    CPPUNIT_ASSERT_NO_THROW(O->Init(p));
-   
+
    CPPUNIT_ASSERT_NO_THROW(O->Init(wf));
    
    /* Prefactor */

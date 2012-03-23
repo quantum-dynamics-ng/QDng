@@ -19,7 +19,6 @@
       CLASSNAME* p; \
       p = new CLASSNAME(); \
       p->Init(_params); \
-      CollectorWF::Instance()->Register(p); \
       return p; \
 }
 
@@ -51,6 +50,18 @@ namespace QDLIB {
           */
          virtual ~WaveFunction() {if (_spacebuffer != NULL) delete _spacebuffer;}
          
+         void* operator new(size_t size)
+         {
+            WaveFunction* p = (WaveFunction*) malloc(size);
+            Collector<WaveFunction>::Instance()->Register(p);
+            return(p);
+         }
+
+         void operator delete(void *ptr)
+         {
+            free(ptr);
+         }
+
          /**
           * This method should create a new instance.
           * 

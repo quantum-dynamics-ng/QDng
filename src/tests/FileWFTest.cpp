@@ -58,15 +58,12 @@ void FileWFTest::IO_Test_Single()
    WaveFunction *psi, *psi_in;
    string s;
    int n;
-
-   CollectorWF *Cwf = CollectorWF::Instance();
    
    /* Init Test WF */
    psi = new WFGridCartesian();
-   Cwf->Register(psi);
    psi_in = new WFGridCartesian();
-   Cwf->Register(psi_in);
    
+
    p.SetValue("dims",1);
    p.SetValue("N0", WF_TEST_SIZE);
    p.SetValue("xmin0", -5);
@@ -159,13 +156,9 @@ void FileWFTest::IO_Test_ZLIB()
    string s;
    int n;
 
-   CollectorWF *Cwf = CollectorWF::Instance();
-
    /* Init Test WF */
    psi = new WFGridCartesian();
-   Cwf->Register(psi);
    psi_in = new WFGridCartesian();
-   Cwf->Register(psi_in);
 
    p.SetValue("dims",1);
    p.SetValue("N0", WF_TEST_SIZE);
@@ -233,13 +226,10 @@ void FileWFTest::IO_Test_BZIP()
    string s;
    int n;
 
-   CollectorWF *Cwf = CollectorWF::Instance();
-
    /* Init Test WF */
    psi = new WFGridCartesian();
-   Cwf->Register(psi);
    psi_in = new WFGridCartesian();
-   Cwf->Register(psi_in);
+
 
    p.SetValue("dims",1);
    p.SetValue("N0", WF_TEST_SIZE);
@@ -307,19 +297,15 @@ void FileWFTest::IO_Test_BZIP()
 void FileWFTest::IO_Test_Multistate()
 {
    ParamContainer p, p_in;
-   WaveFunction *psi0, *psi1, *psi0_in, *psi1_in;
+   WaveFunction *psi0, *psi1, *psi0_in;
    WFMultistate *wfm, *wfm_in;
    string s;
    int n;
-   CollectorWF *Cwf = CollectorWF::Instance();
    
    /* Init Test WF */
    wfm = new WFMultistate();
-   Cwf->Register(wfm);
    psi0 = new WFGridCartesian();
-   Cwf->Register(psi0);
    psi1 = new WFGridCartesian();
-   Cwf->Register(psi1);
    p.SetValue("dims",1);
    p.SetValue("N0", WF_TEST_SIZE);
    p.SetValue("xmin0", -5);
@@ -350,12 +336,9 @@ void FileWFTest::IO_Test_Multistate()
    
    /* Re-read & check */
    wfm_in = new WFMultistate();
-   Cwf->Register(wfm_in);
    psi0_in = new WFGridCartesian();
-   Cwf->Register(psi0_in);
-   psi1_in = new WFGridCartesian();
-   Cwf->Register(psi1_in);
    
+
 
    psi0_in->Init(p);  /* At least one vector must be initialzed */
    

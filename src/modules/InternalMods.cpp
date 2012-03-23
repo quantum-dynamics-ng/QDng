@@ -42,7 +42,6 @@
    { \
       CLASSNAME *p; \
       p = new CLASSNAME (); \
-      CollectorOp::Instance()->Register(p); \
       return p; \
    }
 
@@ -51,7 +50,6 @@
    { \
       CLASSNAME* p; \
       p = new CLASSNAME(); \
-      CollectorWF::Instance()->Register(p); \
       return p; \
    }
 
@@ -83,7 +81,6 @@ namespace QDLIB
    {
       OGridNabla *p;
       p = new OGridNabla(true);
-      CollectorOp::Instance()->Register(p);
       return p;
    }
 

@@ -61,14 +61,6 @@ void OGSPOTest::setUp()
 
    H->Init(psi0);
    psi1 = psi0->NewInstance();
-   
-   CollectorOp *Cop = CollectorOp::Instance();
-   Cop->Register(U);
-   Cop->Register(H);
-   Cop->Register(Ht);
-   
-   CollectorWF *Cwf = CollectorWF::Instance();   
-   Cwf->Register(psi0);
 }
 
 void OGSPOTest::tearDown()

@@ -24,14 +24,10 @@ OHermitianMatrixTest::~OHermitianMatrixTest()
 
 void OHermitianMatrixTest::API_Test()
 {
-   CollectorOp *Cop = CollectorOp::Instance();
-   CollectorWF *Cwf = CollectorWF::Instance();
-   
    OHermitianMatrix *M = new OHermitianMatrix();
    OHermitianMatrix *R;
    ParamContainer pm;
 
-   Cop->Register(M);
    /* Basic stuff */
 
    CPPUNIT_ASSERT(M->Name() == "OHermitianMatrix");
@@ -64,7 +60,6 @@ void OHermitianMatrixTest::API_Test()
    CPPUNIT_ASSERT_NO_THROW( *(M->File()) << M);
 
    R = new OHermitianMatrix();
-   Cop->Register(R);
    CPPUNIT_ASSERT_NO_THROW( *(M->File()) >> R);
 
    CPPUNIT_ASSERT_NO_THROW(FS::Remove("mat.test"));
@@ -73,7 +68,6 @@ void OHermitianMatrixTest::API_Test()
 
    /* Try Init with WF */
    WFLevel *wf = new WFLevel();
-   Cwf->Register(wf);
    pm.clear();
 
    pm.SetValue("size", "2");
@@ -87,14 +81,9 @@ void OHermitianMatrixTest::API_Test()
 
 void OHermitianMatrixTest::NUMERIC_Test()
 {
-   CollectorOp *Cop = CollectorOp::Instance();
-   CollectorWF *Cwf = CollectorWF::Instance();
-
    OHermitianMatrix *M = new OHermitianMatrix();
-   Cop->Register(M);
    
    WFLevel *wf = new WFLevel();
-   Cwf->Register(wf);
    
    WaveFunction *wfo;
    ParamContainer pm;
