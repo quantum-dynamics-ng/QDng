@@ -17,7 +17,11 @@ namespace QDLIB {
 	#ifdef _OPENMP
 	#pragma omp parallel for schedule(static) default(shared) private(i)
 	#endif
-	#ifdef HAVE_SSE2
+	#ifdef HAVE_AVX
+			for (i=0; i < size; i++){
+			   @AVX_EXP@
+			}
+	#elif HAVE_SSE2
 			for (i=0; i < size; i++){
 			   @SSE_EXP@
 			}

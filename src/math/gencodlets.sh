@@ -14,8 +14,11 @@ echo " #include <omp.h>" >> VectorPrimitives.h
 echo "#endif" >> VectorPrimitives.h
 
 echo "#ifdef HAVE_SSE2" >> VectorPrimitives.h
-echo " #include \"cplx_sse2.h\"" >> VectorPrimitives.h
 echo " #include \"m128dc.h\"" >> VectorPrimitives.h
+echo "#endif" >> VectorPrimitives.h
+
+echo "#ifdef HAVE_AVX" >> VectorPrimitives.h
+echo " #include \"m256dc.h\"" >> VectorPrimitives.h
 echo "#endif" >> VectorPrimitives.h
 
 for i in $files; do
