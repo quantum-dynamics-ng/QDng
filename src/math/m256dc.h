@@ -48,32 +48,67 @@ namespace QDLIB
       /** Initializer with native type. */
       m256dc(const __m256d &a) { v = a; }
 
+      /**
+       * Init with vector.
+       */
+      m256dc(const dcomplex *a)
+       {
+          v = _mm256_load_pd( (double*) a );
+       }
+
+      /**
+       * Init with vector.
+       */
+      m256dc(const double *a)
+       {
+          v = _mm256_broadcast_pd( (__m128d*) a );
+       }
+
+      /**
+       * Init with scalar.
+       */
+      m256dc(const dcomplex &a)
+       {
+          v = _mm256_broadcast_pd( (__m128d*) &a );
+       }
+
+      /**
+       * Init with scalar.
+       */
+      m256dc(const double &a)
+       {
+          v = _mm256_broadcast_sd( (double*) &a );
+       }
+
+      /** length of vector in units of elements **/
+      static uint len() { return 2; }
+
       /** Load. */
       inline void operator=(const dcomplex *a)
       {
-         v = _mm256_load_pd( (double*) a );
+         v = _mm256_load_pd( (double*) *a );
       }
 
       /** Store. */
-      inline Store( dcomplex *a )
+      inline void Store( dcomplex& a )
       {
-         _mm256_store_pd( (double*) a, v );
+         _mm256_store_pd( (double*) &a, v );
       }
 
       /**
        * Complex multiplication.
        */
-      inline m256dc operator*(const m128dc &a, const m128dc &b)
+      inline m256dc operator*(const m256dc &b)
       {
          __m256d re, im;
          static const __m256d SIGNMASK256 =
-                       _mm256_castsi128_pd(_mm_set_epi32(0x80000000,0,0,0,0x80000000,0,0,0));
+                       _mm256_castsi256_pd(_mm256_set_epi32(0x80000000,0,0,0,0x80000000,0,0,0));
 
-         re = _mm256_mul_pd(a.v, b.v);       /* a.re * b.re, a.im * a.im */
+         re = _mm256_mul_pd(v, b.v);       /* a.re * b.re, a.im * a.im */
          re = _mm256_xor_pd(re, SIGNMASK256);   /* a.re * b.re, -(a.im * a.im) */
 
-         im = _mm256_permute_pd(b.v, b.v, 0x5);     /* swap re,im */
-         im = _mm256_mul_pd(a.v,im);                /* a.re * b.im, a.re * a.im */
+         im = _mm256_permute_pd(b.v, 0x5);     /* swap re,im */
+         im = _mm256_mul_pd(v,im);                /* a.re * b.im, a.re * a.im */
 
 
          return m256dc(_mm256_hadd_pd(re,im));       /* a.re * b.re -(a.im * a.im) ; a.re * b.im + a.re * a.im */
@@ -82,24 +117,65 @@ namespace QDLIB
       /**
        * Complex multiplication.
        */
-      inline void operator*=(const m128dc &a, const m128dc &b)
+      inline void operator*=(const m256dc &b)
       {
-         a = a * b;
+         (*this) = (*this) * b;
+      }
+
+      /**
+       * Complex * I * real
+       */
+      inline m256dc MultImag(const double &a) const
+      {
+         __m256d res;
+         __m256d sd = _mm256_broadcast_sd( (double*) &a );
+         static const __m256d SIGNMASK256 =
+                       _mm256_castsi256_pd(_mm256_set_epi32(0x80000000,0,0,0,0x80000000,0,0,0));
+
+         res = _mm256_xor_pd(v, SIGNMASK256);
+         res = _mm256_mul_pd(res, sd);
+         res = _mm256_shuffle_pd(res, res, 0x1);
+
+         return m256dc(res);
+      }
+
+      inline m256dc conj()
+      {
+         static const __m256d SIGNMASK256 =
+                  _mm256_castsi256_pd(_mm256_set_epi32(0x80000000,0,0,0,0x80000000,0,0,0));
+
+         return m256dc(_mm256_xor_pd(v, SIGNMASK256));
+      }
+
+      inline m256dc imag()
+      {
+         static const __m256d IMAGMASK256 =
+                       _mm256_castsi256_pd(_mm256_set_epi32(0xFFFFFFFF,0xFFFFFFFF,0,0,0xFFFFFFFF,0xFFFFFFFF,0,0));
+
+         return m256dc( _mm256_and_pd(v, IMAGMASK256) );
+      }
+
+      inline m256dc real()
+      {
+         static const __m256d REALMASK256=
+                       _mm256_castsi256_pd(_mm256_set_epi32(0,0,0xFFFFFFFF,0xFFFFFFFF,0,0,0xFFFFFFFF,0xFFFFFFFF));
+
+         return m256dc( _mm256_and_pd(v, REALMASK256) );
       }
 
 
       /**
        * Scalar multiplication
        */
-      inline m256dc operator*(const m128dd &a)
+      inline m256dc operator*(const double &a)
       {
-         return m256dc( _mm256_mul_pd(v, a.v) );
+         return m256dc( _mm256_mul_pd(v, _mm256_broadcast_sd((double*) &a)) );
       }
 
       /**
        * Addition
        */
-      inline void operator+=(const m128dc &a)
+      inline void operator+=(const m256dc &a)
       {
          v =  _mm256_add_pd(v, a.v) ;
       }
@@ -107,7 +183,7 @@ namespace QDLIB
       /**
        * Addition
        */
-      inline m256dc operator+(const m128dc &a)
+      inline m256dc operator+(const m256dc &a)
       {
          return m256dc( _mm256_add_pd(v, a.v) );
       }

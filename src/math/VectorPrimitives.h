@@ -4,8 +4,10 @@
  #include <omp.h>
 #endif
 #ifdef HAVE_SSE2
- #include "cplx_sse2.h"
  #include "m128dc.h"
+#endif
+#ifdef HAVE_AVX
+ #include "m256dc.h"
 #endif
 #include "codelets/MultElementsCCDd.h"
 #include "codelets/MultElementsAddCCd.h"

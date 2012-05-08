@@ -17,7 +17,11 @@ namespace QDLIB {
 	#ifdef _OPENMP
 	#pragma omp parallel for schedule(static) default(shared) private(i)
 	#endif
-	#ifdef HAVE_SSE2
+	#ifdef HAVE_AVX
+			for (i=0; i < size; i++){
+			   m256dc _res =  m256dc((B->begin(s))[i]) * (C->begin(s))[i]; _res.Store((A->begin(s))[i]);
+			}
+	#elif HAVE_SSE2
 			for (i=0; i < size; i++){
 			   m128dc _res =  m128dc((B->begin(s))[i]) * (C->begin(s))[i]; _res.Store((A->begin(s))[i]);
 			}
@@ -30,3 +34,4 @@ namespace QDLIB {
 	}
 
 }
+

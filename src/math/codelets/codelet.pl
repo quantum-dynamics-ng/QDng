@@ -56,6 +56,7 @@ printf "%s\n",$exp;
 # default SSE expression is dervied from skalar
 if (length($sse_exp) == 0){
   $sse_exp = $exp;
+  $avx_exp = $exp;
 } else {
   printf "SSE Expression: %s\n", $sse_exp;
 }
@@ -64,7 +65,7 @@ if (length($sse_exp) == 0){
 @entries = split(/\s+/,$sse_exp);
 $sse_lhs = @entries[$0];
 $sse_exp =~  s/^$sse_lhs\s+=/_res =/;
-
+$avx_exp =~  s/^$sse_lhs\s+=/_res =/;
 
 #
 # Replace Variables
@@ -82,20 +83,25 @@ for ($i = 0; $i < $varcount; $i++) {
   # SSE specific
   if ($vartype[$i] =~ /cVec/ ){
      $sse_exp =~ s/$varname[$i]/m128dc(($varname[$i]->begin(s))[i])/g;
+     $avx_exp =~ s/$varname[$i]/m256dc(($varname[$i]->begin(s))[i])/g;
      if ($varname[$i] eq $sse_lhs){
         $sse_exp = "m128dc " . $sse_exp;
+	$avx_exp = "m256dc " . $avx_exp;
         $lhs_type = "cVec";
      }
   }
   if ($vartype[$i] =~ /dVec/ ){
      $sse_exp =~ s/$varname[$i]/($varname[$i]->begin(s))[i]/g;
+     $avx_exp =~ s/$varname[$i]/($varname[$i]->begin(s))[i]/g;
      if ($varname[$i] eq $sse_lhs){
         $sse_exp = "double " . $sse_exp;
+        $avx_exp = "m128dc " . $avx_exp;
         $lhs_type = "dVec";
      }
   }
   if ($vartype[$i] =~ /dcomplex/ ){
      $sse_exp =~ s/ $varname[$i]/ m128dc($varname[$i]) /g;
+     $avx_exp =~ s/ $varname[$i]/ m256dc($varname[$i]) /g;
   }
 
 }
@@ -103,10 +109,13 @@ for ($i = 0; $i < $varcount; $i++) {
 # Reassign SSE result to scalar types
 if ($lhs_type =~ /cVec/){
    $sse_exp = sprintf "%s; _res.Store((%s->begin(s))[i]);", $sse_exp, $sse_lhs;
+   $avx_exp = sprintf "%s; _res.Store((%s->begin(s))[i]);", $avx_exp, $sse_lhs;
 } elsif ($lhs_type =~ /dVec/) {
   $sse_exp = sprintf "%s; (%s->begin(s))[i] = _res;", $sse_exp, $sse_lhs;
+  $avx_exp = sprintf "%s; _res.Store((%s->begin(s))[i]);", $avx_exp, $sse_lhs;
 }else {
    $sse_exp = sprintf "%s; %s = _res;", $sse_exp, $sse_lhs;
+   $avx_exp = sprintf "%s; _res.Store((%s->begin(s))[i]);", $avx_exp, $sse_lhs;
 }
 
 
@@ -119,11 +128,13 @@ printf "%s\n", $funcname;
 printf "%s\n", $params;
 printf "Scalar:\t %s\n", $exp;
 printf "SSE2:\t %s\n", $sse_exp;
+printf "AVX:\t %s\n", $avx_exp;
 
 $cod =~ s/\@NAME\@/$funcname/g;
 $cod =~ s/\@PARAMS\@/$params/g;
 $cod =~ s/\@EXP\@/$exp/;
 $cod =~ s/\@SSE_EXP\@/$sse_exp/;
+$cod =~ s/\@AVX_EXP\@/$avx_exp/;
 
 open(HEADER, ">$defname.h");
 printf HEADER "%s\n", $cod;
