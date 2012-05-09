@@ -59,6 +59,7 @@ namespace QDLIB
          static Memory& Instance();
 
          size_t MaximumSize() const;
+         void Reconfigure();
          size_t CurrentSizeAvail() const;
          size_t CurrentSizeUsed() const;
 

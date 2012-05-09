@@ -3,7 +3,7 @@ METASOURCES = AUTO
 noinst_LTLIBRARIES = libtools.la
 libtools_la_SOURCES = Exception.cpp Getopt.cpp KeyValFile.cpp Logger.cpp \
 	ParamContainer.cpp QDClock.cpp QDGlobalClock.cpp XmlNode.cpp XmlParser.cpp fstools.cpp \
-	helpers.cpp GlobalParams.cpp PeakFinder.cpp Memory.cpp Thread.cpp
+	helpers.cpp GlobalParams.cpp PeakFinder.cpp Memory.cpp 
 AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 toolsdir = $(pkgincludedir)/tools
 tools_HEADERS = Exception.h FileSingleDefs.h FileSingle.h fstools.h Getopt.h \

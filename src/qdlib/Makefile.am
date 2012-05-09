@@ -9,7 +9,7 @@ libqd_la_SOURCES = GridSystem.cpp Kspace.cpp Laser.cpp \
 	WFMultistate.cpp FileWF.cpp TransformFFT.cpp TransformMat.cpp TransformMSD.cpp \
 	OGSPO.cpp ODMultistate.cpp OMatDipole.cpp OGridKick.cpp WaveFunction.cpp WFBuffer.cpp OLaser.cpp OList.cpp \
 	OFlux.cpp ORK4.cpp OGridRaman.cpp OGridGStokes.cpp OGridStokesAlbrecht.cpp \
-	OGridStokes.cpp ONormalize.cpp
+	OGridStokes.cpp ONormalize.cpp OGridHOFD.cpp
 qdlibdir = $(pkgincludedir)/qdlib
 qdlib_HEADERS = Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
 	OCheby.h ODMultistate.h ODSpace.h OGobbler.h OGridDipole.h OGridGMat.h OGridKick.h \
@@ -18,7 +18,7 @@ qdlib_HEADERS = Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
 	OPropagator.h OScalar.h OSIL.h OSum.h  TransformFFT.h Transform.h TransformMat.h \
 	TransformMSD.h 	WaveFunction.h WFGridCartesian.h WFGridSystem.h WFLevel.h WFMultistate.h \
 	WFBuffer.h OLaser.h OList.h OProduct.h OFlux.h ORK4.h OGridRaman.h \
-	OGridStokes.h ONormalize.h OGridGStokes.h OGridStokesAlbrecht.h
+	OGridStokes.h ONormalize.h OGridGStokes.h OGridStokesAlbrecht.h OGridHOFD.h
 
 
 

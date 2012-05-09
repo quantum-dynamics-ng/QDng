@@ -30,6 +30,9 @@
 #include "qdlib/OProjection.h"
 #include "qdlib/OScalar.h"
 
+#include "qdlib/OGridHOFD.h"
+
+
 /* Wavefunction list */
 #include "qdlib/WFGridCartesian.h"
 #include "qdlib/WFLevel.h"
@@ -84,6 +87,8 @@ namespace QDLIB
       return p;
    }
 
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridHOFD)
+
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNAC)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridKick)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridStokes)
@@ -123,6 +128,7 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(OGridDipole)
       QDNG_STRING_TO_INSTANCE_PTR(OGridRaman)
       QDNG_STRING_TO_INSTANCE_PTR(OGridPosition)
+      QDNG_STRING_TO_INSTANCE_PTR(OGridHOFD)
 
       /* This is an alias */
       if (name == "INT_OGridMomentum") return &INT_Alias_OGridMomentum;

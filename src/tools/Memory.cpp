@@ -35,24 +35,14 @@ namespace QDLIB
 
    Memory::Memory() : _nslots(MEMORY_SLOTS), _nused(0), _nfree(0), _used(0), _MaxUsed(0)
    {
-      /* Set Limits */
-      ParamContainer& params = GlobalParams::Instance();
-
-      if ( params.isPresent("MaxMem") ){ /* Get limit from user defined entry */
-         string s;
-         params.GetValue("MaxMem", s);
-         _MaxMem = ReadFromString(s);
-      } else {                           /* Default: Half of system RAM */
-         struct sysinfo info;
-         sysinfo(&info);
-         _MaxMem = info.totalram / 2;
-      }
+       Reconfigure();
 
       /* Initialize Slot DB */
       _Slots = new SlotEntry[MEMORY_SLOTS];
       _SlotsF = new SlotEntry*[MEMORY_SLOTS];
       for (int i=0; i < MEMORY_SLOTS; i++)
          _SlotsF[i] = NULL;
+
    }
 
    Memory::~Memory()
@@ -120,6 +110,26 @@ namespace QDLIB
     size_t Memory::MaximumSize() const
     {
        return _MaxMem;
+    }
+
+    /**
+     * Re-read maximum size from global params.
+     */
+    void Memory::Reconfigure()
+    {
+       /* Set Limits */
+            ParamContainer& params = GlobalParams::Instance();
+
+            if ( params.isPresent("MaxMem") ){ /* Get limit from user defined entry */
+               string s;
+               params.GetValue("MaxMem", s);
+               _MaxMem = ReadFromString(s);
+            } else {                           /* Default: Half of system RAM */
+               struct sysinfo info;
+               sysinfo(&info);
+               _MaxMem = info.totalram / 2;
+            }
+
     }
 
     /**
