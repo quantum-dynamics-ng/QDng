@@ -9,6 +9,7 @@
 #define OGRIDHOFD_H_
 
 #include "qdlib/OGridsystem.h"
+#include "qdlib/HOFD.h"
 
 #define HOFD_NDIFF 2      /* Max number of derivates */
 #define HOFD_PERDIFF 4    /* number of orders per deriv. */
@@ -37,7 +38,7 @@ namespace QDLIB
          int _order;     /* accuracy */
          int _dim;       /* Dim. to act on. All if -1 */
          double _pfac;   /* contains a prefactor */
-         double _cf[HOFD_NDIFF*HOFD_PERDIFF][HOFD_NCOEFF];  /* coefficients (4 first + 4 second)x(max. 9 coeffs) */
+         cHOFD *_hofd;    /* diff. operator */
          WaveFunction *_buf;
       public:
          OGridHOFD();

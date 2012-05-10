@@ -32,27 +32,34 @@ void OGridHOFDTest::API_Test()
    pm.SetValue("order", 2);
    CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
 
+   DELETE_OP(Op);  Op = new OGridHOFD();
    pm.SetValue("deriv", HOFD_NDIFF);
    CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
 
+   DELETE_OP(Op);  Op = new OGridHOFD();
    pm.SetValue("deriv", 3);
    CPPUNIT_ASSERT_THROW( Op->Init(pm), EParamProblem );
 
    /* Check Order */
+   DELETE_OP(Op);  Op = new OGridHOFD();
    pm.SetValue("deriv", 2);
    pm.SetValue("order", 2);
    CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
 
+   DELETE_OP(Op);  Op = new OGridHOFD();
    pm.SetValue("order", HOFD_PERDIFF*2);
    CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
 
+   DELETE_OP(Op);  Op = new OGridHOFD();
    pm.SetValue("order", 3);
    CPPUNIT_ASSERT_THROW( Op->Init(pm), EParamProblem );
 
+   DELETE_OP(Op);  Op = new OGridHOFD();
    pm.clear();
    pm.SetValue("deriv", 1);
    pm.SetValue("order", 2);
    pm.SetValue("dim", 0);
+   CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
    CPPUNIT_ASSERT_NO_THROW( Op->Init(wf) );
 
 
