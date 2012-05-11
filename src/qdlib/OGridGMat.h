@@ -4,6 +4,7 @@
 #include "qdlib/OGridPotential.h"
 #include "qdlib/WFGridSystem.h"
 #include "qdlib/TransformFFT.h"
+#include "qdlib/HOFD.h"
 
 namespace QDLIB {
 
@@ -34,9 +35,16 @@ namespace QDLIB {
 	 WFGridSystem** _wfbuf;      /* 1D Array */
 	 WFGridSystem* buf;
 	 
+	 enum {FFT, HOFD} _method;
+
 	 void _InitKspace (WFGridSystem *Psi);
 	 TransformFFT _FFT;
-         
+
+	 void _Diff(WaveFunction* out, WaveFunction* in, int dim, double d = 1);
+    void _DiffAdd(WaveFunction* out, WaveFunction* in, int dim, double d = 1);
+    cHOFD* _hofd;
+
+
 	 bool _KinCoup;
       public:
 	 OGridGMat();

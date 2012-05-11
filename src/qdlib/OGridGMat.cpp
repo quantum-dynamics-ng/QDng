@@ -10,7 +10,7 @@ namespace QDLIB {
 
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridGMat)
    
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _kspace(NULL), _wfbuf(NULL), buf(NULL), _KinCoup(true)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _kspace(NULL), _wfbuf(NULL), buf(NULL), _hofd(NULL), _KinCoup(true)
    {
    }
    
@@ -41,6 +41,8 @@ namespace QDLIB {
 	    delete[] _GmatC[i];
       
       delete[] _GmatC;
+
+      if (_hofd != NULL) delete _hofd;
    }
 
    
@@ -79,6 +81,49 @@ namespace QDLIB {
       DELETE_WF(Psi);
    }
    
+   /**
+    * Differenciate wave function in given dimension.
+    *
+    * \param d prefactor. Is multiplied to wf.
+    */
+   void OGridGMat::_Diff(WaveFunction* out, WaveFunction* in, int dim, double d)
+   {
+      switch (_method){
+         case FFT:
+            out->FastCopy (*in);
+            _FFT.Forward(out, dim);
+            MultElementsComplex((cVec*) out, (dVec*) &(_kspace[dim]), d / double(GridSystem::DimSize(dim)));
+            _FFT.Backward(out, dim);
+            break;
+         case HOFD:
+            _hofd->SetFactor(d);
+            _hofd->Diff(out, in, dim);
+            break;
+      }
+   }
+
+   /**
+    * Differenciate wave function in given dimension.
+    * Input is destroyed after operation.
+    *
+    * \param d prefactor. Is multiplied to wf.
+    */
+   void OGridGMat::_DiffAdd(WaveFunction* out, WaveFunction* in, int dim, double d)
+   {
+      switch (_method){
+         case FFT:
+            _FFT.Forward(in, dim);
+            MultElementsComplex((cVec*) in, (dVec*) &(_kspace[dim]), d / double(GridSystem::DimSize(dim)));
+            _FFT.Backward(in, dim);
+            *out += in;
+            break;
+         case HOFD:
+            _hofd->SetFactor(d);
+            _hofd->DiffAdd(out, in, dim);
+            break;
+      }
+   }
+
    void OGridGMat::Init(WaveFunction *Psi)
    {
       WaveFunction *psi = dynamic_cast<WFGridSystem*>(Psi);
@@ -99,9 +144,13 @@ namespace QDLIB {
          _wfbuf[i]->Retire();
       }
       
-      _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
+      if (_method == FFT) {
+         _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
 
-      FFTGlobal::Instance().FlushWisdom();
+         FFTGlobal::Instance().FlushWisdom();
+      } else {
+         _hofd->SetGrid( *((GridSystem*) this) );
+      }
    }
    
    /**
@@ -173,6 +222,26 @@ namespace QDLIB {
 	 }
       }
       *((GridSystem*) this) = *((GridSystem*) _Gmat[0][0]);
+
+      /* Choose method for differenciation */
+      if (_params.isPresent("method")){
+         string method;
+         _params.GetValue("method", method);
+         if (method == "HOFD") {
+            _method = HOFD;
+
+            int order = 8;
+            if (_params.isPresent("order")){
+               _params.GetValue("order", order);
+            }
+            _hofd = new cHOFD(1, order);
+
+         } else if (method == "FFT") {
+            _method = FFT;
+         } else
+            throw(EParamProblem("Unknown differenciation method", method));
+
+      }
    }
 
    /**
@@ -224,101 +293,48 @@ namespace QDLIB {
    
    void OGridGMat::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
-      /* Make a copy from Psi */
-      for (int i=0; i < GridSystem::Dim(); i++){
-         _wfbuf[i]->Reaquire();
-         _wfbuf[i]->FastCopy (*sourcePsi);
-      }
-      
-      buf->Reaquire();
-
-      *destPsi = dcomplex(0,0);
-      
-      lint i;
-      for (i=0; i < _size; i++){ /* Loop over dims*/
-      /* d/dx from WF */
-      _FFT.Forward(_wfbuf[i], i);
-      MultElementsComplex((cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1 / double(GridSystem::DimSize(i)));
-      _FFT.Backward(_wfbuf[i], i);
-
- 	 for (lint j=0; j < _size; j++){
-	    if ( (i == j) | _KinCoup){ /* Kinetic coupling ?*/
-	       buf->FastCopy(*(_wfbuf[i]));
-	       /* Multiply Gmatrix element */
-	       if (_GmatC[i][j] != 0 ){ /* Constant G-Element*/
-		  /* d/dx from G* d/dx WF */
-		  _FFT.Forward(buf, j);
-		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(GridSystem::DimSize(j)) * _GmatC[i][j]);
-		  _FFT.Backward(buf, j);
-		  
-	       } else { /* Coordinate dependent lu*/
-		  if ( j>i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
-		    MultElements( (cVec*) buf, (dVec*) _Gmat[j][i]);
-		  else
-		    MultElements( (cVec*) buf, (dVec*) _Gmat[i][j]);
-	       	       
-		  /* d/dx from G* d/dx WF */
-		  _FFT.Forward(buf, j);
-		  MultElementsComplex( (cVec*) buf, (dVec*) &(_kspace[j]), -.5/double(GridSystem::DimSize(j)) );
-		  _FFT.Backward(buf, j);
-
-	       }
-	       *destPsi += buf;
-	    }
- 	 }
-      }
-
-      for (int i=0; i < GridSystem::Dim(); i++){
-         _wfbuf[i]->Retire();
-      }
-      buf->Retire();
+      *destPsi = dcomplex(0, 0);
+      OGridGMat::ApplyAdd(destPsi, sourcePsi);
    }
 
    void OGridGMat::ApplyAdd(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       /* Make a copy from Psi */
-      for (int i = 0; i < GridSystem::Dim(); i++) {
+      for (int i = 0; i < GridSystem::Dim(); i++)
+      {
          _wfbuf[i]->Reaquire();
-         _wfbuf[i]->FastCopy(*sourcePsi);
       }
 
       buf->Reaquire();
 
       lint i;
-      for (i = 0; i < _size; i++) { /* Loop over dims*/
+      for (i = 0; i < _size; i++)
+      { /* Loop over dims*/
          /* d/dx from WF */
-         _FFT.Forward(_wfbuf[i], i);
-         MultElementsComplex((cVec*) _wfbuf[i], (dVec*) &(_kspace[i]), 1/double(GridSystem::DimSize(i)));
-         _FFT.Backward(_wfbuf[i], i);
+         _Diff(_wfbuf[i], sourcePsi, i);
 
-         for (lint j = 0; j < _size; j++) {
-            if ((i == j) | _KinCoup) { /* Kinetic coupling ?*/
-               buf->FastCopy(*(_wfbuf[i]));
+         for (lint j = 0; j < _size; j++){
+            if ((i == j) | _KinCoup){ /* Kinetic coupling ?*/
+
                /* Multiply Gmatrix element */
-               if (_GmatC[i][j] != 0) { /* Constant G-Element*/
+               if (_GmatC[i][j] != 0){ /* Constant G-Element*/
                   /* d/dx from G* d/dx WF */
-                  _FFT.Forward(buf, j);
-                  MultElementsComplex((cVec*) buf, (dVec*) &(_kspace[j]), -.5
-                           / double(GridSystem::DimSize(j)) * _GmatC[i][j]);
-                  _FFT.Backward(buf, j);
-
-               } else { /* Coordinate dependent lu*/
+                  _DiffAdd(destPsi, _wfbuf[i], j, -0.5);
+               } else {
+                  /* Coordinate dependent lu*/
                   if (j > i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
-                     MultElements((cVec*) buf, (dVec*) _Gmat[j][i]);
-                  else MultElements((cVec*) buf, (dVec*) _Gmat[i][j]);
+                     MultElementsCopy((cVec*) buf, (cVec*) _wfbuf[i] ,  (dVec*) _Gmat[j][i]);
+                  else MultElements((cVec*) buf, (cVec*) _wfbuf[i], (dVec*) _Gmat[i][j]);
 
                   /* d/dx from G* d/dx WF */
-                  _FFT.Forward(buf, j);
-                  MultElementsComplex((cVec*) buf, (dVec*) &(_kspace[j]), -.5/ double(GridSystem::DimSize(j)));
-                  _FFT.Backward(buf, j);
-
+                  _DiffAdd(destPsi, buf, j , -0.5);
                }
-               *destPsi += buf;
             }
          }
       }
 
-      for (int i = 0; i < GridSystem::Dim(); i++) {
+      for (int i = 0; i < GridSystem::Dim(); i++)
+      {
          _wfbuf[i]->Retire();
       }
       buf->Retire();
