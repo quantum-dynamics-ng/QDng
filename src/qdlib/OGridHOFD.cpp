@@ -14,6 +14,9 @@ namespace QDLIB {
 
    OGridHOFD::OGridHOFD() : _name("OGridHOFD"), _deriv(1), _order(2), _dim(-1), _pfac(1.), _hofd(NULL), _buf(NULL)
    {
+      for (int i=0; i < MAX_DIMS; i++){
+         _mass[i] = -1./2.;
+      }
    }
 
    OGridHOFD::~OGridHOFD()
@@ -59,27 +62,63 @@ namespace QDLIB {
          throw(EParamProblem("Invalid number of active dimension", _dim));
 
       _hofd->SetGrid(*((GridSystem*) this));
+
+      /* Get masses */
+      if ( _params.isPresent("mass") || _params.isPresent("mass0") ){
+         char c[256];
+         string s;
+         bool eff = false;  /* Indicate at least 1 non-zero dim */
+
+         for (int i = 0; i < Dim(); i++) {
+            sprintf(c, "mass%d", i);
+            s = c;
+            if (_params.isPresent(s)) {
+               _params.GetValue(string(c), _mass[i]);
+               if (_mass[i] == 0)
+                  throw(EParamProblem("Zero mass defined"));
+
+               eff = true;
+            } else _mass[i] = -1/2; /* Mark as -1 => don't build k-space */
+         }
+
+         if (!eff)
+            throw(EParamProblem("Nabla^2 Operator is empty (no masses defined)"));
+      }
    }
 
    dcomplex OGridHOFD::Emax()
    {
       if (_deriv == 1)
          return dcomplex(0, _pfac * M_PI/GridSystem::Dx(0) );
-      else
-         return dcomplex(-_pfac * pow(M_PI/GridSystem::Dx(0),2) );
+      else {
+         double T = 0;
+         for (int i = 0; i < GridSystem::Dim(); i++)
+            if (_mass[i] > 0)
+               T += 1 / (_mass[i] * GridSystem::Dx(i) * GridSystem::Dx(i));
+
+         T *= (M_PI * M_PI / 2);
+         return dcomplex(T);
+      }
    }
 
    dcomplex OGridHOFD::Emin()
    {
-      // \todo implement
-      return dcomplex(0);
+      if (_deriv == 1)
+         return dcomplex(0, -_pfac * M_PI/GridSystem::Dx(0) );
+      else
+         return dcomplex(0);
    }
 
    void OGridHOFD::Apply(WaveFunction* destPsi, WaveFunction* sourcePsi)
    {
-      if (_dim == -1)
-         _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi);
-      else
+      if (_dim == -1){
+         _hofd->SetFactor(-1./(2.*_mass[0]));
+         _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, 0);
+         for (int dim=1; dim < Dim(); dim++){
+            _hofd->SetFactor(-1./(2.*_mass[dim]));
+            _hofd->DiffAdd((cVec*) destPsi, (cVec*) sourcePsi, dim);
+         }
+      } else
          _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, _dim);
    }
 

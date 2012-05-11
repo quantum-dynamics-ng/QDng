@@ -16,8 +16,8 @@ using namespace QDLIB;
 
 OGridHOFDTest::OGridHOFDTest()
 {
-   x.newsize(NX);
-   for (int i=0; i < NX; i++)
+   x.newsize(2*NX);
+   for (int i=0; i < 2*NX; i++)
       x[i] = double(i)/2;
 }
 
@@ -61,7 +61,6 @@ void OGridHOFDTest::API_Test()
    pm.SetValue("dim", 0);
    CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
    CPPUNIT_ASSERT_NO_THROW( Op->Init(wf) );
-
 
 }
 
@@ -116,6 +115,105 @@ void OGridHOFDTest::NUMERIC_D2dx_Test()
          CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf_resIP)))[i].imag(), TIGHT_EPS);
       }
    }
+}
+
+void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
+{
+   WFGridCartesian* wf2 = new WFGridCartesian();
+   WFGridCartesian* wf2_res = new WFGridCartesian();
+
+   /**
+    * Init a 2D-WF
+    */
+   pm.SetValue("dims", 2);
+   pm.SetValue("N0", NX);
+   pm.SetValue("N1", 2*NX);
+   pm.SetValue("xmin0", 0);
+   pm.SetValue("xmax0", x[NX-1]);
+   pm.SetValue("xmin1", 0);
+   pm.SetValue("xmax1", x[2*NX-1]);
+
+   wf2->Init(pm);
+   wf2_res->Init(pm);
+
+   (*((cVec*) wf2_res)) = dcomplex(0);
+   (*((cVec*) wf2)) = dcomplex(0);
+   pm.SetValue("deriv", 2);
+   pm.SetValue("dim", 0);
+
+   /* creat test func.: x_0^2 + 3*x_1^2 */
+   int n = 0;
+   for (int i=0; i < 2*NX; i++){
+      for (int j=0; j < NX; j++){
+         (*wf2)[n] = x[j] * x[j] + 3 * x[i] * x[i];
+         //cout << "i = " << i << " , j = " << j << " ; x1 = "<<  x[i] << " ; x0 = "<<  x[j] << endl;
+         n++;
+      }
+   }
+
+   /* Setup operator for diff. w respect to dim 0 */
+   pm.clear();
+   pm.SetValue("deriv", 2);
+   pm.SetValue("dim", 0);
+   pm.SetValue("order", 8);
+
+   CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
+   CPPUNIT_ASSERT_NO_THROW( Op->Init(wf2) );
+
+   Op->Apply(wf2_res, wf2);
+
+   /* check dim 0*/
+   n = 0;
+   for (int i=0; i < NX*2; i++){
+      for (int j=0; j < NX; j++){
+         if (j >= 8/2 && j < NX-8/2){ /* don't care about ghosts */
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(2, (*( (cVec*) (wf2_res)))[n].real(), LOOSE_EPS);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf2_res)))[n].imag(), TIGHT_EPS);
+         }
+         n++;
+      }
+   }
+
+   /* check dim 1*/
+   pm.SetValue("dim", 1);
+   CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
+   CPPUNIT_ASSERT_NO_THROW( Op->Init(wf2) );
+
+   Op->Apply(wf2_res, wf2);
+
+   n = 0;
+   for (int i=0; i < NX*2; i++){
+      for (int j=0; j < NX; j++){
+         if (i >= 8/2 && i < 2*NX-8/2){ /* don't care about ghosts */
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(6, (*( (cVec*) (wf2_res)))[n].real(), LOOSE_EPS);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf2_res)))[n].imag(), TIGHT_EPS);
+         }
+         n++;
+      }
+   }
+
+   /* check All dims */
+   DELETE_OP(Op);  Op = new OGridHOFD();
+   pm.clear();
+   pm.SetValue("deriv", 2);
+   pm.SetValue("order", 8);
+   CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
+   CPPUNIT_ASSERT_NO_THROW( Op->Init(wf2) );
+
+   (*((cVec*) wf2_res)) = dcomplex(0);
+   Op->Apply(wf2_res, wf2);
+
+   n = 0;
+   for (int i=0; i < NX*2; i++){
+      for (int j=0; j < NX; j++){
+         if (i >= 8/2 && i < 2*NX-8/2 && j >= 8/2 && j < NX-8/2){ /* don't care about ghosts */
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(6.+ 2., (*( (cVec*) (wf2_res)))[n].real(), LOOSE_EPS);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf2_res)))[n].imag(), TIGHT_EPS);
+         }
+         n++;
+      }
+   }
+
 }
 
 void OGridHOFDTest::setUp()

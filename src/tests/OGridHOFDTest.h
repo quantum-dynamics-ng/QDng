@@ -20,6 +20,7 @@ class OGridHOFDTest : public CppUnit::TestFixture
    CPPUNIT_TEST( API_Test );
    CPPUNIT_TEST( NUMERIC_D1dx_Test );
    CPPUNIT_TEST( NUMERIC_D2dx_Test );
+   CPPUNIT_TEST( NUMERIC_D2dx_2D_Test );
    CPPUNIT_TEST_SUITE_END();
 
       QDLIB::ParamContainer pm;
@@ -40,6 +41,7 @@ class OGridHOFDTest : public CppUnit::TestFixture
       void API_Test();
       void NUMERIC_D1dx_Test();
       void NUMERIC_D2dx_Test();
+      void NUMERIC_D2dx_2D_Test();
 
 };
 

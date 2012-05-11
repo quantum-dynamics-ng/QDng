@@ -40,6 +40,8 @@ namespace QDLIB
          void Diff(Vector<T> *res, Vector<T> *in);
 
          void Diff(Vector<T> *res, Vector<T> *in, int dim);
+
+         void DiffAdd(Vector<T> *res, Vector<T> *in, int dim);
    };
 
    typedef HOFD<dcomplex> cHOFD;
@@ -138,33 +140,7 @@ namespace QDLIB
    inline void HOFD<T>::Diff(Vector<T>* res, Vector<T>* in)
    {
       for (int dim=0; dim < _grid.Dim(); dim++){ /* Loop over all dims */
-         double h = 1./pow(_grid.Dx(dim), _deriv) * _pfac;
-         int Nx = _grid.DimSize(dim);
-
-         T* psi = in->begin(0);
-         T* Dpsi = res->begin(0);
-
-         /* Edge of grid */
-         for (int i = 0; i <= _order/2-1 ; i++){ /* grid points */
-            Dpsi[i] = 0;
-            Dpsi[Nx-i-1] = 0;
-            for(int j=_order/2-i; j <= _order; j++){ /* coeffs */
-               Dpsi[i] += _cf[j] * psi[ i - _order/2 + j ];
-               Dpsi[Nx-i-1] += _cf[_order-j] * psi[ Nx-1 - (i - _order/2 + j) ];
-            }
-            Dpsi[i] *= h;
-            Dpsi[Nx-i-1] *= h;
-         }
-
-         /* Center of grid */
-         for (int i =_order/2; i < Nx - _order/2; i++){ /* grid points */
-            Dpsi[i] = 0;
-            for(int j=0; j <= _order; j++){ /* coeffs */
-               Dpsi[i] += _cf[j] * psi[ i - _order/2  + j];
-            }
-            Dpsi[i] *= h;
-         }
-
+         Diff(res, in, dim);
       }
 
    }
@@ -176,30 +152,85 @@ namespace QDLIB
    inline void HOFD<T>::Diff(Vector<T>* res, Vector<T>* in, int dim)
    {
          double h = 1./pow(_grid.Dx(dim), _deriv) * _pfac;
-         int Nx = _grid.DimSize(dim);
+
+         _grid.ActiveDim(dim); /* Use index mapping scheme */
+         int Nx = _grid.NumActive();
+
 
          T* psi = in->begin(0);
          T* Dpsi = res->begin(0);
 
-         /* Edge of grid */
-         for (int i = 0; i <= _order/2-1 ; i++){ /* grid points */
-            Dpsi[i] = 0;
-            Dpsi[Nx-i-1] = 0;
-            for(int j=_order/2-i; j <= _order; j++){ /* coeffs */
-               Dpsi[i] += _cf[j] * psi[ i - _order/2 + j ];
-               Dpsi[Nx-i-1] += _cf[_order-j] * psi[ Nx-1 - (i - _order/2 + j) ];
-            }
-            Dpsi[i] *= h;
-            Dpsi[Nx-i-1] *= h;
-         }
+         for (int rep=0; rep < _grid.NumOthers(); rep++){ /* replica points in other dims */
+            int bi = _grid.IndexBase(rep); /* base index of grid points */
+            int lo = _grid.LowOthers();    /* stripe size in lower other dims */
 
-         /* Center of grid */
-         for (int i =_order/2; i < Nx - _order/2; i++){ /* grid points */
-            Dpsi[i] = 0;
-            for(int j=0; j <= _order; j++){ /* coeffs */
-               Dpsi[i] += _cf[j] * psi[ i - _order/2  + j];
+            /* Edge of grid */
+            for (int i = 0; i <= _order/2-1 ; i++){ /* grid points */
+               T db = 0;
+               T de = 0;
+               int cfb = i - _order/2;  /* base index for diff. */
+               for(int j=_order/2-i; j <= _order; j++){ /* coeffs */
+                  db += _cf[j] * psi[bi+(cfb + j) * lo];
+                  de += _cf[_order-j] * psi[bi+(Nx-1 - (cfb + j)) * lo];
+               }
+               Dpsi[bi+i * lo] = h * db;
+               Dpsi[bi+(Nx-i-1) * lo] = h * de;
             }
-            Dpsi[i] *= h;
+
+            /* Center of grid */
+            for (int i =_order/2; i < Nx - _order/2; i++){ /* grid points */
+               T d = 0;
+               int cfb = i - _order/2;  /* base index for diff. */
+               for(int j=0; j <= _order; j++){ /* coeffs */
+                  d += _cf[j] * psi[bi+(cfb  + j) * lo];
+               }
+               Dpsi[bi+i*lo] = d * h;
+            }
+         }
+   }
+
+   /**
+    * Differenciate only the given dimension and add to res.
+    */
+   template<class T>
+   inline void HOFD<T>::DiffAdd(Vector<T>* res, Vector<T>* in, int dim)
+   {
+         double h = 1./pow(_grid.Dx(dim), _deriv) * _pfac;
+         int order2 = _order/2;
+
+         _grid.ActiveDim(dim); /* Use index mapping scheme */
+         int Nx = _grid.NumActive();
+
+         T* psi = in->begin(0);
+         T* Dpsi = res->begin(0);
+
+         for (int rep=0; rep < _grid.NumOthers(); rep++){ /* replica points in other dims */
+            int bi = _grid.IndexBase(rep); /* base index of grid points */
+            int lo = _grid.LowOthers();    /* stripe size in lower other dims */
+
+            /* Edge of grid */
+            for (int i = 0; i <= order2-1 ; i++){ /* grid points */
+               T db = 0;
+               T de = 0;
+               int cfb = i - order2;  /* base index for diff. */
+               for(int j=order2-i; j <= _order; j++){ /* coeffs */
+                  db += _cf[j] * psi[bi+(cfb + j) * lo];
+                  de += _cf[_order-j] * psi[bi+(Nx-1 - (cfb + j)) * lo];
+               }
+
+               Dpsi[bi+i * lo] += db * h;
+               Dpsi[bi+(Nx-i-1) * lo] += de * h;
+            }
+
+            /* Center of grid */
+            for (int i =order2; i < Nx - order2; i++){ /* grid points */
+               T d = 0;
+               int cfb = i - order2;  /* base index for diff. */
+               for(int j=0; j <= _order; j++){ /* coeffs */
+                  d += _cf[j] * psi[bi+(cfb  + j) * lo];
+               }
+               Dpsi[bi+i * lo] += d * h;
+            }
          }
    }
 

@@ -39,6 +39,7 @@ namespace QDLIB
          int _dim;       /* Dim. to act on. All if -1 */
          double _pfac;   /* contains a prefactor */
          cHOFD *_hofd;    /* diff. operator */
+         double _mass[MAX_DIMS];
          WaveFunction *_buf;
       public:
          OGridHOFD();
