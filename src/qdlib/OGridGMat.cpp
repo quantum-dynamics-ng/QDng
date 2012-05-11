@@ -1,127 +1,46 @@
 #include "OGridGMat.h"
 
 #include "WFGridSystem.h"
-#include "Kspace.h"
 #include "tools/FileSingleDefs.h"
+#include "qdlib/Diff.h"
 #include "math/math_functions.h"
-#include "fft/FFTGlobal.h"
 
 namespace QDLIB {
 
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridGMat)
    
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _kspace(NULL), _wfbuf(NULL), buf(NULL), _hofd(NULL), _KinCoup(true)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _kspace(NULL),
+                           _wfbuf(NULL), buf(NULL), _Abuf(NULL), _diff(1), _KinCoup(true)
    {
    }
    
    
    OGridGMat::~OGridGMat()
    {
-      if (_wfbuf != NULL){
-         for(lint i=0; i < GridSystem::Dim(); i++){
-	    DELETE_WF(_wfbuf[i]);
+      if (_wfbuf != NULL) {
+         for (lint i = 0; i < GridSystem::Dim(); i++) {
+            DELETE_WF(_wfbuf[i]);
          }
          delete[] _wfbuf;
       }
-      if (_kspace != NULL) delete[] _kspace;
+
       DELETE_WF(buf);
-      
-      if (_Gmat != NULL){
-	 for (int i=0; i < _size; i++){
-	    for (int j=0; j <= i; j++){
-	       DELETE_OP(_Gmat[i][j]);
-	    }
-	    delete[] _Gmat[i];
-	 }
-	 delete[] _Gmat;
+
+      if (_Gmat != NULL) {
+         for (int i = 0; i < _size; i++) {
+            for (int j = 0; j <= i; j++) {
+               DELETE_OP(_Gmat[i][j]);
+            }
+            delete[] _Gmat[i];
+         }
+         delete[] _Gmat;
       }
-      
+
       if (_GmatC != NULL)
-	 for (int i=0; i < _size; i++)
-	    delete[] _GmatC[i];
-      
+         for (int i = 0; i < _size; i++)
+            delete[] _GmatC[i];
+
       delete[] _GmatC;
-
-      if (_hofd != NULL) delete _hofd;
-   }
-
-   
-   void OGridGMat::_InitKspace (WFGridSystem *Psi)
-   {
-      if (GridSystem::Dim() == 0) throw ( EParamProblem("Missing GridSystem parameters") );
-   
-      dVec *kspace1;
-      dVecView *view;
-           
-      
-      *((GridSystem*) this) = *((GridSystem*) Psi);
-  
-      /* Setup single derivative for every coordinate */
-      for (lint i=0; i < _size; i++)
-      {
-	 
-	 if ( *((GridSystem*) (_Gmat[i][i])) != *((GridSystem*) Psi) )
-	    throw ( EParamProblem("Gmatrix does not match Wavefunction") );
-   	 
-	 
-	 /* derivatives */
-         if (_kspace[i].size() == 0){
-	    _kspace[i].newsize(Psi->size());
-	 }
-	 
-         kspace1 = Kspace::Init1Dddx(static_cast<GridSystem>(*this), i);
-	 view = new dVecView(_kspace[i], GridSystem::Dim(), GridSystem::DimSizes());
-	 
-	 view->ActiveDim(i);
-	 *view = *kspace1;
-	 
-	 delete view;
-	 delete kspace1;
-      }
-      DELETE_WF(Psi);
-   }
-   
-   /**
-    * Differenciate wave function in given dimension.
-    *
-    * \param d prefactor. Is multiplied to wf.
-    */
-   void OGridGMat::_Diff(WaveFunction* out, WaveFunction* in, int dim, double d)
-   {
-      switch (_method){
-         case FFT:
-            out->FastCopy (*in);
-            _FFT.Forward(out, dim);
-            MultElementsComplex((cVec*) out, (dVec*) &(_kspace[dim]), d / double(GridSystem::DimSize(dim)));
-            _FFT.Backward(out, dim);
-            break;
-         case HOFD:
-            _hofd->SetFactor(d);
-            _hofd->Diff(out, in, dim);
-            break;
-      }
-   }
-
-   /**
-    * Differenciate wave function in given dimension.
-    * Input is destroyed after operation.
-    *
-    * \param d prefactor. Is multiplied to wf.
-    */
-   void OGridGMat::_DiffAdd(WaveFunction* out, WaveFunction* in, int dim, double d)
-   {
-      switch (_method){
-         case FFT:
-            _FFT.Forward(in, dim);
-            MultElementsComplex((cVec*) in, (dVec*) &(_kspace[dim]), d / double(GridSystem::DimSize(dim)));
-            _FFT.Backward(in, dim);
-            *out += in;
-            break;
-         case HOFD:
-            _hofd->SetFactor(d);
-            _hofd->DiffAdd(out, in, dim);
-            break;
-      }
    }
 
    void OGridGMat::Init(WaveFunction *Psi)
@@ -144,13 +63,8 @@ namespace QDLIB {
          _wfbuf[i]->Retire();
       }
       
-      if (_method == FFT) {
-         _InitKspace(dynamic_cast<WFGridSystem*>(Psi->NewInstance()));
-
-         FFTGlobal::Instance().FlushWisdom();
-      } else {
-         _hofd->SetGrid( *((GridSystem*) this) );
-      }
+      _diff.SetGrid(*((GridSystem*) this));
+      _diff.InitParams(_params);
    }
    
    /**
@@ -160,88 +74,69 @@ namespace QDLIB {
    {
       int n;
       string name;
-    
+
       _params = params;
-      _params.GetValue( "dims", n);
-   
+      _params.GetValue("dims", n);
+
       if (n < 1)
-	 throw ( EParamProblem ("G-matrix operator needs at least one dimension") );
-      
+         throw(EParamProblem("G-matrix operator needs at least one dimension"));
+
       GridSystem::Dim(n);
-      _size=n;
-      
+      _size = n;
+
       int i;
       _Gmat = new OGridPotential**[n];
       _GmatC = new double*[n];
       _kspace = new dVec[n];
       _wfbuf = new WFGridSystem*[n];
-      
-      for (i=0; i < n; i++){
+
+      for (i = 0; i < n; i++) {
          _wfbuf[i] = NULL;
-	 _Gmat[i] = new OGridPotential*[n];
-	 _GmatC[i] = new double[n];
-	 for (int j=0; j <= i; j++){
-	    _Gmat[i][j] = new OGridPotential();
-	 }
-	 for (int j=0; j < n; j++)
-	    _GmatC[i][j] = 0;
+         _Gmat[i] = new OGridPotential*[n];
+         _GmatC[i] = new double[n];
+         for (int j = 0; j <= i; j++) {
+            _Gmat[i][j] = new OGridPotential();
+         }
+         for (int j = 0; j < n; j++)
+            _GmatC[i][j] = 0;
       }
-     
-      _params.GetValue( "gmat", name);
+
+      _params.GetValue("gmat", name);
       if (name.empty())
-	 throw( EParamProblem ("No G-matrix elements given"));
-      
+         throw(EParamProblem("No G-matrix elements given"));
+
       _params.GetValue("coup", _KinCoup, true);
-      
+
       OGridSystem::FileOGrid file;
       file.Suffix(BINARY_O_SUFFIX);
-      
+
       /* Read Matrix elements */
       char si[32], sj[32];
       string s;
-      for (i=0; i < n; i++){ /* Loop over matrix elem. */
-	 for(int j=0; j <= i; j++){
-	    if (i == j || _KinCoup){ /* No off-diagonals if kinetic coupling is turned off*/
-	       snprintf (si, 32, "%d", i);
-	       snprintf (sj, 32, "%d", j);
-	       s = string("G") +  string(si) + string(sj);
-	       if ( _params.isPresent (s) ) { /* Constant element - has precedence over grided element */
-		  _params.GetValue(s, _GmatC[i][j]);
-		  _GmatC[i][j] = _GmatC[j][i]; /* Symetrize */
-	       } else { /* Coordinate dependent element */
-		  s = name + string("_") + string(si) + string(sj);
-		  file.Name(s);
-		  file >> ((OGridSystem*) _Gmat[i][j]);
-		  
-		  if (i != 0 && j != 0) { /* Check grid compatibility of G-Mat elem. */
-		     if ( *((GridSystem*)  _Gmat[i][j]) != *((GridSystem*) _Gmat[0][0]) )
-			throw (EIncompatible ("Gmatrix elements incompatible"));
-		  }
-	       }
-	    }
-	 }
+      for (i = 0; i < n; i++) { /* Loop over matrix elem. */
+         for (int j = 0; j <= i; j++) {
+            if (i == j || _KinCoup) { /* No off-diagonals if kinetic coupling is turned off*/
+               snprintf(si, 32, "%d", i);
+               snprintf(sj, 32, "%d", j);
+               s = string("G") + string(si) + string(sj);
+               if (_params.isPresent(s)) { /* Constant element - has precedence over grided element */
+                  _params.GetValue(s, _GmatC[i][j]);
+                  _GmatC[i][j] = _GmatC[j][i]; /* Symmetrize */
+               } else { /* Coordinate dependent element */
+                  s = name + string("_") + string(si) + string(sj);
+                  file.Name(s);
+                  file >> ((OGridSystem*) _Gmat[i][j]);
+
+                  if (i != 0 && j != 0) { /* Check grid compatibility of G-Mat elem. */
+                     if (*((GridSystem*) _Gmat[i][j]) != *((GridSystem*) _Gmat[0][0]))
+                        throw(EIncompatible("Gmatrix elements incompatible"));
+                  }
+               }
+            }
+         }
       }
       *((GridSystem*) this) = *((GridSystem*) _Gmat[0][0]);
 
-      /* Choose method for differenciation */
-      if (_params.isPresent("method")){
-         string method;
-         _params.GetValue("method", method);
-         if (method == "HOFD") {
-            _method = HOFD;
-
-            int order = 8;
-            if (_params.isPresent("order")){
-               _params.GetValue("order", order);
-            }
-            _hofd = new cHOFD(1, order);
-
-         } else if (method == "FFT") {
-            _method = FFT;
-         } else
-            throw(EParamProblem("Unknown differenciation method", method));
-
-      }
    }
 
    /**
@@ -311,7 +206,7 @@ namespace QDLIB {
       for (i = 0; i < _size; i++)
       { /* Loop over dims*/
          /* d/dx from WF */
-         _Diff(_wfbuf[i], sourcePsi, i);
+         _diff.DnDxn(_wfbuf[i], sourcePsi, i);
 
          for (lint j = 0; j < _size; j++){
             if ((i == j) | _KinCoup){ /* Kinetic coupling ?*/
@@ -319,7 +214,7 @@ namespace QDLIB {
                /* Multiply Gmatrix element */
                if (_GmatC[i][j] != 0){ /* Constant G-Element*/
                   /* d/dx from G* d/dx WF */
-                  _DiffAdd(destPsi, _wfbuf[i], j, -0.5);
+                  _diff.DnDxnAdd(destPsi, _wfbuf[i], j, -0.5);
                } else {
                   /* Coordinate dependent lu*/
                   if (j > i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
@@ -327,7 +222,7 @@ namespace QDLIB {
                   else MultElements((cVec*) buf, (cVec*) _wfbuf[i], (dVec*) _Gmat[i][j]);
 
                   /* d/dx from G* d/dx WF */
-                  _DiffAdd(destPsi, buf, j , -0.5);
+                  _diff.DnDxnAdd(destPsi, buf, j , -0.5);
                }
             }
          }
@@ -344,16 +239,15 @@ namespace QDLIB {
    void OGridGMat::Apply( WaveFunction * Psi )
    {
      
-      WaveFunction *ket;
-      
-      ket=Psi->NewInstance();
-      
-      Apply(ket, Psi);
-      
-      *Psi = ket;
+     if (_Abuf == NULL)
+         _Abuf = Psi->NewInstance();
+      else
+         _Abuf->Reaquire();
 
-      DELETE_WF(ket);
-   }
+      Apply(_Abuf, Psi);
+      *Psi = _Abuf;
+      _Abuf->Retire();
+    }
    
    Operator * OGridGMat::operator =( Operator * O )
    {

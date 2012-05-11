@@ -3,8 +3,7 @@
 
 #include "qdlib/OGridPotential.h"
 #include "qdlib/WFGridSystem.h"
-#include "qdlib/TransformFFT.h"
-#include "qdlib/HOFD.h"
+#include "qdlib/Diff.h"
 
 namespace QDLIB {
 
@@ -24,58 +23,52 @@ namespace QDLIB {
    class OGridGMat : public Operator, public GridSystem
    {
       private:
-	 typedef Matrix<OGridPotential> Gmatrix_t;
-	 typedef Vector<dVec> Gkspace_t;
-	 
-	 string _name;
-	 lint _size;
-	 OGridPotential*** _Gmat;     /* 2D Array coordinate dependent elements*/
-	 double** _GmatC;             /* 2D Array constant G elements */
-	 dVec* _kspace;
-	 WFGridSystem** _wfbuf;      /* 1D Array */
-	 WFGridSystem* buf;
-	 
-	 enum {FFT, HOFD} _method;
+         typedef Matrix<OGridPotential> Gmatrix_t;
+         typedef Vector<dVec> Gkspace_t;
 
-	 void _InitKspace (WFGridSystem *Psi);
-	 TransformFFT _FFT;
+         string _name;
+         lint _size;
+         OGridPotential*** _Gmat; /* 2D Array coordinate dependent elements*/
+         double** _GmatC; /* 2D Array constant G elements */
+         dVec* _kspace;
+         WFGridSystem** _wfbuf; /* 1D Array */
+         WFGridSystem* buf;
+         WaveFunction* _Abuf;
 
-	 void _Diff(WaveFunction* out, WaveFunction* in, int dim, double d = 1);
-    void _DiffAdd(WaveFunction* out, WaveFunction* in, int dim, double d = 1);
-    cHOFD* _hofd;
+         Diff _diff; /* differenciator object */
 
-
-	 bool _KinCoup;
+         bool _KinCoup;
       public:
-	 OGridGMat();
-      
-	 ~OGridGMat();
-	 
-	 /* Interface implementation */
-	 virtual Operator* NewInstance();
-	 	 
-         virtual void Init(ParamContainer &params);
-	 
-	 virtual void Init(WaveFunction *Psi);
-	 
-	 virtual const string& Name();
-	 
-	 virtual void UpdateTime(){} /* Nothing to do here */
-	                
-	 virtual dcomplex Emax();
-	 
-	 virtual dcomplex Emin();
-	 
-	 virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
-	 
-	 virtual void ApplyAdd(WaveFunction *destPsi, WaveFunction *sourcePsi);
+         OGridGMat();
 
-	 virtual void Apply(WaveFunction *Psi);
-	 
+         ~OGridGMat();
+
+         /* Interface implementation */
+         virtual Operator*
+         NewInstance();
+
+         virtual void Init(ParamContainer &params);
+
+         virtual void Init(WaveFunction *Psi);
+
+         virtual const string& Name();
+
+         virtual void UpdateTime() {} /* Nothing to do here */
+
+         virtual dcomplex Emax();
+
+         virtual dcomplex Emin();
+
+         virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
+
+         virtual void ApplyAdd(WaveFunction *destPsi, WaveFunction *sourcePsi);
+
+         virtual void Apply(WaveFunction *Psi);
+
          virtual Operator* operator=(Operator* O);
-	 
-	 virtual Operator* Copy(Operator* O);
-	          
+
+         virtual Operator* Copy(Operator* O);
+
          virtual bool Valid(WaveFunction *Psi);
    };
 

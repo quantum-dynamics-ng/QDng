@@ -19,6 +19,7 @@ namespace QDLIB {
 	 }
 	 
          static dVec* Init1Dd2dx2(const double mass, const GridSystem &Grid, const int dim);
+         static dVec* Init1Dd2dx2(const GridSystem &Grid, const int dim, const double factor = 1);
          static dVec* Init1Dddx(const GridSystem &Grid, const int dim, const double factor = 1);
    };
 }

@@ -12,31 +12,36 @@ namespace QDLIB
     */
    dVec* Kspace::Init1Dd2dx2(const double mass, const GridSystem &Grid, const int dim)
    {
+      return Init1Dd2dx2(Grid, dim, -1./(2*mass));
+   }
+
+   dVec* Kspace::Init1Dd2dx2(const GridSystem &Grid, const int dim, const double factor)
+   {
       dVec *kspace;
       int Nx = Grid.DimSize(dim);
-      
+
       kspace = new dVec(Nx);
-   
-      double dp = Dk(Grid, dim);    // Setup dp for kspace
-      
-      dp *= dp;   /* dp^2 */
+
+      double dp = Dk(Grid, dim); // Setup dp for kspace
+
+      dp *= dp; /* dp^2 */
       /* We include all the factors in the k-space function => Do it only once */
       /* The minus cancels with minus from -kx^2. */
-      dp *= 0.5 / mass ;
-     
-      if (Nx % 2 == 0){ /* even + odd grid points */
-	 for (int i=0; i < Nx / 2; i++){ //run from [-p..+p]
-	    (*kspace)[i] = (double(i) * double(i)) * dp;
-	    (*kspace)[Nx - i - 1] = (double(i+1) * double(i+1)) * dp;
-	 }
+      dp *= - factor;
+
+      if (Nx % 2 == 0) { /* even + odd grid points */
+         for (int i = 0; i < Nx / 2; i++) { //run from [-p..+p]
+            (*kspace)[i] = (double(i) * double(i)) * dp;
+            (*kspace)[Nx - i - 1] = (double(i + 1) * double(i + 1)) * dp;
+         }
       } else {
-	 (*kspace)[0] = 0; 
-	 for (int i=1; i < (Nx+1) / 2; i++){ //run from [-p..+p]
-	    (*kspace)[i] = (double(i) * double(i)) * dp;
-	    (*kspace)[Nx - i] = (double(i) * double(i)) * dp;
-	 }
+         (*kspace)[0] = 0;
+         for (int i = 1; i < (Nx + 1) / 2; i++) { //run from [-p..+p]
+            (*kspace)[i] = (double(i) * double(i)) * dp;
+            (*kspace)[Nx - i] = (double(i) * double(i)) * dp;
+         }
       }
-      
+
       return kspace;
    }
    
