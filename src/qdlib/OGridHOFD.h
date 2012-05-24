@@ -11,10 +11,6 @@
 #include "qdlib/OGridsystem.h"
 #include "qdlib/HOFD.h"
 
-#define HOFD_NDIFF 2      /* Max number of derivates */
-#define HOFD_PERDIFF 4    /* number of orders per deriv. */
-#define HOFD_NCOEFF 9     /* Max number of coeffs */
-
 namespace QDLIB
 {
 
