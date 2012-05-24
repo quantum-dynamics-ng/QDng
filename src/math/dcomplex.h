@@ -41,7 +41,7 @@ namespace QDLIB {
     dcomplex(const double real, const double imag): _real(real), _imag(imag)  {}
   
     /** Complex conjugate. */
-    inline dcomplex conj() const
+    inline dcomplex conj() const  __attribute__((always_inline))
     {
       dcomplex c;
       c._real = _real;
@@ -54,25 +54,25 @@ namespace QDLIB {
      * 
      * Is carried out in place.
      */
-    inline void conjugate()
+    inline void conjugate()  __attribute__((always_inline))
     {
       _imag = -_imag;
     }
 
-    inline void operator=(const dcomplex &B)
+    inline void operator=(const dcomplex &B)  __attribute__((always_inline))
     {
 	_real = B._real;
 	_imag = B._imag;
     }
     
-    inline dcomplex& operator=(const double B)
+    inline dcomplex& operator=(const double B)  __attribute__((always_inline))
     {
       _real = B;
       _imag = 0;
       return *this;
     }
   
-    inline dcomplex& operator=(const int B)
+    inline dcomplex& operator=(const int B)  __attribute__((always_inline))
     {
       _real = double(B);
       _imag = 0;
@@ -115,9 +115,29 @@ namespace QDLIB {
   };
 #endif
 
+#ifdef __GNUC__
+  /* Force inline forward declarations */
+  inline double conj(double d) __attribute__((always_inline));
+  inline dcomplex conj(dcomplex c)  __attribute__((always_inline));
+  inline dcomplex operator+(const dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline dcomplex operator+(const dcomplex &A, const double &B) __attribute__((always_inline));
+  inline dcomplex operator-(const dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline dcomplex operator-(const dcomplex &A, const double &B) __attribute__((always_inline));
+  inline void operator+=(dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline void operator-=(dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline dcomplex operator*(const dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline void operator*=(dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline dcomplex operator*(const dcomplex &A, const double &B) __attribute__((always_inline));
+  inline void operator*=(dcomplex &A, const double &B) __attribute__((always_inline));
+  inline dcomplex operator*(const double &B, const dcomplex &A) __attribute__((always_inline));
+  inline dcomplex operator/(const dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline void operator/=(dcomplex &A, const dcomplex &B) __attribute__((always_inline));
+  inline dcomplex operator/(const dcomplex &A, const double &B) __attribute__((always_inline));
+#endif
+
   /* Dummies to allow carry out complex conjugation no matter if real or complex */
-  inline double conj(double d){return d;}
-  inline dcomplex conj(dcomplex c){return c.conj();}
+  inline double conj(double d) {return d;}
+  inline dcomplex conj(dcomplex c)  {return c.conj();}
   
   /*
   Operator Definitions
@@ -125,6 +145,7 @@ namespace QDLIB {
   
   std::ostream& operator<<(std::ostream &s, const dcomplex c);
     
+
   inline dcomplex operator+(const dcomplex &A, const dcomplex &B)
   {
     dcomplex c;
@@ -136,6 +157,7 @@ namespace QDLIB {
   }
   
   
+
   inline dcomplex operator+(const dcomplex &A, const double &B)
   {
     dcomplex c;
@@ -166,7 +188,7 @@ namespace QDLIB {
     
     return c;
   }
-  
+
   inline void operator+=(dcomplex &A, const dcomplex &B)
   {
     A = A + B;

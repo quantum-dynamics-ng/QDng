@@ -187,6 +187,8 @@ line:
 	{        
              indent--;
              level = level->Parent();
+             if (level == NULL) 
+             	throw (QDLIB::EParamProblem("Too many closing braces!"));
              if (indent == 0){
                 root->execute();
                 delete root;
