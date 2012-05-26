@@ -42,8 +42,7 @@ namespace QDLIB
          const int*
          DimSizes();
 
-         int
-         Size() const;
+         int Size() const;
 
          void
          DimSize(int dim, int size);
@@ -72,47 +71,28 @@ namespace QDLIB
          bool
          operator!=(GridSystem &G);
 
-         /**
-          *  Activate a dimension for index mapping.
-          */
-         void ActiveDim(int dim)
-         {
-            _lothers = 1;
-            _nothers = 1;
 
-            /* Determine how many values in the lower dims are  present */
-            if (dim>0)
-            {
-               for(int i=0; i < dim; i++)
-                  _lothers *= _dims[i];
-            }
-
-            /* Determine how many times one x_i value is present */
-            for(int i=0; i < _ndims; i++)
-            {
-               if (i != dim) _nothers *= _dims[i];
-            }
-
-            _numactive = _dims[dim];
-         }
+         void ActiveDim(int dim);
 
          /**
           * Number of replica points for one index in activated dimension.
           *
           */
-         int NumOthers() { return _nothers; }
+         int NumOthers() const { return _nothers; }
 
-         int LowOthers() { return _lothers; }
+         int NumOthers(int dim1, int dim2) const;
+
+         int LowOthers() const { return _lothers; }
 
          /**
           * Number of points in active dimension.
           */
-         int NumActive() { return _numactive; }
+         int NumActive() const { return _numactive; }
 
          /**
           * Get index in array by giving the index i of active dimension and the collapsed replica index.
           */
-         int Index(int i, int replica)
+         int Index(int i, int replica) const
          {
            return (replica/_lothers) * _numactive * _lothers + replica%_lothers  + i * _lothers;
          }
@@ -122,12 +102,10 @@ namespace QDLIB
           *
           * The index of the point is then given by: IndexBase + i * LowOthers()
           */
-         int IndexBase(int replica)
+         int IndexBase(int replica) const
          {
             return (replica/_lothers) * _numactive * _lothers + replica%_lothers;
          }
-
-
 
    };
 

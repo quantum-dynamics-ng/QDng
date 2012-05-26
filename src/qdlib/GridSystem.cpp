@@ -87,15 +87,15 @@ namespace QDLIB {
    int GridSystem::Size() const
    {
       int size=1;
-      
+
       if (_ndims == 0) return 0;
 
       for (int i=0; i < _ndims; i++)
 	 size *= _dims[i];
-      
+
       return size;
    }
-   
+
    /**
     * Xmin value.
     * \param dim Number of dimension
@@ -191,6 +191,39 @@ namespace QDLIB {
       else return true;
    }
    
+   /**
+    *  Activate a dimension for index mapping.
+    */
+   void GridSystem::ActiveDim(int dim)
+   {
+      _lothers = 1;
+      _nothers = 1;
+
+      /* Determine how many values in the lower dims are  present */
+      if (dim>0)
+      {
+         for(int i=0; i < dim; i++)
+            _lothers *= _dims[i];
+      }
+
+      /* Determine how many times one x_i value is present */
+      for(int i=0; i < _ndims; i++)
+      {
+         if (i != dim) _nothers *= _dims[i];
+      }
+
+      _numactive = _dims[dim];
+   }
+
+   int GridSystem::NumOthers(int dim1, int dim2) const
+   {
+      int nothers = 1;
+
+      for(int i=0; i < _ndims; i++)
+         if (i != dim1 || i != dim2) nothers *= _dims[i];
+
+      return nothers;
+   }
 }
 
 

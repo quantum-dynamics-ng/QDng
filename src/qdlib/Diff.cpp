@@ -100,8 +100,7 @@ namespace QDLIB
          else
              throw(EParamProblem("Unknown differenciation method", method));
 
-      } else
-         _method = FFT;
+      }
 
       if (_method == HOFD) {
 
@@ -165,7 +164,7 @@ namespace QDLIB
             break;
          case HOFD:
             _hofd->SetFactor(d);
-            _hofd->DiffAdd(out, in, dim);
+            _hofd->Diff(out, in, dim, true);
             break;
       }
    }
@@ -192,8 +191,10 @@ namespace QDLIB
             break;
          case HOFD:
             _hofd->SetFactor(d);
-            _hofd->Diff(out, in, dim1);  /* \todo optimize! */
-            _hofd->Diff(out, in, dim2);
+            _hofd->SetDeriv(1);
+            _hofd->Diff(out->GetSpaceBuffer(), in, dim1);
+            _hofd->Diff(out, out->GetSpaceBuffer(), dim2);
+            _hofd->SetDeriv(_deriv);
             break;
       }
    }

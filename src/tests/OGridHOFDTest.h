@@ -12,6 +12,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "qdlib/OGridHOFD.h"
+#include "qdlib/Diff.h"
 #include "qdlib/WFGridCartesian.h"
 
 class OGridHOFDTest : public CppUnit::TestFixture

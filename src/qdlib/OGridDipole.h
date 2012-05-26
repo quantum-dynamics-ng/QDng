@@ -23,7 +23,7 @@ namespace QDLIB
 
          OGridDipole();
 
-         ~OGridDipole(){}
+         virtual ~OGridDipole(){}
          
          virtual const string& Name();
 

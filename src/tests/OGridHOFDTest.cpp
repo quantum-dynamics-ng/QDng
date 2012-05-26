@@ -163,7 +163,6 @@ void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
    for (int i=0; i < 2*NX; i++){
       for (int j=0; j < NX; j++){
          (*wf2)[n] = x[j] * x[j] + 3 * x[i] * x[i];
-         //cout << "i = " << i << " , j = " << j << " ; x1 = "<<  x[i] << " ; x0 = "<<  x[j] << endl;
          n++;
       }
    }
@@ -180,6 +179,7 @@ void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
    Op->Apply(wf2_res, wf2);
 
    /* check dim 0*/
+   cout << " dim0";
    n = 0;
    for (int i=0; i < NX*2; i++){
       for (int j=0; j < NX; j++){
@@ -192,6 +192,7 @@ void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
    }
 
    /* check dim 1*/
+   cout << " dim1";
    pm.SetValue("dim", 1);
    CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
    CPPUNIT_ASSERT_NO_THROW( Op->Init(wf2) );
@@ -210,6 +211,7 @@ void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
    }
 
    /* check All dims */
+   cout << " all";
    DELETE_OP(Op);  Op = new OGridHOFD();
    pm.clear();
    pm.SetValue("deriv", 2);
@@ -225,6 +227,40 @@ void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
       for (int j=0; j < NX; j++){
          if (i >= 8/2 && i < 2*NX-8/2 && j >= 8/2 && j < NX-8/2){ /* don't care about ghosts */
             CPPUNIT_ASSERT_DOUBLES_EQUAL(6.+ 2., (*( (cVec*) (wf2_res)))[n].real(), LOOSE_EPS);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf2_res)))[n].imag(), TIGHT_EPS);
+         }
+         n++;
+      }
+   }
+
+   /* Check Mixed derivative */
+   cout << " mixed";
+   Diff diff;
+
+   /* creat test func.: x_0^2 + 3*x_1^2 */
+   n = 0;
+   for (int i=0; i < 2*NX; i++){
+      for (int j=0; j < NX; j++){
+         (*wf2)[n] = x[j] * x[i];
+         n++;
+      }
+   }
+
+   pm.clear();
+   pm.SetValue("deriv",1);
+   pm.SetValue("order",8);
+   pm.SetValue("method","HOFD");
+   diff.SetGrid(*wf2);
+
+   diff.InitParams(pm);
+
+   (*((cVec*) wf2_res)) = dcomplex(0);
+   diff.DxDy(wf2_res, wf2, 0, 1);
+   n = 0;
+   for (int i=0; i < NX*2; i++){
+      for (int j=0; j < NX; j++){
+         if (i >= 8/2 && i < 2*NX-8/2 && j >= 8/2 && j < NX-8/2){ /* don't care about ghosts */
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(1, (*( (cVec*) (wf2_res)))[n].real(), LOOSE_EPS);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf2_res)))[n].imag(), TIGHT_EPS);
          }
          n++;

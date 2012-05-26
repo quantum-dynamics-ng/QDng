@@ -22,18 +22,20 @@ namespace QDLIB
     * Differenciator with choosable methods.
     *
     * params:
-    * \li HOFD (Higher order finite differences) order=2..8 for first and second derivatives
+    * \li HOFD (Higher order finite differences) order=2..50 for first and second derivatives
     * \li FFT  Fourier method, arbitrary derivatives.
     *
     */
    class Diff
    {
+      public:
+         typedef enum {FFT, HOFD} method_t;
       private:
          GridSystem _grid;
          int _deriv;                /* Which derivative to use */
          int _dim;                  /* Prepare on dim, all if -1 */
          bool _mixed;               /* Prepare for mixed derivatives */
-         enum {FFT, HOFD} _method;
+         method_t _method;
 
          cHOFD* _hofd;              /* FD operator object */
 
@@ -63,6 +65,10 @@ namespace QDLIB
          void Mixed(bool mixed) { _mixed = mixed; }
          bool Mixed() { return _mixed; }
 
+         /**
+          * Choose the method for diff.
+          */
+         void Method(method_t method) { _method = method; }
          /**
           * Prepare for specific dim.
           * If set to -1. All dims are prepared.

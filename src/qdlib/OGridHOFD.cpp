@@ -116,7 +116,7 @@ namespace QDLIB {
          _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, 0);
          for (int dim=1; dim < Dim(); dim++){
             _hofd->SetFactor(-1./(2.*_mass[dim]));
-            _hofd->DiffAdd((cVec*) destPsi, (cVec*) sourcePsi, dim);
+            _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, dim, true);
          }
       } else
          _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, _dim);
