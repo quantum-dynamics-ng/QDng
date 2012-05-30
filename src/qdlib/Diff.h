@@ -69,6 +69,7 @@ namespace QDLIB
           * Choose the method for diff.
           */
          void Method(method_t method) { _method = method; }
+         method_t Method() { return _method; }
          /**
           * Prepare for specific dim.
           * If set to -1. All dims are prepared.

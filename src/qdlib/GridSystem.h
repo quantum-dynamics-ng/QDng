@@ -84,6 +84,8 @@ namespace QDLIB
 
          int LowOthers() const { return _lothers; }
 
+         int LowOthers(int dim1, int dim2) const;
+
          /**
           * Number of points in active dimension.
           */

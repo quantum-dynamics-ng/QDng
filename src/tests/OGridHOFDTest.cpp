@@ -12,7 +12,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(OGridHOFDTest);
 
 using namespace QDLIB;
 
-#define NX HOFD_MAXORDER*2+1
+#define NX HOFD_MAXORDER+8
 
 OGridHOFDTest::OGridHOFDTest()
 {
@@ -237,7 +237,7 @@ void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
    cout << " mixed";
    Diff diff;
 
-   /* creat test func.: x_0^2 + 3*x_1^2 */
+   /* creat test func.: x_0*x_1 */
    n = 0;
    for (int i=0; i < 2*NX; i++){
       for (int j=0; j < NX; j++){
@@ -256,10 +256,12 @@ void OGridHOFDTest::NUMERIC_D2dx_2D_Test()
 
    (*((cVec*) wf2_res)) = dcomplex(0);
    diff.DxDy(wf2_res, wf2, 0, 1);
+//   cout << *wf2_res << endl;
    n = 0;
    for (int i=0; i < NX*2; i++){
       for (int j=0; j < NX; j++){
          if (i >= 8/2 && i < 2*NX-8/2 && j >= 8/2 && j < NX-8/2){ /* don't care about ghosts */
+//            cout << x[j] << ", " << x[i] << " "<< (*( (cVec*) (wf2_res)))[n].real() << endl;
             CPPUNIT_ASSERT_DOUBLES_EQUAL(1, (*( (cVec*) (wf2_res)))[n].real(), LOOSE_EPS);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf2_res)))[n].imag(), TIGHT_EPS);
          }

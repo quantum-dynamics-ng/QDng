@@ -215,14 +215,34 @@ namespace QDLIB {
       _numactive = _dims[dim];
    }
 
+   /**
+    * Number of points in dims other than dim1 and dim2.
+    *
+    **/
    int GridSystem::NumOthers(int dim1, int dim2) const
    {
       int nothers = 1;
 
       for(int i=0; i < _ndims; i++)
-         if (i != dim1 || i != dim2) nothers *= _dims[i];
+         if (i != dim1 && i != dim2) nothers *= _dims[i];
 
       return nothers;
+   }
+
+   int GridSystem::LowOthers(int dim1, int dim2) const
+   {
+      int lothers = Size();
+
+      for(int i=0; i < _ndims; i++){
+         int ltmp = 1;
+         if (i != dim1 || i != dim2) {
+            for(int j=0; j < i ; j++)
+               ltmp *= _dims[j];
+         }
+         if (ltmp < lothers) lothers = ltmp;
+      }
+
+      return lothers;
    }
 }
 

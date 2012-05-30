@@ -30,6 +30,7 @@ namespace QDLIB {
          lint _size;
          OGridPotential*** _Gmat; /* 2D Array coordinate dependent elements*/
          double** _GmatC; /* 2D Array constant G elements */
+         dVec** _GmatDiff;
          dVec* _kspace;
          WFGridSystem** _wfbuf; /* 1D Array */
          WFGridSystem* buf;
@@ -38,6 +39,7 @@ namespace QDLIB {
          Diff _diff; /* differenciator object */
 
          bool _KinCoup;
+         bool _ChainRule;  /* Re-arange derivatives by chain rule */
       public:
          OGridGMat();
 

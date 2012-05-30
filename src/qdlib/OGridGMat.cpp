@@ -9,8 +9,8 @@ namespace QDLIB {
 
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridGMat)
    
-   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _kspace(NULL),
-                           _wfbuf(NULL), buf(NULL), _Abuf(NULL), _diff(1), _KinCoup(true)
+   OGridGMat::OGridGMat(): _name("OGridGmat"), _size(0), _Gmat(NULL), _GmatC(NULL), _GmatDiff(NULL), _kspace(NULL),
+                           _wfbuf(NULL), buf(NULL), _Abuf(NULL), _diff(1), _KinCoup(true), _ChainRule(false)
    {
    }
    
@@ -34,6 +34,13 @@ namespace QDLIB {
             delete[] _Gmat[i];
          }
          delete[] _Gmat;
+      }
+
+      if (_GmatDiff != NULL) {
+         for (int i = 0; i < _size; i++) {
+            delete[] _GmatDiff[i];
+         }
+         delete[] _GmatDiff;
       }
 
       if (_GmatC != NULL)
@@ -65,6 +72,35 @@ namespace QDLIB {
       
       _diff.SetGrid(*((GridSystem*) this));
       _diff.InitParams(_params);
+
+      _params.GetValue("chainrule", _ChainRule, false);
+
+      /* Create derivatives of Gmatrix elements */
+      if (_ChainRule){
+         int order=8; /* default order for derivatives of Gmat-elements */
+         if (_params.isPresent("order"))
+            _params.GetValue("order",order);
+
+         HOFD<double> dx(1,order);
+         dx.SetFactor(-0.5);
+         dx.SetPBC(false);
+         dx.SetGrid(*((GridSystem*) this) );
+
+         _GmatDiff = new dVec*[_size];
+
+         for (int i=0; i < _size; i++){
+            _GmatDiff[i] = new dVec[_size];
+            for (int j=0; j < _size; j++){
+               if (_Gmat[i][j] != 0  || _Gmat[j][i] != 0 ){
+                  _GmatDiff[i][j].newsize(Psi->size());
+                  if (j > i)
+                     dx.Diff(& _GmatDiff[i][j],(dVec*)  _Gmat[j][i], i);
+                  else
+                     dx.Diff(& _GmatDiff[i][j],(dVec*)  _Gmat[i][j], i);
+               }
+            }
+         }
+      }
    }
    
    /**
@@ -211,18 +247,28 @@ namespace QDLIB {
          for (lint j = 0; j < _size; j++){
             if ((i == j) | _KinCoup){ /* Kinetic coupling ?*/
 
-               /* Multiply Gmatrix element */
-               if (_GmatC[i][j] != 0){ /* Constant G-Element*/
-                  /* d/dx from G* d/dx WF */
-                  _diff.DnDxnAdd(destPsi, _wfbuf[i], j, -0.5);
+               if (_ChainRule){
+                  /* (dxi * Gij) * dxj + Gij * dxij \todo make aware of const. G */
+                  MultElementsAdd((cVec*) destPsi, (cVec*) _wfbuf[i],(dVec*) & _GmatDiff[j][i]);
+                  if (j <= i){
+                     _diff.DnDxn(buf, _wfbuf[i], j, (i==j) ? -.5 : -1.);
+                     MultElementsAdd((cVec*) destPsi, (cVec*) buf, (dVec*) _Gmat[i][j]);
+                  }
                } else {
-                  /* Coordinate dependent lu*/
-                  if (j > i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
-                     MultElementsCopy((cVec*) buf, (cVec*) _wfbuf[i] ,  (dVec*) _Gmat[j][i]);
-                  else MultElements((cVec*) buf, (cVec*) _wfbuf[i], (dVec*) _Gmat[i][j]);
+                  /* dxi * Gij * dxj*/
+                  /* Multiply Gmatrix element */
+                  if (_GmatC[i][j] != 0){ /* Constant G-Element*/
+                     /* d/dx from G* d/dx WF */
+                     _diff.DnDxnAdd(destPsi, _wfbuf[i], j, -0.5);
+                  } else {
+                     /* Coordinate dependent lu*/
+                     if (j > i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
+                        MultElementsCopy((cVec*) buf, (cVec*) _wfbuf[i] ,  (dVec*) _Gmat[j][i]);
+                     else MultElements((cVec*) buf, (cVec*) _wfbuf[i], (dVec*) _Gmat[i][j]);
 
-                  /* d/dx from G* d/dx WF */
-                  _diff.DnDxnAdd(destPsi, buf, j , -0.5);
+                     /* d/dx from G* d/dx WF */
+                     _diff.DnDxnAdd(destPsi, buf, j , -0.5);
+                  }
                }
             }
          }

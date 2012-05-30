@@ -192,8 +192,9 @@ namespace QDLIB
          case HOFD:
             _hofd->SetFactor(d);
             _hofd->SetDeriv(1);
-            _hofd->Diff(out->GetSpaceBuffer(), in, dim1);
-            _hofd->Diff(out, out->GetSpaceBuffer(), dim2);
+//            _hofd->Diff(out->GetSpaceBuffer(), in, dim1);
+//            _hofd->Diff(out, out->GetSpaceBuffer(), dim2);
+            _hofd->Diff(out, out->GetSpaceBuffer(), in, dim1, dim2);
             _hofd->SetDeriv(_deriv);
             break;
       }
