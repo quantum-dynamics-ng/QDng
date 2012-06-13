@@ -1,6 +1,7 @@
 #ifndef PARAMCONTAINER_H
 #define PARAMCONTAINER_H
 
+#include <vector>
 #include <iostream>
 #include <map>
 
@@ -49,6 +50,10 @@ typedef map<string,string> string_map;
 	 bool GetValue(const string name, double &value);
 	 bool GetValue(const string name, bool &value, bool def = false);
          
+	 bool GetArray(const string name, vector<string>& array);
+	 bool GetArray(const string name, vector<double>& array);
+	 bool GetArray(const string name, vector<int>& array);
+	 bool GetArray(const string name, vector<bool>& array);
 	 
 	 void ResetPosition();
 	 bool GetNextValue(string &name, string &value);

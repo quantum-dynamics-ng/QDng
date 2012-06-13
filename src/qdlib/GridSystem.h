@@ -21,9 +21,12 @@ namespace QDLIB
          double _xmin[MAX_DIMS];
          double _xmax[MAX_DIMS];
          double _dx[MAX_DIMS];
-         int _lothers;
-         int _nothers;
+         int _lothers[MAX_DIMS];    /* Stripe size of dim */
+         int _nothers[MAX_DIMS];    /* Replica points for each dim */
+         int _active;               /* activated dimension */
          int _numactive;
+
+         void _BuildInfo();
       public:
          GridSystem();
          GridSystem(int dims) : _ndims(dims) {}
@@ -71,19 +74,21 @@ namespace QDLIB
          bool
          operator!=(GridSystem &G);
 
-
-         void ActiveDim(int dim);
+         /**
+          *  Activate a dimension for index mapping.
+          */
+         void ActiveDim(int dim) { _active = dim;  _numactive = _dims[dim]; }
 
          /**
           * Number of replica points for one index in activated dimension.
           *
           */
-         int NumOthers() const { return _nothers; }
-
+         int NumOthers() const { return _nothers[_active]; }
+         int NumOthers(int dim) const { return _nothers[dim]; }
          int NumOthers(int dim1, int dim2) const;
 
-         int LowOthers() const { return _lothers; }
-
+         int LowOthers() const { return _lothers[_active]; }
+         int LowOthers(int dim) const { return _lothers[dim]; }
          int LowOthers(int dim1, int dim2) const;
 
          /**
@@ -96,7 +101,7 @@ namespace QDLIB
           */
          int Index(int i, int replica) const
          {
-           return (replica/_lothers) * _numactive * _lothers + replica%_lothers  + i * _lothers;
+           return (replica/_lothers[_active]) * _numactive * _lothers[_active] + replica%_lothers[_active]  + i * _lothers[_active];
          }
 
          /**
@@ -106,7 +111,7 @@ namespace QDLIB
           */
          int IndexBase(int replica) const
          {
-            return (replica/_lothers) * _numactive * _lothers + replica%_lothers;
+            return (replica/_lothers[_active]) * _numactive * _lothers[_active] + replica%_lothers[_active];
          }
 
    };

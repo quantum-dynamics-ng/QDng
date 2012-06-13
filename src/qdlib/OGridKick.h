@@ -11,9 +11,10 @@ namespace QDLIB {
      * 
      *      <p>
      * Takes the parameters:
-     * - dims
-     * - kn  Momentum for coordinate \f$ x_n \f$. A missing
-     * value for a dimension means zero.
+     * \li dims
+     * \li kn  Momentum for coordinate \f$ x_n \f$. A missing
+     *   value for a dimension means zero.
+     * \li scale Scale factor for momentum vector.
      * 
      * @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
      */

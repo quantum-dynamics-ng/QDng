@@ -2,6 +2,7 @@
 #define HELPERS_H
 
 #include <string>
+#include <vector>
 #include <iomanip>
 
 #define printbuffer(BUFFER,SIZE) \
@@ -36,6 +37,8 @@
 
 namespace QDLIB {
    
+   using namespace std;
+
    /**
     * Removes whitespaces from the string.
     * 
@@ -44,7 +47,39 @@ namespace QDLIB {
     * are conserved.
     * 
     */
-   extern std::string& trim(std::string &s);
+   extern string& trim(string &s);
+
+   extern void split(const string &s, vector<string>& array);
+
+   /**
+    * Convert and std vector into an raw C-array.
+    *
+    * \param vec Input array.
+    * \param buf Output array.
+    * \param len Size of buf
+    */
+   template <typename T>
+   void ConvertArray(const vector<T> &vec, T* buf, size_t len)
+   {
+      for (size_t i=0; i < vec.size() && i < len; i++)
+         buf[i] = vec[i];
+   }
+
+   /**
+    * Convert and std vector into an QDLIB Vector.
+    *
+    * \param vec Input array.
+    * \param buf Output array.
+    * \param len Size of buf
+    */
+   template <typename T>
+   void ConvertArray(const std::vector<T> &vec, QDLIB::Vector<T>& buf)
+   {
+      buf.newsize(vec.size());
+      for (size_t i=0; i < vec.size(); i++)
+         buf[i] = vec[i];
+   }
+
 
 } /* namespace QDLIB */
 

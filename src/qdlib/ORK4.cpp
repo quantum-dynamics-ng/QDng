@@ -49,6 +49,8 @@ namespace QDLIB
 
    void ORK4::Apply(WaveFunction *Psi)
    {
+      for (int i=0; i < 5; i++)
+         _buf[i]->Reaquire();
 
       H->Apply(_buf[1], Psi); /* k1 = f(t, y0) */
       H->RecalcInternals(false);  /* Non-linear operator should not recalulate internal WF specfic values until end of recursion */
@@ -87,7 +89,10 @@ namespace QDLIB
       *(_buf[1]) *= clock->Dt()/6;
 
       *Psi += _buf[1];
-      
+
+      for (int i=0; i < 5; i++)
+         _buf[i]->Retire();
+
       H->RecalcInternals(true); /* turn it on again */
    }
 

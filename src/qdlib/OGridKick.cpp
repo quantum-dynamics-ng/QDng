@@ -59,6 +59,10 @@ namespace QDLIB {
          throw ( EIncompatible("OGridNablaSq: Number of dims doesn't match WF") );
       }
       
+      double scale=1;
+      if (_params.isPresent("scale"))
+         _params.GetValue("scale", scale);
+
       /* Get k-values from config */
       char c[256];
 
@@ -68,6 +72,8 @@ namespace QDLIB {
          if (_params.isPresent(c))
             _params.GetValue(string(c), _kn[i]);
          else _kn[i] = 0; /* Mark as 0 => don't build k-space */
+
+         _kn[i] *= scale;
       }
       
       *((GridSystem*) this) = *((GridSystem*) opPsi);

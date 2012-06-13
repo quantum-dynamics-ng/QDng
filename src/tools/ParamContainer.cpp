@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "ParamContainer.h"
+#include "tools/helpers.h"
 
 
 namespace QDLIB {
@@ -183,6 +184,89 @@ namespace QDLIB {
          return false;
       }
    }
+
+
+   /**
+    * Extract an array from an Entry.
+    * The array elements are separated by kommas.
+    */
+   bool ParamContainer::GetArray(const string name, vector<string>& array)
+   {
+      string buf;
+      if (! GetValue(name, buf) ) return false;
+
+      split(buf, array);
+
+      return true;
+   }
+
+   /**
+    * Extract an array from an Entry.
+    * The array elements are separated by kommas.
+    */
+   bool ParamContainer::GetArray(const string name, vector<double>& array)
+   {
+      string buf;
+      vector<string> vbuf;
+
+      if (! GetValue(name, buf) ) return false;
+
+      split(buf, vbuf);
+
+      for (size_t i=0; i < vbuf.size(); i++){
+         double value;
+         sscanf( vbuf[i].c_str(), "%lf", &value);
+         array.push_back(value);
+      }
+
+      return true;
+   }
+
+   /**
+    * Extract an array from an Entry.
+    * The array elements are separated by kommas.
+    */
+   bool ParamContainer::GetArray(const string name, vector<int>& array)
+   {
+      string buf;
+      vector<string> vbuf;
+
+      if (! GetValue(name, buf) ) return false;
+
+      split(buf, vbuf);
+
+      for (size_t i=0; i < vbuf.size(); i++){
+         int value;
+         sscanf( vbuf[i].c_str(), "%d", &value);
+         array.push_back(value);
+      }
+
+      return true;
+   }
+
+   /**
+    * Extract an array from an Entry.
+    * The array elements are separated by kommas.
+    */
+   bool ParamContainer::GetArray(const string name, vector<bool>& array)
+   {
+      string buf;
+      vector<string> vbuf;
+
+      if (! GetValue(name, buf) ) return false;
+
+      split(buf, vbuf);
+
+      for (size_t i=0; i < vbuf.size(); i++){
+         bool value;
+         if (vbuf[i] == "true") value=true;
+         else value = false;
+         array.push_back(value);
+      }
+
+      return true;
+   }
+
 
 
    /**

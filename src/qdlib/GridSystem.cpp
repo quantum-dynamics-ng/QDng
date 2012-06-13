@@ -192,27 +192,27 @@ namespace QDLIB {
    }
    
    /**
-    *  Activate a dimension for index mapping.
+    * Create Stripe informations.
     */
-   void GridSystem::ActiveDim(int dim)
+   void GridSystem::_BuildInfo()
    {
-      _lothers = 1;
-      _nothers = 1;
+      for (int dim=0; dim < _ndims; dim++){
+         _lothers[dim] = 1;
+         _nothers[dim] = 1;
 
-      /* Determine how many values in the lower dims are  present */
-      if (dim>0)
-      {
-         for(int i=0; i < dim; i++)
-            _lothers *= _dims[i];
+         /* Determine how many values in the lower dims are  present */
+         if (dim>0)
+         {
+            for(int i=0; i < dim; i++)
+               _lothers[dim] *= _dims[i];
+         }
+
+         /* Determine how many times one x_i value is present */
+         for(int i=0; i < _ndims; i++)
+         {
+            if (i != dim) _nothers[dim] *= _dims[i];
+         }
       }
-
-      /* Determine how many times one x_i value is present */
-      for(int i=0; i < _ndims; i++)
-      {
-         if (i != dim) _nothers *= _dims[i];
-      }
-
-      _numactive = _dims[dim];
    }
 
    /**
