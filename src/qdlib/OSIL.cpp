@@ -83,7 +83,7 @@ namespace QDLIB {
 
         _Lzb.Set(0, Psi);
         H->Apply(buf0,  _Lzb[0]);           /* H*q_0 */
-        H->RecalcInternals(false);  /* Non-linear operator should not recalulate internal WF specfic values until end of recursion */
+        H->RecalcInternals(false);  /* Non-linear operator must not re-calculate internal WF specific values until end of recursion */
         _alpha[0] = (*(_Lzb[0]) * buf0).real();     /* a_0 = <q_0 | H | _q0 > */
         
         _Lzb.Set(1, buf0);
@@ -110,6 +110,13 @@ namespace QDLIB {
 
             *(_Lzb[it]) *= 1 / _beta[it-1];
 
+            /* Estimate the error the L-vecs */
+            dcomplex err = pow(Clock()->Dt(), it-1) * _beta[0];
+            for (int i=1; i < it - 1; i++){
+               err *=  _beta[i] / double(i);
+            }
+            err = cabs(err);
+            cout << "SIL err: " << it << " " << err << endl;
         }
 
         _alpha[it-1] = H->Expec(_Lzb[it-1]);
