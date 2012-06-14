@@ -7,7 +7,7 @@ namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OSIL)
 	 
     OSIL::OSIL()
-            : OPropagator(), _name("OSIL"), _order(0), buf0(NULL), buf1(NULL), buf2(NULL)
+            : OPropagator(), _name("OSIL"), _order(SIL_DEF_ORDER), _convorder(SIL_DEF_ORDER),  _err(SIL_DEF_ERR), buf0(NULL), buf1(NULL), buf2(NULL)
     {
     }
 
@@ -37,13 +37,12 @@ namespace QDLIB {
 
         if (_params.isPresent("order"))
             _params.GetValue("order", _order);
-        else {
-            _order = SIL_DEF_ORDER;
-            _params.SetValue("order", _order);
-        }
 
-        if (_order == 1)
+        if (_order < 3)
             throw(EParamProblem("SIL: order doesn't make sense", _order));
+
+        if (_params.isPresent("err"))
+           _params.GetValue("err",_err);
 
         InitBuffers();
     }
@@ -81,6 +80,11 @@ namespace QDLIB {
         buf0->Reaquire();
         buf1->Reaquire();
 
+        _alpha =  0;
+        _beta = 0;
+
+        double psinorm = Psi->Norm();
+
         _Lzb.Set(0, Psi);
         H->Apply(buf0,  _Lzb[0]);           /* H*q_0 */
         H->RecalcInternals(false);  /* Non-linear operator must not re-calculate internal WF specific values until end of recursion */
@@ -94,8 +98,26 @@ namespace QDLIB {
 
         *(_Lzb[1]) *= 1 / _beta[0];     /* b0 = Norm(q1) = <q1 | H | q0 > */
 
+        _convorder = 2;
         for (it = 2; it < _order; it++)
         {
+           /* Estimate the error the next L-vector */
+           dcomplex err = pow(clock->Dt(), it-2) * _beta[0];
+           for (int i=1; i < it - 2; i++){
+              err *=  _beta[i] / double(i);
+           }
+           err = cabs(err);
+
+
+           if (err.real() > psinorm){
+              cout << "Warning: Lanczos expansion becomes unstable: " << err.real() << endl;
+              //break;
+           }
+           _convorder++;
+
+           if (it == _order - 1)
+              cout << "Warning: Lanczos expansion is not converged: " << err.real() << " > " << _err * psinorm << endl;
+
             /* buf0 = H * q_i-1 */
             H->Apply(_Lzb[it], _Lzb[it-1]);
             _alpha[it-1] = (*(_Lzb[it-1]) * _Lzb[it]).real();
@@ -110,13 +132,15 @@ namespace QDLIB {
 
             *(_Lzb[it]) *= 1 / _beta[it-1];
 
-            /* Estimate the error the L-vecs */
-            dcomplex err = pow(Clock()->Dt(), it-1) * _beta[0];
-            for (int i=1; i < it - 1; i++){
-               err *=  _beta[i] / double(i);
+            /* Check orthogonality of LZB */
+            if ( it > 10){
+               double d = cabs(*(_Lzb[0]) * _Lzb[it]);
+               if ( d > 1000*_err)
+                  cout << "Warning: Lanczos basis becomes non orthogonal: " <<it << " "<< d << endl;
             }
-            err = cabs(err);
-            cout << "SIL err: " << it << " " << err << endl;
+
+            /* convergence reached */
+            if (err.real() < _err * psinorm) break;
         }
 
         _alpha[it-1] = H->Expec(_Lzb[it-1]);
@@ -148,7 +172,7 @@ namespace QDLIB {
         /* Build linear combination from Lanczos vectors */
         *Psi *= _vect[0];
 
-        for (int i = 1; i < _order; i++){
+        for (int i = 1; i < _convorder; i++){
             AddElements((cVec*) Psi, (cVec*) _Lzb[i], _vect[i]);
         }
     }

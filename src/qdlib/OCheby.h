@@ -4,6 +4,7 @@
 #include "OPropagator.h"
 
 #define BESSEL_DELTA 1e-30       /* Lower limit for convergence of the Bessel series convergence (default) */
+#define DEFAULT_PREC 1e-10       /* Default convergence criteria on norm */
 #define BESSEL_MAX_ORDER 1e6     /* Maximum recursion order to used (by automatic determination) */
 
 
@@ -14,7 +15,7 @@ namespace QDLIB
     * Chebychev Propagator for WaveFunctions.
     * 
     * Init parameters:
-    * \li order   desired order of recursion, if left empty it's chosen automatically.
+    * \li order   desired max order of recursion, if left empty it's chosen automatically.
     * \li scaling The scaling of the Hamiltonian. Can only be used in combination with order.
     * \li prec    The lower limit precission of the bessel coeffcients (mutual exclusive with order)
     *
@@ -29,6 +30,7 @@ namespace QDLIB
 	 cVec _coeff;         /* Coefficients including the Bessel functions at k'th order */
 	 dcomplex _exp;       /* Scaled exponent:  e.g. -i*dt/Rdelta */
 	 double _scaling;     /* Energy range of the hamiltonian => the Scaling*/
+	 double _prec;        /* Convergence criteria on norm */
 	 dcomplex _offset;    /* Energy offset of the hamiltonian */
          WaveFunction *ket0, *ket1, *ket2, *buf;
 	 

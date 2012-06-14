@@ -65,6 +65,7 @@ namespace QDLIB
    void OCheby::Apply(WaveFunction * Psi)
    {
       WaveFunction *swap;
+      double norm = Psi->RawNorm();
 
       ket0->Reaquire();
       ket1->Reaquire();
@@ -76,7 +77,7 @@ namespace QDLIB
       ket0->FastCopy(*Psi); /* phi_0 */
 
       H->Apply(ket1, Psi);
-      H->RecalcInternals(false); /* Non-linear operator should not recalulate internal WF specfic values until end of recursion */
+      H->RecalcInternals(false); /* Non-linear operator should not re-calculate internal WF specific values until end of recursion */
 
       AddElements((cVec*) ket1, (cVec*) Psi, -1 * _offset); /* Offset*/
       MultElements((cVec*) ket1, _exp / _scaling);
@@ -86,7 +87,6 @@ namespace QDLIB
                * _offset));
 
       *Psi += buf;
-
       dcomplex *k2, *bf, *k0, *k1, *psi;
 
       int strides = Psi->strides();
@@ -94,7 +94,10 @@ namespace QDLIB
 
       dcomplex exp2 = 2 * _exp;
 
+
+
       for (int i = 2; i < _order; i++) {
+         dcomplex accnorm(0);
          dcomplex coeff = _coeff[i] * cexp(OPropagator::Exponent() * _offset);
          H->Apply(buf, ket1);
          int s, j;
@@ -111,6 +114,7 @@ namespace QDLIB
             psi = Psi->begin(s);
 #ifdef HAVE_SSE2
             m128dc vk2, vbf, vk0, vk1, vpsi, v_o(_offset), v_exp2(exp2), v_coeff(coeff);
+            m128dc vnorm(accnorm);
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) default(shared) private(j,vk2, vbf, vk0, vk1, vpsi)
 #endif
@@ -126,6 +130,7 @@ namespace QDLIB
                vk2 = vk0 + vbf;
                vk0 = vk2;
                vpsi += vk2 * v_coeff;
+               vnorm += vpsi.conj() * vpsi;
 
                vbf.Store(bf[j]);
                vk0.Store(k0[j]);
@@ -133,6 +138,7 @@ namespace QDLIB
                vk2.Store(k2[j]);
                vpsi.Store(psi[j]);
             }
+            vnorm.Store(accnorm);
          }
 #else
 #ifdef _OPENMP    
@@ -145,9 +151,21 @@ namespace QDLIB
                k2[j] += bf[j];
                k0[j] = k2[j];
                psi[j] += k2[j] * coeff;
+               accnorm += conj(psi[j]) * psi[j];
             }
+
          }
 #endif
+
+         /* Check for convergence */
+         double nconv = abs(norm - accnorm.real()) / norm;
+
+         if (nconv  < _prec )
+            break;
+
+         if (i == _order -1 && nconv  > _prec)
+            cout << "Warning: Chebychev series not converged: " << nconv << " > " << _prec  << endl;
+
 
          swap = ket1;
          ket1 = ket0;
@@ -155,10 +173,10 @@ namespace QDLIB
       }
       H->RecalcInternals(true); /* turn it on again */
 
-      ket0->ReaquireStorage();
-      ket1->ReaquireStorage();
-      ket2->ReaquireStorage();
-      buf->ReaquireStorage();
+      ket0->Retire();
+      ket1->Retire();
+      ket2->Retire();
+      buf->Retire();
    }
 
    Operator * OCheby::operator =(Operator * O)
@@ -265,15 +283,13 @@ namespace QDLIB
       /* Check the order which is really needed */
       if (!_params.isPresent("order")) {
          double precission = BESSEL_DELTA;
-         if (_params.isPresent("prec"))
-            _params.GetValue("prec", precission);
          int i = 2;
          /* Check how much is needed for series convergence */
          while (i < _order && abs(bessel[i - 1] - bessel[i - 2]) > precission) {
             i++;
          }
          _order = i;
-         _params.SetValue("prec", precission);
+         _params.SetValue("Bessel prec", precission);
          _params.SetValue("BesselDelta", abs(bessel[_order - 1] - bessel[_order - 2]));
       }
 
@@ -292,6 +308,12 @@ namespace QDLIB
       for (int i = 1; i < _coeff.size(); i++) {
          _coeff[i] = 2.0 * bessel[i];
       }
+
+      /* Check for precision on norm */
+      if (_params.isPresent("prec"))
+         _params.GetValue("prec", _prec);
+
+      _params.SetValue("prec", _prec);
 
       _exp = OPropagator::Exponent() / clock->Dt();
 

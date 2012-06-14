@@ -5,6 +5,7 @@
 #include "qdlib/WFBuffer.h"
 
 #define SIL_DEF_ORDER 20
+#define SIL_DEF_ERR 1e-12
 
 namespace QDLIB {
 
@@ -20,7 +21,9 @@ namespace QDLIB {
     {
         private:
             string _name;
-            int _order;       /* Recursion depth, size of basis */
+            int _order;       /* Max. Recursion depth, size of basis */
+            int _convorder;    /* Converged order of */
+            double _err;       /* Error bound to use */
             WFBuffer _Lzb;  /* Buffer for Lanczos basis */
             WaveFunction *buf0, *buf1, *buf2;   /* Buffers */ 
             dVec _alpha;      /* Store alpha coeffs */

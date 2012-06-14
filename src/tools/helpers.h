@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <iomanip>
+#include "math/typedefs.h"
 
 #define printbuffer(BUFFER,SIZE) \
    unsigned char* buffercast = (unsigned char*) BUFFER; \
