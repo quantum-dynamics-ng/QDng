@@ -70,7 +70,6 @@ namespace QDLIB {
     *
     * \param vec Input array.
     * \param buf Output array.
-    * \param len Size of buf
     */
    template <typename T>
    void ConvertArray(const std::vector<T> &vec, QDLIB::Vector<T>& buf)

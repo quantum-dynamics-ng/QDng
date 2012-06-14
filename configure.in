@@ -239,7 +239,7 @@ if test "x$use_internal_fftw" = "xyes"; then
    if test "x$enable_sse2" = "xyes"; then optconf="--enable-sse2"; fi
    if test "x$enable_avx" = "xyes"; then optconf="--enable-avx"; fi
    AC_MSG_NOTICE([--prefix=${prefix} "$fftw_thread_config" "$optconf"])
-   ../${srcdir}/fftw/configure CFLAGS="-fPIC -O3" --prefix=${prefix} "$fftw_thread_config" "$optconf"
+   ${srcdir}/fftw/configure CFLAGS="-fPIC -O3" --prefix=${prefix} "$fftw_thread_config" "$optconf"
    cd ..
 fi
 
