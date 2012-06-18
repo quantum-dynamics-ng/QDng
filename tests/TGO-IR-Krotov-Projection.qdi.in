@@ -1,8 +1,8 @@
 <qdng>
 <oct alpha="400" dt="10" steps="6750" shape="@srcdir@/GridShapeIR" method="krotov" ttype="operator"  dir="TGO-IR-Krotov-Projection">
-	<propagator name="Cheby">
+	<propagator name="Cheby" prec="1e-12">
 	<hamiltonian name="Sum">
-	      <A name="GridNablaSq" dims="1" mass0="1763.2"/>
+	      <A name="GridNablaSq" mass="1763.2"/>
 	      <B name="GridPotential" file="@srcdir@/GridPot0"/>
 	      <C name="GridDipole" file="@srcdir@/GridDip0" laser="@srcdir@/GridLaser_w0.00713"/>
 	</hamiltonian>
@@ -12,7 +12,7 @@
 </oct>
 <propa dt="10" steps="6750" wcycle="6750" dir="TGO-IR-Krotov-Projection" nfile="norm" spectrum="spectrum.dat">
 	<propagator name="GSPO">
-	      <A name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+	      <A name="GridNablaSq" mass="1763.2" key="T"/>
 	      <B name="GridPotential" file="@srcdir@/GridPot0" key="V"/>
 	      <C name="GridDipole" file="@srcdir@/GridDip0" laser="TGO-IR-Krotov-Projection/laser"/>
 	</propagator>

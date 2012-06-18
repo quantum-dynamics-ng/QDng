@@ -56,24 +56,25 @@ namespace QDLIB {
       if ( GridSystem::Dim() == 0){ /* Take Dims from WF*/
          Dim(opPsi->Dim());
       } else if ( GridSystem::Dim() !=  opPsi->Dim() ) { /* dims has been given in input (check it)*/
-         throw ( EIncompatible("OGridNablaSq: Number of dims doesn't match WF") );
+         throw ( EIncompatible("OGridKick: Number of dims doesn't match WF") );
       }
       
+      /* Read scaling factor */
       double scale=1;
       if (_params.isPresent("scale"))
          _params.GetValue("scale", scale);
 
-      /* Get k-values from config */
-      char c[256];
+      /* read momentum vector */
+      vector<double> kn_raw;
+      _params.GetArray("k", kn_raw);
+      if (kn_raw.size() > uint(Dim()))
+         throw ( EParamProblem("OGridKick: Number of dims doesn't match WF") );
 
-      for (int i = 0; i < Dim(); i++) {
-         sprintf(c, "k%d", i);
+      _kn.newsize(Dim());
+      _kn = 0;
 
-         if (_params.isPresent(c))
-            _params.GetValue(string(c), _kn[i]);
-         else _kn[i] = 0; /* Mark as 0 => don't build k-space */
-
-         _kn[i] *= scale;
+      for (uint i = 0; i < uint(Dim()) && i < kn_raw.size(); i++) {
+         _kn[i] = kn_raw[i] * scale;
       }
       
       *((GridSystem*) this) = *((GridSystem*) opPsi);

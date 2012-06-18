@@ -68,6 +68,7 @@ void OGridHOFDTest::NUMERIC_D1dx_Test()
 {
    pm.SetValue("deriv", 1);
    pm.SetValue("dim", 0);
+   pm.SetValue("mass", 1./2.);
    cout << " order ";
    for (int order=2; order <= HOFD_MAXORDER; order+=2){
       pm.SetValue("order",  order);
@@ -75,17 +76,17 @@ void OGridHOFDTest::NUMERIC_D1dx_Test()
       CPPUNIT_ASSERT_NO_THROW( Op->Init(pm) );
       CPPUNIT_ASSERT_NO_THROW( Op->Init(wf) );
 
-      Op->Apply(wf_res, wf);
+      ((Operator*) Op)->Apply(wf_res, wf);
 
       wf_resIP->FastCopy(*wf);
-      Op->Apply(wf_resIP);
+      ((Operator*) Op)->Apply(wf_resIP);
 
 
       /* Only check values at the centre of the grid. forget ghost points */
       for (int i=order/2; i < NX-order/2; i++){
-         CPPUNIT_ASSERT_DOUBLES_EQUAL(2*x[i], (*( (cVec*) (wf_res)))[i].real(), LOOSE_EPS);
+         CPPUNIT_ASSERT_DOUBLES_EQUAL(-2*x[i], (*( (cVec*) (wf_res)))[i].real(), LOOSE_EPS);
          CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf_res)))[i].imag(), TIGHT_EPS);
-         CPPUNIT_ASSERT_DOUBLES_EQUAL(2*x[i], (*( (cVec*) (wf_resIP)))[i].real(), LOOSE_EPS);
+         CPPUNIT_ASSERT_DOUBLES_EQUAL(-2*x[i], (*( (cVec*) (wf_resIP)))[i].real(), LOOSE_EPS);
          CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf_resIP)))[i].imag(), TIGHT_EPS);
       }
 
@@ -96,11 +97,11 @@ void OGridHOFDTest::NUMERIC_D1dx_Test()
             (*wf_resIP)[i] = -4*M_PI/(double(NX)) * sin(x[i]*4*M_PI/(double(NX)));
          }
 
-         Op->Apply(wf_res);
+         ((Operator*) Op)->Apply(wf_res);
 
          /* Check points - include boundary (PBC)*/
          for (int i=0; i < NX; i++){
-            CPPUNIT_ASSERT_DOUBLES_EQUAL((*wf_resIP)[i].real(), (*( (cVec*) (wf_res)))[i].real(), ROUGH_EPS);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(-(*wf_resIP)[i].real(), (*( (cVec*) (wf_res)))[i].real(), ROUGH_EPS);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(0, (*( (cVec*) (wf_res)))[i].imag(), TIGHT_EPS);
          }
       }
@@ -122,7 +123,7 @@ void OGridHOFDTest::NUMERIC_D2dx_Test()
       Op->Apply(wf_res, wf);
 
       wf_resIP->FastCopy(*wf);
-      Op->Apply(wf_resIP);
+      ((Operator*) Op)->Apply(wf_resIP);
 
       /* Only check values at the centre of the grid. forget ghost points */
       for (int i=order/2; i < NX-order/2; i++){

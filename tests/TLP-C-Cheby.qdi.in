@@ -1,6 +1,6 @@
 <qdng>
 <propa dt="2" steps="512" wcycle="256" dir="TLP-C-Cheby" spectrum="spectrum.dat" proj0="true">
-        <propagator name="Cheby">
+        <propagator name="Cheby" prec="1e-12">
          <hamiltonian name="Sum">
             <H name="HermitianMatrix" file="@srcdir@/LevelHmat"/>
             <C name="HermitianMatrix" file="@srcdir@/LevelCmat"/>

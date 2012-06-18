@@ -162,6 +162,8 @@ namespace QDLIB {
 	 _xmax[i] = G._xmax[i];
 	 _dx[i] = G._dx[i];
       }
+
+      _BuildInfo();
    }
 
    /**

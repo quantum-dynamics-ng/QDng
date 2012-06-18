@@ -1,6 +1,6 @@
 <qdng>
 <oct alpha="20" dt="0.5" steps="629" shape="@srcdir@/ShapeLevel" method="freq" dir="TLO-Cheby" freql="0.01" freqh="0.30">
-        <propagator name="Cheby">
+        <propagator name="Cheby" prec="1e-13">
         	<hamiltonian name="Sum">
         		<A name="HermitianMatrix" file="@srcdir@/LevelH2mat"/>
         		<B name="MatDipole" file="@srcdir@/LevelDIPmat" laser="@srcdir@/LevelLaser_w0.15"/>
@@ -10,7 +10,7 @@
         <wft0 name="Level" file="@srcdir@/Level_ef_1"/>
 </oct>
 <propa dt="0.5" steps="629" wcycle="4096" dir="TLO-Cheby" spectrum="spectrum.dat" proj0="true">
-        <propagator name="Cheby">
+        <propagator name="Cheby" prec="1e-13">
          <hamiltonian name="Sum">
          <A name="HermitianMatrix" file="@srcdir@/LevelH2mat"/>
          <B name="MatDipole" file="@srcdir@/LevelDIPmat" laser="TLO-Cheby/laser"/>

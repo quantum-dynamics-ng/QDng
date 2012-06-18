@@ -1,8 +1,8 @@
 <qdng>
 <propa dt="20" steps="1000" wcycle="1000" dir="TGP-Expec-SP" spectrum="spectrum.dat">
-	<propagator name="Cheby">
+	<propagator name="Cheby" prec="1e-12">
 	  <hamiltonian name="Sum">
-	      <A name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+	      <A name="GridNablaSq" mass="1763.2" key="T"/>
 	      <B name="GridPotential" file="@srcdir@/GridPot0" key="V"/>
 	  </hamiltonian>
 	</propagator>

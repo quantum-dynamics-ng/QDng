@@ -1,9 +1,9 @@
 <qdng>
 <propa dt="1" steps="400" wcycle="1000" dir="TGPLMS-Cheby" spectrum="spectrum.dat">
-	<propagator name="Cheby" order="15">
+	<propagator name="Cheby" prec="1e-12">
 	  <hamiltonian name="Multistate">
             <m0.0 name="Sum">
-               <Tkin name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+               <Tkin name="GridNablaSq" mass="1763.2" key="T"/>
                <Vpot name="GridPotential" file="@srcdir@/GridPot0" key="V0"/>
             </m0.0>
             <m1.1 name="Sum">

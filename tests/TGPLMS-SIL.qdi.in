@@ -3,7 +3,7 @@
 	<propagator name="SIL" order="20">
 	  <hamiltonian name="Multistate">
             <m0.0 name="Sum">
-               <Tkin name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+               <Tkin name="GridNablaSq" mass="1763.2" key="T"/>
                <Vpot name="GridPotential" file="@srcdir@/GridPot0" key="V0"/>
             </m0.0>
             <m1.1 name="Sum">

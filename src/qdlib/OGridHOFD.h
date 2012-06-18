@@ -35,7 +35,7 @@ namespace QDLIB
          int _dim;       /* Dim. to act on. All if -1 */
          double _pfac;   /* contains a prefactor */
          cHOFD *_hofd;    /* diff. operator */
-         double _mass[MAX_DIMS];
+         dVec _mass;
          WaveFunction *_buf;
       public:
          OGridHOFD();
@@ -57,8 +57,6 @@ namespace QDLIB
          virtual dcomplex Emin();
 
          virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
-
-         virtual void Apply(WaveFunction *Psi);
 
          virtual Operator* operator=(Operator* O);
 

@@ -70,6 +70,10 @@ namespace QDLIB {
          _wfbuf[i]->Retire();
       }
       
+      _diff.Collective(false);
+      _diff.Mixed(false);
+      _diff.Single(true);
+
       _diff.SetGrid(*((GridSystem*) this));
       _diff.InitParams(_params);
 
@@ -239,8 +243,7 @@ namespace QDLIB {
       buf->Reaquire();
 
       lint i;
-      for (i = 0; i < _size; i++)
-      { /* Loop over dims*/
+      for (i = 0; i < _size; i++){ /* Loop over dims*/
          /* d/dx from WF */
          _diff.DnDxn(_wfbuf[i], sourcePsi, i);
 

@@ -22,7 +22,7 @@ namespace QDLIB {
     {
        private:
           string _name;
-          double _kn[MAX_DIMS];
+          dVec _kn;        /* k-value for every dim */
           cVec *_exp;
           
         public:

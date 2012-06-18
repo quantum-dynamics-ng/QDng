@@ -1,6 +1,6 @@
 <qdng>
 <propa dt="0.5" steps="629" wcycle="4096" dir="TLPL-Cheby" spectrum="spectrum.dat" proj0="true">
-        <propagator name="Cheby">
+        <propagator name="Cheby" prec="1e-12">
          <hamiltonian name="Sum">
          <A name="HermitianMatrix" file="@srcdir@/LevelH2mat"/>
          <B name="MatDipole" file="@srcdir@/LevelDIPmat" laser="@srcdir@/LevelLaser_w0.15"/>

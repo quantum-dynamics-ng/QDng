@@ -81,7 +81,7 @@ void TestCheby::API_Test( )
 
    pm = U->Params();
    pm.GetValue("prec", d);
-   CPPUNIT_ASSERT_DOUBLES_EQUAL(1e-30, d, TIGHT_EPS );
+   CPPUNIT_ASSERT_DOUBLES_EQUAL(1e-10, d, TIGHT_EPS );
 
    pm.GetValue("offset.imag", d);
    CPPUNIT_ASSERT_DOUBLES_EQUAL(0, d, TIGHT_EPS );

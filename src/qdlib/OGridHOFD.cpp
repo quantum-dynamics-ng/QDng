@@ -12,11 +12,10 @@ namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridHOFD)
 
 
-   OGridHOFD::OGridHOFD() : _name("OGridHOFD"), _deriv(1), _order(2), _dim(-1), _pfac(1.), _hofd(NULL), _buf(NULL)
+   OGridHOFD::OGridHOFD() : _name("OGridHOFD"), _deriv(1), _order(2), _dim(-1), _pfac(1.), _hofd(NULL),
+                            _mass(MAX_DIMS), _buf(NULL)
    {
-      for (int i=0; i < MAX_DIMS; i++){
-         _mass[i] = -1./2.;
-      }
+      _mass = 1.;
    }
 
    OGridHOFD::~OGridHOFD()
@@ -35,12 +34,6 @@ namespace QDLIB {
       if ( _params.isPresent("dim") ){
          _params.GetValue("dim", _dim);
       }
-
-      if ( _params.isPresent("mass") ){
-         _params.GetValue("mass", _pfac);
-         _pfac = -1./_pfac/2.;
-      }
-
 
       if (_hofd != NULL) delete _hofd;
 
@@ -63,27 +56,32 @@ namespace QDLIB {
 
       _hofd->SetGrid(*((GridSystem*) this));
 
-      /* Get masses */
-      if ( _params.isPresent("mass") || _params.isPresent("mass0") ){
-         char c[256];
-         string s;
+      /* Check mass definitons */
+      if ( _params.isPresent("mass") ) {
+         vector<double> vec;
+         _params.GetArray("mass", vec);
+         ConvertArray(vec, _mass);
+         dVec factor(_mass.size());
+
+         if (vec.size() < 1)
+            throw(EParamProblem("HOFD operator needs at least one mass defintion"));
+
+         /* Check if mass definitions make sense */
          bool eff = false;  /* Indicate at least 1 non-zero dim */
 
-         for (int i = 0; i < Dim(); i++) {
-            sprintf(c, "mass%d", i);
-            s = c;
-            if (_params.isPresent(s)) {
-               _params.GetValue(string(c), _mass[i]);
-               if (_mass[i] == 0)
-                  throw(EParamProblem("Zero mass defined"));
+         for (int i = 0; i < GridSystem::Dim(); i++) {
+            if (_mass[i] == 0)
+               throw(EParamProblem("Zero mass defined"));
+            if (_mass[i] > -1) eff = true;
 
-               eff = true;
-            } else _mass[i] = -1/2; /* Mark as -1 => don't build k-space */
+            factor = -1./ (2 * _mass[i]);
          }
 
+         _hofd->SetFactor(factor);
          if (!eff)
-            throw(EParamProblem("Nabla^2 Operator is empty (no masses defined)"));
-      }
+            throw(EParamProblem("HOFD Operator is empty (no masses defined)"));
+      } else
+         _hofd->SetFactor(_mass); /* inti ones */
    }
 
    dcomplex OGridHOFD::Emax()
@@ -112,25 +110,12 @@ namespace QDLIB {
    void OGridHOFD::Apply(WaveFunction* destPsi, WaveFunction* sourcePsi)
    {
       if (_dim == -1){
-         _hofd->SetFactor(-1./(2.*_mass[0]));
          _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, 0);
          for (int dim=1; dim < Dim(); dim++){
-            _hofd->SetFactor(-1./(2.*_mass[dim]));
             _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, dim, true);
          }
       } else
          _hofd->Diff((cVec*) destPsi, (cVec*) sourcePsi, _dim);
-   }
-
-   void OGridHOFD::Apply(WaveFunction* Psi)
-   {
-      if (_buf == NULL) _buf = Psi->NewInstance();
-      else (_buf->Reaquire());
-
-      *_buf = Psi;
-      Apply(Psi, _buf);
-
-      _buf->Retire();
    }
 
    Operator* OGridHOFD::operator =(Operator* O)

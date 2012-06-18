@@ -1,7 +1,7 @@
 <qdng>
 <propa dt="10" steps="6750" wcycle="6750" dir="TGPL-IR-Pulse-GSPO" spectrum="spectrum.dat">
 	<propagator name="GSPO">
-	      <A name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
+	      <A name="GridNablaSq" mass="1763.2" key="T"/>
 	      <B name="GridPotential" file="@srcdir@/GridPot0" key="V"/>
 	      <C name="GridDipole" file="@srcdir@/GridDip0" laser="@srcdir@/GridLaser_w0.00713"/>
 	</propagator>

@@ -2,8 +2,8 @@
 <propa dt="2" steps="3000" wcycle="3000" dir="TGPMS-GSPO" spectrum="spectrum.dat">
 	<propagator name="GSPO">
 	  <A name="DMultistate">
-	     <m0.0 name="GridNablaSq" dims="1" mass0="1763.2" key="T"/>
-	     <m1.1 name="GridNablaSq" dims="1" mass0="1763.2" key="T1"/>
+	     <m0.0 name="GridNablaSq" mass="1763.2" key="T"/>
+	     <m1.1 name="GridNablaSq" mass="1763.2" key="T1"/>
 	  </A>
  	  <B name="DMultistate">
 	     <m0.0 name="GridPotential" file="@srcdir@/GridPot0" key="V0"/>

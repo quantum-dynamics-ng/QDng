@@ -1,6 +1,6 @@
 <qdng>
 <propa dt="20" steps="1000" wcycle="1000" dir="TGP-Gmat" spectrum="spectrum.dat">
-	<propagator name="Cheby">
+	<propagator name="Cheby" prec="1e-12">
 	  <hamiltonian name="Sum">
 	      <A name="GridGMat" dims="1" gmat="@srcdir@/GridGM" key="T"/>
 	      <B name="GridPotential" file="@srcdir@/GridPot0" key="V"/>

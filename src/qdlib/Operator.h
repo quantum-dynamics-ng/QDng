@@ -245,7 +245,16 @@ namespace QDLIB {
 	 /**
 	  * Apply operator to wavefunction in place.
 	  */
-	 virtual void Apply(WaveFunction *Psi) = 0;
+	 virtual void Apply(WaveFunction *Psi)
+	 {
+      if (_buf == NULL) _buf = Psi->NewInstance();
+      else _buf->Reaquire();
+
+      *_buf = Psi;
+      Apply(Psi, _buf);
+
+      _buf->Retire();
+	 }
 	 	 
     /**
      * Use the Apply method of the parent operator.

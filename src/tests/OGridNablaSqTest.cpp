@@ -65,7 +65,7 @@ void OGridNablaSqTest::API_Test()
    CPPUNIT_ASSERT_THROW(O->Init(p), Exception);
    
    p.SetValue("dims", 1);
-   p.SetValue("mass0", 0.5);
+   p.SetValue("mass", 0.5);
    CPPUNIT_ASSERT_NO_THROW(O->Init(p));
    
    CPPUNIT_ASSERT_NO_THROW(O->Init(wf));
@@ -81,7 +81,7 @@ void OGridNablaSqTest::NUMERIC_Test_Even()
    pre *= 2 * pre;
 
    p.SetValue("dims", 1);
-   p.SetValue("mass0", 1);
+   p.SetValue("mass", 1);
    CPPUNIT_ASSERT_NO_THROW(O->Init(p));
    CPPUNIT_ASSERT_NO_THROW(O->Init(wf));
    
@@ -113,7 +113,7 @@ void OGridNablaSqTest::NUMERIC_Test_Odd()
    pre *= 2 * pre;
 
    p.SetValue("dims", 1);
-   p.SetValue("mass0", 1);
+   p.SetValue("mass", 1);
    CPPUNIT_ASSERT_NO_THROW(Oo->Init(p));
    CPPUNIT_ASSERT_NO_THROW(Oo->Init(wfo));
    
@@ -127,7 +127,7 @@ void OGridNablaSqTest::NUMERIC_Test_Odd()
    
    *wf2o = wfo;
    
-   Oo->Apply(wf2o);
+   ((Operator*) Oo)->Apply(wf2o);
    
    for (lint i=0; i < WF_TEST_SIZE; i++){
       CPPUNIT_ASSERT_DOUBLES_EQUAL( pre * (*wfo)[i].real(), (*wf2o)[i].real() , LOOSE_EPS);

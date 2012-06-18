@@ -16,8 +16,9 @@ namespace QDLIB
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OCheby)
 
    OCheby::OCheby() :
-      OPropagator(), _name("OCheby"), _order(0), _coeff(0), _scaling(1.), _offset(0), ket0(NULL),
-               ket1(NULL), ket2(NULL), buf(NULL)
+      OPropagator(), _name("OCheby"), _order(0), _coeff(0), _scaling(1.), _prec(DEFAULT_PREC),
+                     _offset(0), ket0(NULL),
+                      ket1(NULL), ket2(NULL), buf(NULL)
    {
    }
 
@@ -162,9 +163,9 @@ namespace QDLIB
 
          if (nconv  < _prec )
             break;
-
-         if (i == _order -1 && nconv  > _prec)
-            cout << "Warning: Chebychev series not converged: " << nconv << " > " << _prec  << endl;
+                                                 /* Convergence only make sense for norm pres. propagations*/
+         if (i == _order -1 && nconv  > _prec && !imaginary && _offset.imag() == 0)
+            cout << "Warning: Chebychev series not converged: " << scientific << nconv << " > " << _prec  << endl;
 
 
          swap = ket1;
