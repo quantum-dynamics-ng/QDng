@@ -76,8 +76,6 @@ namespace QDLIB
       Diff::SetGrid(*this);
       Diff::InitParams(_params);
       InitDspace();
-
-
    }
 
    void OGridNablaSq::UpdateTime()

@@ -104,7 +104,25 @@ namespace QDLIB {
          return false;
       }	
    }
-   
+
+   /**
+   * Get an unsigned integer value.
+   *
+   * \param name  Name of parameter
+   * \param value Reference to value
+   */
+   bool ParamContainer::GetValue(const string name, unsigned int &value)
+   {
+      if ( _param_map.find(name) != _param_map.end()){
+         sscanf( _param_map[name].c_str(), "%u", &value);
+         return true;
+      }
+      else {
+         value = 0;
+         return false;
+      }
+   }
+
    
    /** 
    * Get an long int value.
@@ -238,6 +256,28 @@ namespace QDLIB {
       for (size_t i=0; i < vbuf.size(); i++){
          int value;
          sscanf( vbuf[i].c_str(), "%d", &value);
+         array.push_back(value);
+      }
+
+      return true;
+   }
+
+   /**
+    * Extract an array from an Entry.
+    * The array elements are separated by kommas.
+    */
+   bool ParamContainer::GetArray(const string name, vector<unsigned int>& array)
+   {
+      string buf;
+      vector<string> vbuf;
+
+      if (! GetValue(name, buf) ) return false;
+
+      split(buf, vbuf);
+
+      for (size_t i=0; i < vbuf.size(); i++){
+         unsigned int value;
+         sscanf( vbuf[i].c_str(), "%u", &value);
          array.push_back(value);
       }
 

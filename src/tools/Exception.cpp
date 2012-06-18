@@ -90,8 +90,12 @@ namespace QDLIB{
       SetMessage(s.c_str());
 
    }
-
    
+   EWrongClassType::EWrongClassType(const char* expectype, const string &classname) :
+          EIncompatible(string("Class not of type " + string(expectype) + ": " + classname).c_str())
+   {
+   }
+
 }
 
 

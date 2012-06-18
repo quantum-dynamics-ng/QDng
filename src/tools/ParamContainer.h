@@ -45,6 +45,7 @@ typedef map<string,string> string_map;
 	 bool GetValue(const string name, char *value);
 	 bool GetValue(const string name, string &value);
 	 bool GetValue(const string name, int &value);
+	 bool GetValue(const string name, unsigned int &value);
 	 bool GetValue(const string name, long int &value);
          bool GetValue(const string name, size_t &value);
 	 bool GetValue(const string name, double &value);
@@ -53,6 +54,7 @@ typedef map<string,string> string_map;
 	 bool GetArray(const string name, vector<string>& array);
 	 bool GetArray(const string name, vector<double>& array);
 	 bool GetArray(const string name, vector<int>& array);
+	 bool GetArray(const string name, vector<unsigned int>& array);
 	 bool GetArray(const string name, vector<bool>& array);
 	 
 	 void ResetPosition();

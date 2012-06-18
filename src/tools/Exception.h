@@ -99,6 +99,12 @@ namespace QDLIB {
 	 EIncompatible(const char *message, const string &name1, const string &name2);
    };
    
+   class EWrongClassType : public EIncompatible
+   {
+      public:
+         EWrongClassType(const char* expectype, const string &classname);
+   };
+
    /**
     * Indicates a parameter problem.
     */

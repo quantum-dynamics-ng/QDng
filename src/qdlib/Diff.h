@@ -41,12 +41,6 @@ namespace QDLIB
 
          cHOFD* _hofd;              /* FD operator object */
 
-         bool   _pml;
-         double _gamma;
-         double _smax;
-         int    _n;
-         int    _thick;
-
          TransformFFT _FFT;         /* Transformation class */
          dVec _kspace1[MAX_DIMS];    /* Holds the k-values for each dim. */
          dVec _kspaceMix[MAX_DIMS][MAX_DIMS]; /* Holds the k-values for the mixed derivatives. */
@@ -119,8 +113,6 @@ namespace QDLIB
          void DnDxn(WaveFunction* out, WaveFunction* in, int dim, double d = 1);
          void DnDxnAdd(WaveFunction* out, WaveFunction* in, int dim, double d = 1);
          void DxDy(WaveFunction* out, WaveFunction* in, int dim1, int dim2, double d = 1);
-
-         void PMLOp(WaveFunction* wf, int dim);
    };
 
 } /* namespace QDLIB */

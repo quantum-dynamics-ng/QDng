@@ -157,10 +157,10 @@ namespace QDLIB {
       
       for (int i=0; i < MAX_DIMS; i++)
       {
-	 _dims[i] = G._dims[i];
-	 _xmin[i] = G._xmin[i];
-	 _xmax[i] = G._xmax[i];
-	 _dx[i] = G._dx[i];
+       _dims[i] = G._dims[i];
+       _xmin[i] = G._xmin[i];
+       _xmax[i] = G._xmax[i];
+       _dx[i] = G._dx[i];
       }
 
       _BuildInfo();

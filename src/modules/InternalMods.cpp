@@ -11,6 +11,7 @@
 #include "qdlib/ORK4.h"
 
 #include "qdlib/OGridNablaSq.h"
+#include "qdlib/OGridPML.h"
 #include "qdlib/OGridGMat.h"
 #include "qdlib/OGridPotential.h"
 #include "qdlib/OGridDipole.h"
@@ -72,6 +73,7 @@ namespace QDLIB
    QDNG_OPERATOR_INSTANCE_FUNCTION(ORK4)
 
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNablaSq)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridPML)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridGMat)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridPotential)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridDipole)
@@ -123,6 +125,7 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(ORK4)
 
       QDNG_STRING_TO_INSTANCE_PTR(OGridNablaSq)
+      QDNG_STRING_TO_INSTANCE_PTR(OGridPML)
       QDNG_STRING_TO_INSTANCE_PTR(OGridGMat)
       QDNG_STRING_TO_INSTANCE_PTR(OGridPotential)
       QDNG_STRING_TO_INSTANCE_PTR(OGridDipole)

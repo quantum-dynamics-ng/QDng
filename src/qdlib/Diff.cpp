@@ -20,7 +20,7 @@ namespace QDLIB
    }
 
    Diff::Diff(int derivative, bool mixed) : _deriv(derivative), _dim(-1), _mixed(mixed), _single(true), _coll(false),
-                      _method(FFT), _pfac (MAX_DIMS), _hofd(NULL), _pml(false), _gamma(M_PI/4), _smax(1), _n(6), _thick(20)
+                      _method(FFT), _pfac (MAX_DIMS), _hofd(NULL)
    {
       _pfac = 1.0;
    }
@@ -183,25 +183,6 @@ namespace QDLIB
             throw (EParamProblem("Invalid dimension for difference operator"));
       }
 
-      if (pm.isPresent("PML")){
-         pm.GetValue("PML", _pml);
-
-         /* read params */
-         if (_pml) {
-            if (pm.isPresent("gamma"))
-               pm.GetValue("gamma", _gamma);
-
-            if (pm.isPresent("thick"))
-               pm.GetValue("thick", _thick);
-
-            if (pm.isPresent("n"))
-               pm.GetValue("n", _n);
-
-            if (pm.isPresent("smax"))
-               pm.GetValue("smax", _smax);
-
-         }
-      }
    }
 
 
@@ -249,7 +230,6 @@ namespace QDLIB
             _hofd->Diff(out, in, dim);
             break;
       }
-      if (_pml) PMLOp(out, dim);
    }
 
    /**
@@ -267,20 +247,13 @@ namespace QDLIB
                MultElementsComplex((cVec*) in, (dVec*) &(_kspace1[dim]), d / double(_grid.DimSize(dim)));
             else
                MultElements((cVec*) in, (dVec*) &(_kspace1[dim]), d / double(_grid.DimSize(dim)));
+
             _FFT.Backward(in, dim);
-            if (_pml) PMLOp(in, dim);
             *out += in;
             break;
          case HOFD:
             _hofd->SetFactor(d);
-            if (_pml){
-               out->IsKspace(true); /* preserve vector and use space buffer */
-               _hofd->Diff(out->GetSpaceBuffer(), in, dim, false);
-               PMLOp(out, dim);
-               out->IsKspace(false);
-               AddElements((cVec*) out, out->GetSpaceBuffer());
-            } else
-               _hofd->Diff(out, in, dim, true);
+            _hofd->Diff(out, in, dim, true);
             break;
       }
    }
@@ -321,25 +294,5 @@ namespace QDLIB
       }
    }
 
-   void Diff::PMLOp(WaveFunction* wf, int dim)
-   {
-      _grid.ActiveDim(dim);
-      int lo = _grid.LowOthers();
-      int Nx = _grid.DimSize(dim);
-
-      dcomplex phi = cexpI(_gamma) * _smax * pow(double(_thick), _n);
-
-      dcomplex* psi = wf->begin(0);
-      for (int rep=0; rep < _grid.NumOthers(); rep++){
-         int base = _grid.IndexBase(rep);
-
-         int step=0;
-         for (int i=0; i < _thick; i++){
-            psi[base+step] *= 1. / (1. + phi * pow( double(i-_thick),_n));
-            psi[base+Nx*lo-step] *= 1. / (1. + phi * pow( double(i),_n));
-            step += lo;
-         }
-      }
-   }
 
 } /* namespace QDLIB */
