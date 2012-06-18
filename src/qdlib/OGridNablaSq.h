@@ -4,7 +4,7 @@
 #include "qdlib/ODSpace.h"
 #include "qdlib/Kspace.h"
 #include "qdlib/GridSystem.h"
-#include "qdlib/TransformFFT.h"
+#include "qdlib/Diff.h"
 
 namespace QDLIB
 {
@@ -23,12 +23,11 @@ namespace QDLIB
     * mass for a dimension means not to apply it for this coordinate.
     *	@author Markus Kowalewski
     */
-   class OGridNablaSq: public ODSpace, public GridSystem
+   class OGridNablaSq: public ODSpace, public GridSystem, protected Diff
    {
       private:
          string _name;
-         double _mass[MAX_DIMS];
-         TransformFFT _FFT;
+         dVec _mass;
 
       public:
          OGridNablaSq();
@@ -52,8 +51,6 @@ namespace QDLIB
 
          virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi);
 
-         virtual void Apply(WaveFunction *Psi);
-
          virtual Operator* operator=(Operator* O);
 
          virtual Operator* Copy(Operator* O);
@@ -62,7 +59,7 @@ namespace QDLIB
 
          virtual Transform* Transformation()
          {
-            return &_FFT;
+            return  GetTransform();
          }
 
          /*Interface implementation, ODSpace  */

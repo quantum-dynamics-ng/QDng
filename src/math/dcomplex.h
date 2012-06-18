@@ -360,6 +360,20 @@ namespace QDLIB {
     return -1;
   }
   
+  /**
+   * Power of imaginary unit.
+   */
+  inline dcomplex cpow(Imaginary i, int n)
+  {
+     int rem = n % 4;
+
+     switch (rem){
+        case 0: return dcomplex(1);
+        case 1: return dcomplex(0,1);
+        case 2: return dcomplex(-1);
+        case 3: return dcomplex(0,-1);
+     }
+  }
 
   extern Imaginary I;
 }

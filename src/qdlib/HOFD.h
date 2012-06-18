@@ -32,7 +32,9 @@ namespace QDLIB
           */
          double _cfc[HOFD_MAXORDER][HOFD_MAXORDER/2+1];
 
-         double _pfac;   /* pre-factor */
+         double _pfac1;   /* scalar pre-factor*/
+         dVec _pfac;      /* Pre-factor per dim */
+
          GridSystem _grid;
 
            void _CheckSetup();
@@ -48,7 +50,9 @@ namespace QDLIB
          HOFD(int diff, int order);
          ~HOFD();
 
-         void SetFactor(double factor) { _pfac = factor; }
+         void SetFactor(double factor) { _pfac1 = factor; }
+
+         void SetFactor(dVec& factors) { _pfac = factors; }
 
          void SetGrid(GridSystem &grid) { _grid = grid; }
 
@@ -85,13 +89,15 @@ namespace QDLIB
     * The derivative and the order of finite diference scheme must be given at construction.
     */
    template<class T>
-   HOFD<T>::HOFD(int diff, int order) : _deriv(diff), _order(order), _pbc(true), _pfac(1)
+   HOFD<T>::HOFD(int diff, int order) : _deriv(diff), _order(order), _pbc(true), _pfac1(1.), _pfac(MAX_DIMS)
    {
       _CheckSetup();
 
       for (int i=0; i < HOFD_MAXORDER; i++)
          for (int j=0; j < HOFD_MAXORDER/2+1; j++)
             _cfc[i][j] = 0;
+
+      _pfac = 1.;
 
       /* fill the table with the coefficients - Moved to seperate files for readability of code */
       #include "cfd_table_1.h"
@@ -110,8 +116,41 @@ namespace QDLIB
    template<class T>
    inline void HOFD<T>::Diff(Vector<T>* res, Vector<T>* in, bool acc)
    {
+      double h[MAX_DIMS];
+      int order2 = _order/2;
+
+      double df=1;
+      if (_deriv % 2 != 0) df=-1;
+
+      double* cf = _cfc[(_deriv-1)*HOFD_MAXORDER/2+order2-1];
+
+      T* psi = in->begin(0);
+      T* Dpsi = res->begin(0);
+
+      /* Build pre factors */
       for (int dim=0; dim < _grid.Dim(); dim++){ /* Loop over all dims */
-         Diff(res, in, dim);
+         h[dim] = 1./pow(_grid.Dx(dim), _deriv) * _pfac1 * _pfac[dim];
+      }
+//      cout << "h " << h[0] << ", pfac " << _pfac[0] << endl;
+
+#ifdef _OPENMP
+#pragma  omp parallel for
+#endif
+      for (int i=0; i < _grid.Size(); i++){ /* Loop over all points */
+         if (!acc)  Dpsi[i] = 0;
+         for (int dim=0; dim < _grid.Dim(); dim++){ /* Loop over all dims */
+            int lo = _grid.LowOthers(dim);
+            int N = _grid.DimSize(dim);
+            int step=lo;
+            T d = cf[order2] * psi[i];
+//            cout << "i " << i << ", dim " << dim<< endl;
+            for (int j=order2-1; j >= 0 ; j--){ /* coeffs */
+               d += df * cf[j] * psi[(i+step)%N]; /* wrap around indices for PBC */
+               d += cf[j] * psi[(N+i-step)%N];
+               step += lo;
+            }
+            Dpsi[i] += h[dim] * d;
+         }
       }
 
    }
@@ -127,14 +166,14 @@ namespace QDLIB
    template<class T>
    void HOFD<T>::Diff(Vector<T>* res, Vector<T>* in, int dim, bool acc)
    {
-         double h = 1./pow(_grid.Dx(dim), _deriv) * _pfac;
+         double h = 1./pow(_grid.Dx(dim), _deriv) * _pfac1 * _pfac[dim];
          int order2 = _order/2;
 
          _grid.ActiveDim(dim); /* Use index mapping scheme */
          int Nx = _grid.NumActive();
 
          double df=1;
-         if (_deriv % 2 != 0) df=-1;
+         if (_deriv % 2 != 0) df = -1;
 
          T* psi = in->begin(0);
          T* Dpsi = res->begin(0);
@@ -220,8 +259,8 @@ namespace QDLIB
    template<class T>
    void HOFD<T>::Diff(Vector<T>* res, Vector<T>* buf, Vector<T>* in, int dim1, int dim2, bool acc)
    {
-      double h1 = 1./pow(_grid.Dx(dim1), _deriv) * _pfac;
-      double h2 = 1./pow(_grid.Dx(dim2), _deriv) * _pfac;
+      double h1 = 1./pow(_grid.Dx(dim1), _deriv) * _pfac1;
+      double h2 = 1./pow(_grid.Dx(dim2), _deriv) * _pfac1;
       const int order2 = _order/2;
 
       _grid.ActiveDim(dim1); /* Use index mapping scheme */
@@ -258,9 +297,9 @@ namespace QDLIB
       int Nrep = _grid.NumOthers(dim1, dim2);
       int lorep = _grid.LowOthers(dim1, dim2);
       int base=0;
-      cout << "Size: " << Nx1 << "x" << Nx2 << endl;
-      cout << "BS: " << bs1 << "x" << bs2 << endl;
-      cout << "stripe: " << lo1 << "x" << lo2 << endl;
+//      cout << "Size: " << Nx1 << "x" << Nx2 << endl;
+//      cout << "BS: " << bs1 << "x" << bs2 << endl;
+//      cout << "stripe: " << lo1 << "x" << lo2 << endl;
 #ifdef _OPENMP
 #pragma  omp parallel for
 #endif
@@ -284,13 +323,13 @@ namespace QDLIB
             for (int blk2=0; blk2 < (Nx2-order2)/bs2-1; blk2++){ /* loop over sec. dim*/
                int base2 = base1 + blk2*bs2*lo2;
 
-               cout << " blk1, blk2 " << blk1 << " " << blk2+1 <<" "<< blk2 <<" "<< base2+bs2*lo2 << " "<< base2 << endl;
+//               cout << " blk1, blk2 " << blk1 << " " << blk2+1 <<" "<< blk2 <<" "<< base2+bs2*lo2 << " "<< base2 << endl;
                /* dx1 in block + 1*/
                _DiffBlock2D(Bpsi, psi, order2, base2+bs2*lo2,
                         N, lo1, lo2, bs1, bs2,
                         cf, df, h1, acc);
                /* dx2 in actual block */
-               cout << "dx2\n";
+//               cout << "dx2\n";
                _DiffBlock2D(Dpsi, Bpsi, order2, base2,
                         N, lo2, lo1, bs2, bs1,
                         cf, df, h2, acc);

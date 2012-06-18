@@ -1,36 +1,56 @@
 #include "OGridNablaSq.h"
 #include "WFGridSystem.h"
+#include "tools/helpers.h"
 
 namespace QDLIB
 {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridNablaSq)
    
    OGridNablaSq::OGridNablaSq() :
-      ODSpace(), _name("OGridNablaSq")
+      ODSpace(), _name("OGridNablaSq"), _mass(MAX_DIMS)
    {
-      for (int i = 0; i < MAX_DIMS; i++) {
-         _mass[i] = -1;
-      }
+      _mass = -1;
+      Diff::Collective(true);
+      Diff::Single(false);
+      Diff::Mixed(false);
+      Diff::Derivative(2);
+      Diff::Method(FFT);
    }
 
    OGridNablaSq::~OGridNablaSq()
    {
-      if (_dspace != NULL)
-         delete _dspace;
    }
 
    void OGridNablaSq::Init(ParamContainer & params)
    {
       _params = params;
-      if (_params.isPresent("dims") ) {
-         int n;
-         _params.GetValue("dims", n);
 
-         if (n < 1)
-            throw(EParamProblem("Nabla operator needs at least one dimension"));
+      /* Get masses */
+      vector<double> vec;
+      _params.GetArray("mass", vec);
+      ConvertArray(vec, _mass);
 
-         GridSystem::Dim(n);
+      if (vec.size() < 1)
+         throw(EParamProblem("Nabla operator needs at least one dimension"));
+
+      GridSystem::Dim(vec.size());
+
+      /* Check if mass definitions make sense */
+      bool eff = false;  /* Indicate at least 1 non-zero dim */
+
+      dVec masses(vec.size());
+      for (int i = 0; i < GridSystem::Dim(); i++) {
+         if (_mass[i] == 0)
+            throw(EParamProblem("Zero mass defined"));
+         if (_mass[i] > 0) eff = true;
+
+         masses[i] = -1./2./_mass[i];
       }
+
+      if (!eff)
+         throw(EParamProblem("Nabla^2 Operator is empty (no masses defined)"));
+
+      Diff::Factors(masses);
    }
 
    void OGridNablaSq::Init(WaveFunction *Psi)
@@ -46,32 +66,15 @@ namespace QDLIB
       if (_dspace != NULL) return;  // Avoid init twice
 
       if ( GridSystem::Dim() == 0){ /* Take Dims from WF*/
-         Dim(opPsi->Dim());
+         GridSystem::Dim(opPsi->Dim());
       } else if ( GridSystem::Dim() !=  opPsi->Dim() ) { /* dims has been given in input (check it)*/
          throw ( EIncompatible("OGridNablaSq: Number of dims doesn't match WF") );
       }
 
-      /* Get masses */
-      char c[256];
-      string s;
-      bool eff = false;  /* Indicate at least 1 non-zero dim */
-
-      for (int i = 0; i < Dim(); i++) {
-         sprintf(c, "mass%d", i);
-         s = c;
-         if (_params.isPresent(s)) {
-            _params.GetValue(string(c), _mass[i]);
-            if (_mass[i] == 0)
-               throw(EParamProblem("Zero mass defined"));
-
-            eff = true;
-         } else _mass[i] = -1; /* Mark as -1 => don't build k-space */
-      }
-
-      if (!eff)
-         throw(EParamProblem("Nabla^2 Operator is empty (no masses defined)"));
-
       *((GridSystem*) this) = *((GridSystem*) opPsi);
+
+      Diff::SetGrid(*this);
+      Diff::InitParams(_params);
       InitDspace();
 
 
@@ -102,27 +105,7 @@ namespace QDLIB
 
    void OGridNablaSq::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      WFGridSystem *ket, *opPsi;
-
-      ket = dynamic_cast<WFGridSystem*> (sourcePsi);
-      opPsi = dynamic_cast<WFGridSystem*> (destPsi);
-
-      _FFT.Forward(ket);
-      opPsi->IsKspace(true); /* The result is in K-space */
-      MultElements((cVec*) opPsi, (cVec*) ket, _dspace, 1 / double(GridSystem::Size()));
-      ket->IsKspace(false); /* switch back to X-space -> we don't change sourcePsi */
-      _FFT.Backward(opPsi);
-   }
-
-   void OGridNablaSq::Apply(WaveFunction * Psi)
-   {
-      WFGridSystem *opPsi;
-
-      opPsi = dynamic_cast<WFGridSystem*> (Psi);
-
-      _FFT.Forward(opPsi);
-      MultElements((cVec*) opPsi, _dspace, 1 / double(GridSystem::Size()));
-      _FFT.Backward(opPsi);
+      DnDxn(destPsi, sourcePsi);
    }
 
    Operator * OGridNablaSq::operator =(Operator * O)
@@ -174,27 +157,8 @@ namespace QDLIB
       if (GridSystem::Dim() == 0)
          throw(EParamProblem("Missing GridSystem parameters"));
 
-      dVec *kspace1;
-
-      if (_dspace == NULL)
-         _dspace = new dVec(GridSystem::Size(), true);
-      else _dspace->newsize(GridSystem::Size());
-
-      *_dspace = 0;
-      dVecView view(*_dspace, GridSystem::Dim(), GridSystem::DimSizes());
-
-      /* Init k-space for every dimension */
-      for (int i = 0; i < GridSystem::Dim(); i++) {
-         if (_mass[i] > 0) {
-
-            kspace1 = Kspace::Init1Dd2dx2(_mass[i], static_cast<GridSystem>(*this), i);
-
-            view.ActiveDim(i);
-            view += *kspace1;
-            delete kspace1;
-
-         }
-      }
+      _InitKspace(); /* Maintained by Diff*/
+      _dspace = &_kspace; /* hosted in Diff class */
    }
 
    void OGridNablaSq::InitExponential(cVec *exp, dcomplex c)
