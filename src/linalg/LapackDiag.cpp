@@ -95,6 +95,43 @@ namespace LAPACK {
       return info;
    }
    
+   int DiagHessenberg(cMat *mat, cVec* evals, cMat* evecs)
+   {
+      if (mat->rows() != mat->cols()) return -1;
+      if (evals->strides() != 1) return -2;
+
+      Memory& mem = Memory::Instance();
+      char job='E';
+      char compz = 'N';
+      int n=mat->rows();
+      int ilo = 1;
+      int info;
+
+      int wsize = 11*n;
+      dcomplex* ws;
+
+      mem.Align( (void**) &ws, wsize );
+
+      ZHSEQR_F77(&job, &compz, &n, &ilo, &n, mat->begin(), &n, evals->begin(0), ws , &n, ws, &wsize, &info);
+
+      if (info > 0)
+         cout << "\n*** ZHSEQR Warning: Eigenvalues failed: " << info << endl;
+      if (info < 0 ){
+         cout << "\n*** ZHSEQR Failed " << info << endl;
+      }
+
+      cout << "\nevals" <<*evals;
+//      char side = 'R';
+//      char eigsrc = 'Q';
+//      char initv = 'N';
+//      Vector<int> select(n);
+//
+//      select = 1;
+//
+//      ZHSEIN_F77(&side, &eigsrc, &initv, select.begin(0), &n, mat->begin(0));
+
+      return info;
+   }
 }
 
 
