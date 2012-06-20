@@ -27,8 +27,9 @@ namespace QDLIB
          int _dim;
          double _gamma;
          double _smax;
-         int _n;
+         int _p;
          int _thick;
+         cVec _f1;
 
       public:
          PML();
@@ -36,6 +37,13 @@ namespace QDLIB
 
          void InitParams(ParamContainer &pm, uint dim);
          void SetGrid(GridSystem &grid) { _grid = grid; }
+
+         int Layer() { return _thick; }
+         double gamma() { return _gamma; }
+         double sigma() { return _smax; }
+         int p() { return _p; }
+
+         const cVec& f1() { return _f1; }
 
          void ApplyTransform(cVec *wf);
    };

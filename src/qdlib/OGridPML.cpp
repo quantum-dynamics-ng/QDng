@@ -82,7 +82,24 @@ namespace QDLIB
 
    dcomplex OGridPML::Emin()
    {
-      return dcomplex(0,-Emax().real()/4.);  /* Crude approximation */
+      //cVec f(_pml[0].Layer());
+      dcomplex sum(0);
+      double kmax = M_PI/GridSystem::Dx(0);
+      double gamma = _pml[0].gamma();
+      double smax = _pml[0].sigma();
+//      double p = double(_pml[0].p());
+//      double d = _pml[0].Layer();
+//      for (int i=0; i < d; i++){
+//         dcomplex pml = _pml[0].f1()[i];
+//         sum += -1 * cexpI(gamma) * p * pow(double(i), p-1) / pml / pml / pml / pow(d,p) + I * kmax / pml / pml;
+//      }
+//
+//      sum *= - GridSystem::Dx(0) *  I * kmax / 2. / _mass[0] / d;
+//
+
+      cout << "emin: " << (kmax*kmax/2/_mass[0] /  (1+smax*cexpI(gamma)))<<endl;
+      cout << -Emax().real()/2<<endl;
+      return dcomplex(0, (kmax*kmax/2/_mass[0] /  (1+smax*cexpI(gamma))).imag() );  /* Crude approximation */
    }
 
    void OGridPML::Apply(WaveFunction* destPsi, WaveFunction* sourcePsi)

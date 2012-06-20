@@ -6,11 +6,12 @@
  */
 
 #include "PML.h"
+#include "tools/Logger.h"
 
 namespace QDLIB
 {
 
-   PML::PML() : _dim(-1), _gamma(0.25), _smax(1), _n(2), _thick(10)
+   PML::PML() : _dim(-1), _gamma(0.25), _smax(1), _p(4), _thick(10)
    {
    }
 
@@ -50,38 +51,61 @@ namespace QDLIB
       }
 
 
-      if (pm.isPresent("n")){
+      if (pm.isPresent("p")){
          vector<double> val;
-         pm.GetArray("n", val);
+         pm.GetArray("p", val);
          if (val.size() != 1 && dim > val.size())
             throw (EParamProblem("PML: mononomial order for at least one dim is missing"));
 
          if (val.size() == 1)
-            _n = val[0];
+            _p = val[0];
          else
-            _n = val[dim];
+            _p = val[dim];
       }
 
-//      double k=M_PI/_grid.Dx(_dim)/2.; /** default is half k-max*/
-//      if (pm.isPresent("k")){
-//         vector<double> val;
-//         pm.GetArray("k", val);
-//         if (val.size() != 1 && dim > val.size())
-//            throw (EParamProblem("PML: characteristic k-value order for at least one dim is missing"));
-//
-//         if (val.size() == 1)
-//            k = val[0];
-//         else
-//            k = val[dim];
-//      }
+      double k=M_PI/_grid.Dx(_dim)/2.; /** default is half k-max*/
+      if (pm.isPresent("k")){
+         vector<double> val;
+         pm.GetArray("k", val);
+         if (val.size() != 1 && dim > val.size())
+            throw (EParamProblem("PML: characteristic k-value order for at least one dim is missing"));
 
+         if (val.size() == 1)
+            k = val[0];
+         else
+            k = val[dim];
+      }
 
+      double otol = 1e-5;
       /* Determine smax */
       if (pm.isPresent("smax"))
          pm.GetValue("smax", _smax);
       else {
-         _smax = 1; /** \todo implement */
+         /* estimate sigma_max by error on outer boundary
+          * Ignore error at the interface.
+          */
+
+         if (pm.isPresent("otol"))
+            pm.GetValue("otol", otol);
+
+         _smax = - log(otol) * (double(_p) + 1) / (1.141 * k * _thick * _grid.Dx(_dim));
       }
+
+      dcomplex phi = cexpI(_gamma*M_PI) * _smax * pow(1./double(_thick), _p);
+      _f1.newsize(_thick);
+      for (int i=0; i < _thick; i++)
+         _f1[i] = 1. / (1. + phi * pow( double(i-_thick-1),_p));
+
+      Logger& log = Logger::InstanceRef();
+
+      log.coutdbg().precision(4);
+      log.coutdbg() << endl << "PML for dim " << _dim << endl;
+      log.IndentInc();
+      log.coutdbg() << "Tol. outer:\t" <<  scientific << otol << endl;
+      log.coutdbg() << "k:\t" <<  scientific << k << endl;
+      log.coutdbg() << "smax:\t" << fixed << _smax  << endl;
+      log.IndentDec();
+      log.flush();
    }
 
    /**
@@ -93,17 +117,14 @@ namespace QDLIB
       int lo = _grid.LowOthers();
       int Nx = _grid.DimSize(_dim);
 
-      dcomplex phi = cexpI(_gamma*M_PI) * _smax * pow(1./double(_thick), _n);
-
       dcomplex* psi = wf->begin(0);
       for (int rep=0; rep < _grid.NumOthers(); rep++){
          int base = _grid.IndexBase(rep);
 
          int step=0;
          for (int i=0; i < _thick; i++){
-            dcomplex pml = 1. / (1. + phi * pow( double(i-_thick-1),_n));
-            psi[base+step] *= pml;
-            psi[base+(Nx-1)*lo-step] *= pml;
+            psi[base+step] *= _f1[i];
+            psi[base+(Nx-1)*lo-step] *= _f1[i];
             step += lo;
          }
       }
