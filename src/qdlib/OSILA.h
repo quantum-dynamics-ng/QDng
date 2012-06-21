@@ -32,7 +32,8 @@ namespace QDLIB {
             cVec _vect;       /* time vector in Lanczos basis */
             cVec _vec0;       /* time vector in Lanczos basis */
             cVec _expHD;       /* Exponential vector */
-            cMat _Z;          /* Lanczos eigenvectors */
+            cMat _ZL;          /* Lanczos eigenvectors */
+            cMat _ZR;          /* Lanczos eigenvectors */
 
             
             void InitBuffers();

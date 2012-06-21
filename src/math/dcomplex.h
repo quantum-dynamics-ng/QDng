@@ -375,7 +375,18 @@ namespace QDLIB {
      }
   }
 
+  /**
+   * Complex square root
+   */
+  inline dcomplex csqrt(dcomplex c)
+  {
+     double r  = sqrt( c.real()*c.real() +  c.imag()*c.imag());
+
+     return dcomplex(sqrt( (r + c.real())/2 ),  sqrt( (r - c.real())/2 ));
+  }
+
   extern Imaginary I;
 }
 
 #endif
+

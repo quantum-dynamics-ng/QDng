@@ -95,7 +95,7 @@ namespace LAPACK {
       return info;
    }
    
-   int DiagHessenberg(cMat *mat, cVec* evals, cMat* evecs)
+   int DiagHessenberg(cMat *mat, cVec* evals, cMat* evecsL, cMat* evecsR)
    {
       if (mat->rows() != mat->cols()) return -1;
       if (evals->strides() != 1) return -2;
@@ -110,9 +110,19 @@ namespace LAPACK {
       int wsize = 11*n;
       dcomplex* ws;
 
-      mem.Align( (void**) &ws, wsize );
+      evals->newsize(n);
+      evecsL->newsize(n,n);
+      evecsR->newsize(n,n);
+      cMat matbuf;
+
+      matbuf = *mat;
+
+      mem.Align( (void**) &ws, wsize * sizeof(dcomplex) );
+
 
       ZHSEQR_F77(&job, &compz, &n, &ilo, &n, mat->begin(), &n, evals->begin(0), ws , &n, ws, &wsize, &info);
+
+      mem.Free( ws );
 
       if (info > 0)
          cout << "\n*** ZHSEQR Warning: Eigenvalues failed: " << info << endl;
@@ -120,15 +130,53 @@ namespace LAPACK {
          cout << "\n*** ZHSEQR Failed " << info << endl;
       }
 
-      cout << "\nevals" <<*evals;
-//      char side = 'R';
-//      char eigsrc = 'Q';
-//      char initv = 'N';
-//      Vector<int> select(n);
-//
-//      select = 1;
-//
-//      ZHSEIN_F77(&side, &eigsrc, &initv, select.begin(0), &n, mat->begin(0));
+
+      char side = 'B';
+      char eigsrc = 'N';
+      char initv = 'N';
+      Vector<int> select(n);
+      Vector<int> lfail(n);
+      Vector<int> rfail(n);
+      cVec ebuf = *evals;
+
+      double* rws;
+
+
+      select = 1;
+
+      mem.Align( (void**) &ws, n*n * sizeof(dcomplex) );
+      mem.Align( (void**) &rws, n * sizeof(double) );
+
+      ZHSEIN_F77(&side, &eigsrc, &initv, select.begin(0), &n, matbuf.begin(0), &n, ebuf.begin(0),
+               evecsL->begin(), &n, evecsR->begin(), &n, &n, &n, ws, rws, lfail.begin(0), rfail.begin(0), &info);
+
+      mem.Free( ws );
+      mem.Free( rws );
+
+      if (info > 0)
+         cout << "\n*** ZHSEIN Warning: Eigenvalues failed: " << info << endl;
+      if (info < 0 ){
+         cout << "\n*** ZHSEIN Failed " << info << endl;
+      }
+
+      /*
+       * normalize eigenvectors
+       */
+      dcomplex sl, sr;
+      for (int c=0; c < n; c++){
+         sl=dcomplex(0);
+         sr=dcomplex(0);
+         for (int r=0; r < n; r++){
+            sl += conj((*evecsL)(r,c)) * (*evecsL)(r,c);
+            sr += conj((*evecsR)(r,c)) * (*evecsL)(r,c);
+         }
+         sl = 1./sqrt(sl.real());
+         sr = 1./sqrt(sl.real());
+         for (int r=0; r < n; r++){
+            (*evecsL)(r,c) = sl.real() * (*evecsL)(r,c);
+            (*evecsR)(r,c) = sr.real() * (*evecsR)(r,c);
+         }
+      }
 
       return info;
    }

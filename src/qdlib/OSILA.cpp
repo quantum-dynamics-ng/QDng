@@ -43,6 +43,8 @@ namespace QDLIB
       if (_order < 3)
          throw(EParamProblem("SIL: order doesn't make sense", _order));
 
+      _convorder = _order;
+
       if (_params.isPresent("err"))
          _params.GetValue("err", _err);
 
@@ -94,24 +96,29 @@ namespace QDLIB
       H->RecalcInternals(false); /* Non-linear operator must not re-calculate internal WF specific values until end of recursion */
 
       _HA = dcomplex(0);
-      _HA(0,0) = H->MatrixElement(_Lzb[0], _Lzb[0]);
       for (it = 1; it < _order; it++) {
          H->Apply(buf0, _Lzb[it-1]);
          _Lzb.Set(it, buf0);
 
-         for (int j=0; j < it-1; j++){
-            cout << j << ", " << it-1 <<endl;
+         for (int j=0; j <= it-1; j++){
             _HA(j, it-1) = *(_Lzb[j]) * _Lzb[it];
             AddElements(_Lzb[it], _Lzb[j], -1 * _HA(j, it-1));
          }
 
-         _HA(it, it-1) = _Lzb[it]->Norm();
-         *(_Lzb[it]) *= 1./_Lzb[it]->Norm();
 
-         _HA(it,it) = H->MatrixElement(_Lzb[it], _Lzb[it]);
+         double norm = _Lzb[it]->Norm();
+         _HA(it, it-1) = norm;
+         *(_Lzb[it]) *= 1./norm;
+
       }
 
-      cout << _HA;
+      //_HA(_order-1,_order-1) = H->MatrixElement(_Lzb[_order-1], _Lzb[_order-1]);
+      H->Apply(buf0, _Lzb[_order-1]);
+      for (int j=0; j < _order; j++){
+         _HA(j, _order-1) = *(_Lzb[j]) * buf0;
+      }
+
+      cout << "\nHL\n" <<_HA;
 //      ///////
 //      _alpha[0] = *(_Lzb[0]) * buf0; /* a_0 = <q_0 | H | _q0 > */
 //
@@ -184,16 +191,27 @@ namespace QDLIB
       /* Diag Lanczos Hamiltonian */
 //      LAPACK::
 //      LAPACK::TriDiagHermitian(&_alpha, &_beta, &_Z, _order);
-      LAPACK::DiagHessenberg(&_HA, &_alpha, &_Z);
+      LAPACK::DiagHessenberg(&_HA, &_alpha, &_ZL, &_ZR);
+      cout << "\neig(HA)\n" <<_alpha;
+//      cout << "\neigvecL(HA)\n" <<_ZL;
+//      cout << "\neigvecR(HA)\n" <<_ZR;
+
 
       _vect = dcomplex(0);
       _vect[0] = 1;
 
+//      _ZR = _ZL;
+//      _ZR.transpose();
+//      MatrixMatrixMult( &_HA, &_ZR, &_ZL);
+//      cout << _HA;
+
       ExpElements(&_expHD, &_alpha, OPropagator::Exponent());
       /* Z * e^(-i*Hd*dt) * Z+ */
-      MatVecMult(&_vec0, &_Z, &_vect, true);
+      MatVecMult(&_vec0, &_ZL, &_vect, true, true);
+//      cout << _vec0;
       MultElements(&_vec0, &_expHD);
-      MatVecMult(&_vect, &_Z, &_vec0);
+      MatVecMult(&_vect, &_ZL, &_vec0);
+//      cout << _vect;
 
       /* Build linear combination from Lanczos vectors */
       *Psi *= _vect[0];

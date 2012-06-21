@@ -226,8 +226,8 @@ namespace QDLIB {
       for (int i=0; i < _m; i++) {
          for (int j=0; j < i; j++) {
             swap=_col[i][j];
-            _col[i][j] = _col[j][i];
-            _col[j][i] = swap;
+            _col[i][j] = conj(_col[j][i]);
+            _col[j][i] = conj(swap);
          }
       }
    }

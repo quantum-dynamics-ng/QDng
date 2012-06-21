@@ -23,7 +23,7 @@ namespace LAPACK {
    
    extern int TriDiagHermitian(dVec *diag, dVec *subdiag, dMat *evec, int length);
    
-   extern int DiagHessenberg(cMat *mat, cVec* evals, cMat* evecs);
+   extern int DiagHessenberg(cMat *mat, cVec* evals, cMat* evecsL, cMat* evecsR);
 
    /* Lapack routines */
    extern "C" {
@@ -479,7 +479,7 @@ namespace LAPACK {
       *                failed to converge; see IFAILL and IFAILR for further
       *                details.
       */
-     extern void ZHSEIN_F77(const char* SIDE, const char* EIGSRC, const int* INITV, const int* SELECT,
+     extern void ZHSEIN_F77(const char* SIDE, const char* EIGSRC, const char* INITV, const int* SELECT,
               const int* N, const dcomplex* H, const int* LDH, dcomplex* W, dcomplex* VL,
               const int* LDVL, dcomplex* VR, const int* LDVR, const int* MM, int* M,
               dcomplex* WORK, double* RWORK, int* IFAILL, int* IFAILR, int* INFO);
