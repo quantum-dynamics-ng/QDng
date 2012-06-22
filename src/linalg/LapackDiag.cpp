@@ -95,6 +95,28 @@ namespace LAPACK {
       return info;
    }
    
+   int DiagGeneral(cMat *mat, cVec* evals, cMat* evecsL, cMat* evecsR)
+   {
+      if (mat->rows() != mat->cols()) return -1;
+      if (evals->strides() != 1) return -2;
+
+      Memory& mem = Memory::Instance();
+      int n=mat->rows();
+      int ilo = 1;
+      int info;
+
+      int wsize = n*n;
+      dcomplex* ws;
+      mem.Align( (void**) &ws, wsize * sizeof(dcomplex) );
+
+      ZGEHRD_F77(&n, &ilo, &n, mat->begin(), &n, evals->begin(0), ws, &wsize, &info);
+
+      mem.Free( ws );
+
+      return DiagHessenberg(mat, evals, evecsL, evecsR);
+
+   }
+
    int DiagHessenberg(cMat *mat, cVec* evals, cMat* evecsL, cMat* evecsR)
    {
       if (mat->rows() != mat->cols()) return -1;
@@ -179,6 +201,49 @@ namespace LAPACK {
       }
 
       return info;
+   }
+
+   int InvertGeneral(cMat *mat)
+   {
+      int m = mat->rows();
+      int n = mat->cols();
+      int info;
+
+      Vector<int> ipiv(m);
+
+
+      ZGETRF_F77(&m, &n, mat->begin(), &m, ipiv.begin(0), &info);
+
+
+      if (info < 0){
+         cout << "*** GETRF Error: Invalid argument: " << info << endl;
+         return info;
+      }
+
+      if (info > 0){
+         cout << "*** GETRF Error: Singular element: " << info << endl;
+         return info;
+      }
+
+
+      int wsize = 10*n;
+      dcomplex* ws;
+      Memory::Instance().Align( (void**) &ws, wsize * sizeof(dcomplex) );
+
+      ZGETRI_F77(&n, mat->begin(0), &m, ipiv.begin(0), ws, &wsize, &info);
+
+      if (info < 0){
+         cout << "*** GETRF Error: Invalid argument: " << info << endl;
+         return info;
+      }
+
+      if (info > 0){
+         cout << "*** GETRF Error: Singular matrix element: " << info << endl;
+         return info;
+      }
+
+      return info;
+
    }
 }
 
