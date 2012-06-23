@@ -7,7 +7,7 @@ namespace QDLIB {
 	{
 	  lint size = A->lsize();
 	  lint strides = A->strides();
-	
+
 	  lint s;
 	  int rank = A->MPIrank();
 	  int msize = A->MPIsize();

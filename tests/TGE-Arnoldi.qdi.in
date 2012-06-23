@@ -1,0 +1,27 @@
+<qdng>
+<eigen dt="5" steps="1000" Nef="10" dir="TGE-Arnoldi-im" method="imag">
+	<propagator name="Arnoldi" order="15">
+	  <hamiltonian name="Sum">
+	      <A name="GridNablaSq" mass="1763.2"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0"/>
+	  </hamiltonian>
+	</propagator>
+        <wf file="@srcdir@/GridGauss" normalize="true"/>
+</eigen>
+<eigen dt="5" steps="2048" dir="TGE-Arnoldi-ac" method="ac">
+	<propagator name="Arnoldi" order="15">
+	  <hamiltonian name="Sum">
+	      <A name="GridNablaSq" mass="1763.2"/>
+	      <B name="GridPotential" file="@srcdir@/GridPot0"/>
+	  </hamiltonian>
+	</propagator>
+        <wf name="LC" normalize="true">
+           <wf0 file="TGE-Arnoldi-im/ef_0"/>
+           <wf1 file="TGE-Arnoldi-im/ef_1"/>
+           <wf2 file="TGE-Arnoldi-im/ef_2"/>
+           <wf3 file="TGE-Arnoldi-im/ef_3"/>
+           <wf4 file="TGE-Arnoldi-im/ef_4"/>
+           <wf5 file="TGE-Arnoldi-im/ef_5"/>
+	</wf>
+</eigen>
+</qdng>

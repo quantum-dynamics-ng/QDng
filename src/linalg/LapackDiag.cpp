@@ -129,7 +129,7 @@ namespace LAPACK {
       int ilo = 1;
       int info;
 
-      int wsize = 11*n;
+      int wsize = n*n;
       dcomplex* ws;
 
       evals->newsize(n);
@@ -144,7 +144,6 @@ namespace LAPACK {
 
       ZHSEQR_F77(&job, &compz, &n, &ilo, &n, mat->begin(), &n, evals->begin(0), ws , &n, ws, &wsize, &info);
 
-      mem.Free( ws );
 
       if (info > 0)
          cout << "\n*** ZHSEQR Warning: Eigenvalues failed: " << info << endl;
@@ -163,10 +162,8 @@ namespace LAPACK {
 
       double* rws;
 
-
       select = 1;
 
-      mem.Align( (void**) &ws, n*n * sizeof(dcomplex) );
       mem.Align( (void**) &rws, n * sizeof(double) );
 
       ZHSEIN_F77(&side, &eigsrc, &initv, select.begin(0), &n, matbuf.begin(0), &n, ebuf.begin(0),

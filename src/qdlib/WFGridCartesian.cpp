@@ -99,8 +99,15 @@ namespace QDLIB {
          {
 #pragma omp  for nowait
 #endif
+#ifdef HAVE_SSE2
+            m128dc vc(c);
+            for (i = 0; i < size; i++)
+               vc += m128dc(&(a[i])).conj() * m128dc(&(b[i]));
+            vc.Store(c);
+#else
             for (i = 0; i < size; i++)
                c += a[i].conj() * b[i];
+#endif
 #ifdef _OPENMP
 #pragma omp critical
             {

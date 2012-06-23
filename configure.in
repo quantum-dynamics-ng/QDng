@@ -207,7 +207,7 @@ AC_CONFIG_FILES(
 		 src/fft/Makefile src/math/Makefile src/modules/Makefile
 		 src/tests/Makefile src/slatec/Makefile src/linalg/Makefile
 		 src/lib/Makefile src/mex/Makefile src/mex/libs/Makefile tests/Makefile src/simpleXml/Makefile
-		 tests/TGE-GSPO.qdi tests/TGE-SPO.qdi tests/TGE-Cheby.qdi tests/TGE-SIL.qdi
+		 tests/TGE-GSPO.qdi tests/TGE-Arnoldi.qdi tests/TGE-Cheby.qdi tests/TGE-SIL.qdi
 		 tests/TGP-Expec.qdi tests/TGP-Expec-SP.qdi tests/TGP-NIP-Cheby.qdi
 		 tests/TGP-Kick.qdi tests/TGP-Gmat.qdi
 		 tests/TGPMS-Cheby.qdi tests/TGPMS-GSPO.qdi

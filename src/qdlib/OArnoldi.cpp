@@ -1,19 +1,19 @@
-#include "OSILA.h"
+#include "OArnoldi.h"
 
 #include "linalg/LapackDiag.h"
 
 namespace QDLIB
 {
 
-   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OSILA)
+   QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OArnoldi)
 
-   OSILA::OSILA() :
-            OPropagator(), _name("OSILA"), _order(SIL_DEF_ORDER), _convorder(SIL_DEF_ORDER), _err(SIL_DEF_ERR),
-            buf0(NULL), buf1(NULL), buf2(NULL)
+   OArnoldi::OArnoldi() :
+            OPropagator(), _name("OArnoldi"), _order(ARNOLDI_DEF_ORDER), _convorder(ARNOLDI_DEF_ORDER),
+            buf0(NULL), buf1(NULL)
    {
    }
 
-   OSILA::~OSILA()
+   OArnoldi::~OArnoldi()
    {
       DELETE_WF(buf0);
       DELETE_WF(buf1);
@@ -23,17 +23,16 @@ namespace QDLIB
    /**
     * Initialize vectors etc. with right size.
     */
-   void OSILA::InitBuffers()
+   void OArnoldi::InitBuffers()
    {
-      _alpha.newsize(_order);
-      _beta.newsize(_order);
+      _evals.newsize(_order);
       _HA.newsize(_order, _order);
       _vect.newsize(_order);
       _vec0.newsize(_order);
       _expHD.newsize(_order);
    }
 
-   void OSILA::Init(ParamContainer & params)
+   void OArnoldi::Init(ParamContainer & params)
    {
       _params = params;
 
@@ -41,17 +40,17 @@ namespace QDLIB
          _params.GetValue("order", _order);
 
       if (_order < 3)
-         throw(EParamProblem("SIL: order doesn't make sense", _order));
+         throw(EParamProblem("Arnoldi: order doesn't make sense", _order));
 
       _convorder = _order;
 
-      if (_params.isPresent("err"))
-         _params.GetValue("err", _err);
+//      if (_params.isPresent("err"))
+//         _params.GetValue("err", _err);
 
       InitBuffers();
    }
 
-   void OSILA::Init(WaveFunction * Psi)
+   void OArnoldi::Init(WaveFunction * Psi)
    {
       OPropagator::Init(Psi);
 
@@ -62,33 +61,33 @@ namespace QDLIB
 
       buf0 = Psi->NewInstance();
       buf1 = Psi->NewInstance();
-      buf2 = Psi->NewInstance();
 
       buf0->Retire();
       buf1->Retire();
-      buf2->Retire();
 
       _Lzb.Size(_order);
       _Lzb.Init(Psi);
-      _Lzb.AutoLock(3);
+      _Lzb.AutoLock(2);
 
       H->Clock(Operator::Clock());
    }
 
    /**
-    * Create Lanczos vectors + Hamiltonian.
+    * Create Arnoldi vectors + Hamiltonian.
     */
-   void OSILA::BuildLZB(WaveFunction* Psi)
+   void OArnoldi::BuildLZB(WaveFunction* Psi)
    {
       int it;
 
       buf0->Reaquire();
       buf1->Reaquire();
 
-      _beta = 1.;
 
-      _Lzb.Set(0, Psi);
-      H->Apply(buf0, _Lzb[0]); /* q1 = H*q_0 */
+      *buf1 = Psi;
+      buf1->Normalize();
+
+      _Lzb.Set(0, buf1);
+      H->Apply(buf0, buf1); /* q1 = H*q_0 */
       _Lzb.Set(1, buf0);
       H->RecalcInternals(false); /* Non-linear operator must not re-calculate internal WF specific values until end of recursion */
 
@@ -98,15 +97,18 @@ namespace QDLIB
          H->Apply(buf0, _Lzb[it-1]);
          _Lzb.Set(it, buf0);
 
+         /* Orthogonalize */
          for (int j=0; j <= it-1; j++){
-            _HA(j, it-1) = *(_Lzb[j]) * _Lzb[it];
-            AddElements(_Lzb[it], _Lzb[j], -1 * _HA(j, it-1));
+            WaveFunction* wfj = _Lzb[j];
+            _HA(j, it-1) = *wfj * buf0;
+            AddElements(buf0, wfj, -1 * _HA(j, it-1));
          }
 
-
-         double norm = _Lzb[it]->Norm();
+         double norm = buf0->Norm();
          _HA(it, it-1) = norm;
-         *(_Lzb[it]) *= 1./norm;
+         *buf0 *= 1./norm;
+
+         _Lzb.Set(it, buf0);
       }
 
       /* Last row */
@@ -121,23 +123,26 @@ namespace QDLIB
       buf1->Retire();
    }
 
-   /**
-    * Propagate one step with given Lanczos-Hamiltonian.
-    *
-    * Lzb, alpha and beta must present.
-    */
-   void   OSILA::DiagLZB(WaveFunction* Psi)
+   void OArnoldi::DiagLZB()
    {
-      /* Diag Lanczos Hamiltonian */
-      LAPACK::DiagHessenberg(&_HA, &_alpha, &_ZL, &_ZR);
+      /* Diag Arnoldi Hamiltonian */
+      LAPACK::DiagHessenberg(&_HA, &_evals, &_ZL, &_ZR);
+   }
 
+   /**
+    * Propagate one step with given Arnoldi-Hamiltonian.
+    *
+    * Diagonalized Hamiltonian must be present
+    */
+   void OArnoldi::Propagate(WaveFunction* Psi)
+   {
       _vect = dcomplex(0);
       _vect[0] = 1;
 
       _ZL = _ZR;
       LAPACK::InvertGeneral(&_ZL);
 
-      ExpElements(&_expHD, &_alpha, OPropagator::Exponent());
+      ExpElements(&_expHD, &_evals, OPropagator::Exponent());
       /* Z * e^(-i*Hd*dt) * Z+ */
       MatVecMult(&_vec0, &_ZL, &_vect);
       MultElements(&_vec0, &_expHD);
@@ -151,31 +156,33 @@ namespace QDLIB
       }
    }
 
-   void  OSILA::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
+   void  OArnoldi::Apply(WaveFunction * destPsi, WaveFunction * sourcePsi)
    {
       *destPsi = sourcePsi;
       BuildLZB(destPsi);
-      DiagLZB(destPsi);
+      DiagLZB();
+      Propagate(destPsi);
    }
 
-   void   OSILA::Apply(WaveFunction * Psi)
+   void   OArnoldi::Apply(WaveFunction * Psi)
    {
       BuildLZB(Psi);
-      DiagLZB(Psi);
+      DiagLZB();
+      Propagate(Psi);
    }
 
-   Operator* OSILA::operator =(Operator * O)
+   Operator* OArnoldi::operator =(Operator * O)
    {
       Copy(O);
       return this;
    }
 
-   Operator* OSILA::Copy(Operator * O)
+   Operator* OArnoldi::Copy(Operator * O)
    {
-      OSILA *o = dynamic_cast<OSILA*>(O);
+      OArnoldi *o = dynamic_cast<OArnoldi*>(O);
 
       if (o == NULL)
-         throw(EIncompatible("OSIL: unable to copy: ", O->Name()));
+         throw(EIncompatible("OArnoldi: unable to copy: ", O->Name()));
 
       OPropagator::Copy(O);
 
@@ -184,7 +191,6 @@ namespace QDLIB
       InitBuffers();
       buf0 = o->buf0->NewInstance();
       buf1 = o->buf0->NewInstance();
-      buf2 = o->buf0->NewInstance();
 
       H = o->H->NewInstance();
       H->Copy(o->H);
@@ -192,7 +198,7 @@ namespace QDLIB
       return this;
    }
 
-   bool OSILA::Valid(WaveFunction * Psi)
+   bool OArnoldi::Valid(WaveFunction * Psi)
    {
       if (H == NULL)
          return false;

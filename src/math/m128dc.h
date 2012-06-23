@@ -41,8 +41,14 @@ namespace QDLIB
 
       m128dc(const dcomplex &a)
       {
-         v = _mm_load_pd( (double*) &a );
+         v = _mm_loadu_pd( (double*) &a );
       }
+
+      m128dc(const dcomplex *a)
+      {
+         v = _mm_load_pd( (double*) a );
+      }
+
 
       /** Load. */
       inline void operator=(const dcomplex &a)
