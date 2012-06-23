@@ -240,7 +240,7 @@ namespace QDLIB {
     * Fill the buffer with a wf series from disk.
     * The buffer is cleared prior to reading.
     */
-   void WFBuffer::ReadFromFiles(const string&  name)
+   void WFBuffer::ReadFromFiles(const string&  name, int begin, int step, int end)
    {
       FileWF wfile;
       WaveFunction* psi;
@@ -249,19 +249,21 @@ namespace QDLIB {
       /* Init file writer for wf output */
       wfile.Name(name);
       wfile.Suffix(BINARY_WF_SUFFIX);
-      wfile.ActivateSequence();
+      wfile.ActivateSequence(step);
       wfile.ResetCounter();
-      
+      wfile.Counter(begin);
+
       psi = wfile.LoadWaveFunctionByMeta();
       Add(psi);
       
+      int counter = 0;
       try {
-         while (true){ /* Run loop until something fails => must be the end of the wf-series (this is dirty) */
+         while (counter < end || end == -1){ /* Run loop until something fails => must be the end of the wf-series (this is dirty) */
             wfile >> psi;
             Add(psi);
+            counter++;
          }
-      } catch (EIOError) {
-      }
+      } catch (EIOError& e) {}
    }
   
   

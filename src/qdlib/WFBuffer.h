@@ -71,7 +71,7 @@ namespace QDLIB {
          void Add(WaveFunction *Psi);
          
          void SaveToFiles(const string&  name);
-         void ReadFromFiles(const string&  name);
+         void ReadFromFiles(const string&  name, int begin=0, int step=1, int end=0);
          
          /**
           * This is a synoyme for Get.

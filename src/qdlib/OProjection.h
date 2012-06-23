@@ -2,8 +2,7 @@
 #define QDLIBOPROJECTION_H
 
 #include "qdlib/Operator.h"
-
-#define MAX_WFSPACE 1024 /* Maximum number of storable WFs */
+#include "WFBuffer.h"
 
 namespace QDLIB {
 
@@ -21,14 +20,12 @@ namespace QDLIB {
     * \li inv     sets the inverse Projection operator \f$ \sum_i |1-\Psi_i><\Psi_i| \f$
     * @author Markus Kowalewski
     */
-   class OProjection : public Operator {
+   class OProjection : public Operator, public WFBuffer {
       private:
 	 string _name;
 	 
          double _sign;
          bool _inv;        /* true: inverse projection 1-P */
-	 int _size;
-	 WaveFunction* _wfbuf[MAX_WFSPACE];
 	 WaveFunction* _buf;
 	 
 	 void _destroy();
@@ -37,13 +34,9 @@ namespace QDLIB {
 	 OProjection();
       
 	 ~OProjection();
-      
-	 void Add(WaveFunction* Psi);
-	 
-	 WaveFunction* Get(int n);
 	 
          /** Number of elements. */
-	 int Length() { return _size; };
+	 int Length() { return Size(); };
 	 
          /** Set sign of the sum */
          void Sign(bool positive) {
