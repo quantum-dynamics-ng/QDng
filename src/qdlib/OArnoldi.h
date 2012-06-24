@@ -24,7 +24,7 @@ namespace QDLIB {
             int _convorder;    /* Converged order of */
 //            double _err;       /* Error bound to use */
             WFBuffer _Lzb;     /* Buffer for Lanczos basis */
-            WaveFunction *buf0, *buf1, *buf2;   /* Buffers */ 
+            WaveFunction *buf0, *buf1;   /* Buffers */
             cVec _evals;      /* Eigenvalues */
             cMat _HA;         /* Arnoldi hamiltonian */
             cVec _vect;       /* time vector in Lanczos basis */

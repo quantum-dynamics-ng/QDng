@@ -52,54 +52,66 @@ namespace QDLIB
    {
 
       private:
-         typedef enum {imag, ac} _method_t;
-	 /* Input */
-	 XmlNode &_EigenNode;
-	 XmlNode *_ContentNodes;
-	 
-	 /* Operators */
-	 OPropagator *_U;
-	 Operator *_H;
-	 OProjection *_P;
-	 
-	 /* Parameters */
+         typedef enum
+         {
+            imag, ac, lanczos
+         } _method_t;
+         /* Input */
+         XmlNode &_EigenNode;
+         XmlNode *_ContentNodes;
+
+         /* Operators */
+         OPropagator *_U;
+         Operator *_H;
+         OProjection *_P;
+
+         /* Parameters */
          _method_t _method;
-	 string _dir;
-	 lint _Nef;
-	 double _convergence;
-	 int _MaxSteps;
-	 string _fname;
-	 string _ename;
+         string _dir;
+         lint _Nef;
+         double _convergence;
+         int _MaxSteps;
+         string _fname;
+         string _ename;
          string _spectrum;
-	 string _read;
-	 double _dt;
-	 bool _diag; /* Diagonalize Basis */
+         string _read;
+         double _dt;
+         bool _diag; /* Diagonalize Basis */
          int _start;
          double _tol;
          bool _win;
-         
+
          WaveFunction *_PsiInitial;
-         
+
          FileWF _efile;
-         
-	 dVec _Energies_raw;
-	 dVec _Energies_diag;
-	 
-	 void _InitParams();
-	 void _CreateInitalWF();
-	 
+
+         dVec _Energies_raw;
+         dVec _Energies_diag;
+
+         void
+         _InitParams();
+         void
+         _CreateInitalWF();
+
       protected:
-	 void WriteEnergyFile();
+         void WriteEnergyFile();
          void ImagTimeEF();
          void AutoCorrEF();
+         void LanczosEF();
+         void DiagBasis();
       public:
-	 ProgEigen(XmlNode &EigenNode);
-	 
-	 void SetDirectory(string &directory) {_dir = directory;}
-	       
-	 void Run();
-         
-	 ~ProgEigen();
+         ProgEigen(XmlNode &EigenNode);
+
+         void
+         SetDirectory(string &directory)
+         {
+            _dir = directory;
+         }
+
+         void
+         Run();
+
+         ~ProgEigen();
 
    };
 

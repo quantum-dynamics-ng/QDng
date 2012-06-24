@@ -83,14 +83,13 @@ namespace QDLIB {
       _m = m;
       _n = n;
       
-      Memory& mem = Memory::Instance();
-      mem.Align((void**) (&_v), sizeof(T) * _mn);
+      Memory::Instance().Align((void**) (&_v), sizeof(T) * _mn);
 
       _col = new T*[_n];
       
       /* init col pointers */
       for(int i=0; i < _n; i++){
-	 _col[i] = &(_v[i*_m]);
+         _col[i] = &(_v[i*_m]);
 	 
       }
    }
@@ -101,6 +100,8 @@ namespace QDLIB {
       if (_v != NULL) {
          Memory::Instance().Free( (void*) _v);
          delete[] _col;
+         _v = NULL;
+         _col = NULL;
       }
       _mn=0;
       _m=0;

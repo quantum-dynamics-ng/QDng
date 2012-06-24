@@ -17,7 +17,6 @@ namespace QDLIB
    {
       DELETE_WF(buf0);
       DELETE_WF(buf1);
-      DELETE_WF(buf2);
    }
 
    /**
@@ -195,6 +194,7 @@ namespace QDLIB
       H = o->H->NewInstance();
       H->Copy(o->H);
 
+      OPropagator::Copy(o);
       return this;
    }
 

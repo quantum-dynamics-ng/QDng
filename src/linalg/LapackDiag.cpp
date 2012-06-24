@@ -190,7 +190,7 @@ namespace LAPACK {
             sr += conj((*evecsR)(r,c)) * (*evecsL)(r,c);
          }
          sl = 1./sqrt(sl.real());
-         sr = 1./sqrt(sl.real());
+         sr = 1./sqrt(sr.real());
          for (int r=0; r < n; r++){
             (*evecsL)(r,c) = sl.real() * (*evecsL)(r,c);
             (*evecsR)(r,c) = sr.real() * (*evecsR)(r,c);

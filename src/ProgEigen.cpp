@@ -18,6 +18,7 @@
 #include "math/math_functions.h"
 #include "fft/fft.h"
 
+#include "qdlib/OArnoldi.h"
 #include "linalg/LapackDiag.h"
 
 namespace QDLIB
@@ -83,6 +84,54 @@ namespace QDLIB
       }
    }
 
+   /**
+    * Diagonalize Hamiltonian in caculated basis.
+    */
+   void ProgEigen::DiagBasis()
+   {
+      Logger& log = Logger::InstanceRef();
+
+      log.Header("Diagonalize Hamiltonian", Logger::SubSection);
+      /* Create Hamiltonian Matrix */
+      dMat S;
+      S.newsize(_Nef, _Nef);
+      _Energies_diag.newsize(_Nef);
+      S = 0;
+      WaveFunction *bra, *ket;
+      for (int i = 0; i < _Nef; i++) {
+         bra = _P->Get(i);
+         for (int j = 0; j < i; j++) {
+            ket = _P->Get(j);
+            S(j, i) = _H->MatrixElement(bra, ket).real();
+         }
+         S(i, i) = _Energies_raw[i];
+      }
+
+      if (LAPACK::FullDiagHermitian(&S, &_Energies_diag) != 0)
+         throw(EOverflow("Problem with diagonlization routine"));
+
+      /* Build EFs in diag basis & write to file */
+      _efile.ResetCounter();
+      log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
+      WaveFunction* Psi = _P->Get(0)->NewInstance();
+      WaveFunction* buf = _P->Get(0)->NewInstance();
+      for (int i = 0; i < _Nef; i++) {
+         *Psi = _P->Get(0);
+         *Psi *= S(0, i);
+         for (int j = 1; j < _Nef; j++) { /* make linear combination */
+            *buf = _P->Get(j);
+            *buf *= S(j, i);
+            *Psi += buf;
+         }
+         log.cout().precision(8);
+         log.cout() << i << "\t" << fixed << _Energies_diag[i] - _Energies_raw[i];
+         log.cout().precision(3);
+         log.cout() << "\t" << fixed << (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
+         log.flush();
+         _efile << Psi;
+      }
+
+   }
    
    /**
     * Init the propramm parameters.
@@ -103,6 +152,7 @@ namespace QDLIB
          attr.GetValue("method", s);
          if (s == "imag") _method = imag;
          else if (s == "ac") _method = ac;
+         else if (s == "lanczos") _method = lanczos;
          else throw (EParamProblem("Unknown method for EF calculation given: ", s));
       }
       
@@ -146,7 +196,7 @@ namespace QDLIB
             if ( _convergence > 1)
                throw ( EParamProblem ("Convergence critera larger than one doesn't make sense") );
          }
-      } else { /* specific for ac */
+      } else if (_method == ac){ /* specific for ac */
          
          /* Basis Diagonalization */
          attr.GetValue("diag", _diag, false); /* Default false: diag may lead to ambigous result with ac method */
@@ -165,10 +215,12 @@ namespace QDLIB
       }
       
       /* Maximum number of steps */
-      if ( attr.isPresent("steps") ) {
-	 attr.GetValue("steps", _MaxSteps);
-	 if ( _MaxSteps < 1)
-	    throw ( EParamProblem ("Maximum number of time steps smaller than one requested") );
+      if (_method != lanczos){
+         if ( attr.isPresent("steps") ) {
+            attr.GetValue("steps", _MaxSteps);
+            if ( _MaxSteps < 1)
+               throw ( EParamProblem ("Maximum number of time steps smaller than one requested") );
+         }
       }
 
       /* Init the clock */
@@ -328,7 +380,7 @@ namespace QDLIB
          log.flush();
       }
       log.cout() << "\n\n";
-      
+
       DELETE_WF(Psi_old);
       DELETE_WF(Psi);
       DELETE_WF(buf);
@@ -418,7 +470,7 @@ namespace QDLIB
 
 	   if (!meta.isPresent("WFBaseName"))
 	      throw (EParamProblem("No WF base name given"));
-	   
+
 	   meta.GetValue("WFBaseName", s);
 	   _read += s;
 	   
@@ -523,6 +575,57 @@ namespace QDLIB
       DELETE_WF(Psi);
    }
 
+   void ProgEigen::LanczosEF()
+   {
+      Logger& log = Logger::InstanceRef();
+      OArnoldi* U = dynamic_cast<OArnoldi*>(_U);
+
+      if (U == NULL)
+         throw (EParamProblem("Arnoldi Propagator is needed to find Lanczos Eigenvalues"));
+
+
+      log.cout() << "Build Arnoldi basis\n\n";
+      log.flush();
+
+      /* Create Arnoldi vectors */
+      U->BuildLZB(_PsiInitial);
+      U->DiagLZB();
+
+      /* Get results */
+      WFBuffer* wfs = U->Basis();
+      _Nef = wfs->Size();
+      _Energies_raw.newsize(_Nef);
+      cVec evals(_Nef);
+      evals = *(U->Evals());
+      cMat evecs(_Nef,_Nef);
+      evecs = *(U->Evecs());
+
+      /* Create approximate Eigenfunctions */
+
+      WaveFunction* buf = _PsiInitial->NewInstance();
+      log.cout() << "#\tE(Ritz)\tE(Expec)\n";
+      log.cout() << fixed;
+      log.cout().precision(8);
+      log.flush();
+
+      for (int i=0; i < _Nef; i++){
+         *buf = wfs->Get(0);
+         *buf *= evecs(0,i);
+         for (int j=1; j < _Nef; j++){
+            AddElements( (cVec*) buf, (cVec*) wfs->Get(j), evecs(j,i));
+         }
+         _P->Add(buf);
+         dcomplex ene = _H->MatrixElement(buf, buf);
+         _Energies_raw[i] = ene.real();
+         log.cout() << i << "\t" << evals[i] << "\t" << ene << endl;
+      }
+      log.cout() << endl;
+      log.flush();
+
+      _P->SaveToFiles(_dir+_fname);
+
+      DELETE_WF(buf);
+   }
    
    void ProgEigen::Run()
    {
@@ -531,8 +634,6 @@ namespace QDLIB
 
       QDClock *clock = QDGlobalClock::Instance();
       Logger& log = Logger::InstanceRef();
-      
-      WaveFunction *Psi, *buf;
       
       _InitParams();
       
@@ -583,53 +684,21 @@ namespace QDLIB
 
       
       /* Jump to specific method */
-      if (_method == imag)
-         ImagTimeEF();
-      else
-         AutoCorrEF();
+      switch (_method){
+         case imag:
+            ImagTimeEF();
+            break;
+         case ac:
+            AutoCorrEF();
+            break;
+         case lanczos:
+            LanczosEF();
+            break;
+      }
       
       /* Optional basis diagonalization */
-      if (_diag){
-         log.Header("Diagonalize Hamiltonian", Logger::SubSection);
-         /* Create Hamiltonian Matrix */
-         dMat S;
-         S.newsize(_Nef,_Nef);
-         _Energies_diag.newsize(_Nef);
-         S = 0;
-         WaveFunction *bra,*ket;
-         for (int i=0; i < _Nef; i++){
-            bra = _P->Get(i);
-            for (int j=0; j < i; j++){
-               ket = _P->Get(j);
-               S(j,i) =  _H->MatrixElement(bra, ket).real();
-            }
-            S(i,i) = _Energies_raw[i];
-         }
+      if (_diag)  DiagBasis();
 
-         if (LAPACK::FullDiagHermitian(&S, &_Energies_diag) != 0)
-            throw (EOverflow("Problem with diagonlization routine"));
-         
-         /* Build EFs in diag basis & write to file */
-         _efile.ResetCounter();
-         log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
-         Psi = _P->Get(0)->NewInstance();
-         buf = _P->Get(0)->NewInstance();
-         for (int i=0; i < _Nef; i++){
-            *Psi = _P->Get(0);
-            *Psi *= S(0,i);
-            for (int j=1; j < _Nef; j++){ /* make linear combination */
-               *buf = _P->Get(j);
-               *buf *= S(j,i);
-               *Psi += buf;
-            }
-            log.cout().precision(8);
-            log.cout() << i << "\t" <<fixed<< _Energies_diag[i] - _Energies_raw[i];
-            log.cout().precision(3);
-            log.cout() << "\t" <<fixed<< (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
-            log.flush();
-            _efile << Psi;
-         }
-      }
       log.cout() << endl;
 
       WriteEnergyFile();
