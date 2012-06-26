@@ -15,6 +15,8 @@ int yylex();
 int yyparse();
 
 extern void rewind(int n);
+extern int line_num = 1;
+
 
 FILE *_yyout = stdout;
 
@@ -27,7 +29,7 @@ FILE *_yyout = stdout;
 
 void yyerror(const char *str)
 {
-   throw (QDLIB::EParamProblem(str));
+   throw (QDLIB::EParamProblem(str,line_num));
 }
 
 extern "C" {
@@ -110,6 +112,8 @@ void CheckRoot()
 	char* sval;
 }
 
+%locations
+%error-verbose
 %token <sval> TOKID QSTRING BEGINSEC ENDSEC EQUAL QUOTE COMMENT VARDEF VAREXP FOR CONCAT FMT
 %type <sval> strexp 
 %left CONCAT

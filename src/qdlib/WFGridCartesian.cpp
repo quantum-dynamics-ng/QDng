@@ -94,17 +94,23 @@ namespace QDLIB {
          a = begin(s);
          b = Psi->begin(s);
          int i;
+#ifdef HAVE_SSE2
+            m128dc vc(c);
+#ifdef _OPENMP
+#pragma omp parallel shared(cglob) firstprivate(vc,c)
+         {
+#pragma omp  for nowait
+#endif
+            for (int i = 0; i < size; i++)
+               vc += m128dc(&(a[i])).conj() * m128dc(&(b[i]));
+
+            vc.Store(c);
+#else
 #ifdef _OPENMP
 #pragma omp parallel shared(cglob) private(i) firstprivate(c)
          {
 #pragma omp  for nowait
 #endif
-#ifdef HAVE_SSE2
-            m128dc vc(c);
-            for (i = 0; i < size; i++)
-               vc += m128dc(&(a[i])).conj() * m128dc(&(b[i]));
-            vc.Store(c);
-#else
             for (i = 0; i < size; i++)
                c += a[i].conj() * b[i];
 #endif

@@ -187,7 +187,7 @@ namespace LAPACK {
          sr=dcomplex(0);
          for (int r=0; r < n; r++){
             sl += conj((*evecsL)(r,c)) * (*evecsL)(r,c);
-            sr += conj((*evecsR)(r,c)) * (*evecsL)(r,c);
+            sr += conj((*evecsR)(r,c)) * (*evecsR)(r,c);
          }
          sl = 1./sqrt(sl.real());
          sr = 1./sqrt(sr.real());

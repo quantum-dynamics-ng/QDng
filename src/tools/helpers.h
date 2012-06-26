@@ -81,6 +81,32 @@ namespace QDLIB {
    }
 
 
+   /**
+    * Reorder a linear sequenced lower triangular matrix into 2D matrix array.
+    *
+    * No boundary check is done!
+    *
+    * \param sym treat matrix as symmetric.
+    */
+   template <class V, class M>
+   void ReorderLowerTriangular(V &vec, M &mat, bool sym = false)
+   {
+      int r = 0;
+      int clen = 1;
+      int c = 0;
+
+      for (uint i = 0; i < vec.size(); i++) {
+         mat(r, c) = vec[i];
+         if (sym) mat(c, r) = vec[i];
+         c++;
+         if (c == clen) {
+            r++;
+            clen++;
+            c = 0;
+         }
+      }
+   }
+
 } /* namespace QDLIB */
 
 #endif /* #ifndef HELPERS_H */

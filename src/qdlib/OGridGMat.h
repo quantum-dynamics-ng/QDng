@@ -4,6 +4,7 @@
 #include "qdlib/OGridPotential.h"
 #include "qdlib/WFGridSystem.h"
 #include "qdlib/Diff.h"
+#include "qdlib/PML.h"
 
 namespace QDLIB {
 
@@ -29,14 +30,16 @@ namespace QDLIB {
          string _name;
          lint _size;
          OGridPotential*** _Gmat; /* 2D Array coordinate dependent elements*/
-         double** _GmatC; /* 2D Array constant G elements */
+         dMat _GmatC; /* 2D Array constant G elements */
          dVec** _GmatDiff;
          dVec* _kspace;
          WFGridSystem** _wfbuf; /* 1D Array */
-         WFGridSystem* buf;
+         WFGridSystem *buf;
+         WaveFunction *buf1;
          WaveFunction* _Abuf;
 
          Diff _diff; /* differenciator object */
+         PML*  _pml; /* Optional PML objects */
 
          bool _KinCoup;
          bool _ChainRule;  /* Re-arange derivatives by chain rule */

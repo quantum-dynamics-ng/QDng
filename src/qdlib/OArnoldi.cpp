@@ -136,7 +136,7 @@ namespace QDLIB
    void OArnoldi::Propagate(WaveFunction* Psi)
    {
       _vect = dcomplex(0);
-      _vect[0] = 1;
+      _vect[0] = Psi->Norm();
 
       _ZL = _ZR;
       LAPACK::InvertGeneral(&_ZL);

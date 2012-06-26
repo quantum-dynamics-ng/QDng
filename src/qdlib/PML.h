@@ -24,12 +24,13 @@ namespace QDLIB
       private:
          GridSystem _grid;
 
-         int _dim;
-         double _gamma;
-         double _smax;
-         int _p;
-         int _thick;
-         cVec _f1;
+         int _dim;         /* Applies to dim */
+         double _gamma;    /* Phase factor for scaling KO */
+         double _smax;     /* sigma_max */
+         int _p;           /* degree of polynomial */
+         int _thick;       /* thickness of layer in grid points */
+         int _side;        /* Activate at begin (1) and/or end (2) */
+         cVec _f1;         /* Layer metric 1/f */
 
       public:
          PML();
@@ -45,6 +46,7 @@ namespace QDLIB
 
          const cVec& f1() { return _f1; }
 
+         void ApplyTransformAdd(cVec *dwf, cVec *wf);
          void ApplyTransform(cVec *wf);
    };
 
