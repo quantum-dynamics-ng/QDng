@@ -61,10 +61,10 @@ namespace QDLIB {
           log.cout() << " to " << num-start-1;
           log.cout() << endl << endl;*/
 
-         ReadFromFiles(files, start, step, start+num*step);
+         ReadFromFiles(files, start, step, num);
 
          if (uint(num) != Size())
-            throw (EIOError("Projector: The Projection couldn't be read completely something is missing"));
+            throw (EIOError("Projector: The Projection couldn't be read completely. Something is missing."));
 
       }
    }
@@ -127,14 +127,9 @@ namespace QDLIB {
       *destPsi = dcomplex(0, 0);
       _buf->Reaquire();
 
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared)
-#endif
       for (uint i = 0; i < Size(); i++) {
          WaveFunction* wfi = Get(i);
-         Lock(i);
          MultElementsAdd(destPsi, wfi, *wfi * sourcePsi * _sign);
-         UnLock(i);
       }
       if (_inv) {
          *_buf = 1;

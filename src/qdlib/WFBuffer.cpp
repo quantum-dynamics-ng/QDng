@@ -240,25 +240,25 @@ namespace QDLIB {
     * Fill the buffer with a wf series from disk.
     * The buffer is cleared prior to reading.
     */
-   void WFBuffer::ReadFromFiles(const string&  name, int begin, int step, int end)
+   void WFBuffer::ReadFromFiles(const string&  name, int begin, int step, int num)
    {
       FileWF wfile;
       WaveFunction* psi;
       
       Clear();
       /* Init file writer for wf output */
-      wfile.Name(name);
       wfile.Suffix(BINARY_WF_SUFFIX);
+      wfile.Name(name);
       wfile.ActivateSequence(step);
-      wfile.ResetCounter();
       wfile.Counter(begin);
 
-      psi = wfile.LoadWaveFunctionByMeta();
+      wfile >> &psi; /* Load and init first wf by meta data */
       Add(psi);
-      
-      int counter = 0;
+
+      int counter = 1;
+
       try {
-         while (counter < end || end == -1){ /* Run loop until something fails => must be the end of the wf-series (this is dirty) */
+         while (counter < num || num == -1){ /* Run loop until something fails => must be the end of the wf-series (this is dirty) */
             wfile >> psi;
             Add(psi);
             counter++;
@@ -275,9 +275,10 @@ namespace QDLIB {
    {
       if (_LastLocks + _locked + 1 > _maxmem )
          throw (EParamProblem("Can't lock another wave function to memory. Increase MaxBufferSize"));
-         
+
+      if (!_buf[pos].Locked) _locked++;
       _buf[pos].Locked = true;
-      _locked++;
+
    }
 
    /**
@@ -285,8 +286,8 @@ namespace QDLIB {
     */
    void WFBuffer::UnLock(size_t pos)
    {
+      if (_buf[pos].Locked) _locked--;
       _buf[pos].Locked = false;
-      _locked--;
    }
    
    /**
