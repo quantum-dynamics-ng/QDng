@@ -1,4 +1,15 @@
 x.x.x
+  *** Uppsala changes
+  * Added Perfectly Matched Layers (PML): OGridPML + GridGMat
+  * Added Arnoldi Propagator (SIL for non-hermitian H's)
+  * Introduced automatic error cutoffs for Cheby & SIL 
+  * Scale factor for GridKick
+  * Changed multi dimension input parameters (e.g. mass0=xx mass1=yy => mass=xx,yy)
+  * Added Higher Order Finite diffencing scheme (accesible via method keyword)
+  *** Munich changes:
+  * Removed old SPO propagator. Use GSPO instead.
+  * Memory optimizations
+  * Scaling factor for laser fields.
   * Increased max. number of filters.
   * Added Raman Operator for 2 Photon couplings
   * OCT support for operators which are marked as non-hermitian.

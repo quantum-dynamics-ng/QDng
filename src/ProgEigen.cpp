@@ -212,6 +212,8 @@ namespace QDLIB
          
          /* window function */
          attr.GetValue("win", _win, true);
+      } else {  /* Special values for Lancos Method */
+         attr.GetValue("diag", _diag, true); /* Default true here */
       }
       
       /* Maximum number of steps */
@@ -256,32 +258,44 @@ namespace QDLIB
       log.Header("Eigenfunction calculation parameters", Logger::Section);
       
       log.cout() << "Method: ";
-      if (_method == imag)
-         log.cout() << "Relaxation in imaginary time\n";
-      else
-         log.cout() << "EF extraction from auto correlation\n";
+      switch (_method){
+         case imag:
+            log.cout() << "Relaxation in imaginary time\n";
+            break;
+         case ac:
+            log.cout() << "EF extraction from auto correlation\n";
+            break;
+         case lanczos:
+            log.cout() << "EF approximation by Lanczos/Arnoldi power iteration\n";
+            break;
+      }
       
-      log.cout() << "Number of steps: " <<  clock->Steps() << endl;
-      log.cout().precision(2);
-      log.cout() << "Time step: " << fixed << clock->Dt() << endl;
+      if (_method != lanczos){
+         log.cout() << "Number of steps: " <<  clock->Steps() << endl;
+         log.cout().precision(2);
+         log.cout() << "Time step: " << fixed << clock->Dt() << endl;
+      }
+
       /* This is specific */
       if (_method == imag) {
          if (_start > 0)
             log.cout() << "Restart Calculation at EF " << _start << endl;
 
          log.cout() << "Number of Eigenfunctions: " << _Nef << endl;
-         log.cout() <<  "Requested convergence: " << scientific << _convergence << endl;
+         log.cout() << "Requested convergence: " << scientific << _convergence << endl;
       } else {
-	 if (!_read.empty()){
-	    log.cout() << "Read Propagation from files: " << _read << endl;
-	 }
+         if (!_read.empty()) {
+            log.cout() << "Read Propagation from files: " << _read << endl;
+         }
       }
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
       if (_diag)
-         log.cout() <<  "Diagonalize basis" << endl;
+         log.cout() << "Diagonalize basis" << endl;
+
       log.cout() << "Name for eigenenergy file: " << _ename << endl;
       log.cout() << "Basename for wave function output: " << _fname << endl;
-      log.cout().precision(6); log.cout() << scientific;
+      log.cout().precision(6);
+      log.cout() << scientific;
       log.flush();
    }
 
@@ -553,11 +567,10 @@ namespace QDLIB
          /* Run time integration */
          *Psi = _PsiInitial;
          for (int s=1; s < _MaxSteps; s++){
-            
             AddElements((cVec*) Psi, (cVec*) tbuf[s], cexpI(energy*(double(s))*_dt));
          }
          
-         Psi->Normalize(); /* Just normalize. We don't some factors, so we also drop  dt, 1/T */
+         Psi->Normalize(); /* Just normalize. We don't take in account some factors, so we also drop  dt, 1/T */
          _Energies_raw[i] = _H->Expec(Psi);
          
          log.cout() << i;
@@ -584,7 +597,7 @@ namespace QDLIB
          throw (EParamProblem("Arnoldi Propagator is needed to find Lanczos Eigenvalues"));
 
 
-      log.cout() << "Build Arnoldi basis\n\n";
+      log.cout() << "\nBuild Arnoldi basis\n\n";
       log.flush();
 
       /* Create Arnoldi vectors */
@@ -603,7 +616,7 @@ namespace QDLIB
       /* Create approximate Eigenfunctions */
 
       WaveFunction* buf = _PsiInitial->NewInstance();
-      log.cout() << "#\tE(Ritz)\tE(Expec)\n";
+      log.cout() << "#\tE(Ritz)\n";
       log.cout() << fixed;
       log.cout().precision(8);
       log.flush();
@@ -615,9 +628,8 @@ namespace QDLIB
             AddElements( (cVec*) buf, (cVec*) wfs->Get(j), evecs(j,i));
          }
          _P->Add(buf);
-         dcomplex ene = _H->MatrixElement(buf, buf);
-         _Energies_raw[i] = ene.real();
-         log.cout() << i << "\t" << evals[i] << "\t" << ene << endl;
+         _Energies_raw[i] = evals[i].real();
+         log.cout() << i << "\t" << evals[i] << endl;
       }
       log.cout() << endl;
       log.flush();
