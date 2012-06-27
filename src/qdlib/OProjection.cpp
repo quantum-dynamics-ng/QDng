@@ -31,6 +31,8 @@ namespace QDLIB {
       if (Size() > 0)
          return;
 
+      WFBuffer::Init(Psi);
+
       _buf = Psi->NewInstance();
       _buf->Retire();
 
@@ -125,19 +127,19 @@ namespace QDLIB {
    void OProjection::Apply( WaveFunction * destPsi, WaveFunction * sourcePsi )
    {
       *destPsi = dcomplex(0, 0);
-      _buf->Reaquire();
+
 
       for (uint i = 0; i < Size(); i++) {
          WaveFunction* wfi = Get(i);
          MultElementsAdd(destPsi, wfi, *wfi * sourcePsi * _sign);
       }
       if (_inv) {
+         _buf->Reaquire();
          *_buf = 1;
          AddElements(_buf, destPsi, -1);
          *destPsi = _buf;
+         _buf->Retire();
       }
-
-      _buf->Retire();
    }
 
 

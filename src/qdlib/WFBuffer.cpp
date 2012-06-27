@@ -238,14 +238,12 @@ namespace QDLIB {
    
    /**
     * Fill the buffer with a wf series from disk.
-    * The buffer is cleared prior to reading.
     */
    void WFBuffer::ReadFromFiles(const string&  name, int begin, int step, int num)
    {
       FileWF wfile;
       WaveFunction* psi;
       
-      Clear();
       /* Init file writer for wf output */
       wfile.Suffix(BINARY_WF_SUFFIX);
       wfile.Name(name);
