@@ -196,7 +196,7 @@ namespace QDLIB {
                snprintf(si, 32, "%d", i);
                snprintf(sj, 32, "%d", j);
 
-               if (isnan(_GmatC(i,j))) { /* Constant element - has precedence over grided element */
+               if (isnan(_GmatC(i,j)) == 0) { /* Constant element - has precedence over grided element */
                   _Gmat[i][j] = new OGridPotential();
                   s = name + string("_") + string(si) + string(sj);
                   file.Name(s);
@@ -223,7 +223,7 @@ namespace QDLIB {
          for (int j = 0; j <= i; j++) {
             if (i != j && _KinCoup) {
                double max, min;
-               if (isnan(_GmatC(i, j))) {
+               if (isnan(_GmatC(i, j)) == 0) {
                   max = VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
                   min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
                } else {
@@ -234,7 +234,7 @@ namespace QDLIB {
                   T += 2 * fabs(min);
                else T += 2 * max;
             } else if (i == j){
-               if (isnan(_GmatC(i, j)))
+               if (isnan(_GmatC(i, j)) == 0)
                   T += VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
                else
                   T += _GmatC(i, j) / (GridSystem::Dx(i) * GridSystem::Dx(j));
@@ -255,7 +255,7 @@ namespace QDLIB {
             double min;
             if (i == j || _KinCoup) {
 
-               if (isnan(_GmatC(i,j)))
+               if (isnan(_GmatC(i,j)) == 0)
                   min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
                else
                   min = _GmatC(i,j);
@@ -306,7 +306,7 @@ namespace QDLIB {
                } else {
                   /* dxi * Gij * dxj*/
                   /* Multiply Gmatrix element */
-                  if (!isnan(_GmatC(i,j))){ /* Constant G-Element*/
+                  if (isnan(_GmatC(i,j)) != 0){ /* Constant G-Element*/
                      /* d/dx from G* d/dx WF */
                      if (_pml){
                         _diff.DnDxn(buf, _wfbuf[i], j , -0.5 * _GmatC(i,j));
@@ -327,7 +327,9 @@ namespace QDLIB {
                      /* d/dx from G* d/dx WF */
                      if (_pml){
                         _diff.DnDxn(buf1, buf, j , -0.5);
-                        _pml[j].ApplyTransformAdd(destPsi, buf1);
+                        _pml[j].ApplyTransform(buf1);
+                        *destPsi += buf1;
+                        //_pml[j].ApplyTransformAdd(destPsi, buf1);
                      } else
                         _diff.DnDxnAdd(destPsi, buf, j , -0.5);
                   }
