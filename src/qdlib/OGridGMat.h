@@ -26,11 +26,13 @@ namespace QDLIB {
       private:
          typedef Matrix<OGridPotential> Gmatrix_t;
          typedef Vector<dVec> Gkspace_t;
+         typedef enum {none, cnst, grd} source_t;  /* defines source of G-matrix elements */
 
          string _name;
          lint _size;
          OGridPotential*** _Gmat; /* 2D Array coordinate dependent elements*/
          dMat _GmatC; /* 2D Array constant G elements */
+         Matrix<source_t> _src;
          dVec** _GmatDiff;
          dVec* _kspace;
          WFGridSystem** _wfbuf; /* 1D Array */

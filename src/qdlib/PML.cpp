@@ -119,8 +119,9 @@ namespace QDLIB
 
       dcomplex phi = cexpI(_gamma*M_PI) * _smax * pow(1./double(_thick), _p);
       _f1.newsize(_thick);
-      for (int i=0; i < _thick; i++)
+      for (int i=0; i < _thick; i++){
          _f1[i] = 1. / (1. + phi * pow( double(i-_thick-1),_p));
+      }
 
       Logger& log = Logger::InstanceRef();
 

@@ -57,13 +57,13 @@ namespace QDLIB {
 	 void transpose();
          
 	 T& operator() (int i, int j);
-         T& operator() (int i, int j) const;
+    const T& operator() (int i, int j) const;
 	 
 	 void operator=(const Matrix<T> &M);
 	 
-	 void operator=(T scalar);
+	 void operator=(const T &scalar);
 	 
-	 void operator*=(T scalar);
+	 void operator*=(const T &scalar);
 	 
    
    };
@@ -246,7 +246,7 @@ namespace QDLIB {
    }
    
    template <class T> 
-   inline T& Matrix<T>::operator()(int i, int j) const
+   inline const T& Matrix<T>::operator()(int i, int j) const
    {
       return _col[j][i];
    }
@@ -273,7 +273,7 @@ namespace QDLIB {
     * Fill the matrix with scalar value.
     */
    template <class T>
-   void Matrix<T>::operator=(T scalar)
+   void Matrix<T>::operator=(const T &scalar)
    {
       for (int i=0; i < _mn; i++)
 	 _v[i] = scalar;
@@ -283,7 +283,7 @@ namespace QDLIB {
     * Scale the matrix.
     */
    template <class T>
-   void Matrix<T>::operator*=(T scalar)
+   void Matrix<T>::operator*=(const T &scalar)
    {
       for (int i=0; i < _mn; i++)
 	 _v[i] *= scalar;

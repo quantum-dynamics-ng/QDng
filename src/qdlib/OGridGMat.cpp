@@ -61,7 +61,7 @@ namespace QDLIB {
       /* Check compatibility of gridsystems */
       for (int i=0; i < Dim(); i++){
          for (int j=0; j <= i ; j++){
-            if (isnan(_GmatC(i,j)))
+            if (_src(i,j) == grd)
                if (*((GridSystem*) _Gmat[i][j]) != *((GridSystem*) psi))
                   throw(EIncompatible("Gmatrix element is incompatible with wave function"));
          }
@@ -153,6 +153,7 @@ namespace QDLIB {
       uint i;
       _Gmat = new OGridPotential**[n];
       _GmatC.newsize(n,n);
+      _src.newsize(n,n);
       _kspace = new dVec[n];
       _wfbuf = new WFGridSystem*[n];
 
@@ -162,20 +163,35 @@ namespace QDLIB {
          for (uint j = 0; j <= i; j++) {
             _Gmat[i][j] = NULL;
          }
-         for (uint j = 0; j < n; j++)
-            _GmatC(i,j) = NAN; /* NaN means: don't use this element */
       }
-
-      _params.GetValue("gmat", name);
-      if (name.empty())
-         throw(EParamProblem("No G-matrix elements given"));
+      _GmatC = 0.;
+      _src = none;
 
       _params.GetValue("coup", _KinCoup, true);
 
       OGridSystem::FileOGrid file;
       file.Suffix(BINARY_O_SUFFIX);
 
-      /* Read Constant G-Matrix elements - lower triangular format */
+      Matrix<char> gdefs;
+      gdefs.newsize(n,n);
+
+      if (_params.isPresent("G"))
+         gdefs = 'c';
+      else
+         gdefs = 'g';
+
+      /* Check for definitions */
+      if (_params.isPresent("Gdef")){
+         vector<char> gmc;
+         _params.GetArray("Gdef", gmc);
+
+         if ( gmc.size() > (n*n + n) / 2 ) /* Cut down to matrix dimension - ignore the rest */
+            gmc.resize((n*n + n) / 2);
+
+         ReorderLowerTriangular(gmc, gdefs, true);
+      }
+
+      /* Read Constant G-Matrix elements and/or defs - lower triangular format */
       if (_params.isPresent("G")){
          vector<double> gmc;
          _params.GetArray("G", gmc);
@@ -186,17 +202,33 @@ namespace QDLIB {
          ReorderLowerTriangular(gmc, _GmatC, true);
       }
 
+      /* Check what matrix elements are requested */
+      for (uint i=0; i < n; i++){
+         for (uint j=0; j < n; j++){
+            if (gdefs(i,j) == 'x') /* don't use this matrix element */
+               _src(i,j) = none;
+            else if (gdefs(i,j) == 'c')
+               _src(i,j) = cnst;
+            else if (gdefs(i,j) == 'g') /* Read from grid file */
+               _src(i,j) = grd;
+         }
+      }
 
       /* Read Matrix elements */
       char si[32], sj[32];
       string s;
+      _params.GetValue("gmat", name);
+
       for (i = 0; i < n; i++) { /* Loop over matrix elem. */
          for (uint j = 0; j <= i; j++) {
             if (i == j || _KinCoup) { /* No off-diagonals if kinetic coupling is turned off*/
                snprintf(si, 32, "%d", i);
                snprintf(sj, 32, "%d", j);
 
-               if (isnan(_GmatC(i,j)) == 0) { /* Constant element - has precedence over grided element */
+               if (_src(i,j) == grd) {
+                  if (name.length() < 2)
+                       throw(EParamProblem("No G-matrix elements given"));
+
                   _Gmat[i][j] = new OGridPotential();
                   s = name + string("_") + string(si) + string(sj);
                   file.Name(s);
@@ -222,11 +254,11 @@ namespace QDLIB {
       for (int i = 0; i < GridSystem::Dim(); i++) {
          for (int j = 0; j <= i; j++) {
             if (i != j && _KinCoup) {
-               double max, min;
-               if (isnan(_GmatC(i, j)) == 0) {
+               double max=0, min=0;
+               if (_src(i,j) == grd) {
                   max = VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
                   min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
-               } else {
+               } else if (_src(i,j) == cnst) {
                   max = _GmatC(i, j);
                   min = _GmatC(i, j);
                }
@@ -234,9 +266,9 @@ namespace QDLIB {
                   T += 2 * fabs(min);
                else T += 2 * max;
             } else if (i == j){
-               if (isnan(_GmatC(i, j)) == 0)
+               if (_src(i,j) == grd)
                   T += VecMax(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
-               else
+               else if(_src(i,j) == cnst)
                   T += _GmatC(i, j) / (GridSystem::Dx(i) * GridSystem::Dx(j));
             }
 
@@ -255,9 +287,9 @@ namespace QDLIB {
             double min;
             if (i == j || _KinCoup) {
 
-               if (isnan(_GmatC(i,j)) == 0)
+               if (_src(i,j) == grd)
                   min = VecMin(*(_Gmat[i][j])) / (GridSystem::Dx(i) * GridSystem::Dx(j));
-               else
+               else if (_src(i,j) == cnst)
                   min = _GmatC(i,j);
 
                if (min < 0)
@@ -306,7 +338,7 @@ namespace QDLIB {
                } else {
                   /* dxi * Gij * dxj*/
                   /* Multiply Gmatrix element */
-                  if (isnan(_GmatC(i,j)) != 0){ /* Constant G-Element*/
+                  if (_src(i,j) == cnst){ /* Constant G-Element*/
                      /* d/dx from G* d/dx WF */
                      if (_pml){
                         _diff.DnDxn(buf, _wfbuf[i], j , -0.5 * _GmatC(i,j));
@@ -317,7 +349,7 @@ namespace QDLIB {
                         _diff.DnDxnAdd(destPsi, buf, j , -0.5 * _GmatC(i,j));
                      }
 
-                  } else {
+                  } else if (_src(i,j) == grd) {
                      /* Coordinate dependent lu*/
                      if (j > i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
                         MultElementsCopy((cVec*) buf, (cVec*) _wfbuf[i] ,  (dVec*) _Gmat[j][i]);

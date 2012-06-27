@@ -54,6 +54,8 @@ typedef map<string,string> string_map;
 	 bool GetArray(const string name, vector<string>& array);
 	 bool GetArray(const string name, vector<double>& array);
 	 bool GetArray(const string name, vector<int>& array);
+    bool GetArray(const string name, vector<char>& array);
+
 	 bool GetArray(const string name, vector<unsigned int>& array);
 	 bool GetArray(const string name, vector<bool>& array);
 	 

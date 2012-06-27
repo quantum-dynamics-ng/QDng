@@ -107,6 +107,8 @@ namespace QDLIB {
       }
    }
 
+
+
 } /* namespace QDLIB */
 
 #endif /* #ifndef HELPERS_H */

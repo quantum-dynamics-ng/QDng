@@ -288,6 +288,26 @@ namespace QDLIB {
     * Extract an array from an Entry.
     * The array elements are separated by kommas.
     */
+   bool ParamContainer::GetArray(const string name, vector<char>& array)
+   {
+      string buf;
+      vector<string> vbuf;
+
+      if (! GetValue(name, buf) ) return false;
+
+      split(buf, vbuf);
+
+      for (size_t i=0; i < vbuf.size(); i++){
+         array.push_back(vbuf[i][0]);
+      }
+
+      return true;
+   }
+
+   /**
+    * Extract an array from an Entry.
+    * The array elements are separated by kommas.
+    */
    bool ParamContainer::GetArray(const string name, vector<bool>& array)
    {
       string buf;
