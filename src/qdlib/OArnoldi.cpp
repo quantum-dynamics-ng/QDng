@@ -81,9 +81,7 @@ namespace QDLIB
       buf0->Reaquire();
       buf1->Reaquire();
 
-
       *buf1 = Psi;
-      buf1->Normalize();
 
       _Lzb.Set(0, buf1);
       H->Apply(buf0, buf1); /* q1 = H*q_0 */
@@ -125,6 +123,7 @@ namespace QDLIB
    void OArnoldi::DiagLZB()
    {
       /* Diag Arnoldi Hamiltonian */
+//      cout << _HA;
       LAPACK::DiagHessenberg(&_HA, &_evals, &_ZL, &_ZR);
    }
 
@@ -136,7 +135,7 @@ namespace QDLIB
    void OArnoldi::Propagate(WaveFunction* Psi)
    {
       _vect = dcomplex(0);
-      _vect[0] = Psi->Norm();
+      _vect[0] = 1;
 
       _ZL = _ZR;
       LAPACK::InvertGeneral(&_ZL);
