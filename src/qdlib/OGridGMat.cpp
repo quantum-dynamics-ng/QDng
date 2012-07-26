@@ -123,10 +123,7 @@ namespace QDLIB {
             for (int j=0; j < _size; j++){
                if (_Gmat[i][j] != 0  || _Gmat[j][i] != 0 ){
                   _GmatDiff[i][j].newsize(Psi->size());
-                  if (j > i)
-                     dx.Diff(& _GmatDiff[i][j],(dVec*)  _Gmat[j][i], i);
-                  else
-                     dx.Diff(& _GmatDiff[i][j],(dVec*)  _Gmat[i][j], i);
+                  dx.Diff(& _GmatDiff[i][j],(dVec*)  _Gmat[i][j], i);
                }
             }
          }
@@ -134,7 +131,7 @@ namespace QDLIB {
    }
    
    /**
-    * \todo Clean memory if already initialized.
+    *
     */
    void OGridGMat::Init(ParamContainer &params)
    {
@@ -230,6 +227,7 @@ namespace QDLIB {
                        throw(EParamProblem("No G-matrix elements given"));
 
                   _Gmat[i][j] = new OGridPotential();
+                  _Gmat[j][i] = _Gmat[i][j];
                   s = name + string("_") + string(si) + string(sj);
                   file.Name(s);
                   file >> ((OGridSystem*) _Gmat[i][j]);
@@ -322,8 +320,8 @@ namespace QDLIB {
          /* d/dx from WF */
          _diff.DnDxn(_wfbuf[i], sourcePsi, i);
 
-         if (_pml)
-            _pml[i].ApplyTransform(_wfbuf[i]);
+//         if (_pml)
+//            _pml[i].ApplyTransform(_wfbuf[i]);
 
          for (lint j = 0; j < _size; j++){
             if ((i == j) | _KinCoup){ /* Kinetic coupling ?*/
@@ -342,6 +340,10 @@ namespace QDLIB {
                      /* d/dx from G* d/dx WF */
                      if (_pml){
                         _diff.DnDxn(buf, _wfbuf[i], j , -0.5 * _GmatC(i,j));
+//                        if (i == j)
+//                           _pml[j].ApplyTransformDiff(buf);
+
+                        _pml[i].ApplyTransform(buf);
                         _pml[j].ApplyTransform(buf);
                         *destPsi += buf;
                      } else {
@@ -351,10 +353,7 @@ namespace QDLIB {
 
                   } else if (_src(i,j) == grd) {
                      /* Coordinate dependent lu*/
-                     if (j > i) /* Gmatrix it self is symmetric - but not the mixed derivatives !!!*/
-                        MultElementsCopy((cVec*) buf, (cVec*) _wfbuf[i] ,  (dVec*) _Gmat[j][i]);
-                     else
-                        MultElements((cVec*) buf, (cVec*) _wfbuf[i], (dVec*) _Gmat[i][j]);
+                     MultElements((cVec*) buf, (cVec*) _wfbuf[i], (dVec*) _Gmat[i][j]);
 
                      /* d/dx from G* d/dx WF */
                      if (_pml){
@@ -428,6 +427,7 @@ namespace QDLIB {
             if (o->_Gmat[i][j] != NULL){
 	       if (o->_GmatC(i,j) < 0) {
                   _Gmat[i][j] = new OGridPotential();
+                  _Gmat[j][i] = _Gmat[i][j];
                   *(_Gmat[i][j]) = *(o->_Gmat[i][j]);
 	       }
             }

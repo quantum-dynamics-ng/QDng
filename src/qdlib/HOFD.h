@@ -253,7 +253,7 @@ namespace QDLIB
     *
     * \param res
     * \param in
-    * \param dim  Differenciate along dimension.
+    * \param dim  Differenciate along dimension.,
     * \param acc  Add result to output.
     */
    template<class T>

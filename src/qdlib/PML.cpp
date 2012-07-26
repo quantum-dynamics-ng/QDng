@@ -119,8 +119,10 @@ namespace QDLIB
 
       dcomplex phi = cexpI(_gamma*M_PI) * _smax * pow(1./double(_thick), _p);
       _f1.newsize(_thick);
+      _df1.newsize(_thick);
       for (int i=0; i < _thick; i++){
          _f1[i] = 1. / (1. + phi * pow( double(i-_thick-1),_p));
+         _df1[i] = -1 / (_f1[i] * _f1[i]) * phi * _p * pow( double(i-_thick-1),_p - 1);
       }
 
       Logger& log = Logger::InstanceRef();
@@ -178,6 +180,48 @@ namespace QDLIB
 
    /**
     * Apply the PML specific metric 1/f
+    */
+   void PML::ApplyTransformDiff(cVec* wf)
+   {
+      _grid.ActiveDim(_dim);
+      int lo = _grid.LowOthers();
+      int Nx = _grid.DimSize(_dim);
+
+      dcomplex* psi = wf->begin(0);
+
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+      for (int rep=0; rep < _grid.NumOthers(); rep++){
+         int base = _grid.IndexBase(rep);
+
+         int step=0;
+         switch (_side){
+            case PML_BEG:
+               for (int i=0; i < _thick; i++){
+                  psi[base+step] *= _df1[i];
+                  step += lo;
+               }
+               break;
+            case PML_END:
+               for (int i=0; i < _thick; i++){
+                  psi[base+(Nx-1)*lo-step] *= _df1[i];
+                  step += lo;
+               }
+               break;
+            default:
+               for (int i=0; i < _thick; i++){
+                  psi[base+step] *= _df1[i];
+                  psi[base+(Nx-1)*lo-step] *= _df1[i];
+                  step += lo;
+               }
+         }
+      }
+   }
+
+   /**
+    * Apply the PML specific metric 1/f
+    * \bug broken (interior is not correctly added!)
     */
    void PML::ApplyTransformAdd(cVec* dwf, cVec* wf)
    {

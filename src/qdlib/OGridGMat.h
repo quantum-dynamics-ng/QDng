@@ -12,13 +12,14 @@ namespace QDLIB {
     * Kinetic energy Operator for the G-matrix method.
     * 
     * parameters:
-    * \li dims       Number of internal coordiantes
-    * \li gmat   G-matrix element file name
+    * \li dims   Number of internal coordiantes
+    * \li gmat   G-matrix element base file name
     * \li coup   Turn on kinetic coupling [default: true]
-    * 
-    * \todo possibility to turn of specific matrix elements
-    * \todo enable constant-g mode / mixed g-mode
-    * 
+    * \li G      Constant G-matrix elements (given as lower triangular lin. matrix)
+    * \li Gdef   Define source of matrix elements:
+    *            c = constant, g = grided, x=none (=0)
+    *            (given as lower triangular lin. matrix)
+    *
     * @author Markus Kowalewski
     */
    class OGridGMat : public Operator, public GridSystem

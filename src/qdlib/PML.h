@@ -31,6 +31,7 @@ namespace QDLIB
          int _thick;       /* thickness of layer in grid points */
          int _side;        /* Activate at begin (1) and/or end (2) */
          cVec _f1;         /* Layer metric 1/f */
+         cVec _df1;        /* Layer metric derivative d/dx 1/f */
 
       public:
          PML();
@@ -48,6 +49,8 @@ namespace QDLIB
 
          void ApplyTransformAdd(cVec *dwf, cVec *wf);
          void ApplyTransform(cVec *wf);
+
+         void ApplyTransformDiff(cVec* wf);
    };
 
 } /* namespace QDLIB */
