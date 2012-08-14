@@ -9,5 +9,5 @@ toolsdir = $(pkgincludedir)/tools
 tools_HEADERS = Exception.h FileSingleDefs.h FileSingle.h fstools.h Getopt.h \
 	GlobalParams.h helpers.h KeyValFile.h Logger.h ParamContainer.h QDClock.h \
 	QDGlobalClock.h tnt_io.h XmlNode.h XmlParser.h Collector.h PeakFinder.h TmpFile.h \
-	Memory.h Thread.h
+	Memory.h Thread.h SharedVar.h
 	
