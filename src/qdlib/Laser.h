@@ -11,7 +11,7 @@ namespace QDLIB
 {
 
    /**
-    * Class which represents a laserfield.
+    * Class which represents a laser field.
     */
    class Laser : public dVec
    {
@@ -64,6 +64,8 @@ namespace QDLIB
          double Get();
 
          void Set(double value);
+
+         double GetVectorPot();
 
          Laser& operator=(const Laser &laser);
 

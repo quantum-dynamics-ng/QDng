@@ -130,6 +130,22 @@ namespace QDLIB {
       (*this)[_clock->TimeStep()] = value;
    }
    
+   /**
+    * Get the corresponding vector potential A(t).
+    *
+    * \f$ A(t) = \int_0^t E(t) dt \f$.
+    */
+   double Laser::GetVectorPot()
+   {
+      double sum=0;
+
+      for (int t=0; t < _clock->TimeStep(); t++){
+         sum += (*this)[t];
+      }
+
+      return sum * _dt;
+   }
+
    Laser& Laser::operator =(const Laser &laser)
    {
       *((dVec*) this) = (dVec) laser;
