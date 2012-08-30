@@ -233,6 +233,20 @@ namespace QDLIB {
   {
     return A*B;
   }
+
+  inline dcomplex operator/(const double &A, const dcomplex &B)
+  {
+    dcomplex c;
+    double d;
+
+    d = B._real*B._real + B._imag*B._imag;
+    c._real =   A * B._real;
+    c._imag = - A * B._imag;
+    c._real /= d;
+    c._imag /= d;
+    return c;
+  }
+
   
   inline dcomplex operator/(const dcomplex &A, const dcomplex &B)
   {
@@ -267,7 +281,7 @@ namespace QDLIB {
   Functions
   */
   
-  /** 
+  /** dcomplex(0,2.)
    * Calculates \f$ e^{i phi} \f$.
    * 
    * This ist faster than cexp(), which is more general
@@ -380,9 +394,10 @@ namespace QDLIB {
    */
   inline dcomplex csqrt(dcomplex c)
   {
-     double r  = sqrt( c.real()*c.real() +  c.imag()*c.imag());
+     double r  = cabs(c);
+     double phi = phase(c);
 
-     return dcomplex(sqrt( (r + c.real())/2 ),  sqrt( (r - c.real())/2 ));
+     return sqrt(r) * cexpI(phi/2);
   }
 
   extern Imaginary I;
