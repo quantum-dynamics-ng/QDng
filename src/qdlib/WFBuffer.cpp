@@ -124,16 +124,34 @@ namespace QDLIB {
       _ondisk--;
       _inmem++;
    }
-   
+
    /**
-    * Size of the buffer.
+    * Set the maximum number buffer slots needed.
     */
-   void WFBuffer::Size(size_t size)
+   void WFBuffer::ResizeBuffer(size_t size)
    {
-      if (size > 0) {
-         _size = size;
-         _buf.resize(_size);
-      } else if (size <= 0) Clear();
+      size_t oldsize = _buf.size();
+
+      if (oldsize > size) { /* Reduce size */
+         for (size_t i=oldsize-1; i >= size; i--){
+            if (_buf[i].Psi != NULL){ /* Remove wf from memory */
+               DELETE_WF(_buf[i].Psi);
+               _inmem--;
+            }
+            if (_buf[i].BufPos > -1){ /* Remove wf from disk buf */
+               _diskmap[_buf[i].BufPos] = -1;
+               _ondisk--;
+            }
+            if (_buf[i].Psi != NULL && _buf[i].BufPos > -1) _size--;
+            _buf.pop_back();
+
+         }
+         /* Clear all locks */
+         _LastAccess.clear();
+         _locked = 0;
+      } else if (oldsize < size) { /* Enlarge */
+         _buf.resize(size);
+      }
    }
 
    /**
@@ -156,6 +174,14 @@ namespace QDLIB {
          }
          
       }
+
+      /* Have at least one valid entry */
+      if (_buf.size() == 0){
+         _buf.resize(1);
+         _inmem = 1;
+      }
+
+      _buf[0].Psi = Psi->NewInstance();
    }
    
    /**
@@ -166,8 +192,10 @@ namespace QDLIB {
       /* Check for right map size */
       if (pos >= _buf.size()){
          _buf.resize(pos+1);
-         _size = pos+1;
       }
+
+      if (pos >= _size)
+         _size = pos + 1;
 
       if (_inmem >= _maxmem){/* Move an element to disk storage */
          bool lock = _buf[pos].Locked;
@@ -191,13 +219,13 @@ namespace QDLIB {
    
    void WFBuffer::Add(WaveFunction *Psi)
    {
-      Set(_buf.size(), Psi);
+      Set(_size, Psi);
    }
    
    WaveFunction* WFBuffer::Get(const size_t pos)
    {
       if (pos >= _buf.size())
-         throw (EIncompatible("Invalid WFBuffer Element"));
+         throw (EIncompatible("Tried to read invalid WFBuffer element"));
       
       if (_buf[pos].Psi == NULL){
          if (_inmem >= _maxmem) {/* Move an element to disk storage */
@@ -206,9 +234,9 @@ namespace QDLIB {
             _buf[pos].Locked = false;
          }
 
-         if (_buf[pos].BufPos == -1) /* This might happen if we request a postion which haven't been written before */
+         if (_buf[pos].BufPos == -1){ /* This might happen if we request a postion which haven't been written before */
             _buf[pos].Psi = _ValidEntry()->NewInstance();
-         else
+         } else
             _MoveToMem(pos);
       }
       

@@ -34,7 +34,7 @@ namespace QDLIB {
             BufMap() : Psi(NULL), Locked(false), BufPos(-1){}
          };
          
-         size_t _size;
+         size_t _size;           /* Number of initialized wfs */
          size_t _wfsize;
          size_t _LastLocks;      /* How much of the last access to keep valid */
          
@@ -61,7 +61,7 @@ namespace QDLIB {
          WFBuffer();
          ~WFBuffer();
           
-         void Size(size_t size);
+         void ResizeBuffer(size_t size);
          size_t Size() const {return _size;}
          
          void Init(WaveFunction* Psi);

@@ -128,14 +128,14 @@ namespace QDLIB {
       /* k-space has different Norm! */
       if (IsKspace())
       {
-	 for(int i=0; i < GridSystem::Dim(); i++){
-	    cglob *= 2*M_PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i)) ;
-	 }
+         for (int i = 0; i < GridSystem::Dim(); i++) {
+            cglob *= 2 * M_PI / (GridSystem::Xmax(i) - GridSystem::Xmin(i));
+         }
 
       } else {
-	 for(int i=0; i < GridSystem::Dim(); i++){
-	    cglob *= GridSystem::Dx(i);
-	 }
+         for (int i = 0; i < GridSystem::Dim(); i++) {
+            cglob *= GridSystem::Dx(i);
+         }
 	 
       }
       

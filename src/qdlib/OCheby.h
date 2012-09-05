@@ -4,7 +4,7 @@
 #include "OPropagator.h"
 
 #define BESSEL_DELTA 1e-32       /* Lower limit for convergence of the Bessel series convergence (default) */
-#define DEFAULT_PREC 1e-10       /* Default convergence criteria on norm */
+#define DEFAULT_PREC 1e-13       /* Default convergence criteria on norm */
 #define BESSEL_MAX_ORDER 1e6     /* Maximum recursion order to used (by automatic determination) */
 
 

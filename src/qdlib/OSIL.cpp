@@ -63,8 +63,8 @@ namespace QDLIB {
         buf1->Retire();
         buf2->Retire();
 
-        _Lzb.Size(_order);
         _Lzb.Init(Psi);
+        _Lzb.ResizeBuffer(_order);
         _Lzb.AutoLock(3);
 
         H->Clock(Operator::Clock());
@@ -101,22 +101,22 @@ namespace QDLIB {
         _convorder = 2;
         for (it = 2; it < _order; it++)
         {
-           /* Estimate the error the next L-vector */
-           dcomplex err = pow(clock->Dt(), it-2) * _beta[0];
+           /* Estimate the error of the next L-vector */
+           double err = pow(clock->Dt(), it-2) * _beta[0];
            for (int i=1; i < it - 2; i++){
               err *=  _beta[i] / double(i);
            }
            err = cabs(err);
 
 
-           if (err.real() > psinorm){
-              cout << "Warning: Lanczos expansion becomes unstable: " << err.real() << endl;
+           if (err > psinorm){
+              cout << "Warning: Lanczos expansion becomes unstable: " << err << endl;
               //break;
            }
            _convorder++;
 
            if (it == _order - 1)
-              cout << "Warning: Lanczos expansion is not converged: " << err.real() << " > " << _err * psinorm << endl;
+              cout << "Warning: Lanczos expansion is not converged: " << err << " > " << _err * psinorm << endl;
 
             /* buf0 = H * q_i-1 */
             H->Apply(_Lzb[it], _Lzb[it-1]);
@@ -140,7 +140,7 @@ namespace QDLIB {
             }
 
             /* convergence reached */
-            if (err.real() < _err * psinorm) break;
+            if (err < _err * psinorm) break;
         }
 
         _alpha[it-1] = H->Expec(_Lzb[it-1]);

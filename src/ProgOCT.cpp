@@ -838,7 +838,7 @@ namespace QDLIB
 
       /* Initialize Buffer for back propagation */
       for (int t = 0; t < _ntargets; t++){
-         _memwfbuf[t].Size(clock->Steps() + 1);
+         _memwfbuf[t].ResizeBuffer(clock->Steps() + 1);
          _memwfbuf[t].Init(PsiI[t]);
          _memwfbuf[t].AutoLock(2);
       }

@@ -320,7 +320,7 @@ namespace QDLIB {
            _WriteMeta(i); /* Write meta file */
         }
       }
-      } catch (Exception e) {
+      } catch (Exception &e) {
          _Finalize();
          DELETE_WF(Psi);
          throw;

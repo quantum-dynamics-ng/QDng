@@ -421,8 +421,8 @@ namespace QDLIB
 
       /* Propagation */
       WFBuffer tbuf;
+      tbuf.ResizeBuffer(_MaxSteps);
       tbuf.AutoLock(1);
-      tbuf.Size(_MaxSteps);
       tbuf.Init(_PsiInitial);
       
       if ( _read.empty() ){ /* Need to run Propagation */
@@ -604,6 +604,8 @@ namespace QDLIB
       U->BuildLZB(_PsiInitial);
       U->DiagLZB();
 
+      _Nef = U->Size();
+
       /* Get results */
       WFBuffer* wfs = U->Basis();
       _Nef = wfs->Size();
@@ -614,7 +616,6 @@ namespace QDLIB
       evecs = *(U->Evecs());
 
       /* Create approximate Eigenfunctions */
-
       WaveFunction* buf = _PsiInitial->NewInstance();
       log.cout() << "#\tE(Ritz)\n";
       log.cout() << fixed;

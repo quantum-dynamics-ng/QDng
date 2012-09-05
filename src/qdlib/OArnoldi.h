@@ -5,28 +5,34 @@
 #include "qdlib/WFBuffer.h"
 
 #define ARNOLDI_DEF_ORDER 20
+#define ARNOLDI_UNDERRUN 1e-10
+#define ARNOLDI_CONV 1e-8
 
 namespace QDLIB {
 
     /**
-     * Arnoldi Propagator. Generalisation of (SIL)
+     * Arnoldi Propagator.
      *
-     * \param order   Recursion depth/Ritz basis size. the default is 20.
+     * Generalisation of SIL. Can also handle non-hermitian hamiltonians.
      *
-     *     @author Markus Kowalewski <markus.kowalewski@math.uu.se>
+     * \param order   Maximum recursion depth/Ritz basis size. the default is 20.
+     * \param conv    Approiximate error bound for time-stepping [1e-8].
+     *
+     *     @author Markus Kowalewski <markus.kowalewski@it.uu.se>
      */
 
     class OArnoldi : public OPropagator
     {
         private:
             string _name;
-            int _order;        /* Max. Recursion depth, size of basis */
-            int _convorder;    /* Converged order of */
-//            double _err;       /* Error bound to use */
+            int _maxorder;     /* Max. Recursion depth, size of basis */
+            int _order;        /* Converged order of */
+            double _conv;      /* Convergence criteria */
             WFBuffer _Lzb;     /* Buffer for Lanczos basis */
             WaveFunction *buf0, *buf1;   /* Buffers */
             cVec _evals;      /* Eigenvalues */
             cMat _HA;         /* Arnoldi hamiltonian */
+            cMat _tHA;         /* temp.  Arnoldi hamiltonian */
             cVec _vect;       /* time vector in Lanczos basis */
             cVec _vec0;       /* time vector in Lanczos basis */
             cVec _expHD;       /* Exponential vector */
@@ -62,6 +68,11 @@ namespace QDLIB {
 
             cVec* Evals() { return &_evals; }
             cMat* Evecs() { return &_ZR; }
+
+            /**
+             * Number of converged eigenvectors.
+             */
+            int Size() { return _order; }
 
             virtual Operator* NewInstance();
             virtual void Init(ParamContainer &params);

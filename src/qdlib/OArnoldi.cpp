@@ -8,7 +8,7 @@ namespace QDLIB
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OArnoldi)
 
    OArnoldi::OArnoldi() :
-            OPropagator(), _name("OArnoldi"), _order(ARNOLDI_DEF_ORDER), _convorder(ARNOLDI_DEF_ORDER),
+            OPropagator(), _name("OArnoldi"), _maxorder(ARNOLDI_DEF_ORDER), _order(ARNOLDI_DEF_ORDER), _conv(ARNOLDI_CONV),
             buf0(NULL), buf1(NULL)
    {
    }
@@ -24,11 +24,12 @@ namespace QDLIB
     */
    void OArnoldi::InitBuffers()
    {
-      _evals.newsize(_order);
-      _HA.newsize(_order, _order);
-      _vect.newsize(_order);
-      _vec0.newsize(_order);
-      _expHD.newsize(_order);
+      _evals.newsize(_maxorder);
+      _HA.newsize(_maxorder, _maxorder);
+      _tHA.newsize(_maxorder, _maxorder);
+      _vect.newsize(_maxorder);
+      _vec0.newsize(_maxorder);
+      _expHD.newsize(_maxorder);
    }
 
    void OArnoldi::Init(ParamContainer & params)
@@ -36,12 +37,16 @@ namespace QDLIB
       _params = params;
 
       if (_params.isPresent("order"))
-         _params.GetValue("order", _order);
+         _params.GetValue("order", _maxorder);
 
-      if (_order < 3)
-         throw(EParamProblem("Arnoldi: order doesn't make sense", _order));
+      if (_params.isPresent("conv"))
+         _params.GetValue("conv", _conv);
 
-      _convorder = _order;
+
+      if (_maxorder < 3)
+         throw(EParamProblem("Arnoldi: order doesn't make sense", _maxorder));
+
+      _order = _maxorder;
 
 //      if (_params.isPresent("err"))
 //         _params.GetValue("err", _err);
@@ -64,9 +69,9 @@ namespace QDLIB
       buf0->Retire();
       buf1->Retire();
 
-      _Lzb.Size(_order);
       _Lzb.Init(Psi);
-      _Lzb.AutoLock(2);
+      _Lzb.ResizeBuffer(_maxorder);
+      _Lzb.AutoLock(1);
 
       H->Clock(Operator::Clock());
    }
@@ -76,42 +81,62 @@ namespace QDLIB
     */
    void OArnoldi::BuildLZB(WaveFunction* Psi)
    {
-      int it;
-
       buf0->Reaquire();
       buf1->Reaquire();
+
+      double PsiNorm = Psi->Norm();
 
       *buf1 = Psi;
 
       _Lzb.Set(0, buf1);
-      H->Apply(buf0, buf1); /* q1 = H*q_0 */
-      _Lzb.Set(1, buf0);
-      H->RecalcInternals(false); /* Non-linear operator must not re-calculate internal WF specific values until end of recursion */
 
-      _HA = dcomplex(0);
+      _tHA = dcomplex(0);
 
-      for (it = 1; it < _order; it++) {
+      for (int it = 1; it < _maxorder; it++) {
          H->Apply(buf0, _Lzb[it-1]);
-         _Lzb.Set(it, buf0);
+         if (it == 1)
+            H->RecalcInternals(false); /* Non-linear operator must not re-calculate internal WF specific values until end of recursion */
 
          /* Orthogonalize */
          for (int j=0; j <= it-1; j++){
             WaveFunction* wfj = _Lzb[j];
-            _HA(j, it-1) = *wfj * buf0;
-            AddElements(buf0, wfj, -1 * _HA(j, it-1));
+            _tHA(j, it-1) = *(_Lzb[j]) * buf0;
+            AddElements(buf0, wfj, -1 * _tHA(j, it-1));
          }
 
          double norm = buf0->Norm();
-         _HA(it, it-1) = norm;
+
+         if (norm < ARNOLDI_UNDERRUN){
+            break;  /* Zero vector reached */
+         }
+
+         _tHA(it, it-1) = norm;
          *buf0 *= 1./norm;
 
          _Lzb.Set(it, buf0);
+         _order = it+1;
+
+         /* Estimate the error of the next L-vector */
+         dcomplex err = pow(clock->Dt(), it-2) * _tHA(1,0) * PsiNorm;
+         for (int i=1; i < it - 1; i++){
+            err *=  _tHA(i+1,i) / double(i);
+         }
+
+         if (cabs(err) < _conv) break;
       }
 
       /* Last row */
       H->Apply(buf0, _Lzb[_order-1]);
       for (int j=0; j < _order; j++){
-         _HA(j, _order-1) = *(_Lzb[j]) * buf0;
+         _tHA(j, _order-1) = *(_Lzb[j]) * buf0;
+      }
+
+      /* Copy hamiltonian to new matrix */
+      _HA.newsize(_order, _order);
+      for (int i=0; i < _order; i++){
+         for (int j=0; j < _order; j++){
+            _HA(i,j) = _tHA(i,j);
+         }
       }
 
       H->RecalcInternals(true); /* turn it on again */
@@ -123,7 +148,9 @@ namespace QDLIB
    void OArnoldi::DiagLZB()
    {
       /* Diag Arnoldi Hamiltonian */
-//      cout << _HA;
+      _evals.newsize(_order);
+      _ZL.newsize(_order,_order);
+      _ZR.newsize(_order,_order);
       LAPACK::DiagHessenberg(&_HA, &_evals, &_ZL, &_ZR);
    }
 
@@ -134,6 +161,10 @@ namespace QDLIB
     */
    void OArnoldi::Propagate(WaveFunction* Psi)
    {
+      _vect.newsize(_order);
+      _vec0.newsize(_order);
+      _expHD.newsize(_order);
+
       _vect = dcomplex(0);
       _vect[0] = 1;
 
@@ -149,7 +180,7 @@ namespace QDLIB
       /* Build linear combination from Lanczos vectors */
       *Psi *= _vect[0];
 
-      for (int i = 1; i < _convorder; i++) {
+      for (int i = 1; i < _order; i++) {
          AddElements((cVec*) Psi, (cVec*) _Lzb[i], _vect[i]);
       }
    }
@@ -184,7 +215,7 @@ namespace QDLIB
 
       OPropagator::Copy(O);
 
-      _order = o->_order;
+      _maxorder = o->_maxorder;
 
       InitBuffers();
       buf0 = o->buf0->NewInstance();

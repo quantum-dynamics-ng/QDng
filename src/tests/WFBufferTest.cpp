@@ -39,11 +39,9 @@ void WFBufferTest::API_Test_DiskBuf()
   
    CPPUNIT_ASSERT_NO_THROW(buf = new WFBuffer());
    
-   CPPUNIT_ASSERT_NO_THROW(buf->Size(2));
-   
    CPPUNIT_ASSERT_NO_THROW( buf->Init(wf0) );
    
-   CPPUNIT_ASSERT(buf->Size() == 2);
+   CPPUNIT_ASSERT(buf->Size() == 0);
    
    CPPUNIT_ASSERT_THROW(buf->AutoLock(4), EParamProblem);
    CPPUNIT_ASSERT_NO_THROW(buf->AutoLock(1));

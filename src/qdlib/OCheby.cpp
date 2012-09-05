@@ -163,7 +163,8 @@ namespace QDLIB
 
          if (nconv  < _prec )
             break;
-                                                 /* Convergence only make sense for norm pres. propagations*/
+
+         /* Convergence only make sense for norm preserving propagations*/
          if (i == _order -1 && nconv  > _prec && !imaginary && _offset.imag() == 0)
             cout << "Warning: Chebychev series not converged: " << scientific << nconv << " > " << _prec  << endl;
 

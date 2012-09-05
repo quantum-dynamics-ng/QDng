@@ -1,5 +1,6 @@
 x.x.x
   *** Uppsala changes
+  * Added Lanczos method to ProgEigen. Suitable for non-hermitian problems
   * Added Perfectly Matched Layers (PML): OGridPML + GridGMat
   * Added Arnoldi Propagator (SIL for non-hermitian H's)
   * Introduced automatic error cutoffs for Cheby & SIL 
