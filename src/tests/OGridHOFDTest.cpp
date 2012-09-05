@@ -69,6 +69,8 @@ void OGridHOFDTest::NUMERIC_D1dx_Test()
    pm.SetValue("deriv", 1);
    pm.SetValue("dim", 0);
    pm.SetValue("mass", 1./2.);
+   pm.SetValue("pbc", true);
+
    cout << " order ";
    for (int order=2; order <= HOFD_MAXORDER; order+=2){
       pm.SetValue("order",  order);

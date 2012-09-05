@@ -164,9 +164,14 @@ namespace QDLIB
          if (pm.isPresent("order")){
             pm.GetValue("order", order);
          }
+
+         bool pbc;
+         pm.GetValue("pbc", pbc, false);
+
          _hofd = new cHOFD(_deriv, order);
          _hofd->SetGrid(_grid);
          _hofd->SetFactor(_pfac);
+         _hofd->SetPBC(pbc);
 
       } else if (_method == FFT) {
          _InitKspace();

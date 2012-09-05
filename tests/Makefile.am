@@ -1,4 +1,4 @@
-noinst_DATA = TGE-Cheby.qdi  TGE-GSPO.qdi  TGE-SIL.qdi  TGE-SPO.qdi \
+noinst_DATA = TGE-Cheby.qdi  TGE-GSPO.qdi  TGE-SIL.qdi  \
 	      TGP-Expec.qdi  TGP-Expec-SP.qdi  TGPMS-Cheby.qdi  TGPMS-GSPO.qdi
 
 check_SCRIPTS = TGE TGP TLP TLO TGO check.sh

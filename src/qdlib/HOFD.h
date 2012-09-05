@@ -46,6 +46,9 @@ namespace QDLIB
            void _DiffBlock2D(T *out, T *in, int order2, int point,
                     int N, int lo1, int lo2,  int bs1, int bs2,
                     double* cf, double df, double h ,bool acc);
+
+           void _DiffSingleDim(T* res, T* in, double* cf, int Nx,
+                    int lo, int order2, double h, double df, bool acc);
       public:
          HOFD(int diff, int order);
          ~HOFD();
@@ -89,7 +92,7 @@ namespace QDLIB
     * The derivative and the order of finite diference scheme must be given at construction.
     */
    template<class T>
-   HOFD<T>::HOFD(int diff, int order) : _deriv(diff), _order(order), _pbc(true), _pfac1(1.), _pfac(MAX_DIMS)
+   HOFD<T>::HOFD(int diff, int order) : _deriv(diff), _order(order), _pbc(false), _pfac1(1.), _pfac(MAX_DIMS)
    {
       _CheckSetup();
 
@@ -99,7 +102,7 @@ namespace QDLIB
 
       _pfac = 1.;
 
-      /* fill the table with the coefficients - Moved to seperate files for readability of code */
+      /* fill the table with the coefficients - Moved to separate files for readability of code */
       #include "cfd_table_1.h"
       #include "cfd_table_2.h"
 
@@ -131,7 +134,6 @@ namespace QDLIB
       for (int dim=0; dim < _grid.Dim(); dim++){ /* Loop over all dims */
          h[dim] = 1./pow(_grid.Dx(dim), _deriv) * _pfac1 * _pfac[dim];
       }
-//      cout << "h " << h[0] << ", pfac " << _pfac[0] << endl;
 
 #ifdef _OPENMP
 #pragma  omp parallel for
@@ -143,11 +145,26 @@ namespace QDLIB
             int N = _grid.DimSize(dim);
             int step=lo;
             T d = cf[order2] * psi[i];
-//            cout << "i " << i << ", dim " << dim<< endl;
-            for (int j=order2-1; j >= 0 ; j--){ /* coeffs */
-               d += df * cf[j] * psi[(i+step)%N]; /* wrap around indices for PBC */
-               d += cf[j] * psi[(N+i-step)%N];
-               step += lo;
+
+            int lrep = i / N; /* local replica */
+
+            if (_pbc){
+               for (int j=order2-1; j >= 0 ; j--){ /* coeffs */
+                  d += df * cf[j] * psi[(i+step)%N]; /* wrap around indices for PBC */
+                  d += cf[j] * psi[(N+i-step)%N];
+                  step += lo;
+               }
+            } else {
+               step = i+lo;
+               for (int j=order2-1; j >= 0 && (step)/N == lrep ; j--){
+                  d += df * cf[j] * psi[step];
+                  step += lo;
+               }
+               step = i-lo;
+               for (int j=order2-1; j >= 0 && (N+i-step)/N == lrep+1; j--){
+                  d += cf[j] * psi[(N+step)%N];
+                  step -= lo;
+               }
             }
             Dpsi[i] += h[dim] * d;
          }
@@ -178,73 +195,18 @@ namespace QDLIB
          T* psi = in->begin(0);
          T* Dpsi = res->begin(0);
 
+         double* cf = _cfc[(_deriv-1)*HOFD_MAXORDER/2+order2-1];
+
 #ifdef _OPENMP
 #pragma  omp parallel for
 #endif
          for (int rep=0; rep < _grid.NumOthers(); rep++){ /* replica points in other dims */
             int bi = _grid.IndexBase(rep); /* base index of grid points */
             int lo = _grid.LowOthers();    /* stripe size in lower other dims */
-
-            double* cf = _cfc[(_deriv-1)*HOFD_MAXORDER/2+order2-1];
  
-            /* Edge of grid - evtl. periodic boundary cond. */
-            for (int i = 0; i <= order2-1 ; i++){ /* grid points */
-               int cfbb = bi+i*lo;         /* base index for left grid point */
-               int cfbe = bi+(Nx-i-1)*lo;  /* base index for right grid point */
-               int step = 0;
-               T db = cf[order2] * psi[cfbb];
-               T de = cf[order2] * psi[cfbe];
 
-               /* Left (right) loop */
-               step = lo;
-               for (int j=order2-1; j >= order2-i; j--){
-                  db += cf[j] * (psi[cfbb-step] + df * psi[cfbb+step]);
-                  de += cf[j] * (psi[cfbe-step] + df * psi[cfbe+step]);
-                  step += lo;
-               }
+            _DiffSingleDim(&(Dpsi[bi]), &(psi[bi]), cf, Nx, lo, order2, h, df, acc);
 
-               /* Right (left) loop */
-               for (int j=order2-1-i; j >= 0; j--){
-                  db += df * cf[j] * psi[cfbb+step];
-                  de += cf[j] * psi[cfbe-step];
-                  step += lo;
-               }
-
-               /* PBC loop */
-               if (_pbc){
-                  step = lo;
-                  for (int j=order2-i-1; j >= 0; j--){
-                     db += cf[j] * psi[bi+Nx*lo-step];
-                     de += df * cf[j] * psi[bi+step-lo];
-                     step += lo;
-                  }
-               }
-
-               if (acc){
-                  Dpsi[cfbb] += h * db;
-                  Dpsi[cfbe] += h * de;
-               } else {
-                  Dpsi[cfbb] = h * db;
-                  Dpsi[cfbe] = h * de;
-               }
-            }
-
-            /* Center of grid */
-            for (int i =order2; i < Nx - order2; i++){ /* grid points */
-               int cfb = bi+i*lo;  /* base index for diff. */
-               int step = lo;
-               T d = cf[order2] * psi[cfb];
-               for (int j=order2-1; j >= 0 ; j--){ /* coeffs */
-                  d += df * cf[j] * psi[cfb+step];
-                  d += cf[j] * psi[cfb-step];
-                  step += lo;
-               }
-
-               if (acc)
-                  Dpsi[cfb] += d * h;
-               else
-                  Dpsi[cfb] = d * h;
-            }
          }
    }
 
@@ -255,6 +217,8 @@ namespace QDLIB
     * \param in
     * \param dim  Differenciate along dimension.,
     * \param acc  Add result to output.
+    *
+    * \bug Always does PBC
     */
    template<class T>
    void HOFD<T>::Diff(Vector<T>* res, Vector<T>* buf, Vector<T>* in, int dim1, int dim2, bool acc)
@@ -350,6 +314,9 @@ namespace QDLIB
       }
    }
 
+   /**
+    * Differenciate a 2 dimensional block along the both dims.
+    */
    template<class T>
    void HOFD<T>::_DiffBlock2DDxDy(T *out, T *buf, T *in, int order2, int point,
             int N, int lo1, int lo2,  int bs1, int bs2,
@@ -366,6 +333,9 @@ namespace QDLIB
 
    }
 
+   /**
+    * Differenciate a 2 dimensional block along the first dim.
+    */
    template<class T>
    void HOFD<T>::_DiffBlock2D(T *out, T *in, int order2, int point,
             int N, int lo1, int lo2,  int bs1, int bs2,
@@ -393,5 +363,70 @@ namespace QDLIB
          base2 += lo2;
       }
    }
+
+   template<class T>
+   void HOFD<T>::_DiffSingleDim(T* res, T* in, double* cf, int Nx, int lo, int order2, double h, double df, bool acc)
+   {
+         /* Edge of grid - evtl. periodic boundary cond. */
+         for (int i = 0; i <= order2-1 ; i++){ /* grid points */
+            int cfbb = i*lo;         /* base index for left grid point */
+            int cfbe = (Nx-i-1)*lo;  /* base index for right grid point */
+            int step = 0;
+            T db = cf[order2] * in[cfbb];
+            T de = cf[order2] * in[cfbe];
+
+            /* Left (right) loop */
+            step = lo;
+            for (int j=order2-1; j >= order2-i; j--){
+               db += cf[j] * (in[cfbb-step] + df * in[cfbb+step]);
+               de += cf[j] * (in[cfbe-step] + df * in[cfbe+step]);
+               step += lo;
+            }
+
+            /* Right (left) loop */
+            for (int j=order2-1-i; j >= 0; j--){
+               db += df * cf[j] * in[cfbb+step];
+               de += cf[j] * in[cfbe-step];
+               step += lo;
+            }
+
+            /* PBC loop */
+            if (_pbc){
+               step = lo;
+               for (int j=order2-i-1; j >= 0; j--){
+                  db += cf[j] * in[Nx*lo-step];
+                  de += df * cf[j] * in[step-lo];
+                  step += lo;
+               }
+            }
+
+            if (acc){
+               res[cfbb] += h * db;
+               res[cfbe] += h * de;
+            } else {
+               res[cfbb] = h * db;
+               res[cfbe] = h * de;
+            }
+         }
+
+         /* Center of grid */
+         for (int i =order2; i < Nx - order2; i++){ /* grid points */
+            int cfb = i*lo;  /* base index for diff. */
+            int step = lo;
+            T d = cf[order2] * in[cfb];
+            for (int j=order2-1; j >= 0 ; j--){ /* coeffs */
+               d += df * cf[j] * in[cfb+step];
+               d += cf[j] * in[cfb-step];
+               step += lo;
+            }
+
+            if (acc)
+               res[cfb] += d * h;
+            else
+               res[cfb] = d * h;
+         }
+
+   }
+
 } /* namespace QDLIB */
 #endif /* HOFD_H_ */

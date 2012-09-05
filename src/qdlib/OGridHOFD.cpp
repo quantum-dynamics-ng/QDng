@@ -31,6 +31,9 @@ namespace QDLIB {
 
       _params.GetValue("order", _order);
 
+      bool pbc;
+      _params.GetValue("pbc", pbc, false);
+
       if ( _params.isPresent("dim") ){
          _params.GetValue("dim", _dim);
       }
@@ -38,6 +41,7 @@ namespace QDLIB {
       if (_hofd != NULL) delete _hofd;
 
       _hofd = new cHOFD(_deriv, _order);
+      _hofd->SetPBC(pbc);
       _hofd->SetFactor(_pfac);
    }
 
