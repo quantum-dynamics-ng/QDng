@@ -99,37 +99,38 @@ AC_ARG_ENABLE([openmp],
 AM_CONDITIONAL([HAVEOPENMP],[test "x$enable_openmp"="xyes"] )
 
 
-AC_ARG_ENABLE([internalfftw],
-              [AS_HELP_STRING([--enable-internalfftw],[Enable internal fftw library])],
-              [use_internal_fftw=yes],
-              [use_internal_fftw=no])
+AC_ARG_WITH([staticfftw],[AS_HELP_STRING([--with-staticfftw=PATH],[Path to fftw installation])])
+
 
 dnl
-dnl Prepare for interal fftw3
-dnl 
-FFTW_INCLUDE=""
-if test "x$have_matlab" = "xyes" -o "x$use_internal_fftw" = "xyes"; then
-   use_internal_fftw=yes;
-   AC_MSG_NOTICE([Using shipped fftw3])
-   FFTW_INCLUDE="\$(top_srcdir)/fftw/api";
-   FFTW_LIBS="\$(top_builddir)/fftw/libfftw3.la";
+dnl Setup FFTW compile time parameters
+dnl
+if test "x$with_staticfftw" = "x"; then
+   sinclude([m4/acx_fftw3.m4])
+   ACX_FFTW3
+else
+   AC_MSG_CHECKING([for static version of fftw3])
+   echo ""
+   save_LIBS="$LIBS"; LIBS="$LIBS $with_staticfftw/lib/libfftw3_omp.a $with_staticfftw/lib/libfftw3.a"
+   save_CFLAGS="$CFLAGS"; CFLAGS="$CFLAGS -I$with_staticfftw/include"
+   
+   AC_CHECK_HEADER(fftw3.h,[FFTW_CFLAGS="-I$with_staticfftw/include"],AC_MSG_ERROR(fftw3 headers are missing))
+   
+   AC_TRY_LINK_FUNC([fftw_plan_dft],
+       [FFTW_LIBS="$with_staticfftw/lib/libfftw3.a"],
+       [AC_MSG_ERROR(libfftw3.a lib is missing)])
+   
    if test "x$enable_openmp" = "xyes"; then
-      FFTW_LIBS="\$(top_builddir)/fftw/threads/.libs/libfftw3_threads.la $FFTW_LIBS";
+   	AC_TRY_LINK_FUNC([fftw_init_threads],
+    	   [FFTW_LIBS="$with_staticfftw/lib/libfftw3_omp.a $with_staticfftw/lib/libfftw3.a"],
+       	[AC_MSG_ERROR(libfftw3_omp.a is missing)])
    fi
-   FFTW_CFLAGS="";
-   AC_SUBST(FFTW_INCLUDE)
+
+   LIBS="$save_LIBS"
+   CFLAGS="$save_CFLAGS"
+   
    AC_SUBST(FFTW_LIBS)
    AC_SUBST(FFTW_CFLAGS)
-fi 
-
-AM_CONDITIONAL(FFTW_INTERNAL, test "x$use_internal_fftw" = "xyes" )
-
-dnl
-dnl External fftw3
-dnl
-sinclude([m4/acx_fftw3.m4])
-if test "x$use_internal_fftw" != "xyes"; then
-   ACX_FFTW3
 fi
 
 
@@ -138,7 +139,7 @@ AC_ARG_ENABLE([sse2],
 	      [enable_sse2 = yes; AC_DEFINE([HAVE_SSE2], [1], [Explictly enable SSE2 optimizations])])
 	      
 AC_ARG_ENABLE([sse3],
-	      [AS_HELP_STRING([--enable-sse2],[Explictly enable SSE3 optimizations])],
+	      [AS_HELP_STRING([--enable-sse3],[Explictly enable SSE3 optimizations])],
 	      [enable_sse3=yes; enable_sse2=yes; OPT_FLAGS="$OPT_FLAGS -msse3" ; 
 	          AC_DEFINE([HAVE_SSE2], [1], [Explictly enable SSE2 optimizations])
 	          AC_DEFINE([HAVE_SSE3], [1], [Explictly enable SSE3 optimizations])])
@@ -155,7 +156,6 @@ AX_CHECK_ZLIB()
 dnl bzip2
 sinclude([m4/ax_libbz2.m4])
 AX_CHECK_LIBBZ2()
-
 
 
 dnl libxml2
@@ -202,6 +202,17 @@ dnl 	    [AS_HELP_STRING([--with-mpi-prefix=PATH],[Prefix of the mpi installatio
 dnl	    [],with_mpi-prefix=no)
 
 
+dnl
+dnl CPP Unit tests
+dnl 
+AC_ARG_WITH([cppunit], 
+      [AS_HELP_STRING([--with-cppunit], [Enable CppUnit tests])],
+      [with_cppunit=yes],
+      [with_cppunit=no])
+
+AM_CONDITIONAL([CPPUNIT], [test "x$with_cppunit" != "xno"])
+
+
 AC_CONFIG_FILES(
 		[Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
 		 src/fft/Makefile src/math/Makefile src/modules/Makefile
@@ -219,27 +230,6 @@ AC_CONFIG_FILES(
                  tests/TGO-IR-Freq.qdi tests/TGO-IR-Krotov.qdi tests/TGO-IR-Rabitz.qdi
                  tests/TGO-IR-Krotov-Projection.qdi tests/TGO-UV-Krotov.qdi tests/TLO-Cheby.qdi ])
 
-AC_ARG_WITH([cppunit], 
-      [AS_HELP_STRING([--with-cppunit], [Enable CppUnit tests])],
-      [with_cppunit=yes],
-      [with_cppunit=no])
-
-AM_CONDITIONAL([CPPUNIT], [test "x$with_cppunit" != "xno"])
      
 AC_OUTPUT
-
-dnl
-dnl Subconfigure the fftw.
-dnl
-if test "x$use_internal_fftw" = "xyes"; then
-   AC_MSG_NOTICE([Configure shipped fftw])
-   mkdir -p fftw;
-   cd fftw;
-   if test "x$enable_openmp" = "xyes"; then fftw_thread_config="--enable-threads"; else fftw_thread_config=""; fi
-   if test "x$enable_sse2" = "xyes"; then optconf="--enable-sse2"; fi
-   if test "x$enable_avx" = "xyes"; then optconf="--enable-avx"; fi
-   AC_MSG_NOTICE([--prefix=${prefix} "$fftw_thread_config" "$optconf"])
-   ${srcdir}/fftw/configure CFLAGS="-fPIC -O3" --prefix=${prefix} "$fftw_thread_config" "$optconf"
-   cd ..
-fi
 

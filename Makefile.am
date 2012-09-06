@@ -2,9 +2,6 @@
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
 
-if FFTW_INTERNAL
-  OPTDIRS = fftw
-endif
 
-SUBDIRS = $(OPTDIRS) src tests
+SUBDIRS =  src tests
 

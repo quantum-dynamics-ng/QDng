@@ -2,6 +2,7 @@ The following software ist required:
  * libxml2
  * lapack
  * blas
+ * fftw3-3.2.2
 
 The fftw3 is included.
 Use the CFLAGS=-fPIC configure option to compile the fftw3 as a library
@@ -9,5 +10,10 @@ If a builddir is used fftw has to be confgiured manually in $builddir/src/fftw
 
 Use ./genbs to generate the build system (configure)
 
-Use the --with-matlab=path (e.g /opt/adm/matlab7.9_test/) configure option to enable the mex Functions.
-To avoid library conflicts use matlab from "/opt/adm/matlab7.9_test/"
+* Matlab support
+ Use the --with-matlab=path (e.g /opt/adm/matlab7.9_test/) configure option to enable the mex Functions.
+ To avoid library conflicts use matlab from "/opt/adm/matlab7.9_test/"
+ 
+ To compile the matlab support a static version of the fftw3 library must be used.
+ configure --enable-shared --enable-static --with-pic 
+
