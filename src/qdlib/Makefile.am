@@ -19,10 +19,10 @@ qdlib_HEADERS = Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
 	OPropagator.h OScalar.h OSIL.h OSum.h  TransformFFT.h Transform.h TransformMat.h \
 	TransformMSD.h 	WaveFunction.h WFGridCartesian.h WFGridSystem.h WFLevel.h WFMultistate.h \
 	WFBuffer.h OLaser.h OList.h OProduct.h OFlux.h ORK4.h OGridRaman.h \
-	OGridStokes.h ONormalize.h OGridGStokes.h OGridStokesAlbrecht.h OGridHOFD.h Diff.h \
+	OGridStokes.h ONormalize.h OGridGStokes.h OGridStokesAlbrecht.h OGridHOFD.h HOFD.h Diff.h \
 	PML.h OGridPML.h OArnoldi.h
 
-
+noinst_HEADERS = cfd_table_1.h cfd_table_2.h
 
 AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 libqd_la_LDFLAGS = -module

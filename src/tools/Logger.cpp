@@ -194,32 +194,32 @@ namespace QDLIB {
          {
             _sout->str("");
             _soutdbg->str("");
-            return;
-         }
 
-         string s;
+         } else {
+            string s;
 
-         if (_laststream == 1)
-         { /* Write standard output stream */
-            s = _sout->str();
-            _IndentString(s);
-            *_global_out << s;
-            _sout->str("");
-         }
-         if (_laststream == 2)
-         {/* Write debug output stream */
-            s = _soutdbg->str();
-            _IndentString(s);
-            if (_debug)
-            {
-               s = _soutdbg->str();
+            if (_laststream == 1)
+            { /* Write standard output stream */
+               s = _sout->str();
                _IndentString(s);
                *_global_out << s;
+               _sout->str("");
             }
-            _soutdbg->str("");
+            if (_laststream == 2)
+            {/* Write debug output stream */
+               s = _soutdbg->str();
+               _IndentString(s);
+               if (_debug)
+               {
+                  s = _soutdbg->str();
+                  _IndentString(s);
+                  *_global_out << s;
+               }
+               _soutdbg->str("");
+            }
+            _global_out->flush();
+            _laststream = 0;
          }
-         _global_out->flush();
-         _laststream = 0;
       }
    }
    

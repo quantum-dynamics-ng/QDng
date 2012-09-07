@@ -2,18 +2,22 @@ The following software ist required:
  * libxml2
  * lapack
  * blas
- * fftw3-3.2.2
+ * fftw3-3.2.2 (with openmp support)
+ For WF compression
+ * zlib (optional)
+ * libbzip (optional)
 
-The fftw3 is included.
-Use the CFLAGS=-fPIC configure option to compile the fftw3 as a library
-If a builddir is used fftw has to be confgiured manually in $builddir/src/fftw
-
-Use ./genbs to generate the build system (configure)
+Use ./genbs to generate the build system (configure) after a fresh git clone
 
 * Matlab support
  Use the --with-matlab=path (e.g /opt/adm/matlab7.9_test/) configure option to enable the mex Functions.
- To avoid library conflicts use matlab from "/opt/adm/matlab7.9_test/"
  
  To compile the matlab support a static version of the fftw3 library must be used.
- configure --enable-shared --enable-static --with-pic 
+ The --with-staticfftw option asures this.
+ 
+ The fftw package has to be compiled seperately and installed.
+ Use the follwing options to configure the fftw package:
+ --enable-shared --enable-static --with-pic --with-openmp
+ This options should create a set of libraries which are suitable for the matlab interface
+ as well as for a parallel standalone version.  
 

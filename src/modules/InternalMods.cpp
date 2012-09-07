@@ -5,7 +5,6 @@
 #include "qdlib/OProduct.h"
 
 #include "qdlib/OCheby.h"
-#include "qdlib/OSPO.h"
 #include "qdlib/OGSPO.h"
 #include "qdlib/OSIL.h"
 #include "qdlib/OArnoldi.h"

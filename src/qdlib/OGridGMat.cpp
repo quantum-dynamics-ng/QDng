@@ -282,7 +282,7 @@ namespace QDLIB {
       double Tmin = 0;
       for (int i = 0; i < GridSystem::Dim(); i++) {
          for (int j = 0; j < i; j++) {
-            double min;
+            double min=0;
             if (i == j || _KinCoup) {
 
                if (_src(i,j) == grd)
