@@ -135,7 +135,7 @@ namespace QDLIB {
       }
       if (_inv) {
          _buf->Reaquire();
-         *_buf = 1;
+         *_buf = sourcePsi;
          AddElements(_buf, destPsi, -1);
          *destPsi = _buf;
          _buf->Retire();

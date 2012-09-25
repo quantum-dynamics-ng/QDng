@@ -288,6 +288,7 @@ namespace QDLIB
             log.cout() << "Read Propagation from files: " << _read << endl;
          }
       }
+
       log.cout() << "Maximum propagation  time: " << fixed << _MaxSteps * clock->Dt() << endl;
       if (_diag)
          log.cout() << "Diagonalize basis" << endl;
@@ -538,12 +539,14 @@ namespace QDLIB
       for (int i=0; i < _MaxSteps; i++)
          PowerSpectrum[i] = cabs(spectrum[i]);
       
+      PFind.Tolerance(_tol);
       PFind.Find(PowerSpectrum);
       
       _Nef = PFind.NumPeaks();
       _Energies_raw.newsize(_Nef);
       
       log.cout() << "\nFound " << _Nef << " eigenvalues in spectrum\n";
+      log.cout() << "(mean=" << PFind.Mean() << ", sigma=" << PFind.Sigma() <<  ")\n";
       log.cout() << "\nIntegrating to obtain eigenfunctions\n";
       log.cout() << "\nEF#";
       log.coutdbg() << "\tindex\tenergy_est";
