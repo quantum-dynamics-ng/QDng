@@ -93,7 +93,6 @@ namespace QDLIB {
       for (s = MPIrank(); s < strides(); s += MPIsize()) {
          a = begin(s);
          b = Psi->begin(s);
-         int i;
 #ifdef HAVE_SSE2
             m128dc vc(c);
 #ifdef _OPENMP
@@ -107,11 +106,11 @@ namespace QDLIB {
             vc.Store(c);
 #else
 #ifdef _OPENMP
-#pragma omp parallel shared(cglob) private(i) firstprivate(c)
+#pragma omp parallel shared(cglob) firstprivate(c)
          {
 #pragma omp  for nowait
 #endif
-            for (i = 0; i < size; i++)
+            for (int i = 0; i < size; i++)
                c += a[i].conj() * b[i];
 #endif
 #ifdef _OPENMP
