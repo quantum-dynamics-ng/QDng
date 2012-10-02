@@ -35,6 +35,10 @@
 #include "mpi.h"
 #endif
 
+#ifdef HAVE_PERFCOUNTERS
+ #include "PerfCounterList.h"
+#endif
+
 using namespace std;
 using namespace QDLIB;
 
@@ -387,6 +391,11 @@ int main(int argc, char **argv)
 
 #ifdef HAVE_MPI
    MPI::Finalize();
+#endif
+
+#ifdef HAVE_PERFCOUNTERS
+   log.cout() << endl << endl;
+   PerfCounterList::Reference().PrintStats();
 #endif
 
   exit(retval);

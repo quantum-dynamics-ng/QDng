@@ -79,6 +79,14 @@ AC_ARG_ENABLE([gccopt],
 AC_SUBST(OPT_FLAGS)
 
 dnl
+dnl PerfCounters for Performance Checking
+dnl
+AC_ARG_ENABLE([perfcounters],
+              [AS_HELP_STRING([--enable-perfcounters],[Enable PerfCounters for timing analysis])],
+              [enable_perfcounters=yes; AC_DEFINE([HAVE_PERFCOUNTERS],[1],[enable PerfCounters for timings])],
+              [enable_perfcounters=no;])
+
+dnl
 dnl Matlab Library
 dnl
 sinclude([m4/mex_init.m4])
