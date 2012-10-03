@@ -93,7 +93,14 @@ namespace QDLIB {
           * 
           * \f$ N = \sqrt{ \langle \Psi | \Psi \rangle} \f$
           */
-         virtual double Norm() = 0;
+         virtual double Norm()
+         {
+            dcomplex c(0,0);
+
+            c = *this * this;
+
+            return sqrt(c.real());
+         }
          
          /**
           * Raw Vector Norm.
@@ -108,7 +115,10 @@ namespace QDLIB {
             return c.real();
          }
          
-         virtual void Normalize() = 0;
+         virtual void Normalize()
+         {
+            MultElements( (cVec*) this, 1/Norm() );
+         }
       
          /**
           * Check if WF is in different representation/basis.

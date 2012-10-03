@@ -33,46 +33,35 @@ namespace QDLIB
 
          ~GridSystem();
 
-         int
-         Dim() const;
+         int Dim() const;
 
-         void
-         Dim(int dims);
+         void Dim(int dims);
 
-         int
-         DimSize(int dim) const;
+         int DimSize(int dim) const;
 
-         const int*
-         DimSizes();
+         const int* DimSizes();
 
          int Size() const;
 
-         void
-         DimSize(int dim, int size);
+         void DimSize(int dim, int size);
 
-         double
-         Xmin(int dim) const;
+         double Xmin(int dim) const;
 
-         void
-         Xmin(int dim, double xmin);
+         void Xmin(int dim, double xmin);
 
-         double
-         Xmax(int dim) const;
+         double Xmax(int dim) const;
 
-         void
-         Xmax(int dim, double xmax);
+         void Xmax(int dim, double xmax);
 
-         double
-         Dx(int dim) const;
+         void SetFromArrays(vector<int> N, vector<double> xmin, vector<double> xmax);
 
-         void
-         operator=(GridSystem &G);
+         double Dx(int dim) const;
 
-         bool
-         operator==(GridSystem &G);
+         void operator=(GridSystem &G);
 
-         bool
-         operator!=(GridSystem &G);
+         bool operator==(GridSystem &G);
+
+         bool operator!=(GridSystem &G);
 
          /**
           *  Activate a dimension for index mapping.

@@ -19,28 +19,24 @@ namespace QDLIB {
    class WFGridCartesian : public WFGridSystem
    {
       private:
-	 string _name;
+         string _name;
       public:
-	 WFGridCartesian();
-      
-	 ~WFGridCartesian();
-	    /* Interface implementation, WaveFunction */
-      
-	       virtual WaveFunction* NewInstance();
-		     
-	       virtual void Init(ParamContainer &params);
-	       
-	       virtual const string& Name();
-		  
-	       virtual double Norm();
-	       
-	       virtual void Normalize();
-	    
-	       virtual WaveFunction* operator=(WaveFunction* Psi);
-	       
-	       virtual dcomplex operator*(WaveFunction* Psi);
-               
-               virtual dcomplex Integral();
+         WFGridCartesian();
+
+         ~WFGridCartesian();
+         /* Interface implementation, WaveFunction */
+
+         virtual WaveFunction* NewInstance();
+
+         virtual void Init(ParamContainer &params);
+
+         virtual const string& Name();
+
+         virtual WaveFunction* operator=(WaveFunction* Psi);
+
+         virtual dcomplex operator*(WaveFunction* Psi);
+
+         virtual dcomplex Integral();
       };
 
 }

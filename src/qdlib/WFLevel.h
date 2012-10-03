@@ -11,39 +11,33 @@ namespace QDLIB {
    class WFLevel: public WaveFunction
    {
       private:
-	 string _name;
-	 
+         string _name;
+
       public:
          /* Interface implementation */
-	 WFLevel();
-	 
- 	 ~WFLevel();
-	 
-	 WaveFunction* NewInstance();
-	 
+         WFLevel();
+
+         ~WFLevel();
+
+         WaveFunction* NewInstance();
+
          virtual void Init(ParamContainer &params);
-	 
+
          virtual const string& Name();
-	 
-         virtual double Norm();
-	 
-         virtual void Normalize();
-	 
-	 WaveFunction* operator=(WaveFunction *Psi);
-	 
-	 dcomplex operator*(WaveFunction *Psi);
-	 
+
+         WaveFunction* operator=(WaveFunction *Psi);
+
+         dcomplex operator*(WaveFunction *Psi);
+
          virtual void Reduce(double tolerance);
-         
+
          virtual void Restore();
-	 
-	 /* Own methods */
-	 void Size(int size);
-	 
-	 WFLevel& operator=(WFLevel &Psi);
-	 
-         
-	
+
+         /* Own methods */
+         void Size(int size);
+
+         WFLevel& operator=(WFLevel &Psi);
+
    }; /* class WFLevel */
    
 } /* namespace QDLIB */

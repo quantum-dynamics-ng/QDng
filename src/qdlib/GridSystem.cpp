@@ -149,6 +149,21 @@ namespace QDLIB {
    }
    
    /**
+    * Initialize all grid parameters from arrays.
+    */
+   void GridSystem::SetFromArrays(vector<int> N, vector<double> xmin, vector<double> xmax)
+   {
+      if (N.size() != xmin.size() || xmin.size() != xmax.size())
+         throw (EParamProblem("GridSystem: All Arrays must have the same size"));
+
+      for (unsigned int i=0; i < N.size(); i++){
+         DimSize(i, N[i]);
+         Xmin(i, xmin[i]);
+         Xmax(i, xmax[i]);
+      }
+   }
+
+   /**
     * Copy the parameter set.
     */
    void GridSystem::operator =(GridSystem &G)

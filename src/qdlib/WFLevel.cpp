@@ -36,28 +36,6 @@ namespace QDLIB {
    {
       return _name;
    }
-      
-   /**
-    * Calcualte the Norm of the vector.
-    */
-   double WFLevel::Norm()
-   {
-      dcomplex d;
-      
-      d = *this * *this;
-      return sqrt(d.real());
-   }
-   
-   /**
-    * Normalize the vector.
-    */
-   void WFLevel::Normalize()
-   {
-      double  d = 1/Norm();
-      for (int i=0; i < size(); i++){
-	 (*this)[i] = (*this)[i] * d;
-      }
-   }
    
    WaveFunction* WFLevel::operator=(WaveFunction *Psi)
    {

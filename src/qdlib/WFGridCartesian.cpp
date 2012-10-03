@@ -59,21 +59,6 @@ namespace QDLIB {
       return _name;
    }
 
-
-   double WFGridCartesian::Norm()
-   {
-      dcomplex c(0,0);
-   
-      c = *this * this;
-   
-      return sqrt(c.real());
-   }
-
-   void WFGridCartesian::Normalize()
-   {
-      MultElements( (cVec*) this, 1/Norm() );
-   }
-
    WaveFunction * WFGridCartesian::operator =(WaveFunction * Psi)
    {
       /* WFGridSystem already knows what to copy */
