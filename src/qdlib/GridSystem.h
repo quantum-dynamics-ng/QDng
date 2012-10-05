@@ -59,9 +59,9 @@ namespace QDLIB
 
          void operator=(GridSystem &G);
 
-         bool operator==(GridSystem &G);
+         bool operator==(GridSystem &G) const;
 
-         bool operator!=(GridSystem &G);
+         bool operator!=(GridSystem &G) const;
 
          /**
           *  Activate a dimension for index mapping.

@@ -156,6 +156,8 @@ namespace QDLIB {
       if (N.size() != xmin.size() || xmin.size() != xmax.size())
          throw (EParamProblem("GridSystem: All Arrays must have the same size"));
 
+      Dim(N.size());
+
       for (unsigned int i=0; i < N.size(); i++){
          DimSize(i, N[i]);
          Xmin(i, xmin[i]);
@@ -184,7 +186,7 @@ namespace QDLIB {
    /**
     * Comparison of grid parameters.
     */
-   bool GridSystem::operator ==( GridSystem & G )
+   bool GridSystem::operator ==( GridSystem & G ) const
    {
       bool equal = true;
       
@@ -202,7 +204,7 @@ namespace QDLIB {
    /**
     * Comparison of grid parameters.
     */
-   bool GridSystem::operator !=( GridSystem & G )
+   bool GridSystem::operator !=( GridSystem & G ) const
    {
      if ( *this == G ) return false;
       else return true;

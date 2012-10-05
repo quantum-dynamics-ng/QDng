@@ -515,6 +515,68 @@ namespace QDLIB {
    }
    
    /**
+    * Creates a sequence of values in one one entry.
+    */
+   void ParamContainer::SetArray(const string& name, const double* values, size_t n)
+   {
+      stringstream cat;
+
+      for (size_t i=0; i < n; i++){
+         cat << values[i];
+         if (i != n-1) cat << ",";
+      }
+
+      SetValue(name, cat.str());
+   }
+
+   /**
+    * Creates a sequence of values in one one entry.
+    */
+   void ParamContainer::SetArray(const string& name, const int* values, size_t n)
+   {
+      stringstream cat;
+
+      for (size_t i=0; i < n; i++){
+         cat << values[i];
+         if (i != n-1) cat << ",";
+      }
+
+      SetValue(name, cat.str());
+   }
+
+   /**
+    * Creates a sequence of values in one one entry.
+    */
+   void ParamContainer::SetArray(const string& name, const size_t* values, size_t n)
+   {
+      stringstream cat;
+
+      for (size_t i=0; i < n; i++){
+         cat << values[i];
+         if (i != n-1) cat << ",";
+      }
+
+      SetValue(name, cat.str());
+   }
+
+   /**
+    * Creates a sequence of values in one one entry.
+    */
+   void ParamContainer::SetArray(const string& name, const bool* values, size_t n)
+   {
+      stringstream cat;
+
+      for (size_t i=0; i < n; i++){
+         if (values[i] == true) cat << "true";
+         else cat << "false";
+         if (i != n-1) cat << ",";
+      }
+
+      SetValue(name, cat.str());
+   }
+
+
+   /**
     * Copy operator.
     */
    ParamContainer& ParamContainer::operator=(const ParamContainer &params)
