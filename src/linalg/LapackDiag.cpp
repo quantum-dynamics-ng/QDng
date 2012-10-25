@@ -123,10 +123,10 @@ namespace LAPACK {
       if (evals->strides() != 1) return -2;
 
       Memory& mem = Memory::Instance();
-      char job='E';
-      char compz = 'N';
-      int n=mat->rows();
-      int ilo = 1;
+      const char job='E';
+      const char compz = 'N';
+      const int n=mat->rows();
+      const int ilo = 1;
       int info;
 
       int wsize = n*n;
@@ -155,6 +155,7 @@ namespace LAPACK {
       char side = 'B';
       char eigsrc = 'N';
       char initv = 'N';
+      int nevs;
       Vector<int> select(n);
       Vector<int> lfail(n);
       Vector<int> rfail(n);
@@ -167,7 +168,7 @@ namespace LAPACK {
       mem.Align( (void**) &rws, n * sizeof(double) );
 
       ZHSEIN_F77(&side, &eigsrc, &initv, select.begin(0), &n, matbuf.begin(0), &n, ebuf.begin(0),
-               evecsL->begin(), &n, evecsR->begin(), &n, &n, &n, ws, rws, lfail.begin(0), rfail.begin(0), &info);
+               evecsL->begin(), &n, evecsR->begin(), &n, &n, &nevs, ws, rws, lfail.begin(0), rfail.begin(0), &info);
 
       mem.Free( ws );
       mem.Free( rws );
