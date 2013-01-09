@@ -172,6 +172,7 @@ namespace QDLIB
       LAPACK::InvertGeneral(&_ZL);
 
       ExpElements(&_expHD, &_evals, OPropagator::Exponent());
+
       /* Z * e^(-i*Hd*dt) * Z+ */
       MatVecMult(&_vec0, &_ZL, &_vect);
       MultElements(&_vec0, &_expHD);

@@ -74,6 +74,16 @@ namespace QDLIB {
 	  * This is needed by time dependent operators.
 	  */
 	 QDClock *clock;
+
+	       /**
+	        * Use the complex conjugate.
+	        */
+	       bool _conj;
+
+	       /**
+	        * Indicates that the operator is hermitian.
+	        */
+	       bool _hermitian;
       public:
           /**
           * Make class pure virtual
@@ -87,9 +97,10 @@ namespace QDLIB {
 	 /**
 	  * Standard constructor
 	  */
-         Operator() : _recalc(true), _buf(NULL), _buf1(NULL), _isTimedependent(false), clock(NULL)
-	 {
-         }
+         Operator() : _recalc(true), _buf(NULL), _buf1(NULL), _isTimedependent(false), clock(NULL),
+                      _conj(false), _hermitian(true)
+	  {
+     }
 	  
 	 /**
 	  * Constructor with full parameter set.
@@ -184,6 +195,24 @@ namespace QDLIB {
 	 {
 	    return clock;
 	 }
+
+	 /**
+	  *  Check if operator is hermitian
+	  */
+	 bool Hermitian() const { return _hermitian; }
+
+	 /**
+	  * Check if complex conjugate is set.
+	  */
+	 bool Conj() const { return _conj; }
+
+	 /**
+	  * Set/unset complex conjugate.
+	  *
+	  * If set to true than a consecutive apply should carry H^dagger Psi
+	  * instead of H Psi
+	  */
+	 virtual void Conj(bool conj) { _conj = conj; }
 
 	 /**
 	  * Complex Bra.Op.Ket value of two Wavefunctions.

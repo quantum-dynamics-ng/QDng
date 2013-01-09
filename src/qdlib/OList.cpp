@@ -82,11 +82,15 @@ namespace QDLIB {
          throw( EIncompatible("Access to empty element") );
       
       _O[index] = O;
+      _O[index]->Conj(_conj);
    }
    
    void OList::Set(const string& name, Operator *O)
    {
-      _O[GetIndex(name)] = O;
+      int index = GetIndex(name);
+
+      _O[index] = O;
+      _O[index]->Conj(_conj);
    }
 
    /**
@@ -114,6 +118,10 @@ namespace QDLIB {
       if (O->isTimeDep()) _isTimedependent = true;
      
       _O[_size] = O;
+
+      _O[_size]->Conj(_conj);
+      if (! O->Hermitian() ) _hermitian = false;
+
       _size++;
    }
 
@@ -144,6 +152,15 @@ namespace QDLIB {
       for(int i=0; i < _size; i++){
          _O[i]->UpdateTime();
       }
+   }
+
+   void OList::Conj(bool conj)
+   {
+      for(int i=0; i < _size; i++){
+         _O[i]->Conj(conj);
+      }
+
+      _conj = conj;
    }
 
    void OList::Init( WaveFunction *Psi)

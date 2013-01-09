@@ -106,6 +106,7 @@ namespace QDLIB {
 
       /* negative imaginary potential */
       _params.GetValue("nip", _nip, false);
+      if (_nip) _hermitian = false;
       
       /* Gain value. */
       if (_params.isPresent("gain")){
@@ -189,18 +190,22 @@ namespace QDLIB {
    
    void OGobbler::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
    {
-      if (_nip) 
-	 MultElementsComplexEq((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, -1);
-      else 
+      if (_nip){
+         double sgn = -1;
+         if (_conj) sgn = 1; /* Switch sign for complex conjugate */
+         MultElementsComplexEq((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this, sgn);
+      } else
 	 MultElements((cVec*) destPsi, (cVec*) sourcePsi, (dVec*) this);
 
    }
    
    void OGobbler::Apply(WaveFunction * Psi)
    {
-      if (_nip)
-	 MultElements( (cVec*) Psi, (dVec*) this, dcomplex(0,-1));
-      else
+      if (_nip) {
+         double sgn = -1;
+         if (_conj) sgn = 1; /* Switch sign for complex conjugate */
+         MultElements( (cVec*) Psi, (dVec*) this, dcomplex(0, sgn));
+      } else
 	 MultElements( (cVec*) Psi, (dVec*) this);
    }
    

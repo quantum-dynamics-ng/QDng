@@ -20,6 +20,8 @@ namespace QDLIB
       Diff::Mixed(false);
       Diff::Derivative(1);
       Diff::Method(FFT);
+
+      _hermitian = false;
    }
 
    OGridPML::~OGridPML()
@@ -109,11 +111,20 @@ namespace QDLIB
 
       *destPsi = 0.0;
       for (int i=0; i < GridSystem::Dim(); i++){
-         DnDxn(_buf1, sourcePsi, i);
-         _pml[i].ApplyTransform(_buf1);
-         DnDxn(_buf2, _buf1, i, -1./2./_mass[i]);
-         _pml[i].ApplyTransform(_buf2);
-         *destPsi += _buf2;
+         if (!_conj){
+            DnDxn(_buf1, sourcePsi, i);
+            _pml[i].ApplyTransform(_buf1);
+            DnDxn(_buf2, _buf1, i, -1./2./_mass[i]);
+            _pml[i].ApplyTransform(_buf2);
+            *destPsi += _buf2;
+         } else { /* Apply the adjoint operator */
+            *_buf1 = sourcePsi;
+            _pml[i].ApplyTransform(_buf1, true);
+            DnDxn(_buf2, _buf1, i);
+            _pml[i].ApplyTransform(_buf2, true);
+            DnDxn(_buf1, _buf2, i, -1./2./_mass[i]);
+            *destPsi += _buf1;
+         }
       }
       _buf1->Retire();
       _buf2->Retire();

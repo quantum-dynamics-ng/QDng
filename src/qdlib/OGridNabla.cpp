@@ -76,13 +76,15 @@ namespace QDLIB {
       ket = dynamic_cast<WFGridSystem*>(sourcePsi);
       opPsi = dynamic_cast<WFGridSystem*>(destPsi);
 
+      double sgn = 1;
+      if (_conj) sgn = -1; /* Switch sign for complex conjugate */
 
       _FFT.Forward(ket);
       opPsi->IsKspace(true);
       if (_momentum)
-         MultElementsCopy((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
+         MultElementsCopy((cVec*) opPsi, (cVec*) ket, _kspace, sgn * _fac/double(GridSystem::Size()));
       else
-         MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, _kspace, _fac/double(GridSystem::Size()));
+         MultElementsComplexEq((cVec*) opPsi, (cVec*) ket, _kspace, sgn * _fac/double(GridSystem::Size()));
       
       ket->IsKspace(false);   /* switch back to X-space -> we don't change sourcePsi*/
       _FFT.Backward(opPsi);
@@ -95,11 +97,15 @@ namespace QDLIB {
 
       opPsi = dynamic_cast<WFGridSystem*>(Psi);
 
+      double sgn = 1;
+      if (_conj) sgn = -1; /* Switch sign for complex conjugate */
+
       _FFT.Forward(opPsi);
       if (_momentum)
-         MultElements((cVec*) opPsi, _kspace, _fac/double(GridSystem::Size()));
+         MultElements((cVec*) opPsi, _kspace, sgn * _fac/double(GridSystem::Size()));
       else
-         MultElementsComplex((cVec*) opPsi, _kspace, _fac/double(GridSystem::Size()));
+         MultElementsComplex((cVec*) opPsi, _kspace, sgn * _fac/double(GridSystem::Size()));
+
       _FFT.Backward(opPsi);
    }
 

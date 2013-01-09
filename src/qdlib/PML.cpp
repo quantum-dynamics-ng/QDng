@@ -140,7 +140,7 @@ namespace QDLIB
    /**
     * Apply the PML specific metric 1/f
     */
-   void PML::ApplyTransform(cVec* wf)
+   void PML::ApplyTransform(cVec* wf, bool conj)
    {
       _grid.ActiveDim(_dim);
       int lo = _grid.LowOthers();
@@ -157,22 +157,44 @@ namespace QDLIB
          int step=0;
          switch (_side){
             case PML_BEG:
-               for (int i=0; i < _thick; i++){
-                  psi[base+step] *= _f1[i];
-                  step += lo;
+               if (conj){
+                  for (int i=0; i < _thick; i++){
+                     psi[base+step] *= _f1[i].conj();
+                     step += lo;
+                  }
+               } else {
+                  for (int i=0; i < _thick; i++){
+                     psi[base+step] *= _f1[i];
+                     step += lo;
+                  }
                }
                break;
             case PML_END:
-               for (int i=0; i < _thick; i++){
-                  psi[base+(Nx-1)*lo-step] *= _f1[i];
-                  step += lo;
+               if (conj){
+                  for (int i=0; i < _thick; i++){
+                     psi[base+(Nx-1)*lo-step] *= _f1[i].conj();
+                     step += lo;
+                  }
+               } else {
+                  for (int i=0; i < _thick; i++){
+                     psi[base+(Nx-1)*lo-step] *= _f1[i];
+                     step += lo;
+                  }
                }
                break;
             default:
-               for (int i=0; i < _thick; i++){
-                  psi[base+step] *= _f1[i];
-                  psi[base+(Nx-1)*lo-step] *= _f1[i];
-                  step += lo;
+               if (conj){
+                  for (int i=0; i < _thick; i++){
+                     psi[base+step] *= _f1[i].conj();
+                     psi[base+(Nx-1)*lo-step] *= _f1[i].conj();
+                     step += lo;
+                  }
+               } else {
+                  for (int i=0; i < _thick; i++){
+                     psi[base+step] *= _f1[i];
+                     psi[base+(Nx-1)*lo-step] *= _f1[i];
+                     step += lo;
+                  }
                }
          }
       }
@@ -222,6 +244,7 @@ namespace QDLIB
    /**
     * Apply the PML specific metric 1/f
     * \bug broken (interior is not correctly added!)
+    * \bug adjoint missing
     */
    void PML::ApplyTransformAdd(cVec* dwf, cVec* wf)
    {

@@ -41,6 +41,12 @@ namespace QDLIB {
 	 {
 	    clock = cl;
 	    if (clock->Dt() > 0) forward = true;
+	    else {
+	       forward = false;
+	       _conj = true;
+	       OList::Conj(true);
+	    }
+
 	    _c0 = (-1)*I*clock->Dt();
 	 }
 	 	 
@@ -51,11 +57,19 @@ namespace QDLIB {
 	  */
 	 void Forward()
 	 {
+	    if (clock == NULL)
+	       throw (EIncompatible("Propagator has no clock"));
+
 	    if (imaginary)
 	       _c0 = clock->Dt();
 	    else
 	       _c0 = (-1)*I*clock->Dt();
+
 	    forward = true;
+
+	    _conj = false;
+
+	    OList::Conj(false);
 	 }
 	 
 	 /**
@@ -63,11 +77,19 @@ namespace QDLIB {
 	  */
 	 void Backward()
 	 {
+       if (clock == NULL)
+          throw (EIncompatible("Propagator has no clock"));
+
 	    if (imaginary)
 	       _c0 = -clock->Dt();
 	    else
 	       _c0 = (1)* I *clock->Dt();
+
 	    forward = false;
+
+	    _conj = true;
+
+	    OList::Conj(true);
 	 }
 	 	 
 	 /**
@@ -82,6 +104,14 @@ namespace QDLIB {
 	    imaginary = true;
 	 }
 	 
+	 virtual void Conj(bool conj)
+	 {
+	    if (conj)
+	       Backward();
+	    else
+	       Forward();
+	 }
+
 	 /**
 	  * Set propagation in real time.
 	  * 

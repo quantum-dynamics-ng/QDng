@@ -55,6 +55,9 @@ namespace QDLIB {
 
         H = Get("hamiltonian");
 
+        if (! H->Hermitian() )
+           throw(EIncompatible("SIL can't handle non-hermitian Hamiltonians use Arnolid instead"));
+
         buf0 = Psi->NewInstance();
         buf1 = Psi->NewInstance();
         buf2 = Psi->NewInstance();

@@ -49,6 +49,8 @@ namespace QDLIB {
          
          virtual void UpdateTime();
          
+         virtual void Conj(bool conj);
+
          virtual void Init(ParamContainer &params) {}
          
          virtual void Init( WaveFunction * Psi );

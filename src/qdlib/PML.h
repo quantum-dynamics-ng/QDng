@@ -48,7 +48,7 @@ namespace QDLIB
          const cVec& f1() { return _f1; }
 
          void ApplyTransformAdd(cVec *dwf, cVec *wf);
-         void ApplyTransform(cVec *wf);
+         void ApplyTransform(cVec *wf, bool conj = false);
 
          void ApplyTransformDiff(cVec* wf);
    };
