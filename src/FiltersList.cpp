@@ -4,12 +4,9 @@
 
 namespace QDLIB {
 
-   FiltersList::FiltersList() : _size(0), _initalized(false),
+   FiltersList::FiltersList() : _renorm(false), _size(0), _initalized(false),
                                  _fname(DEFAULT_EXPEC_FILENAME), _writefile(false)
    {
-      for (int i=0; i < MAX_FILTERS; i++){
-	 _olist[i] = NULL;
-      }
       _clock = QDGlobalClock::Instance();
    }
    
@@ -51,6 +48,7 @@ namespace QDLIB {
     * \param header  Coloumn header to use. Defaults to the operator name (if string is empty)
     * \param faction One of apply, expec, expeconly, normalize. [expeconly]
     * \param val     What part of the expectation should be plotted: real, imag, complex [real]
+    * \param int     Integrate/sum up over time [false]
     */
    void FiltersList::Add(const Operator* O, const string& header, const string& faction, const string& val, bool integrate)
    {
@@ -73,32 +71,32 @@ namespace QDLIB {
 
       /* Handle type of value */
       if (value == "real")
-         _value[_size] = real;
+         _filter[_size].value = real;
       else if (value == "imag")
-         _value[_size] = imag;
+         _filter[_size].value = imag;
       else if (value == "complex")
-         _value[_size] = complex;
+         _filter[_size].value = complex;
       else
          throw EParamProblem ("Value type not known: ", value);
 
       /* Accumulate/Integrate values ?*/
-      _integrate[_size] = integrate;
-      _sum[_size] = dcomplex(0);
+      _filter[_size].integrate = integrate;
+      _filter[_size].sum = dcomplex(0);
 
       /* Check which filter action should be taken */
       if (action == "normalize")
       {
-         _action[_size] = normalize;
+         _filter[_size].action = normalize;
       } else if (action == "expec")
       {
-         _action[_size] = expec;
+         _filter[_size].action = expec;
          _writefile = true;
       }
       else if (action == "apply")
-         _action[_size] = apply;
+         _filter[_size].action = apply;
       else if (action == "expeconly")
       {
-         _action[_size] = expeconly;
+         _filter[_size].action = expeconly;
          _writefile = true;
       }
       else
@@ -139,6 +137,9 @@ namespace QDLIB {
     * \li apply      Just Apply the operator
     * \li expeconly  Only calculate and show the expectation value
     * \li normalize  Simple normalization of wave function
+    *
+    * Options:
+    * \li renorm     Renormalize expectation values before printing.
     */
    void FiltersList::Init(XmlNode *section)
    {
@@ -158,6 +159,10 @@ namespace QDLIB {
       {
          params.GetValue("fname", _fname);
       }
+
+      /* Check if expectation values should be renormalized */
+      if (params.isPresent("renorm"))
+         params.GetValue("renorm", _renorm, false);
 
       /* Load the filter list*/
       filters = section->NextChild();
@@ -187,11 +192,11 @@ namespace QDLIB {
          Operator* O=NULL;
          if (faction != "normalize")
          {
-            _olist[_size] = ChainLoader::LoadOperatorChain(filters); /* Load operator */
+            _filter[_size].op = ChainLoader::LoadOperatorChain(filters); /* Load operator */
             ParamContainer attr = filters->Attributes(); /* Set header label */
             if (attr.isPresent("header"))
-               attr.GetValue("header", _labels[_size]);
-            else _labels[_size] = _olist[_size]->Name();
+               attr.GetValue("header", _filter[_size].label);
+            else _filter[_size].label = _filter[_size].op->Name();
          }
 
          Add(O, header, faction, value, integrate);
@@ -213,12 +218,12 @@ namespace QDLIB {
       if (! _initalized){
          _ofile << "time \t";
 	 for(int i=0; i < _size; i++){
-	    if (_action[i] != normalize){
-	       _olist[i]->Clock(_clock);
-	       GlobalOpList::Instance().Init(_olist[i], Psi);
+	    if (_filter[i].action != normalize){
+	       _filter[i].op->Clock(_clock);
+	       GlobalOpList::Instance().Init(_filter[i].op, Psi);
 	    }
-	    if (_writefile && (_action[i] == expec || _action[i] == expeconly) && _action[i] != normalize)
-	       _ofile << _labels[i] << "\t";
+	    if (_writefile && (_filter[i].action == expec || _filter[i].action == expeconly) && _filter[i].action != normalize)
+	       _ofile << _filter[i].label << "\t";
 	 }
 	 if (_writefile)
 	    _ofile << endl;
@@ -230,37 +235,37 @@ namespace QDLIB {
       
       /* Apply filters */
       for(int i=0; i < _size; i++){
-	 if (_action[i] == expec || _action[i] == expeconly){
-	    switch (_value[i]) {
-	       case imag:
-                  if (_integrate[i])
-                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi).imag() * _clock->Dt();
-                  else
-                     _sum[i] = _olist[i]->MatrixElement(Psi,Psi).imag();
-                  
-		  _ofile << _sum[i].imag() << "\t";
-		  break;
-	       case complex:
-                  if (_integrate[i])
-                     _sum[i] += _olist[i]->MatrixElement(Psi,Psi) * _clock->Dt();
-                  else
-                     _sum[i] = _olist[i]->MatrixElement(Psi,Psi);
-                  
-                  _ofile << _sum[i] << "\t";
-		  break;
-	       default:
-                  if (_integrate[i])
-                     _sum[i] += _olist[i]->Expec(Psi) * _clock->Dt();
-                  else
-                     _sum[i] = _olist[i]->Expec(Psi);
-                  
-                  _ofile << _sum[i].real() << "\t";
-	    }
-	 }	 
-	 if (_action[i] == apply || _action[i] == expec){
-	    _olist[i]->Apply(Psi);
+	 if (_filter[i].action == expec || _filter[i].action == expeconly){
+
+	    dcomplex matel = _filter[i].op->MatrixElement(Psi,Psi);
+
+	    /* Renormalize expectation value */
+	    if (_renorm)
+	       matel /= Psi->Norm();
+
+	    if (_filter[i].integrate)
+	       _filter[i].sum += matel * _clock->Dt();
+	    else
+	       _filter[i].sum = matel;
+
+            switch (_filter[i].value) {
+               case imag:
+                  _ofile << _filter[i].sum.imag() << "\t";
+                  break;
+               case complex:
+                  _ofile << _filter[i].sum << "\t";
+                  break;
+               default:
+                  _ofile << _filter[i].sum.real() << "\t";
+                  break;
+            }
 	 }
-	 if (_action[i] == normalize)
+
+	 if (_filter[i].action == apply || _filter[i].action == expec){
+	    _filter[i].op->Apply(Psi);
+	 }
+
+	 if (_filter[i].action == normalize)
 	    Psi->Normalize();
       }
       

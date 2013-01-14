@@ -225,6 +225,27 @@ namespace QDLIB {
          delete section;
       }
       
+      QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
+
+      /* Let the Propagator do it's initalisation */
+      _U->Clock( clock );
+      _U->Init(Psi);
+      _H = _U->Hamiltonian();
+      _H->UpdateTime();
+
+
+      log.cout() << "Initial energy: " << _H->Expec(Psi) << endl;
+
+      /* Give the reporter module what it needs */
+      _reporter.PsiInitial( Psi );
+      _reporter.Hamilton( _H );
+
+      /* Report what the propagator has chosen */
+      ParamContainer Upm;
+
+      Upm = _U->Params();
+      log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
+
       /* Pre step filters */
       section = _ContentNodes->FindNode( "filterpre" );
       if (section != NULL) {
@@ -232,6 +253,7 @@ namespace QDLIB {
 	 log.Header( "Using pre propagation step filters", Logger::SubSection);
 	 log.IndentInc();
 	 _prefilter.SetDefaultName(s);
+	 _prefilter.UseRenormalizedValues(~ _H->Hermitian() );/* Renormalized values are the default */
 	 _prefilter.Init( section );
 	 _usepre = true;
 	 log.IndentDec();
@@ -243,40 +265,19 @@ namespace QDLIB {
       /* Post step filters */
       section = _ContentNodes->FindNode( "filterpost" );
       if (section != NULL) {
-	 string s(_dir+DEFAULT_EXPEC_POST_FILENAME);
-	 log.Header("Using post propagation step filters", Logger::SubSection);
-	 log.IndentInc();
-	 _postfilter.SetDefaultName(s);
-	 _postfilter.Init( section );
-	 _usepost = true;
-	 log.IndentDec();
-	 log.cout() << endl;
+         string s(_dir + DEFAULT_EXPEC_POST_FILENAME);
+         log.Header("Using post propagation step filters", Logger::SubSection);
+         log.IndentInc();
+         _postfilter.SetDefaultName(s);
+         _postfilter.UseRenormalizedValues(~_H->Hermitian()); /* Renormalized values are the default */
+         _postfilter.Init(section);
+         _usepost = true;
+         log.IndentDec();
+         log.cout() << endl;
          log.flush();
-	 delete section;
+         delete section;
       }
-      
-      
-      QDClock *clock = QDGlobalClock::Instance();  /* use the global clock */
-
-      /* Let the Propagator do it's initalisation */
-      _U->Clock( clock );
-      _U->Init(Psi);
-      _H = _U->Hamiltonian();
-      _H->UpdateTime();
-
-
-      log.cout() << "Initial energy: " << _H->Expec(Psi) << endl;
             
-      /* Give the reporter module what it needs */
-      _reporter.PsiInitial( Psi );
-      _reporter.Hamilton( _H );
-
-      /* Report what the propagator has chosen */
-      ParamContainer Upm;
-    
-      Upm = _U->Params();
-      log.cout() << "Propagators init parameters:\n\n" << Upm << endl;
-      
       /* Init file writer for wf output */
       FileWF wfile;
   
