@@ -1,9 +1,11 @@
 #include "OGridGMat.h"
 
-#include "WFGridSystem.h"
+#include "qdlib/WFGridSystem.h"
+#include "tools/helpers.h"
 #include "tools/FileSingleDefs.h"
 #include "qdlib/Diff.h"
 #include "math/math_functions.h"
+
 
 namespace QDLIB {
 

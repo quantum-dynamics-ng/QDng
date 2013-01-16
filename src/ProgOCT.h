@@ -125,7 +125,7 @@ namespace QDLIB
          ProgOCT(XmlNode &OCTNode);
          ~ProgOCT();
 
-         void SetDirectory(string &directory)
+         void SetDirectory(const string &directory)
          {
             _dir = directory;
          }

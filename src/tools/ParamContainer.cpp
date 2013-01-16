@@ -1,4 +1,6 @@
 #include <sstream>
+#include <iostream>
+#include <fstream>
 #include <string.h>
 #include <stdio.h>
 #include "ParamContainer.h"
@@ -7,7 +9,54 @@
 
 namespace QDLIB {
    
-   
+   /**
+    * Translate a enum into textual representation.
+    */
+   string ParamContainer::Type2String(datatype type)
+   {
+      switch (type){
+         case t_undef:
+            return string();
+         case t_int:
+            return string("int");
+         case t_uint:
+            return string("uint");
+         case t_size_t:
+            return string("sizet");
+         case t_double:
+            return string("double");
+         case t_bool:
+            return string("bool");
+         case t_string:
+            return string("string");
+      }
+
+      return string();
+   }
+
+   /**
+    * Translate the textual representation of the datatype into the enum.
+    */
+   ParamContainer::datatype ParamContainer::String2Type(const string& type)
+   {
+      if (type == "")
+         return t_undef;
+      else if (type == "int")
+         return t_int;
+      else if (type == "uint")
+         return t_uint;
+      else if (type == "sizet")
+         return t_size_t;
+      else if (type == "double")
+         return t_double;
+      else if (type == "bool")
+         return t_bool;
+      else if (type == "string")
+         return t_string;
+      else
+         throw (EParamProblem("Unknown type"));
+   }
+
    ParamContainer::ParamContainer()
    {
       _it = _param_map.begin();
@@ -385,13 +434,46 @@ namespace QDLIB {
 	 return false;
    }
 
+   /**
+    * Check is entry has a certain data type.
+    */
+   bool ParamContainer::isType(const string &name, datatype type)
+   {
+      if ( _type_map.find(name) != _type_map.end())
+         if(_type_map[name] == type) return true;
+
+      return false;
+   }
+
+   /**
+    * Check is entry has a certain data type.
+    */
+   bool ParamContainer::isType(const string &name, const string& type)
+   {
+      if ( _type_map.find(name) != _type_map.end())
+         if(_type_map[name] == String2Type(type)) return true;
+
+      return false;
+   }
+
+   /**
+    * Get datatype for an entry.
+    */
+   ParamContainer::datatype ParamContainer::GetType(const string &name)
+   {
+      if ( _type_map.find(name) != _type_map.end())
+         return _type_map[name];
+
+      return t_undef;
+   }
    
    /**
     * Remove all parameters from the container.
     */
-   void QDLIB::ParamContainer::clear( )
+   void ParamContainer::clear()
    {
       _param_map.clear();
+      _type_map.clear();
    }
    
    
@@ -404,8 +486,9 @@ namespace QDLIB {
     * \param name Name of parameter
     * \param value Referenze to value
     */
-   void ParamContainer::SetValue(const string name, const char *value)
+   void ParamContainer::SetValue(const string name, const char *value, datatype type)
    {
+      _type_map[name] = type;
       _param_map[name] = string(value);
    }
    
@@ -418,9 +501,9 @@ namespace QDLIB {
     * \param name Name of parameter
     * \param value Referenze to value
     */
-   void ParamContainer::SetValue(const string name, const string &value)
+   void ParamContainer::SetValue(const string name, const string &value, datatype type)
    {
-     
+     _type_map[name] = type;
      _param_map[name] = value;
 
    }
@@ -441,6 +524,7 @@ namespace QDLIB {
      ss << value;
      ss >> _param_map[name];
 
+     _type_map[name] = t_int;
    }
 
    /**
@@ -459,6 +543,7 @@ namespace QDLIB {
      ss << value;
      ss >> _param_map[name];
 
+     _type_map[name] = t_int;
    }
 
    /**
@@ -476,6 +561,8 @@ namespace QDLIB {
      
      ss << value;
      ss >> _param_map[name];
+
+     _type_map[name] = t_size_t;
    }
 
    
@@ -497,6 +584,7 @@ namespace QDLIB {
      ss << value;
      ss >> _param_map[name];
 
+     _type_map[name] = t_double;
    }
 
    /**
@@ -512,6 +600,8 @@ namespace QDLIB {
    {
       if (value == true) _param_map[name] = "true";
       else _param_map[name] = "false";
+
+      _type_map[name] = t_bool;
    }
    
    /**
@@ -526,7 +616,7 @@ namespace QDLIB {
          if (i != n-1) cat << ",";
       }
 
-      SetValue(name, cat.str());
+      SetValue(name, cat.str(), t_double);
    }
 
    /**
@@ -541,7 +631,7 @@ namespace QDLIB {
          if (i != n-1) cat << ",";
       }
 
-      SetValue(name, cat.str());
+      SetValue(name, cat.str(), t_int);
    }
 
    /**
@@ -556,7 +646,7 @@ namespace QDLIB {
          if (i != n-1) cat << ",";
       }
 
-      SetValue(name, cat.str());
+      SetValue(name, cat.str(), t_size_t);
    }
 
    /**
@@ -572,7 +662,7 @@ namespace QDLIB {
          if (i != n-1) cat << ",";
       }
 
-      SetValue(name, cat.str());
+      SetValue(name, cat.str(), t_bool);
    }
 
 
@@ -583,7 +673,7 @@ namespace QDLIB {
    {
 
       _param_map = params._param_map;
- 
+      _type_map = params._type_map;
       
       _it = _param_map.begin();
       return *this;
@@ -597,12 +687,18 @@ namespace QDLIB {
    ParamContainer& ParamContainer::operator+=(const ParamContainer &params)
    {
 
-      string_map::iterator it;
-      string_map addmap = params._param_map;
+      string_map addpmap = params._param_map;
       
-      for (it = addmap.begin(); it != addmap.end(); it++)
+      for (string_map::iterator it = addpmap.begin(); it != addpmap.end(); it++)
       {
          _param_map[it->first] = it->second;
+      }
+
+      map<string, datatype> addtmap = params._type_map;
+
+      for (map<string, datatype>::iterator it = addtmap.begin(); it != addtmap.end(); it++)
+      {
+         _type_map[it->first] = it->second;
       }
 
       _it = _param_map.begin();
@@ -610,6 +706,121 @@ namespace QDLIB {
       return *this;
    }
    
+   void ParamContainer::Parse(istream &stream)
+   {
+      string s;
+      char line[MAX_LINE_LENGTH];
+      size_t pos;
+
+      while (!stream.eof()) { // Reading loop
+         stream.getline(line, MAX_LINE_LENGTH);
+         //if (file.fail()) return false;
+
+         s.assign(line);
+
+         pos = s.find("="); // Delimiter between Key Val is always =
+
+         if (pos != s.npos) { // Check if line is valid
+            string key, val;
+            key = s.substr(0, pos);
+            val = s.substr(pos + 1);
+
+            trim(key); // remove whitespaces
+            trim(val);
+
+            /* look for type definition */
+            ParamContainer::datatype type = ParamContainer::t_undef;
+            size_t tpos1 = key.find("[");
+            size_t tpos2 = key.find("]");
+
+            if (tpos1 != key.npos) { /* extract typedef */
+               string stype;
+               if (tpos2 != key.npos)
+                  stype = key.substr(tpos1+1, tpos1);
+               else
+                  stype = key.substr(tpos1+1);
+
+               type = String2Type(stype);
+
+               key = key.substr(0, tpos1);
+               trim(key);
+            }
+
+            /*  At least the key has to contain something
+             * Lines begining with "#" are treated as comment
+             */
+            if (!key.empty() && key.find("#") != 0) {
+               SetValue(key, val, type);
+            }
+         }
+      }
+   }
+
+   bool ParamContainer::ReadFromFile(const string& name)
+   {
+      fstream file;
+
+      file.open(name.c_str());           // Open file
+      if (file.fail()) return false;
+
+      Parse(file);
+
+      return true;
+
+   }
+
+   /**
+    * Write Key value pairs to stream.
+    */
+   void ParamContainer::Write(ostream& stream, bool with_types)
+   {
+      string key,value;
+
+      stream << "# Generated file" << endl;
+
+      ResetPosition();
+
+      /* Punch out key-value pairs */
+      while (GetNextValue(key, value)) {
+         if (!with_types)
+            stream << key << " = " << value << endl;
+         else {
+            datatype type = GetType(key);
+
+            if (type == t_undef)
+               stream << key << " = " << value << endl; /* undefined type => no type */
+            else
+               stream << key << "[" << ParamContainer::Type2String(type) << "] = " << value << endl;
+         }
+      }
+   }
+
+
+
+   /**
+    * Write a KeyValue File
+    *
+    * \param name path
+    * \param with_types add type info to keys
+    *
+    * \return true if written correct
+    */
+   bool ParamContainer::WriteToFile(const string& name, bool with_types)
+   {
+      ofstream file;
+
+      file.open(name.c_str(),  ios_base::out);
+      if( file.bad() ) return false;
+
+      Write(file, with_types);
+
+      file.close();
+      if( file.bad() ) return false;
+
+      return true;
+   }
+
+
    /**
     * ASCII output for ParamContainers.
     */
@@ -617,10 +828,8 @@ namespace QDLIB {
    {
       string key, value;
       
-      p.ResetPosition();
-      while ( p.GetNextValue( key, value ) ){
-	 s << key << " = " << value << std::endl;
-      }
+      p.Write(s, true);
+
       return s;
    }
    

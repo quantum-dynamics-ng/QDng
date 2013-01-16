@@ -47,7 +47,7 @@ namespace QDLIB
          ProgFilter(XmlNode &FilterNode);
          ~ProgFilter();
 
-         void SetDirectory(string &directory) {_dir = directory;}
+         void SetDirectory(const string &directory) {_dir = directory;}
          void Run();
    };
 

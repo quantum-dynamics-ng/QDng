@@ -6,7 +6,6 @@
 #include <fstream>
 
 #include "ParamContainer.h"
-#include "KeyValFile.h"
 #include "Exception.h"
 
 #include "qdlib/WaveFunction.h"
@@ -348,8 +347,7 @@ namespace QDLIB {
       /* Write meta file. In a sequence only for the first file. */
       if (!_drop_meta || _counter != _counter_last){
 	 
-         KeyValFile meta_file(_name + METAFILE_SUFFIX);
-         if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
+         if ( ! p.WriteToFile(_name + METAFILE_SUFFIX) ) EIOError("Can not write meta file");
       }
    }
    
@@ -366,8 +364,7 @@ namespace QDLIB {
 	 stringstream ss;
 	 ss << stride;
 	 
-	 KeyValFile meta_file(_name + "-" + ss.str() +METAFILE_SUFFIX);
-	 if ( !meta_file.Write(p) ) EIOError("Can not write meta file");
+	 if ( !p.WriteToFile(_name + "-" + ss.str() +METAFILE_SUFFIX) ) EIOError("Can not write meta file");
       }
       
    }
@@ -473,15 +470,13 @@ namespace QDLIB {
       string name;
       
       name = _name + METAFILE_SUFFIX;
-      KeyValFile file(name);
       
-      if ( !file.Parse(p) ) {
+      if ( !p.ReadFromFile(name) ) {
          /* try again, but remove trailing underscore + further chars */
          if (_name.rfind('_') != string::npos) {
             name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
-            file.SetName( name );
             
-            if ( !file.Parse(p) )
+            if ( !p.ReadFromFile(name) )
                throw( EIOError("Can not read meta file", name + " or " + _name) );
          } else {
             throw( EIOError("Can not read meta file", name + " or " + _name) );

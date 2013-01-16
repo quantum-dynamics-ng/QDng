@@ -1,6 +1,5 @@
 #include "GlobalParams.h"
 #include "fstools.h"
-#include "KeyValFile.h"
 #include <stdlib.h>
 
 namespace QDLIB {
@@ -11,17 +10,13 @@ namespace QDLIB {
       {
          _ref = new ParamContainer();
 
-         KeyValFile config;
-
          /* Look for config file in home */
          string home(getenv("HOME"));
          if ( FS::IsFile(home + "/" + QD_CONFIG_FILE_HOME) ){
-            config.SetName(home + "/" + QD_CONFIG_FILE_HOME);
-            config.Parse(*_ref);
+            _ref->ReadFromFile(home + "/" + QD_CONFIG_FILE_HOME);
          }
          if ( FS::IsFile(QD_CONFIG_FILE_LOCAL) ){ /* Look for config in current directory */
-            config.SetName(QD_CONFIG_FILE_LOCAL);
-            config.Parse(*_ref);
+            _ref->ReadFromFile(QD_CONFIG_FILE_LOCAL);
          }
 
       }

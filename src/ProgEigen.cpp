@@ -467,12 +467,11 @@ namespace QDLIB
 	log.cout() << "Read Propagation from disk\n\n"; log.flush();
 	
 	if (FS::IsDir(_read)) { /* Look for Propagation meta */
-	   KeyValFile MetaFile(_read+"Propagation.meta");
 	   ParamContainer meta;
 	   string s;
 	   int wcycle;
 	   
-	   MetaFile.Parse(meta);
+	   meta.ReadFromFile(_read+"Propagation.meta");
 	   
 	   meta.GetValue("CLASS", s);
 	   if (s != "Propagation")

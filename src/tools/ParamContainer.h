@@ -7,7 +7,7 @@
 
 using namespace std;
 
-
+#define MAX_LINE_LENGTH 2048
 
 namespace QDLIB {
 
@@ -29,12 +29,19 @@ typedef map<string,string> string_map;
    */
    class ParamContainer
    {
+      public:
+         typedef enum {t_undef, t_int, t_uint, t_size_t, t_double, t_bool, t_string} datatype;
+
       private:
-	 string_map _param_map;
+         map<string, datatype> _type_map;
+         string_map _param_map;
          string_map::iterator _it;
 	 
+
       public:
 	 
+         static string Type2String(datatype type);
+         static datatype String2Type(const string& type);
 
 	 ParamContainer();
 	 ParamContainer(const string_map params);
@@ -63,14 +70,19 @@ typedef map<string,string> string_map;
 	 bool GetNextValue(string &name, string &value);
 	 
 	 bool isPresent(const string &name);
-	 bool isPresent(const char *name);	 
+	 bool isPresent(const char *name);
+
+	 bool isType(const string &name, datatype type);
+
+	 bool isType(const string &name, const string& type);
+	 datatype GetType(const string &name);
 	 
 	 void clear();
 	 
 	 size_t Size() { return _param_map.size(); }
 
-	 void SetValue(const string name, const char *value);
-	 void SetValue(const string name, const string &value);
+	 void SetValue(const string name, const char *value, datatype type = t_undef);
+	 void SetValue(const string name, const string &value, datatype type = t_undef);
 	 void SetValue(const string name, const int &value);
 	 void SetValue(const string name, const long int &value);
     void SetValue(const string name, const size_t &value);
@@ -84,6 +96,12 @@ typedef map<string,string> string_map;
 
 	 ParamContainer& operator=(const ParamContainer &params);
 	 ParamContainer& operator+=(const ParamContainer &params);
+
+    void Parse(istream &stream);
+    bool ReadFromFile(const string& name);
+
+    void Write(ostream& stream, bool with_types = false);
+    bool WriteToFile(const string& name, bool with_types = false);
 
    }; /* class ParamContainer */
 

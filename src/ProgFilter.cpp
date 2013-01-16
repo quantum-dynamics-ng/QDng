@@ -11,7 +11,6 @@
 #include "tools/QDGlobalClock.h"
 #include "tools/fstools.h"
 #include "tools/Logger.h"
-#include "tools/KeyValFile.h"
 #include "qdlib/FileWF.h"
 
 
@@ -56,14 +55,14 @@ namespace QDLIB
 
 
       /* Read the Propagation.meta */
-      KeyValFile propmetafile(_path + "/Propagation.meta");
       ParamContainer p;
       string s;
       int i;
       double d;
 
-      if ( !propmetafile.Parse(p) )
-         throw(EIncompatible("Can't parse Propgation.meta"));
+
+      if ( ! p.ReadFromFile(_path + "/Propagation.meta") )
+         throw(EIOError("Can't parse Propgation.meta"));
 
 
       p.GetValue("CLASS", s);

@@ -104,7 +104,7 @@ namespace QDLIB
          ProgEigen(XmlNode &EigenNode);
 
          void
-         SetDirectory(string &directory)
+         SetDirectory(const string &directory)
          {
             _dir = directory;
          }

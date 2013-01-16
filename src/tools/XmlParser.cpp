@@ -26,7 +26,7 @@ namespace QDLIB
     * 
     * \param name File name or URL
     */
-   void XmlParser::Parse(string &name)
+   void XmlParser::Parse(const string &name)
    {
       _doc = xmlReadFile(name.c_str(), NULL, XML_PARSE_NOBLANKS);
 
@@ -40,6 +40,21 @@ namespace QDLIB
 	 throw ( EIOError("Can not create XML root node: ") );
       }
       
+   }
+
+   void XmlParser::Parse(const char* buffer, int size)
+   {
+      _doc = xmlReadMemory(buffer, size,  "noname.xml", NULL, XML_PARSE_NOBLANKS);
+
+      if (_doc == NULL) {
+         throw(EIOError("Can not parse XML file: "));
+      }
+
+      /*Get the root element node */
+      _root = xmlDocGetRootElement(_doc);
+      if (_root == NULL) {
+         throw(EIOError("Can not create XML root node: "));
+      }
    }
 
    /**

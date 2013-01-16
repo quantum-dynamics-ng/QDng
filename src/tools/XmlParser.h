@@ -28,7 +28,8 @@ namespace QDLIB
 	 
       ~XmlParser();
       
-      void Parse(string &name);
+      void Parse(const string &name);
+      void Parse(const char* buffer, int size);
       
       XmlNode& Root();
 

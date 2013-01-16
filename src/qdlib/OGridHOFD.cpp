@@ -4,6 +4,8 @@
  *  Created on: 08.05.2012
  *      Author: Markus Kowalewski
  */
+
+#include "tools/helpers.h"
 #include "OGridHOFD.h"
 #include "WFGridSystem.h"
 
