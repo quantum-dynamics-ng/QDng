@@ -58,64 +58,87 @@ namespace QDLIB {
 	 {
 	    /** unformated raw binary file */
 	    binary,
+	    /** meta data+binary raw data stream format **/
+	    stream,
 	    /** human readable ascii format */
 	    ascii,
 	    /** HDF5 specific format */
 	    hdf5
 	 };
       private:
+	      istream* _sin;    /* I/O streams used for StorageType streams */
+	      ostream* _sout;
+
          bool _drop_meta;      // Ignore metadata
-	 int _counter_last;
+         int _counter_last;
          int _fsize;          /* Specify write size other than suggested by vector etc. */
          size_t _freadsize;      /* Contains number of bytes from last read operation */
          
-	 void _ReadMeta(C *data);
-	 void _WriteMeta(C *data);
-	 void _WriteMetaStrided(C *data, int stride);
+         void _ReadMeta(C *data);
+         void _WriteMeta(C *data);
+         void _WriteMetaStrided(C *data, int stride);
 	 
+         void _WriteFileStream(C *data);
+         void _ReadFileStream(C *data);
+
          void _WriteFileBinary(C *data);
-	 void _WriteFileBinaryStrided(C *data);
+         void _WriteFileBinaryStrided(C *data);
 	 
-	 bool _WriteFileASCII(C *data);
+         bool _WriteFileASCII(C *data);
 // 	 bool _WriteFileHDF(WaveFunction &wf);
 	 
          void _ReadFileBinary(C *data);
-	 bool _ReadFileASCII(C *data);
+         bool _ReadFileASCII(C *data);
 // 	 bool _ReadFileHDF(WaveFunction &wf);
-      protected:
-	StorageType _type;
-	string _name;
-	string _suffix;
-	bool _sequence;
-        bool _sequence_init; /* indicates that this is the first step of the sequence */
-	int _counter;
-	int _increment;
-        void ReadMeta(ParamContainer &p);
-        void WriteMeta(ParamContainer &p);
+         protected:
+            StorageType _type;
+            string _name;
+            string _suffix;
+            bool _sequence;
+            bool _sequence_init; /* indicates that this is the first step of the sequence */
+            int _counter;
+            int _increment;
+            void ReadMeta(ParamContainer &p);
+            void WriteMeta(ParamContainer &p);
       public:
 	 	 
-	 FileSingle();
-	 FileSingle(const StorageType type, bool Sequence = false);
-	 FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence = false);
+            FileSingle();
+            FileSingle(const StorageType type, bool Sequence = false);
+            FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence = false);
+            FileSingle(istream* in, ostream out);
 	 
 	 
-         void Format(const StorageType type);
-         StorageType Format();
+            /**
+             * Set input stream for stream storage format.
+             *
+             * Only relevant if Format = stream.
+             */
+            void SetInputStream(istream& s) { _sin = &s; }
+
+            /**
+             * Set output stream for stream storage format.
+             *
+             * Only relevant if Format = stream.
+             */
+            void SetOutputStream(ostream& s) { _sout = &s; }
+
+            void Format(const StorageType type);
+            StorageType Format();
          
-	 void Name(const string &name);
-         string Name();
+            void Name(const string &name);
+            string Name();
          
-	 void Suffix(const string &suffix);
-	 string Suffix();
+            void Suffix(const string &suffix);
+            string Suffix();
 	 
-         void DropMeta(bool drop);
-         bool DropMeta();
+            void DropMeta(bool drop);
+            bool DropMeta();
          
-	 void ActivateSequence();
-         void ActivateSequence(int increment);
-	 void StopSequence();
+            void ActivateSequence();
+            void ActivateSequence(int increment);
+            void StopSequence();
 	 
-	 void ResetCounter();
+            void ResetCounter();
          
 	 void ReverseSequence(){ _increment = -1; }
 	 void ForwardSequence(){ _increment = +1; }
@@ -158,7 +181,7 @@ namespace QDLIB {
     * Default type is binary.
     */
    template <class C>
-   FileSingle<C>::FileSingle() :
+   FileSingle<C>::FileSingle() : _sin(NULL), _sout(NULL),
          _drop_meta(false), _counter_last(0), _fsize(0), _freadsize(0), _type(binary),  _name("default"), _suffix(""), _sequence(false),
                     _sequence_init(false), _counter(0), _increment(1) {}
    
@@ -167,7 +190,7 @@ namespace QDLIB {
     *
     */
    template <class C>
-   FileSingle<C>::FileSingle(const StorageType type, bool Sequence) :
+   FileSingle<C>::FileSingle(const StorageType type, bool Sequence) : _sin(NULL), _sout(NULL),
          _type(type), _drop_meta(false), _counter_last(0), _fsize(0), _freadsize(0), _name("default"), _suffix(""), _sequence(Sequence),
                _sequence_init(false), _counter(0),_increment(1) {}
    
@@ -176,10 +199,16 @@ namespace QDLIB {
     */
    template <class C>
    FileSingle<C>::FileSingle(const StorageType type, const string &name, const string &suffix, bool Sequence) :
+         _sin(NULL), _sout(NULL),
          _counter_last(0), _fsize(0), _freadsize(0), _type(type), _name(name), _suffix(suffix), _sequence(Sequence),
                        _sequence_init(false), _counter(0), _increment(1) {}
    
    
+   template <class C>
+   FileSingle<C>::FileSingle(istream* in, ostream out) : _sin(in), _sout(out),
+   _counter_last(0), _fsize(0), _freadsize(0), _type(stream), _name(), _suffix(), _sequence(false),
+                         _sequence_init(false), _counter(0), _increment(1)  {}
+
    /**
     * Set disk storage format.
     * 
@@ -370,6 +399,87 @@ namespace QDLIB {
    }
    
    /**
+    * Write object to stream.
+    */
+   template <class C>
+   void FileSingle<C>::_WriteFileStream(C *data)
+   {
+      if (_sout != NULL){
+         /* Punch Metadata */
+         ParamContainer& pm = data->Params();
+         pm.SetValue("CLASS", data->Name());
+         *_sout << "BEGINMETA\n";
+         *_sout << data->Params();
+         *_sout << "ENDMETA\n";
+
+         /* Punch binary data */
+         size_t size =  data->sizeBytes();
+         if (_fsize != 0) size = _fsize;
+
+
+         *_sout << "BEGINDATA\n";
+         *_sout << size << endl;
+
+         _sout->write(reinterpret_cast<char*>(data->begin(0)), size);
+         *_sout << endl;
+      } else
+         throw(EIncompatible("No output stream set!"));
+
+   }
+
+   /**
+    * Read object from stream storage format.
+    *
+    */
+   template <class C>
+   void FileSingle<C>::_ReadFileStream(C *data)
+   {
+      char* buf = NULL;
+      size_t size = 0;
+
+      if (_sin != NULL ){
+         while (1==1){
+            string line;
+            *_sin >> line;
+
+            cout << "dbg: " << line << endl;
+            if (string("BEGINMETA") == line){ /* Extract meta data*/
+               _sin->rdbuf()->sputn(line.c_str(), line.length());
+               ParamContainer pm;
+               ReadMeta(pm);
+               if (!_drop_meta) data->Init(pm);
+            } else if (string("BEGINDATA") == line){ /* extract binary data */
+               *_sin >> size;
+               cout << "size: " <<size << endl;
+               buf = (char*) malloc(size);
+               _sin->read(buf, size);
+               cout << "read: " <<_sin->gcount() << endl;
+               /** \bug if we get kicked out by throw, there will be a mem leak */
+            } else
+               break;
+         }
+
+         /* Copy binary data to object */
+         if (buf != NULL){
+            if (size > data->sizeBytes()){
+               free(buf);
+               throw(EParamProblem("Provided data to large for object"));
+            }
+            /* clear memory if necessary */
+            if (size < data->sizeBytes())
+               memset((char*) data->begin(0) + size, 0, data->sizeBytes() - size);
+
+            memcpy((char*) data->begin(0), buf, size);
+
+            free(buf);
+
+            _freadsize = size;
+         }
+      } else
+         throw(EIncompatible("No input stream set!"));
+   }
+
+   /**
     * Write raw binary data.
     * 
     * Version for single stride of Vector.
@@ -467,19 +577,25 @@ namespace QDLIB {
    template <class C>
    void  FileSingle<C>::ReadMeta(ParamContainer &p)
    {
-      string name;
       
-      name = _name + METAFILE_SUFFIX;
-      
-      if ( !p.ReadFromFile(name) ) {
-         /* try again, but remove trailing underscore + further chars */
-         if (_name.rfind('_') != string::npos) {
-            name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
-            
-            if ( !p.ReadFromFile(name) )
+      if (_type == stream){
+         /* strip metadata from stream */
+         if (_sin != NULL) p.Parse(*_sin, "ENDMETA");
+      } else { /* Try to obtain meta data from associated file */
+         string name;
+
+         name = _name + METAFILE_SUFFIX;
+
+         if ( !p.ReadFromFile(name) ) {
+            /* try again, but remove trailing underscore + further chars */
+            if (_name.rfind('_') != string::npos) {
+               name = _name.substr(0,_name.rfind('_')) + METAFILE_SUFFIX;
+
+               if ( !p.ReadFromFile(name) )
+                  throw( EIOError("Can not read meta file", name + " or " + _name) );
+            } else {
                throw( EIOError("Can not read meta file", name + " or " + _name) );
-         } else {
-            throw( EIOError("Can not read meta file", name + " or " + _name) );
+            }
          }
       }
    }
@@ -560,17 +676,21 @@ namespace QDLIB {
    void FileSingle<C>::WriteFile(C *data)
    {
       
-       switch(_type){
-         case binary:
-	        if (data->strides() == 1)
+       switch (_type) {
+            case binary:
+               if (data->strides() == 1)
                   _WriteFileBinary(data);
-		else _WriteFileBinaryStrided(data);
-         break;
-	 case ascii:
+               else _WriteFileBinaryStrided(data);
+               break;
+            case stream:
+               if (data->strides() > 1) throw(EIncompatible("Stream storage not implemented for strided data"));
+               _WriteFileStream(data);
+               break;
+            case ascii:
                throw(Exception("ASCII Unsupported"));
-	 case hdf5:
+            case hdf5:
                throw(Exception("HDF5 Unsupported"));
-      }
+         }
    }
 
    /**
@@ -581,15 +701,18 @@ namespace QDLIB {
     * \todo Add a check to meta data, for right class name
     */
    template <class C>
-         void FileSingle<C>::ReadFile(C *data)
+   void FileSingle<C>::ReadFile(C *data)
    {
       switch(_type){
-         case binary:
+            case binary:
                _ReadFileBinary(data);
-         break;
-	 case ascii:
+               break;
+            case stream:
+               _ReadFileStream(data);
+               break;
+            case ascii:
                throw(Exception("ASCII Unsupported"));
-	 case hdf5:
+            case hdf5:
                throw(Exception("HDF5 Unsupported"));
       }
    }   

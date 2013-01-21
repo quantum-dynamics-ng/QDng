@@ -26,7 +26,7 @@ endif
 SUBDIRS = fft linalg math modules qdlib slatec tools lib simpleXml $(OPT_DIRS)
 
 bin_PROGRAMS = qdng qdz
-qdng_SOURCES = CmdHandler.cpp GlobalOpList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
+qdng_SOURCES = CmdHandler.cpp GlobalOpList.cpp GlobalWFList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
 	ProgOCT.cpp ProgPropa.cpp Reporter.cpp ProgFilter.cpp qdng.cpp
 qdng_LDADD =  $(top_builddir)/src/lib/libqdng.la $(LAPACK_LIBS) $(BLAS_LIBS) $(FFTW_LIBS) $(top_builddir)/src/simpleXml/libsimplexml.la $(DL_LIBS) 
 				 
@@ -35,7 +35,7 @@ qdng_LDFLAGS = -Wl,-export-dynamic
 qdz_SOURCES = qdz.cpp
 qdz_LDADD = $(top_builddir)/src/lib/libqdng.la $(LAPACK_LIBS) $(BLAS_LIBS) $(FFTW_LIBS) $(DL_LIBS)
 
-noinst_HEADERS = GlobalOpList.h ChainLoader.h FiltersList.h ProgAutocorr.h \
+noinst_HEADERS = GlobalOpList.h GlobalWFList.h ChainLoader.h FiltersList.h ProgAutocorr.h \
 	ProgEigen.h ProgPropa.h Reporter.h ProgOCT.h ProgFilter.h CmdHandler.h
 
 

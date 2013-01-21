@@ -43,6 +43,8 @@
 using namespace std;
 using namespace QDLIB;
 
+#define QDNG_INPUT_BUFFER 4096
+
 /**
  * Show the version information.
  */
@@ -117,113 +119,27 @@ void CheckInput(string &name)
  */
 void RunProgrammes(const string& name, const string& dir)
 {
-   Logger& log = Logger::InstanceRef();
-   ParamContainer& gp = GlobalParams::Instance();
-
-   XmlParser XMLfile;
-   XmlNode rnodes;
-   XmlNode *prognodes;
-
-   time_t wall_time;
-   struct tms proc_time, proc_time_new;
-
    /* Check for input format */
    string fname = name;
    CheckInput(fname);
 
-   /* Open input file and check programm nodes */
-   XMLfile.Parse(fname);
+   fstream infile;
+   infile.open(name.c_str(), fstream::in);
 
-   rnodes = XMLfile.Root();
+   char* buf = (char*) malloc(QDNG_INPUT_BUFFER);
+   size_t size = 0;
 
-   /* enables multiple programm nodes*/
-   if (rnodes.Name() == "multi" || rnodes.Name() == "qdng") {
-      /* Read out global attributes/parameters */
-      gp += rnodes.Attributes();
-      prognodes = rnodes.NextChild();
-   } else prognodes = &rnodes;
+   /* Read clean XML input */
+   while (! infile.eof() ){
+      if (size > 0) buf = (char*) realloc(buf, size + QDNG_INPUT_BUFFER);
 
-   /* Look for global Operator definitions */
-   if (prognodes->Name() == "opdefs") {
-      XmlNode *opdefs = prognodes->NextChild();
-      if (opdefs != NULL) {
-         log.Header("Loading global operator definitions", Logger::Section);
-         while (opdefs->EndNode()) {
-            Operator *O;
+      infile.read(buf+size, QDNG_INPUT_BUFFER);
 
-            log.Header(opdefs->Name(), Logger::SubSection);
-            log.IndentInc();
-            if (opdefs->Name() == "udef") {
-               O = ChainLoader::LoadPropagator(opdefs, true);
-            } else if (opdefs->Name() == "opdef") {
-               O = ChainLoader::LoadOperatorChain(opdefs, true);
-            } else {
-               throw(EParamProblem("Unknown definition type: ", opdefs->Name()));
-            }
-            O = O;
-            log.IndentDec();
-            opdefs->NextNode();
-            log.cout() << endl;
-         }
-      }
-      prognodes->NextNode();
-
-      if (log.Debug())
-         log.cout() << endl;
-      log.Header("Internal Operator list", Logger::SubSection);
-      log.IndentInc();
-      GlobalOpList::Instance().PrintList();
+      size += infile.gcount();
    }
 
-   if (prognodes == NULL)
-      throw(EParamProblem("Empty parameter file provided"));
-
-   /* Loop over program nodes */
-   while (prognodes->EndNode()) {
-      wall_time = times(&proc_time);
-      wall_time = time(NULL);
-      string progname = prognodes->Name();
-      if (progname == "propa") {
-         ProgPropa propa(*prognodes);
-         propa.SetDirectory(dir);
-         log.Header("Propagation", Logger::Chapter);
-         propa.Run();
-      } else if (progname == "filter") {
-         ProgFilter filter(*prognodes);
-         filter.SetDirectory(dir);
-         log.Header("Filter", Logger::Chapter);
-         filter.Run();
-      } else if (progname == "eigen") {
-         ProgEigen eigen(*prognodes);
-         eigen.SetDirectory(dir);
-         log.Header("Eigenfunctions calculation", Logger::Chapter);
-         eigen.Run();
-      } else if (progname == "oct") {
-         ProgOCT oct(*prognodes);
-         oct.SetDirectory(dir);
-         log.Header("Optimal control theory", Logger::Chapter);
-         oct.Run();
-      } else if (progname == "densmat") {
-         throw(EParamProblem("Density matrix propagation not implementet yet"));
-      } else {
-         throw(EParamProblem("Programm type not known ", progname));
-      }
-
-      /* Show memory consumption */
-      log.cout() << "\nMaximum amount of memory used: " << Memory::Format(Memory::Instance().MaximumSizeUsed()) << endl;
-
-      /* Show time consumption */
-      log.cout().precision(0);
-      log.cout() << "\nWall time: " << fixed << difftime(time(NULL), wall_time) << " s";
-
-      wall_time = times(&proc_time_new);
-      log.cout() << "\tCPU time: "
-               << double(proc_time_new.tms_utime - proc_time.tms_utime) / double(sysconf(_SC_CLK_TCK)) << " s";
-      log.cout() << "\tSYS time: "
-               << double(proc_time_new.tms_stime - proc_time.tms_stime) / double(sysconf(_SC_CLK_TCK)) << " s \n\n";
-
-      prognodes->NextNode();
-   }
+   CmdHandler::RunXML(buf, size,  dir);
+   free(buf);
 }
 
 /**
@@ -350,10 +266,6 @@ int main(int argc, char **argv)
 
    show_version();
 
-   if (CmdMode) { /* */
-
-   }
-
    /* This is the global try-catch block */
    try {
 
@@ -398,7 +310,9 @@ int main(int argc, char **argv)
       show_memory_info();
 
       if (CmdMode) { /* */
-
+         log.cout() << "Running in interactive mode" << endl;
+         CmdHandler cmd(cin, cout);
+         cmd.RunInteractive("");
       } else
          RunProgrammes(fname, dir);
 

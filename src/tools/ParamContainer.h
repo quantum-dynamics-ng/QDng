@@ -97,7 +97,7 @@ typedef map<string,string> string_map;
 	 ParamContainer& operator=(const ParamContainer &params);
 	 ParamContainer& operator+=(const ParamContainer &params);
 
-    void Parse(istream &stream);
+    void Parse(istream &stream, const char* eof = NULL);
     bool ReadFromFile(const string& name);
 
     void Write(ostream& stream, bool with_types = false);

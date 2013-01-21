@@ -706,7 +706,13 @@ namespace QDLIB {
       return *this;
    }
    
-   void ParamContainer::Parse(istream &stream)
+   /**
+    * Parse ParamContainer from a stream.
+    *
+    * \param eof if eof is non-NULL then eof string marks the end.
+    * otherwise it will continue reading from the stream until a real end-of file is reached.
+    */
+   void ParamContainer::Parse(istream &stream, const char* eof)
    {
       string s;
       char line[MAX_LINE_LENGTH];
@@ -717,6 +723,9 @@ namespace QDLIB {
          //if (file.fail()) return false;
 
          s.assign(line);
+
+         if (eof != NULL)
+            if (s == eof) break;
 
          pos = s.find("="); // Delimiter between Key Val is always =
 

@@ -2,6 +2,8 @@
 #define TYPEDEFS_H
 
 
+#include "stdlib.h"
+
 namespace QDLIB {
                
    /**
@@ -11,7 +13,7 @@ namespace QDLIB {
     * Helps us to avoid potential size problems
     * 
     */
-   typedef  int lint;
+   typedef int lint;
 }
 
 

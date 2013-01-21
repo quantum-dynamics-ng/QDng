@@ -13,6 +13,8 @@
 #include "qdlib/WFMultistate.h"
 #include "qdlib/FileWF.h"
 
+#include "GlobalWFList.h"
+
 namespace QDLIB
 {
    
@@ -164,6 +166,7 @@ namespace QDLIB
     * 
     * \li coeff   Coefficient in LC
     * \li coeff2  Coefficient squared  in LC
+    * \li phase   Apply a phase factor (in units of pi)
     * 
     */
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, int seqnum)
@@ -172,7 +175,7 @@ namespace QDLIB
       Logger& log = Logger::InstanceRef();
       
       ParamContainer pm;
-      string name;
+      string name, key;
       WaveFunction *WF=NULL;
       XmlNode *child;
       bool onoff;
@@ -180,6 +183,9 @@ namespace QDLIB
       pm = WFNode->Attributes();
       pm.GetValue( "name", name );
       
+      if (pm.isPresent("key"))      /* Check for a key to store in the Global WF container */
+         pm.GetValue("key", key);
+
       if (name == "Multistate"){ /* Further recursion for multistate WF */
 	 log.cout() << "Multi state wave function:" << endl;
 	 log.IndentInc();
@@ -275,7 +281,7 @@ namespace QDLIB
 	    WF->Normalize();
 	 }
 	 log.IndentDec();
-	 return WF; 
+
       } else { /* load a specific wf */
 	 string fname;
 	 
@@ -326,6 +332,13 @@ namespace QDLIB
 	 if ( name.length() == 1 ) log.cout() << WF->Params() << endl;
 	 log.cout() << pm << "------------------\n" << endl;
       }
+
+      /* Add to global container */
+      if (! key.empty()){
+         GlobalWFList& wflist = GlobalWFList::Instance();
+         wflist.Add(key, WF, true);
+      }
+
       return WF;
    }
    

@@ -9,7 +9,7 @@ if HAVEOPENMP
 endif
 
 
-noinst_HEADERS = ComplexNumbers.h TmpFileTest.h MatrixTest.h LapackTest.h GridSystem.h FileWFTest.h MultElementsTest.h \
+noinst_HEADERS = ComplexNumbers.h TmpFileTest.h FIFOTEst.h MatrixTest.h LapackTest.h GridSystem.h FileWFTest.h MultElementsTest.h \
         PeakFinderTest.h FFTnTest.h ParamContainerTest.h \
 	OGridHarmonic.h OGridNablaSqTest.h OGridNablaTest.h QDClock.h TestCheby.h \
 	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
@@ -20,7 +20,7 @@ noinst_HEADERS = ComplexNumbers.h TmpFileTest.h MatrixTest.h LapackTest.h GridSy
 noinst_PROGRAMS = runtest mpitest
 
 runtest_SOURCES = MemoryTest.cpp ComplexNumbers.cpp ParamContainerTest.cpp \
-    TmpFileTest.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
+    TmpFileTest.cpp FIFOTEst.cpp Vector.cpp TestViews.cpp TestViews.h MultElementsTest.cpp \
 	dVecMinMax.cpp dVecMinMax.h PeakFinderTest.cpp MatrixTest.cpp LapackTest.cpp GridSystem.cpp FileWFTest.cpp QDClock.cpp \
 	FFTnTest.cpp \
 	WFLevelTest.cpp WFBufferTest.cpp OHermitianMatrixTest.cpp OMatDipoleTest.cpp OGridNablaSqTest.cpp OGridNablaTest.cpp OGridHOFDTest.cpp \

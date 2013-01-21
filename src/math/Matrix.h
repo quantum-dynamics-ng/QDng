@@ -43,7 +43,7 @@ namespace QDLIB {
 	 lint rows() const { return _m;}
 	 lint cols() const { return _n;}
 	 
-	 lint sizeBytes();
+	 size_t sizeBytes();
 	 lint strides() {return 1;}
 	 void SyncStrides() {}
 
@@ -88,7 +88,7 @@ namespace QDLIB {
       _col = new T*[_n];
       
       /* init col pointers */
-      for(int i=0; i < _n; i++){
+      for(lint i=0; i < _n; i++){
          _col[i] = &(_v[i*_m]);
 	 
       }
@@ -164,7 +164,7 @@ namespace QDLIB {
    }
 	 
    template <class T>
-   lint Matrix<T>::sizeBytes()
+   size_t Matrix<T>::sizeBytes()
    {
       return _mn * sizeof(T);
    }

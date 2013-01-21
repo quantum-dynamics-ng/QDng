@@ -72,12 +72,19 @@ namespace QDLIB{
          case ENOSPC:
                s = "No space left on device";
             break;
+         case ENAMETOOLONG:
+               s = "File name too long";
+            break;
+         case EROFS:
+               s = "Access to read-only fs";
+            break;
          default:
             s = "Error in accessing file";
+            break;
       }
       SetMessage(s + ": " + name);
    }
-   
+
    EIncompatible::EIncompatible(const char * message, const string & name)
    {
       string s = string(message) + ": " + name;
