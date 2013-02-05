@@ -1,0 +1,1070 @@
+\documentclass[a4paper,12pt]{scrbook}
+\usepackage[utf8]{inputenc}
+\usepackage{environ}
+\usepackage{amsmath}
+
+%% Macros
+\newcommand{\option}[2]{\item \texttt{#1}\\ #2}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\NewEnviron{options}{\subsubsection*{Options}{\begin{itemize}\BODY\end{itemize}}}
+
+
+\NewEnviron{example}{\subsubsection*{Example}
+\begin{verbatim}
+  \BODY
+\end{verbatim}
+}
+
+
+\title{QDng Docomentation}
+\author{Markus Kowalewski}
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\chapter{Input Format}
+\section{Input files}
+The native QDng input format is XML but there is simplified version which allows
+for easier typing:
+\begin{verbatim}
+ qndg { attr1=value1 attr2="More_Complex/Value"
+   prog1 {
+     ...
+   }
+}
+\end{verbatim}
+is equivalent to 
+\begin{verbatim}
+<qdng attr1="value1" attr2="More_Complex/Value"
+   <prog1>
+     ...
+   </prog1>
+</qdng>
+\end{verbatim}
+Values containing only letters, numbers, and the characters \verb|.-_:| need not to
+be quoted.
+
+\section{Operator References}
+To save memory and initialization time it is possible to define access keys to operators
+so that they can be reused at another place in the programm. By adding the option \verb|key|
+to an operator it is given a reference. Instead of re-defining the operator in another place
+it can be re-used with \verb|ref|.
+
+For example in a multistate system the kinetic hamiltonian
+is only needed once:
+\begin{verbatim}
+hamiltonian { name=Multistate
+   m0.0 { name=Sum
+      Tkin {name=GridNablaSq dims=1 mass0=1763.2 key=T}
+      Vpot {name=GridPotential file="potX"}
+   }
+   m1.1 { name=Sum
+      Tkin {ref=T}
+      Vpot {name=GridPotential file=potA}
+   }
+} 
+\end{verbatim}
+
+Operators can also be defined globaly in an extra \verb|opdefs| section to make them
+available in several subprograms. The entries are called \verb|opdef| for normal operators
+and \verb|udef| for propagators:
+\begin{verbatim}
+qdng {
+   opdefs {
+      opdef {name=GridNablaSq dims=1 mass0=1763.2 key=T}
+      opdef {name=GridPotential file="../../tests/GridPot0" key=V}
+   }
+   eigen {dt="5" steps="1000" Nef="10" dir="TGE-GSPO-im" method="imag"
+           propagator {name="GSPO"
+                 A {ref=T}
+                 B {ref=V}
+           }
+           wf {file="../../tests/GridGauss" normalize="true"}
+   }
+   eigen {dt="5" steps="2048" dir="TGE-GSPO-ac" method="ac"
+           propagator {name="GSPO"
+                 A {ref=T}
+                 B {ref=V}
+           }
+           wf {name="LC" normalize="true"
+              wf0 {file="TGE-GSPO-im/ef_0"}
+              wf1 {file="TGE-GSPO-im/ef_1"}
+              wf2 {file="TGE-GSPO-im/ef_2"}
+              wf3 {file="TGE-GSPO-im/ef_3"}
+              wf4 {file="TGE-GSPO-im/ef_4"}
+              wf5 {file="TGE-GSPO-im/ef_5"}
+           }
+   }
+}
+\end{verbatim}
+
+\section{Variables and Loops}
+TODO
+\begin{verbatim}
+for $loopvar = <begin> <end> [step]
+{
+....
+}
+\end{verbatim}
+
+\begin{verbatim}
+$a = "1234"
+$(a)
+$(a) %.2f
+\end{verbatim}
+
+\begin{verbatim}
+for $delay = 1 5 {
+   propa { dt="2" steps="2000" wcycle="2000" dir="propa" ~ $(delay) 
+      propagator { name="Cheby"
+         hamiltonian { name="Sum"
+            A { name="HermitianMatrix" file="LevelH2mat"}
+            B { name="MatDipole" file="LevelDIPmat" laser= "Laser_" ~ $(delay) %.2f }
+         }
+      }
+      wf { name="Level" file="Level_ef_0"}
+   }
+} 
+\end{verbatim}
+
+
+\chapter{Data Format}
+
+\section{Raw Data with Additional Meta-Data}
+\section{Protobuf format}
+Not implemented yet.
+
+\chapter{Main Programms}
+
+\begin{verbatim}
+qdng [ -d output directory] [-p cpus] <input file> [var1=val1] ... [varN=valN] 
+\end{verbatim}
+
+\subsection{Global Options}
+Global options can be given in several locations:
+\begin{itemize}
+ \item directly in the input file.
+ \item in ~/.qdconfig (as key-value file).
+ \item in .qdconfig in the current directory (as key-value file).
+\end{itemize}
+
+\begin{options}
+ \option{debug}{Print more information.}
+ \option{modpath}{Search path for dynamic loadable modules.}
+\end{options} 
+
+\subsubsection{Buffers}
+\begin{options}
+ \option{MaxBufferSize}{Buffer size for wave function buffers. Used for example in SIL and OCT. The value is in bytes but
+ can suffixed by K,M or G.}
+ \option{tmpdir}{Path for on-disk buffer files.}
+\end{options}
+
+\subsubsection{Compression}
+\begin{options}
+ \option{compress}{Turn on/off wave function compression [false].}
+ \option{comptol}{Tolerance value for seting values to zero.}
+ \option{complevel}{Compression level like defined in zlib/bzip2 (1=fast, 9=best but slow).}
+ \option{compmethod}{Method ot use. Chose ZLIB or BZIP [ZLIB].}
+\end{options}
+
+\subsubsection{FFTW}
+\begin{options}
+ \option{wisdom}{File name for reading wisdom [wisdom].}
+ \option{wisdomsave}{File name for saving wisdom [wisdom].}
+ \option{fftwOptimize}{Try to optimize fft strategy. This can take some time but accelerate large ffts.}
+\end{options}
+
+
+\section{Propagation}
+Wave function propagation.
+\subsubsection*{Standard}
+\begin{options}
+\option{dt}{time step. A negative time step means backward propagagation. (required)}
+\option{steps}{number of time steps (required)}
+\option{wcycle}{number of step to make until a wf will be written.}
+\option{fname}{basename for the propagated files [WF].}
+\option{start}{Index for the first written wave function (default: 0). if $>0$ the initial wave function is not written.}
+\option{dir}{Output directory.}
+\end{options}
+
+\subsubsection*{Printing}
+\begin{options}
+\option{norm}{Print norm in the report [true].}
+\option{nfile}{Filename -- write norm to seperate file. If not given the norm is printed to stdout.}
+\option{energy}{Print the Energy in the report [true].}
+\option{proj0}{Print the projection against in the initial wave function [false].}
+\option{proj0Abs}{Print the absolute square of the projection against in the initial wave function [false].}
+\option{spectrum}{Filename -- if given a the projection against the inital wavefunction is turned on, the power spectrum of the propagagation will be written.}
+\end{options}
+
+A \verb|propagator| and \verb|wf| section is needed to define the problem. Optional the initial condition can
+be modified with in the \verb|filterinit| section. For analyzing or midifieng the results before and after each time step
+the \verb|filterpre| and \verb|filterpost| sections can be used. For details see sec. \ref{sec:Filters}.
+
+\subsubsection*{Examples}
+A simple propagation of super position in a 2D system:
+\begin{verbatim}
+<propa dt="5" steps="10" wcycle="10>
+   <propagator name="SPO">
+         <Tkin name="GridNablaSq" mass="1.5979,1.0645"/>
+         <Vpot name="GridPotential" file="pot_file"/>
+   </propagator>
+   <wf name="LC">
+        <wf name="GridCartesian" file="ef_0"/>
+        <wf name="GridCartesian" file="ef_1"/>
+   </wf>
+</propa> 
+\end{verbatim}
+
+Propagation of a 1D System. The eigenfunction is given a momentum of -5 au before starting the
+propagation. The position and momentum expetation values are evaluated after every time step:
+\begin{verbatim}
+<propa dt="16" steps="4096" wcycle="1000" dir="propa_kick"
+ nfile="norm" spectrum="autocorr">
+        <propagator name="GSPO">
+              <A name="GridNablaSq" mass="1763.2"/>
+              <B name="GridPotential" file="potX"/>[false|true] Integriert über den Wert über die Zeitschritte auf.
+        </propagator>
+        <wf name="LC" normalize="true">
+                <wf file="ef_0"/>
+        </wf>
+        <filterinit>
+                <apply name="GridKick" k="-5"/>
+        </filterinit>
+        <filterpost>
+                <expeconly name="GridMomentum"/>
+                <expeconly name="GridPosition"/>
+        </filterpost>
+</propa> 
+\end{verbatim}
+
+
+\section{Eigenvalues}
+Find the Eigenvalues to given operator.
+
+\begin{options}
+\option{method}{Method to use: \code{imag} imaginary time propagation, \code{ac} project efs from autocorrelatin, \code{lanczos} obtain efs by lanczos iterations.}
+\option{dt}{Time step.}
+\option{dir}{Output directory.}
+\option{fname}{Basename for eigenfunction files [ef].}
+\option{ename}{Alternative name for energy.dat}
+\option{diag}{diagonalize hamiltonian in ef basis [true for method imag].}
+\end{options}
+
+\subsubsection*{Imaginary time propagation}
+See \cite{Ezer86} for the basic method.
+\begin{options}
+\option{steps}{Maximum number of time steps [10000].}
+\option{conv}{Convergence criteria for im-propagation [$10^{-5}$ if diag=true, $10^{-8}$ if diag=false].}
+\option{Nef}{Number of efs to calculate [20].}
+\option{start}{Continue an aborted ef calculation.}
+\end{options}
+
+\subsubsection*{Autocorrelation}
+\begin{options}
+\option{steps}{Number of time steps [10000].}
+\option{tol}{Tolerance value for finding peaks in the eigen value specrum[1].}
+\option{read}{Read finished propagation. If \code{read} specifies a directory name then the needed information is obtained form \code{Propagation.meta}.}
+\end{options}
+
+
+\subsubsection*{Examples}
+\begin{verbatim}
+ eigen {dt=10 steps=10000 ncycle=1 Nef=20 conv=1e-10 dir="ef_test"
+   propagator {name=GSPO
+         A {name=GridNablaSq mass=1728.4}
+         B {name=GridPotential file="pot"}
+   }
+    wf { file="guess"}
+}
+\end{verbatim}
+Or with the Chebychev propagator:
+\begin{verbatim}
+eigen {dt=10 steps=10000 ncycle=1 Nef=20 conv="1e-10" dir="ef_test"
+   propagator {name=Cheby
+         hamiltonian {name=Sum
+            A {name=GridNablaSq mass=1728.4}
+            B {name=GridPotential file="pot"}
+         }
+   }
+    wf { file="guess" }
+}
+\end{verbatim}
+
+
+\section{Filters}
+The filter programm is used to analyze a propagation produced by the \verb|propa|.
+\begin{options}
+\option{path}{Path to propagated fieles.}
+\option{dir}{Output Directory.}
+\option{fname}{File name for table [\code{expec.dat}]}
+\end{options}
+
+
+\subsubsection*{Examples}
+Analyze a 2D propagation postpone:
+\begin{verbatim}
+qdng {
+      filter { path="propa_0.2" dir="analyze_0.2"
+           filterdef {
+            expeconly { name=GridPosition dim=0 key=x0 header="<x0>"}
+            expeconly { name=GridPosition dim=1 key=x1 header="<x1>"}
+            expeconly { name=Product header="<x0^2>"
+                        A { ref=x0 }
+                        B { ref=x0 }
+                      }
+            expeconly { name=Product header="<x1^2>"
+                        A { ref=x1 }
+                        B { ref=x1 }
+                      }
+            expeconly { name=GridMomentum dim=0 key=p0 header="<p0>"}
+            expeconly { name=GridMomentum dim=1 key=p1 header="<p1>"}
+            expeconly { name=Product header="<p0^2>"
+                        A { ref=p0 }
+                        B { ref=p0 }
+                      }
+            expeconly { name=Product header="<p1^2>"
+                        A { ref=p1 }
+                        B { ref=p1 }
+                      }
+                   }
+          }
+} 
+\end{verbatim}
+
+Cut out one half of the grid and analyze the results:
+\begin{verbatim}
+qdng {                                                                                                                                       
+   opdefs {                                                                                                                                  
+      opdef { name=GridGMat dims=2 gmat="gm" coup=true key=T }                                      
+      opdef { name=GridPotential file="pot-clip-0.2" key=V }                                        
+      opdef { name=Gobbler dims=2 rp0="0" order=50 residue=true key=GR }                                                                     
+      opdef { name=GridPosition dim=0 key=x0 }                                                                                               
+      opdef { name=GridPosition dim=1 key=x1 }                                                                                               
+      opdef { name=GridMomentum dim=0 key=p0 }                                                                                               
+      opdef { name=GridMomentum dim=1 key=p1 }                                                                                               
+   }                                                                                                                                         
+   filter { path="propa_0.7" dir="0.7" fname="expec_right"                                         
+      filterdef {                                                                                                                  
+	    expec { ref=GR header="fraction" }                                                                              
+	    normalize {}                                                                                                    
+	    expeconly { ref=x0 header="<x0>"}                                                                               
+	    expeconly { ref=x1 header="<x1>"}                                                                               
+	    expeconly { ref=p0 header="<p0>"}                                                                               
+	    expeconly { ref=p1 header="<p1>"}                                                                               
+	    expeconly { ref=T header=T}                                                                                     
+	    expeconly { ref=V header=V}                                                                                     
+      }                                                                                                                  
+   }
+}
+\end{verbatim}
+
+
+\subsection{Defining Filter Lists}
+\label{sec:Filters}
+Filter lists are evaluated from top to bottom.
+
+\subsubsection*{Sections}
+\begin{options}
+\option{expec}{Apply operator and show expectation value.}
+\option{apply}{Just apply the operator.}
+\option{expeconly}{Only show the expectation value. Don't modify the wave function.}
+\option{normalize}{Normalize the wave function. No further options needed.}
+\end{options}
+
+Every filter can also take some options:
+\begin{options}
+\option{header}{Text to appear in coloumn header [operator name].}
+\option{value}{Represenation of the expectation value to plot (real$|$imag$|$complex) .}
+\option{int}{Accumulate values [false].}
+\end{options}
+
+
+\section{Optimal Control Theory}
+The OCT programm supports Multi Target OCT with various methods:
+\begin{itemize}
+ \item The Krotov algorithm like described in \cite{Palao03}.
+ \item The similar alogrithm with a zero refence field from \cite{Zhu98}.
+ \item A feedback driven algorithm designed for operator targets \cite{Zhu98FB}.
+ \item Krotov with restrictions in the frequency domain \cite{Gollub08,Gollub10}.
+\end{itemize}
+
+\begin{options}
+\option{dt}{time step}
+\option{steps}{number of time steps}
+\option{dir}{Output directory}
+\option{method}{OCT method to use [krotov$|$rabitz$|$freq$|$rabitzfb] (default krotov)}
+\option{coup}{The type of coupling to optimize [dipole]}
+\option{ttype}{target type [operator,overlap]}
+\option{phase}{phase sensitive objective. false makes only sense with overlapp target!!! [true|false] (default false)}
+\option{ntargets}{Number of targets}
+\option{alpha}{The Field restriction value}
+\option{iterations}{Maximum number of iterations (default 50)}
+\option{conv}{Target convergence. Stop iterating if below convergence (default 10-5)}
+\option{shape}{Name of the temporal shapefile}
+\option{writel}{Write laser in every iteration to file (default false)}
+\option{yfile}{Write the yield table to seperate file (default false)}
+\end{options}
+It is possible have more than one laser field in the input. Usually the OCT programm
+is looking for laserfields in the Hamiltonian. If you want some of them to be fixed e.g. not in
+the included in the optimization labeling has to be used.
+In that case the active fields have to marked with an attribute \verb|label=OptLaser|.
+
+Needed sections in the input:
+\begin{itemize}
+ \option{propagator}{}
+ \option{wfi<index>}{One or more initial wave functions.}
+ \option{wft<index>}{The respective number of target wave functions if \code{ttype=overlap}.}
+ \option{target}{A target operators if \code{ttype=operator}.}
+\end{itemize}
+
+
+
+\subsubsection*{Examples}
+Simple IR transition from $v=0$ to $v=1$:
+\begin{verbatim}
+oct {alpha="1" dt="10" steps="3000" shape="shape" iterations="30" writel="true"
+     method="krotov"
+        propagator {name="GSPO"
+               A {name="GridNablaSq" mass="1715.65"}
+               B {name="GridPotential" file="potX"}
+               C {name="GridDipole" file="dipmom" laser="guess_laser"}
+        }
+        wfi0 {name="GridCartesian" file="ef_0" normalize="true"}
+        wft0 {name="GridCartesian" file="ef_1" normalize="true"}
+} 
+\end{verbatim}
+
+
+\chapter{Operator modules}
+\section{Propagators}
+
+\begin{center}
+ \begin{tabular}{lll}
+ \hline\hline
+  Propagator & time step & non-hermitian $\hat H$ \\\hline
+  Split operator (GSPO) & short & yes \\
+  Cheby & long &  yes \\
+  Short Iterative Lanczos SIL & short & no \\
+  Arnoldi & short & yes \\
+  RK4 & very short & yes \\\hline\hline
+ \end{tabular}
+\end{center}
+
+\subsection{GSPO}
+General split operator scheme:
+\begin{equation}
+\label{eq:defSPO}
+\hat U = e^{-i(\hat A+ \hat B+..)dt} = e^{-\frac{i}{2} .. dt} e^{-\frac{i}{2} \hat B dt} e^{-i \hat A dt} e^{-\frac{i}{2} \hat B dt} e^{-\frac{i}{2} .. dt}
+\end{equation}
+The Propagator takes operators which has a diagonal represenation available.
+The sections are named according to the operator names in \ref{eq:defSPO}. Where $A$ is always the inner operator.
+If operators $C$ and higher are used they have to commute with $B$ to valid.
+The corresponding Hamiltonian is: $\hat H = A + B + ...$.
+% Multiple electronic states are possible via ODMultistate
+
+\subsubsection*{Examples}
+Propagation on a one dimensional grid.
+\begin{verbatim}
+propa {dt="4" steps="4"
+    propagator {name="GSPO"
+       A {name="GridNablaSq" mass="1763.2"}
+       B {name="GridPotential" file="potX"}
+    }
+    wf0 {name="GridCartesian" file="ef_0"}
+}
+\end{verbatim}
+% Two electronic states with diabatic coupling. \textbf{Example is may be broken.}
+% \begin{verbatim}
+% <propa dt="4" steps="4">
+%         <propagator name="GSPO">
+%         <A name="DMultistate">
+%                 <m0.0 name="GridNablaSq" dims="1" mass0="1763.2"/>
+%                 <m1.1 name="GridNablaSq" dims="1" mass0="1763.2"/>
+%         </A>
+%         <B name="DMultistate">
+%                 <m0.1 name="GridPotential" file="nacmeCD"/>
+%                 <m1.0 name="GridPotential" file="nacmeCD"/>
+%         </B>
+%         <C name="DMultistate">
+%                 <m0.0 name="GridPotential" file="potX"/>
+%                 <m1.1 name="GridPotential" file="potA"/>
+%         </C>
+%         </propagator>
+%         <wf name="Multistate" states="2" normalize="true">
+%                 <wf0 name="GridCartesian" file="ef_4"/>
+%         </wf>
+% </propa> 
+% \end{verbatim}
+
+\subsection{Cheby}
+The Chebychev propagator \cite{Ezer84} needs a subsection \verb|hamiltonian|.
+Suitable and very efficient for long time steps. Non-hermitian Hamiltonians are supported.
+\begin{options}
+ \option{order}{desired max order of recursion, if left empty it's chosen automatically.}
+ \option{scaling}{The scaling of the Hamiltonian. Can only be used in combination with order.}
+ \option{prec}{The lower limit precission for the series convergence on the norm: $prec < 1-\langle psi|psi \rangle$}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+<propagator name="Cheby">
+  <hamiltonian name="Sum">
+    <Tkin name="GridNablaSq" dims="1" mass="1763.2"/>
+    <Vpot name="GridPotential" file="potX"/>
+  </hamiltonian>
+</propagator>
+\end{verbatim}
+
+\subsection{Short Iterative Lanczos}
+The SIL propagator \cite{needed} needs a subsection \verb|hamiltonian|.
+Suitable for short time steps or combination with time dependent Hamiltonians.
+Non-hermitian Hamiltonians are not supported.
+\begin{options}
+ \option{order}{Maximum Lanczos basis size [20].}
+ \option{err}{Approximated series error. Series Expansions stops when value is reached [$10^{-12}$]}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+propagator { name=SIL order=32
+   hamiltonian {name=Sum
+      Tkin {name=GridNablaSq mass=1763.2}
+      Vpot {name=GridPotential file=potX}
+   }
+}
+\end{verbatim}
+
+\subsection{Arnoldi}
+Like SIL but supports non-hermitian Hamiltonians
+
+\begin{options}
+ \option{order}{Maximum Lanczos basis size [20].}
+ \option{conv}{Approximated series error. Series Expansions stops when value is reached [$10^{-10}$]}
+\end{options}
+
+\subsection{RK4}
+This is for testing purposes only. Impletments a fourth order Runge-Kutta propagation scheme.
+Can be us with non-hermitian and time dependent Hamiltonians. Note no intermediate time steps
+are implementet. $\hat H(t)$ is only evaluated at $t$.
+The RK4 propagator \cite{needed} needs a subsection \verb|hamiltonian|.
+
+\section{General Operators}
+
+\subsection{Sum}
+Represents a sum of other operators.
+
+\subsection{Product}
+Represents a product of other operators.
+Operators are applied in reverse order: Last operator in the list is applied first.
+
+\subsection{Normalize}
+Helper which normalizes a wave function when applied.
+
+\subsection{Scalar}
+Helper which applies a constant to a wave function.
+\begin{options}
+ \option{value}{The constant to apply [1.0]}
+\end{options}
+
+\subsection{Projection}
+Projection operator consisting of a set of given wave functions. The set is read from
+a series of existing wf files.
+\begin{equation}
+ \hat P = \sum_i |\phi_i\rangle \langle \phi_i|
+\end{equation}
+or
+\begin{equation}
+ \label{eq:InvProj}
+ \hat Q = 1 - \hat P
+\end{equation}
+\begin{options}
+\option{positive}{Set the sign of the projector (false=negative) [\code{true}].}
+\option{files}{Read wavefunctions set $\{\phi_i\}$ from a sequence of files. give base name here.}
+\option{num}{Number of files to read [1].}
+\option{start}{Start with index [0].}
+\option{step}{Step size trough the sequence [1].}
+\option{inv}{Apply the inverse projection operator 1-P like in eq. \ref{eq:InvProj} [false]}
+\end{options}
+
+\section{Multiple electronic states}
+It's possible to combine several electronic states as tensor product. The corresponding multistate
+modules allows for defining the matrix elements and states in freely.
+If an operator is defined as multistate the wave function has to be defined in the same way e.g. same
+number of states (see sec. \ref{sec:WFMultistate}).
+
+The name of the operator is simply \verb|Multistate|. The matrix elements are given in the following way:
+\begin{itemize}
+ \item The indices are encoded in the section name by \verb|m<row>.<col>|.
+ \item The number of states is automatically the maximum index number of the given diagonals.
+ \item Off diagonals are only needed to be given once. They are by default assumed to be the adjoint ($H_{ij} = H_{ji}^\dagger$)
+ \item Every matrix element can be represented by an arbitrary operator.
+ \item Empty off-diagonals are zero.
+\end{itemize}
+
+\begin{options}
+ \option{states}{Number of states. Usually chosen automatically. Only needed if the diagonal is sparse.}
+ \option{unity}{Defines howto handle empty diagonal elements. \code{true} treats empty element as 1 [\code{false}].}
+ \option{nonhermitian}{Turn off assumption that $H_{ij} = H_{ji}^\dagger$ (if \code{true}) [\code{false}].}
+\end{options}
+
+
+\subsubsection*{Example}
+Two electronic states coupled a laser field.
+\begin{verbatim}
+ <hamiltonian name="Multistate">
+   <m0.0 name="Sum">
+       <Tkin name="GridNablaSq" mass="1763.2"/>
+       <Vpot name="GridPotential" file="potX.bin"/>
+   </m0.0>
+   <m1.1 name="Sum">
+       <Tkin name="GridNablaSq" mass="1763.2"/>
+       <Vpot name="GridPotential" file="potA.bin"/>
+   </m1.1>
+   <m1.0 name="GridDipole" file="dipXA.bin" laser="Laser290nm_4fs_pp"/>
+</hamiltonian>
+\end{verbatim}
+
+
+\section{Grid Based Operators}
+
+\subsection{Kinetic Energy in Cartesian Coordiantes (GridNablaSq)}
+Kinetic energy operator for cartesian or cartesian-like coordinates.
+\begin{equation}
+ \hat T = -\sum_i \frac{1}{2m_i}\frac{\partial^2}{\partial x_i}
+\end{equation}
+
+\begin{options}
+ \option{dim}{Number of dimensions [\# given in mass]}
+ \option{mass}{Define masses for $m_i$. If mass is $= 0$ means not to apply the operator in that dimension}
+ \option{method}{\code{FFT} or \code{HOFD}.}
+ \option{order}{Finite differencing (FD) order (max. 50) [8].}
+ \option{pbc}{FD periodic boundary conditions [false].}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+ Tkin { name="GridNablaSq" mass="1728.4" }
+\end{verbatim}
+
+\subsection{Perfect Matched Layer (GridPML)}
+Use a cartesian type kinetic energy operator with a perfect matched layer (PML) \cite{Nissen10} as
+absorbing boundary conditions.
+
+\begin{options}
+ \option{dim}{Number of dimensions [\# given in mass]}
+ \option{mass}{Define masses for $m_i$. If mass is $= 0$ means not to apply the operator in that dimension}
+ \option{method}{\code{FFT} or \code{HOFD}.}
+ \option{order}{Finite differencing (FD) order (max. 50) [8].}
+ \option{pbc}{FD periodic boundary conditions [false].}
+ \option{lmap}{PML map: Where to put the PMLs. Give a number for each dimension: 0 = none, 1=begin of grid, 2=end grid, 3=both ends.}
+ \option{gamma}{}
+ \option{thick}{The thickness in number of grid points [10]. One number per dimensions.}
+ \option{k}{Optimal momentum. One number per dimensions.}
+ \option{p}{Mononomial order. One number per dimensions.}
+ \option{smax}{$\sigma_{max}$. Chosen automatically by default.}
+ \option{otol}{Approximated error tolerance at the edge the grid. One number per dimensions.}
+\end{options}
+
+\subsection{Kinetic Energy in the G-Matrix Represenation (GridGmat)}
+Kintec Hamiltonian in G-matrix represenation \cite{Stare03}. With kinetic 
+couplings:
+\begin{equation}
+ T_{kin} = -\frac{\hbar^2}{2} \sum_r^N \sum_s^N \frac{\partial}{\partial q_r} G_{rs}(q) \frac{\partial}{\partial q_s}
+\end{equation}
+without kinetic coupling:
+\begin{equation}
+ T_{kin} = -\frac{\hbar^2}{2} \sum_r^N \frac{\partial}{\partial q_r} G_{rr}(q) \frac{\partial}{\partial q_r}
+\end{equation}
+The Matrix elements can either be given as position dependent elements or they can be constant.
+In the first case they are read from a grid file. The naming scheme is like:
+\begin{itemize}
+ \item \verb|basename_00.op| ($+$ \verb|.meta|)
+ \item \verb|basename_10.op| ($+$ \verb|.meta|)
+ \item \verb|basename_11.op| ($+$ \verb|.meta|)
+\end{itemize}
+The base name for the fiels is defined via \verb|gmat|. Constant elements are given by the \verb|G| option.
+Mixed definitions of position dependent and constant elements are possible.
+
+\begin{options}
+\option{dims}{Number of internal coordiantes.} 
+\option{gmat}{G-matrix element base file name.}
+\option{coup}{Turn on/off kinetic coupling [true].}
+\option{G}{Constant G-matrix elements (given as lower triangular lin. matrix).}
+\option{Gdef}{Define source of matrix elements: c = constant, g = grided, x=none (=0) (given as lower triangular lin. matrix)}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+ Tkin { name="GridGMat" dims="2" gmat="g" }
+\end{verbatim}
+
+\subsection{Potentials (GridPotential)}
+Represents Potentials and other simple grided operators:
+\begin{equation}
+ V(\vec{x}) = \hat O(\vec{x}) \Psi(\vec{x})
+\end{equation}
+The only option needed in the input is \verb|file| to specify the file name (w/o extension).
+The other options are defined in the meta data.
+\begin{options}
+ \option{dims}{Number of dims.}
+ \option{n<dim>}{Number of grid points in dim.}
+ \option{min<dim>}{$x_{min}$ in dim.}
+ \option{max<dim>}{$x_{max}$ in dim.}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+<Vpot name="GridPotential" file="pot"/>
+\end{verbatim}
+Reads the binary grided data set from \verb|pot.op| and the meta data from \verb|pot.meta| which may contain for example:
+\begin{verbatim}
+dims=2
+xmin0=0.9331
+xmax0=2.329
+xmin1=-8.2885
+xmax1=9.3468
+N1 = 256
+N0 = 128
+\end{verbatim}
+
+\subsection{Dipole Operator for Laser Interaction (GridDipole)}
+Impletments an interaction between a dipole and laser field.
+\begin{equation}
+ V_c(\vec{x},t) = -\mu(\vec{x}) E(t)
+\end{equation}
+The dipole moment has the same format as a potential. The laser
+can be either generated or read in from a binary file.
+This operator can be used for infrared exciatations as as for
+the laser coupling between two electronic states.
+
+\begin{options}
+ \option{file}{Read from fiven binary file.}
+ \option{gen}{Indicates that laser should be generated. See sec. \ref{sec:LaserFields} for details.}
+\end{options}
+
+
+\subsubsection*{Example}
+Two electronic states
+\begin{equation}
+ \hat H = \begin{pmatrix}T + V & -\mu E(t) \\ -\mu E(t) & T + V\\\end{pmatrix}
+\end{equation}
+\begin{verbatim}
+<hamiltonian name="Multistate">
+  <m1.0 name="GridDipole" file="dipXA.bin" laser="Laser290nm_4fs_pp"/>
+  <m0.0 name="Sum">
+    <Tkin name="GridNablaSq" mass="1763.2"/>
+    <Vpot name="GridPotential" file="potX.bin"/>
+  </m0.0>
+  <m1.1 name="Sum">
+    <Tkin name="GridNablaSq" mass="1763.2"/>
+    <Vpot name="GridPotential" file="potA.bin"/>
+  </m1.1>
+</hamiltonian>
+\end{verbatim}
+Simple IR interaction
+\begin{equation}
+ \hat H = \hat T + \hat V  -\mu E(t)
+\end{equation}
+\begin{verbatim}
+<hamiltonian name="Sum">
+  <Tkin name="GridNablaSq" mass="1763.2"/>
+  <Vpot name="GridPotential" file="potX"/>
+  <Vcoup name="GridDipole" file="dipX" laser="Laser290nm_4fs_pp"/>
+</hamiltonian>
+\end{verbatim}
+
+\subsection{Two-Photon Raman Laser Interaction (GridRaman)}
+
+\subsection{Flux Operator}
+Propabilty flux through a surface/hyper surface. The formulation
+is kept general and not bound to cartesian coordiantes only.
+\begin{equation}
+ \int_S \vec{j} dV = -\frac{2}{\hbar} \int_V \Im(\Psi^* \hat T \Psi)dV
+\end{equation}
+The operator needs the kinetic operator $T$ and an operator $V$
+defining the enclosing volume element of the surface $S$.
+Give the operators in exactly this order.
+
+\subsubsection*{Example}
+Use it for example in the filter section to collect the outgoing propability:
+\begin{verbatim}
+filterpost {
+  expeconly {
+     name=Flux int=true
+     T { ref=T }
+     G { name=Gobbler dims=1 lp0=5 order=100 }
+  }
+}
+\end{verbatim}
+Collect the outgoing flux of a specific electronic state:
+\begin{verbatim}
+filterpost {
+  expeconly { name=Flux int=true
+    T { name=Multistate states=8 unity=false
+       m3.3 { ref = T}
+      }
+    G { name=Multistate states=8 unity=false
+      m3.3 { name=Gobbler dims=1 lp0=5 order=100 }
+      }
+  }
+}
+\end{verbatim}
+
+\subsection{Momentum Operator}
+Momentum operator:
+\begin{equation}
+ \hat p = \sum_n -i \frac{\partial}{\partial x_n}
+\end{equation}
+
+\begin{options}
+ \option{dim}{If the operator acts only on the given dimension. Default is to sum up over all.}
+\end{options}
+
+\subsection{Position Operator}
+\begin{equation}
+ \hat \vec{x} = \sum_i \hat x_i
+\end{equation}
+
+\begin{options}
+ \option{dim}{If the operator acts only on the given dimension. Default is to sum up over all.}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+filterpost {
+  expeconly { name=Multistate states=2 unity=false 
+    m0.0 { name=GridPosition }
+  }
+}
+\end{verbatim}
+Be careful, a single electronic is not normalized to 1 here.
+
+\subsection{Momentum kick (GridKick)}
+Add momentum $k$ to a wave function
+\begin{equation}
+ e^{i s \vec{k} \vec{x}} \Psi
+\end{equation}
+\begin{options}
+ \option{k}{Give momentum vector $k$ as a list.}
+ \option{scale}{Scale the momentum vector with $s$ [1.0].}
+\end{options}
+
+\subsubsection*{Example}
+Modifiy the inital condition in 2D propagation:
+\begin{verbatim} 
+filterinit {
+            apply { name=GridKick k="-60.8,10" }
+           }
+\end{verbatim}
+
+
+\subsection{Non-adiabtic couplings}
+Non-adiabtic couplings between electronic states. Can handle conical intersections.
+For the simple 1D case:
+\begin{equation}
+ K \Psi = \frac{1}{m}
+\begin{pmatrix}
+ 0 & 1 \\
+-1 & 0 \\
+\end{pmatrix}
+\left (
+f_{12} \partial_R \Psi + \dfrac{1}{2} \Psi \partial_R f_{12}
+\right )
+\end{equation}
+For the more general ND-case:
+\begin{equation}
+ K \Psi =
+\begin{pmatrix}
+ 0 & 1 \\
+-1 & 0 \\
+\end{pmatrix}
+\sum_j \left (
+\tilde f_{12}^{(j)} \partial_{q_j} \Psi + \dfrac{1}{2} \Psi \partial_{q_j} \tilde f_{12}^{(j)}
+\right )
+\end{equation}
+In the ND-case the mass must be included in the in data of the coupling file.
+
+\begin{options}
+ \option{dims}{Number of dimensions.}
+ \option{mass}{Reduced mass (only for 1D).}
+ \option{sign}{Sign of the matrix element either 1 or -1 [1].}
+ \option{file}{Coupling element $f_{12}$.}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+Coupling { name=Multistate
+  m1.0 { name=GridNAC file="nacmeT" dims=1 sign=-1 mass=1763.2 }
+  m0.1 { name=GridNAC file="nacmeT" dims=1 mass=1763.2 }
+}
+\end{verbatim}
+
+
+\subsection{Gobbler}
+Masking function (Butterworth) which can also be used as negative imaginary potential.
+
+\begin{options}
+\option{rp<dim>}{a "right pass" leaving everything on the right hand side (larger x values). dim is the number of the dimesion the gobbler is applied to (starting with dimension 0).}
+\option{lp<dim>}{a "left pass" leaving everything on the left hand side (smaller x values). dim is the number of the dimesion the gobbler is applied to (starting with dimension 0).}
+\option{order}{filter order. determines the cutoff sharpness.}
+\option{nip}{If present use the gobbler as negative imaginary potential.}
+\option{gain}{Supply a gain value. 1 per default. Only makes sense in combination with nip.}
+\option{residue}{Don't calculate a expectation value but the residue after application. Calculates $\langle \Psi|G^\dagger G|\Psi\rangle$ instead of $\langle \Psi|G|\Psi\rangle$.}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+   <filterpost>
+        <expec name="Gobbler" rp1="-8.1" lp1="+9.2" order="50"/>
+   </filterpost>
+\end{verbatim}
+
+
+\section{Matrix Represenation}
+\subsection{Hermitian Matrix}
+Represents a real symetric Matrix.
+Storage in binary file is in full format.
+
+\subsubsection*{Example}
+\begin{verbatim}
+propa {dt="1" steps="8000" dir="propa2" wcycle="1000" nfile="norm"
+       spectrum="autocorr" proj0="true"
+   propagator {name="Cheby"
+       hamiltonian {name="HermitianMatrix" file="Hmat"}
+   }
+   wf {name="Level" file="wfvec"}
+} 
+\end{verbatim}
+
+
+\subsection{Hermitian Matrix Laser Coupling}
+\begin{equation}
+ V_c(t) = -\mu E(t)
+\end{equation}
+
+\begin{options}
+ \option{file}{Read from fiven binary file.}
+ \option{gen}{Indicates that laser should be generated. See sec. \ref{sec:LaserFields} for details.}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+propa { dt="0.5" steps="629" wcycle="4096" dir="TLPL-GSPO" spectrum="spectrum.dat" proj0="true"
+        propagator { name="GSPO"
+          A { name="HermitianMatrix" file="LevelH2mat"}
+          B { name="MatDipole" file="LevelDIPmat" laser="LevelLaser_w0.15"}
+        }
+        wf { name="Level" file="Level_ef_0"}
+        filterpost {
+          expeconly { name="Projection" files="Level_ef" start="0" }
+          expeconly { name="Projection" files="Level_ef" start="1" }
+        }
+} 
+\end{verbatim}
+
+\section{Laser Fields}
+\label{sec:LaserFields}
+\subsection{On the fly generation.}
+Operators which include laser fields can generate the field on the fly if the option gen is used.
+\begin{equation}
+E(t) = E_{max} e^{-(t-t_0)^2/2\sigma^2} \cos(\omega_0 (t-t_0)+ b(t-t_0)^2+\phi) 
+\end{equation}
+A single Gaussian pulse is generated with \verb|gen=gauss|. A double pulse can be created with
+\verb|gen=gauss2|.
+\begin{options}
+ \option{Emax}{Maximum [$0.0001$].}
+ \option{t0}{Center of envelope [$T/2$].}
+ \option{sigma}{Width [$T/8$].}
+ \option{w0}{Center frequency [$0.05695 = 800$ nm]}
+ \option{phi}{CEP [0].}
+ \option{b}{Chirp parameter [0].}
+\end{options}
+In the case of double pulse, the parameters of the second pulse can controlled by adding a 2 to
+name of the option (Emax2, t02, sigma2, w02, phi2, b2).
+
+\subsubsection*{MATLAB code snippet for visualization}
+\begin{verbatim}
+t = 0:1000;
+dt = 1;
+
+t=t*dt;
+
+Emax = 0.0001;
+t0 = 500;
+w0 = 0.05695;
+phi = 0;
+b = 0.0;
+sigma=500/8;
+
+plot(t, Emax * exp(-(t-t0).^2/2/sigma^2) .* cos(w0*(t-t0) + phi + b*(t-t0).^2)); 
+\end{verbatim}
+
+
+\chapter{Wave Functions}
+Wave function can be defined in two ways -- either it is just a pure wave function from a
+file or it is compostion of wave functions like a super position or a tensor product like
+multiple electronic states.
+
+The following options apply to all modules.
+\begin{options}
+ \option{name}{Name of the wave function module. Needs not to be given if the \code{CLASS} option in the meta data is present.}
+ \option{normalize}{Normalizes the the subsections [false].}
+ \option{phase}{Applies a phase factor $e^{i\phi}$ to the subsection (in units of $\pi$).}
+\end{options}
+
+\section{Wave function from file}
+The only mandatory option here is \verb|file| which gives the base name of the wave function file
+(without .wf ending).
+
+\section{Linear combination}
+The name of the module is \verb|LC|.
+\begin{equation}
+ \Psi = \sum_n c_n \phi_n
+\end{equation}
+
+\begin{options}
+ \option{coeff}{The coefficient $c_n$ [1.0]}
+ \option{coeff2}{The squared coefficient $c^2_n$ [1.0]}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+<wf name="LC" normalize="true">
+ <wf1 file="ef_0" coeff2="0.25"/>
+ <wf2 file="ef_1" coeff2="0.5"/>
+ <wf3 file="ef_2" coeff2="0.5"/>
+</wf>
+\end{verbatim}
+
+
+\section{Multiple electronic states}
+\label{sec:WFMultistate}
+
+Multistate wave functions are composed of ``single state'' wave functions like the operator.
+The name of the module is simply \verb|Multiple|. The subsections have to follow the naming
+scheme \verb|wf<index>|. The option \verb|states| defines the number of states if it can not
+be guessed automatically from the number of subsections. An empty state is initalzed with zeros
+by default. At lest one wave function must be given.
+
+\subsubsection*{Example}
+Define a superposition of two electronic states:
+\begin{verbatim}
+<wf name="Multistate" states="2" normalize="true">
+  <wf0 file="ef_0"/>
+  <wf1 file="ef_0"/>
+</wf>
+\end{verbatim}
+
+
+\bibliographystyle{acm}
+\bibliography{qdng}
+
+%\thebibliography
+
+\end{document}
+
+

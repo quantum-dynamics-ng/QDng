@@ -13,7 +13,7 @@ namespace QDLIB {
     * The operator two subsequent Operators (in order!):
     * \li Kinetic energy operator
     * \li Gobbler which encloses the inner Volume.
-    * \li
+    * \todo get ops by name
     * 
     *	@author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */

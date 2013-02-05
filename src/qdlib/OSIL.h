@@ -13,6 +13,7 @@ namespace QDLIB {
      * Short iterative Lanczos Propagator.
      *
      * \param order   Recursion depth/Lanczos basis size. the default is 20.
+     * \param err     Approximated series abortion error. [1e-20]
      *
      *     @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
      */
