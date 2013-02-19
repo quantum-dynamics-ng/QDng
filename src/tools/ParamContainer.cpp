@@ -707,6 +707,18 @@ namespace QDLIB {
    }
    
    /**
+    * Parse from string buffer.
+    */
+   void ParamContainer::Parse(const string &buffer)
+   {
+      stringstream ss;
+
+      ss << buffer;
+      Parse(ss);
+   }
+
+
+   /**
     * Parse ParamContainer from a stream.
     *
     * \param eof if eof is non-NULL then eof string marks the end.
@@ -718,6 +730,7 @@ namespace QDLIB {
       char line[MAX_LINE_LENGTH];
       size_t pos;
 
+      clear();
       while (!stream.eof()) { // Reading loop
          stream.getline(line, MAX_LINE_LENGTH);
          //if (file.fail()) return false;
@@ -778,6 +791,16 @@ namespace QDLIB {
 
    }
 
+
+   void ParamContainer::Write(string& buffer, bool with_types)
+   {
+      stringstream ss;
+
+      Write(ss, with_types);
+
+      buffer = ss.str();
+   }
+
    /**
     * Write Key value pairs to stream.
     */
@@ -785,7 +808,7 @@ namespace QDLIB {
    {
       string key,value;
 
-      stream << "# Generated file" << endl;
+      //stream << "# Generated file" << endl;
 
       ResetPosition();
 

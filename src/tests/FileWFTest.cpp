@@ -89,8 +89,7 @@ void FileWFTest::IO_Test_Single()
    p_in = psi_in->Params();
    CPPUNIT_ASSERT( psi->size() == psi_in->size() );
 
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
+   CPPUNIT_ASSERT(file.GetMeta().class_() == "WFGridCartesian");
    
    p_in.GetValue("dims",n);
    CPPUNIT_ASSERT(n == 1);
@@ -114,15 +113,13 @@ void FileWFTest::IO_Test_Single()
    CPPUNIT_ASSERT_NO_THROW( file >> &psi_in );
    
    CPPUNIT_ASSERT (psi_in != NULL);
-   
    CPPUNIT_ASSERT (psi_in->Name() == "WFGridCartesian");
    
    /* both wfs should match */
    p_in = psi_in->Params();
    CPPUNIT_ASSERT( psi->size() == psi_in->size() );
 
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
+   CPPUNIT_ASSERT(file.GetMeta().class_() == "WFGridCartesian");
    
    p_in.GetValue("dims",n);
    CPPUNIT_ASSERT(n == 1);
@@ -140,7 +137,7 @@ void FileWFTest::IO_Test_Single()
    }
 
    CPPUNIT_ASSERT_NO_THROW(FS::Remove("TEST.wftest"));
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TEST.meta"));
+   //CPPUNIT_ASSERT_NO_THROW(FS::Remove("TEST.meta"));
 
    DELETE_ALL_WF();
 }
@@ -187,9 +184,6 @@ void FileWFTest::IO_Test_ZLIB()
    p_in = psi_in->Params();
    CPPUNIT_ASSERT( psi->size() == psi_in->size() );
 
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
-
    p_in.GetValue("dims",n);
    CPPUNIT_ASSERT(n == 1);
    p_in.GetValue("N0", n);
@@ -207,7 +201,6 @@ void FileWFTest::IO_Test_ZLIB()
    DELETE_WF(psi_in);
 
    CPPUNIT_ASSERT_NO_THROW(FS::Remove("ZLIBTEST.wftest"));
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("ZLIBTEST.meta"));
 
    DELETE_ALL_WF();
    file.Compress(false);
@@ -259,9 +252,6 @@ void FileWFTest::IO_Test_BZIP()
    p_in = psi_in->Params();
    CPPUNIT_ASSERT( psi->size() == psi_in->size() );
 
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
-
    p_in.GetValue("dims",n);
    CPPUNIT_ASSERT(n == 1);
    p_in.GetValue("N0", n);
@@ -279,7 +269,6 @@ void FileWFTest::IO_Test_BZIP()
    DELETE_WF(psi_in);
 
    CPPUNIT_ASSERT_NO_THROW(FS::Remove("BZIPTEST.wftest"));
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("BZIPTEST.meta"));
 
    DELETE_ALL_WF();
    file.Compress(false);
@@ -296,7 +285,7 @@ void FileWFTest::IO_Test_BZIP()
  */
 void FileWFTest::IO_Test_Multistate()
 {
-   ParamContainer p, p_in;
+   ParamContainer pms, p, p_in;
    WaveFunction *psi0, *psi1, *psi0_in;
    WFMultistate *wfm, *wfm_in;
    string s;
@@ -329,7 +318,7 @@ void FileWFTest::IO_Test_Multistate()
    file.Name("TESTMS");
    file.Suffix(".wftest");
 
-   CPPUNIT_ASSERT_NO_THROW(wfm->Init(p));
+   CPPUNIT_ASSERT_NO_THROW(wfm->Init(pms));
 
    /* Write File */
    CPPUNIT_ASSERT_NO_THROW(file << wfm);
@@ -344,15 +333,15 @@ void FileWFTest::IO_Test_Multistate()
    
    p.clear();
    wfm_in->Add(psi0_in, 0);
-   p.SetValue("states", 2);
-   wfm_in->Init(p);
+   pms.SetValue("states", 2);
+   wfm_in->Init(pms);
    
+   CATCH_EXCEPTION(file >> wfm_in);
    CPPUNIT_ASSERT_NO_THROW (file >> wfm_in); /* Read file */
    
    /* Check MS container */
    p_in = wfm_in->Params();
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT( s == "WFMultistate" );
+   CPPUNIT_ASSERT( dynamic_cast<WFMultistate*>(wfm) != NULL );
    CPPUNIT_ASSERT( wfm->States() == 2);
    
    /* Check state 0 */
@@ -362,9 +351,6 @@ void FileWFTest::IO_Test_Multistate()
    p_in.clear();
    p_in = psi0_in->Params();
    CPPUNIT_ASSERT( psi0->size() == psi0_in->size() );
-
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
    
    p_in.GetValue("dims",n);
    CPPUNIT_ASSERT(n == 1);
@@ -390,9 +376,6 @@ void FileWFTest::IO_Test_Multistate()
    p_in = psi0_in->Params();
    CPPUNIT_ASSERT( psi0->size() == psi0_in->size() );
 
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
-   
    p_in.GetValue("dims",n);
    CPPUNIT_ASSERT(n == 1);
    p_in.GetValue("N0", n);
@@ -421,21 +404,14 @@ void FileWFTest::IO_Test_Multistate()
    CPPUNIT_ASSERT( dynamic_cast<WFGridCartesian*>(wfm_in->State(1)) != NULL );
    CPPUNIT_ASSERT( wfm_in->State(0) !=  wfm_in->State(1));
    
-   p_in = wfm_in->State(0)->Params();
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
-   
-   p_in = wfm_in->State(1)->Params();
-   p_in.GetValue("CLASS", s);
-   CPPUNIT_ASSERT(s == "WFGridCartesian");
-
    /* Cleanup */
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS.meta"));
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-0.meta"));
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-0.wftest"));
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-1.meta"));
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-1.wftest"));
-   
+     CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS.wftest"));
+//   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS.meta"));
+//   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-0.meta"));
+//   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-0.wftest"));
+//   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-1.meta"));
+//   CPPUNIT_ASSERT_NO_THROW(FS::Remove("TESTMS-1.wftest"));
+//
    
    /* Check if sequence Naming works correct */
    file.ResetCounter();
@@ -446,30 +422,35 @@ void FileWFTest::IO_Test_Multistate()
    
    for (int i=0; i < 3; i++){
       CPPUNIT_ASSERT_NO_THROW(file << wfm);
-      if (i==0){ /* Check for meta files */
-         sprintf(name, "TESTMS.meta");
-         CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
-         fclose(fh);
-         sprintf(name, "TESTMS-0.meta");
-         CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
-         fclose(fh);
-         sprintf(name, "TESTMS-1.meta");
-         CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
-         fclose(fh);
-      }
+//      if (i==0){ /* Check for meta files */
+//         sprintf(name, "TESTMS.meta");
+//         CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
+//         fclose(fh);
+//         sprintf(name, "TESTMS-0.meta");
+//         CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
+//         fclose(fh);
+//         sprintf(name, "TESTMS-1.meta");
+//         CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
+//         fclose(fh);
+//      }
       /* check for data */
-      sprintf(name, "TESTMS-0_%d.wftest", i);
+      sprintf(name, "TESTMS_%d.wftest", i);
       CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
-      fclose(fh);
-      sprintf(name, "TESTMS-1_%d.wftest", i);
-      CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
-      fclose(fh);
+
+//      sprintf(name, "TESTMS-0_%d.wftest", i);
+//      CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
+//      fclose(fh);
+//      sprintf(name, "TESTMS-1_%d.wftest", i);
+//      CPPUNIT_ASSERT( (fh = fopen(name, "r")) != NULL );
+//      fclose(fh);
    }
    
    /* Check for re-reading the sequence */
    file.ResetCounter();
    for (int i=0; i < 3; i++){
       CPPUNIT_ASSERT_NO_THROW(file >> wfm);
+      sprintf(name, "TESTMS_%d.wftest", i);
+      CPPUNIT_ASSERT_NO_THROW(FS::Remove(name));
    }
    
    DELETE_ALL_WF();

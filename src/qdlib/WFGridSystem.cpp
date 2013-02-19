@@ -16,6 +16,15 @@ namespace QDLIB {
    
    void WFGridSystem::CheckFFT()
    {
+      /* Make sure the space buffer has the right size */
+      GetSpaceBuffer();
+
+      if ( _spacebuffer->size() != size() || _spacebuffer->strides() != strides()){
+         _spacebuffer->newsize(size(), strides());
+         delete _fft;
+         _fft = NULL;
+      }
+
       if (_fft == NULL){
          if (IsKspace())
             /* Take care - the buffers are switched in this constellation! */

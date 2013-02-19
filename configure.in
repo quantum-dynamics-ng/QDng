@@ -57,7 +57,7 @@ dnl Compiler flags for development
 dnl
 AC_ARG_ENABLE([devel],
               [AS_HELP_STRING([--enable-devel],[Enable gcc pedantic code checking])],
-              [enable_devel=yes; DEVEL_FLAGS="-Werror -pedantic -pedantic-errors -Wall -Wdiv-by-zero -ansi -Wall -Wno-error=unused-function"],
+              [enable_devel=yes; DEVEL_FLAGS="-Werror -pedantic -pedantic-errors -Wall -Wdiv-by-zero -ansi -Wall -Wno-error=unused-function -Wno-error=long-long"],
               [enable_devel=no; DEVEL_FLAGS=""])
 
 AC_SUBST(DEVEL_FLAGS)

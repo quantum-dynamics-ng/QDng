@@ -98,9 +98,11 @@ typedef map<string,string> string_map;
 	 ParamContainer& operator+=(const ParamContainer &params);
 
     void Parse(istream &stream, const char* eof = NULL);
+    void Parse(const string &buffer);
     bool ReadFromFile(const string& name);
 
     void Write(ostream& stream, bool with_types = false);
+    void Write(string& buffer, bool with_types = false);
     bool WriteToFile(const string& name, bool with_types = false);
 
    }; /* class ParamContainer */

@@ -5,7 +5,7 @@
 #include "qdlib/WaveFunction.h"
 
 #define FILEWF_COMPRESSION false
-#define FILEWF_COMPRESSION_TOLERANCE 1e-4
+#define FILEWF_COMPRESSION_TOLERANCE 1e-6
 
 namespace QDLIB {
 
@@ -14,20 +14,12 @@ namespace QDLIB {
    */
    class FileWF : public FileSingle<WaveFunction>
    {
-      public:
-         typedef enum {ZLIB, BZIP, INVALID} compMethod_t;
       private:
          bool _compress;         /* Use compression on write */
          int _compLevel;         /* Compression level 0..9; 0 = no compression, 9 = best */
          double _compTolerance;   /* Cut off factor for lossy compression */
-         compMethod_t _compMethod;     /* Compression method */
-         cVec *_buf;
-         
-         void CheckBuf(WaveFunction *data);
-         void _ReadFromFile(WaveFunction *data);
+
 #ifdef HAVE_LIBZ
-         void _CompressZLIB(WaveFunction * data);
-         void _DecompressZLIB(WaveFunction * data);
 
          void _CompressBZIP(WaveFunction * data);
          void _DecompressBZIP(WaveFunction * data);
@@ -37,15 +29,15 @@ namespace QDLIB {
          FileWF();
          ~FileWF();
          WaveFunction* LoadWaveFunctionByMeta();
-         virtual void ReadFile (WaveFunction *data);
-         virtual void WriteFile (WaveFunction *data);
+         virtual void ReadWaveFunction (WaveFunction *data);
+         virtual void WriteWaveFunction (WaveFunction *data, bool more_files_follow = false);
          
          /** Stream operator for file writing. */
-         virtual void operator<<(WaveFunction *data){ WriteFile(data); }
-         
+         virtual void operator<<(WaveFunction *data){ WriteWaveFunction(data); }
+
          /** Get file compression mode. */
          bool Compress() const { return _compress; }
-         
+
          void CompressMethod(compMethod_t method){
             _compMethod = method;
          }

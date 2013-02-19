@@ -2,6 +2,7 @@
 #define QDLIBWFGRIDCARTESIAN_H
 
 #include "qdlib/WFGridSystem.h"
+#include "tools/FileSingle.h"
 
 namespace QDLIB {
 
@@ -18,8 +19,11 @@ namespace QDLIB {
     */
    class WFGridCartesian : public WFGridSystem
    {
+      friend class FileSingle<WaveFunction>;
       private:
          string _name;
+
+         void ProtobufInit(const string& message);
       public:
          WFGridCartesian();
 

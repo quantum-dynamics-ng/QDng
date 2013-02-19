@@ -1,6 +1,10 @@
 #include "WFGridCartesian.h"
 #include "tools/Exception.h"
 
+#include "google/protobuf/message.h"
+
+using google::protobuf::Message;
+
 namespace QDLIB {
 
    
@@ -14,6 +18,15 @@ namespace QDLIB {
    
    WFGridCartesian::~WFGridCartesian()
    {
+   }
+
+
+   /**
+    * Supply a protobuf message.
+    */
+   void ProtobufInit(const string& message)
+   {
+
    }
 
    void WFGridCartesian::Init(ParamContainer &params)

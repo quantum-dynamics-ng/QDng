@@ -6,4 +6,9 @@
 #define LOOSE_EPS 1e-10
 #define ROUGH_EPS 1e-6
 
+#define CATCH_EXCEPTION( LINE ) \
+  try { LINE; } catch (Exception& e) { cout << __FILE__ << ": line " << __LINE__ <<": "<< e.GetMessage() << endl; }
+
+
+
 #endif
