@@ -161,11 +161,11 @@ namespace QDLIB
          /* Check for convergence */
          double nconv = abs(norm - accnorm.real()) / norm;
 
-         if (nconv  < _prec )
+         if (nconv  < _prec && Exponent().imag() == 0)
             break;
 
          /* Convergence only make sense for norm preserving propagations*/
-         if (i == _order -1 && nconv  > _prec && !imaginary && _offset.imag() == 0)
+         if (i == _order -1 && nconv  > _prec && !imaginary && _offset.imag() == 0 && Exponent().imag() == 0)
             cout << "Warning: Chebychev series not converged: " << scientific << nconv << " > " << _prec  << endl;
 
 
