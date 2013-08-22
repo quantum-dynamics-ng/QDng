@@ -29,7 +29,7 @@ namespace QDLIB
 			    _convergence(DEFAULT_CONVERGENCE_EF_RAW),
 			    _MaxSteps(DEFAULT_MAXSTEPS),
                                       _fname(DEFAULT_EF_BASE_NAME), _ename(DEFAULT_EF_ENERGY_NAME), _spectrum(DEFAULT_EF_SPECTRUM_NAME),
-                                      _diag(true), _start(0), _tol(1), _win(true)
+                                      _diag(true), _start(0), _tol(1), _width(-1), _win(true)
    {
       _P = new OProjection();
    }
@@ -207,6 +207,13 @@ namespace QDLIB
             if (_tol < 0)
                throw (EParamProblem("Tolerance factor for peak finder is non-sense. Must >= 0"));
          }
+
+         if ( attr.isPresent("width")){
+            attr.GetValue("width", _width);
+            if (_width < 0)
+               throw (EParamProblem("Tolerance factor for peak finder is non-sense. Must > 0"));
+         }
+
 	 if ( attr.isPresent("read"))
 	    attr.GetValue("read", _read);
          
@@ -540,7 +547,8 @@ namespace QDLIB
          PowerSpectrum[i] = cabs(spectrum[i]);
       
       PFind.Tolerance(_tol);
-      PFind.Find(PowerSpectrum);
+      if (_width > 0) PFind.Find(PowerSpectrum,_width);
+      else PFind.Find(PowerSpectrum);
       
       _Nef = PFind.NumPeaks();
       _Energies_raw.newsize(_Nef);
@@ -574,12 +582,15 @@ namespace QDLIB
          }
          
          Psi->Normalize(); /* Just normalize. We don't take in account some factors, so we also drop  dt, 1/T */
-         _Energies_raw[i] = _H->Expec(Psi);
+         dcomplex ec = _H->MatrixElement(Psi, Psi);
+         _Energies_raw[i] = ec.real();
          
          log.cout() << i;
          log.cout().precision(8);
          log.coutdbg() << "\t" << index << "\t" << energy;
-         log.cout() << "\t" << fixed << _Energies_raw[i] << endl;
+         log.cout() << "\t" << fixed << _Energies_raw[i];
+         if (abs(ec.imag()) > 1e-8) log.cout() << " " << ec.imag() << "i"; /* Show imaginary if part if preseent */
+         log.cout() << endl;
          log.flush();
          _efile << Psi;
          if (_diag) /* the diag proc. takes the basis from the Projector */

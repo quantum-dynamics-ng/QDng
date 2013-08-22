@@ -79,6 +79,7 @@ namespace QDLIB
          bool _diag; /* Diagonalize Basis */
          int _start;
          double _tol;
+         int _width;
          bool _win;
 
          WaveFunction *_PsiInitial;
