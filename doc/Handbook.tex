@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{environ}
 \usepackage{amsmath}
+\usepackage{hyperref}
 
 %% Macros
 \newcommand{\option}[2]{\item \texttt{#1}\\ #2}
@@ -983,6 +984,7 @@ A single Gaussian pulse is generated with \verb|gen=gauss|. A double pulse can b
  \option{w0}{Center frequency [$0.05695 = 800$ nm]}
  \option{phi}{CEP [0].}
  \option{b}{Chirp parameter [0].}
+ \option{lasero}{File name for dumping the generated field.}
 \end{options}
 In the case of double pulse, the parameters of the second pulse can controlled by adding a 2 to
 name of the option (Emax2, t02, sigma2, w02, phi2, b2).

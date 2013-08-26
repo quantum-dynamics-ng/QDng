@@ -99,8 +99,8 @@ namespace QDLIB
 //      sum *= - GridSystem::Dx(0) *  I * kmax / 2. / _mass[0] / d;
 //
 
-      cout << "emin: " << (kmax*kmax/2/_mass[0] /  (1+smax*cexpI(gamma)))<<endl;
-      cout << -Emax().real()/2<<endl;
+//      cout << "emin: " << (kmax*kmax/2/_mass[0] /  (1+smax*cexpI(gamma)))<<endl;
+//      cout << -Emax().real()/2<<endl;
       return dcomplex(0, (kmax*kmax/2/_mass[0] /  (1+smax*cexpI(gamma))).imag() );  /* Crude approximation */
    }
 
