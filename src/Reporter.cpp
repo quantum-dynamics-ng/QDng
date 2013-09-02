@@ -177,7 +177,9 @@ namespace QDLIB
           else
              ofile << -(N-i) * dw;
           
-          ofile << "\t"<< cabs(spec[i]) / (N/2) << endl;
+          ofile << "\t"<< cabs(spec[i]) / (N/2)  <<
+                   "\t" << spec[i].real() / (N/2) <<
+                   "\t" << spec[i].imag() / (N/2) << endl;
        }
        ofile.close();
        log.cout() << "Autocorellation power spectrum written to file: " << name.c_str() << endl << endl;
@@ -200,8 +202,10 @@ namespace QDLIB
       log.cout() << "\n\n" << clock->Steps() << " step done (" << clock->Steps() *  clock->Dt() << " au)\n\n";
       
       if (_spectrum){
-         if (_window)
+         if (_window){
+            log.cout() << "Apply Hann-window function to autocorrelation" << endl;
             FunctionGenerator<cVec>::Hann(_specbuf);
+         }
             
          WriteSpectrum(_specbuf, clock->Dt(), _specname);
       }
