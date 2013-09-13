@@ -213,6 +213,7 @@ namespace QDLIB
       int msize = sourcePsi->MPIsize();
 
       for (int i = rank; i < _nstates; i += msize) {
+         *(dPsi->State(i)) = 0.;
          for (int j = 0; j < _nstates; j++) {
             if (_matrix[i][j] != NULL) {
                _matrix[i][j]->ApplyAdd(dPsi->State(i), psi->State(j));
