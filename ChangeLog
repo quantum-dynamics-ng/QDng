@@ -1,4 +1,4 @@
-x.x.x
+0.6.2
   *** Uppsala changes:
   * Removed 
   * Added Lanczos method to ProgEigen. Suitable for non-hermitian problems
