@@ -54,6 +54,10 @@ namespace QDLIB
          virtual void Retire();
 
          virtual void Reaquire();
+
+         virtual void Serialize (ostream& os) {}
+
+         virtual void DeSerialize (istream& is) {}
    };
 
 }

@@ -9,19 +9,20 @@
 
 namespace QDLIB {
 
-   GridSystem::GridSystem() :  _ndims(0)
+   GridSystem::GridSystem()
    {
+      grid_sys.set_dims(0);
       for (int i=0; i < MAX_DIMS; i++){
-	 _dims[i] = 0;
-	 _xmin[i] = 0;
-	 _xmax[i] = 0;
 	 _dx[i] = 0;
       }
    }
 
-
-   GridSystem::~GridSystem()
+   GridSystem::GridSystem(int dims)
    {
+      for (int i=0; i < dims; i++)
+         grid_sys.add_dim();
+
+      grid_sys.set_dims(dims);
    }
    
    /**
@@ -29,7 +30,7 @@ namespace QDLIB {
     */
    int GridSystem::Dim() const
    {
-      return _ndims;
+      return grid_sys.dims();
    }
          
    /**
@@ -45,9 +46,20 @@ namespace QDLIB {
       if (dims < 0)
          throw(EParamProblem("GridSystem: Number of Dimensions is negative"));
 
-      _ndims = dims;
+      grid_sys.mutable_dim()->Clear();
+      for (int i=0; i < dims; i++)
+         grid_sys.add_dim();
+
+      grid_sys.set_dims(dims);
    }
          
+   const int* GridSystem::DimSizes()
+   {
+      for (size_t i=0; i < grid_sys.dims(); i++)
+       dimsizes_[i] = grid_sys.dim(i).size();
+
+      return dimsizes_;
+   }
    
    /**
     * Sizes of dimensions.
@@ -57,17 +69,7 @@ namespace QDLIB {
     */
    int GridSystem::DimSize(int dim) const
    {
-      return _dims[dim];
-   }
-   
-   /**
-    * Sizes of dimensions.
-    * 
-    * \return pointer to array with sizes.
-    */
-   const int* GridSystem::DimSizes( )
-   {
-      return _dims;
+      return grid_sys.dim(dim).size();
    }
    
    /**
@@ -76,9 +78,9 @@ namespace QDLIB {
     * \param dim Number of dimension
     * \param size Number of points in this direction
     */
-   void GridSystem::DimSize(int dim, int size)
+   void GridSystem::DimSize(int dim, uint32_t size)
    {
-      _dims[dim] = size;
+      grid_sys.mutable_dim(dim)->set_size(size);
    }
    
    /**
@@ -86,12 +88,11 @@ namespace QDLIB {
     */
    int GridSystem::Size() const
    {
+      if (grid_sys.dims() == 0) return 0;
+
       int size=1;
-
-      if (_ndims == 0) return 0;
-
-      for (int i=0; i < _ndims; i++)
-	 size *= _dims[i];
+      for (size_t i=0; i < grid_sys.dims(); i++)
+	 size *= grid_sys.dim(i).size();
 
       return size;
    }
@@ -103,7 +104,7 @@ namespace QDLIB {
     */
    double GridSystem::Xmin(int dim) const
    {
-      return _xmin[dim];
+      return grid_sys.dim(dim).xmin();
    }
    
    /**
@@ -113,8 +114,8 @@ namespace QDLIB {
     */
    void GridSystem::Xmin(int dim, double xmin)
    {
-      _xmin[dim] = xmin;
-      _dx[dim] = (_xmax[dim] - _xmin[dim])/(double(_dims[dim]-1)); /* Update dx value */
+      grid_sys.mutable_dim(dim)->set_xmin(xmin);
+      _dx[dim] = (grid_sys.dim(dim).xmax() - xmin)/(double(grid_sys.dim(dim).size()-1)); /* Update dx value */
    }
    
    /**
@@ -124,7 +125,7 @@ namespace QDLIB {
     */
    double GridSystem::Xmax(int dim) const
    {
-      return _xmax[dim];
+      return grid_sys.dim(dim).xmax();
    }
    
    /**
@@ -134,8 +135,8 @@ namespace QDLIB {
     */
    void GridSystem::Xmax(int dim, double xmax)
    {
-      _xmax[dim] = xmax;
-      _dx[dim] = (xmax - _xmin[dim])/(double(_dims[dim]-1));    /* Update dx value */
+      grid_sys.mutable_dim(dim)->set_xmax(xmax);
+      _dx[dim] = (xmax - grid_sys.dim(dim).xmin())/(double(grid_sys.dim(dim).size()-1));    /* Update dx value */
    }
 
    /**
@@ -170,13 +171,10 @@ namespace QDLIB {
     */
    void GridSystem::operator =(GridSystem &G)
    {
-      _ndims = G._ndims;
+      grid_sys = G.grid_sys;
       
       for (int i=0; i < MAX_DIMS; i++)
       {
-       _dims[i] = G._dims[i];
-       _xmin[i] = G._xmin[i];
-       _xmax[i] = G._xmax[i];
        _dx[i] = G._dx[i];
       }
 
@@ -190,13 +188,13 @@ namespace QDLIB {
    {
       bool equal = true;
       
-      if ( _ndims != G._ndims ) return false;
+      if ( grid_sys.dims() != G.grid_sys.dims() ) return false;
 
-      for (int i=0; i < _ndims; i++)
+      for (size_t i=0; i < grid_sys.dims(); i++)
       {
-         if ( _dims[i] != G._dims[i] ) equal = false;
-         if ( fabs(_xmin[i] - G._xmin[i]) > GRID_EPS) equal = false;
-         if ( fabs(_xmax[i] - G._xmax[i]) > GRID_EPS) equal = false;
+         if ( grid_sys.dim(i).size() != G.grid_sys.dim(i).size() ) equal = false;
+         if ( fabs(grid_sys.dim(i).xmin() - G.grid_sys.dim(i).xmin()) > GRID_EPS) equal = false;
+         if ( fabs(grid_sys.dim(i).xmax() - G.grid_sys.dim(i).xmax()) > GRID_EPS) equal = false;
       }
       return equal;
    }
@@ -215,21 +213,21 @@ namespace QDLIB {
     */
    void GridSystem::_BuildInfo()
    {
-      for (int dim=0; dim < _ndims; dim++){
+      for (size_t dim=0; dim < grid_sys.dims(); dim++){
          _lothers[dim] = 1;
          _nothers[dim] = 1;
 
          /* Determine how many values in the lower dims are  present */
          if (dim>0)
          {
-            for(int i=0; i < dim; i++)
-               _lothers[dim] *= _dims[i];
+            for(size_t i=0; i < dim; i++)
+               _lothers[dim] *= grid_sys.dim(i).size();
          }
 
          /* Determine how many times one x_i value is present */
-         for(int i=0; i < _ndims; i++)
+         for(size_t i=0; i < grid_sys.dims(); i++)
          {
-            if (i != dim) _nothers[dim] *= _dims[i];
+            if (i != dim) _nothers[dim] *= grid_sys.dim(i).size();
          }
       }
    }
@@ -238,25 +236,25 @@ namespace QDLIB {
     * Number of points in dims other than dim1 and dim2.
     *
     **/
-   int GridSystem::NumOthers(int dim1, int dim2) const
+   int GridSystem::NumOthers(size_t dim1, size_t dim2) const
    {
       int nothers = 1;
 
-      for(int i=0; i < _ndims; i++)
-         if (i != dim1 && i != dim2) nothers *= _dims[i];
+      for(size_t i=0; i < grid_sys.dims(); i++)
+         if (i != dim1 && i != dim2) nothers *= grid_sys.dim(i).size();
 
       return nothers;
    }
 
-   int GridSystem::LowOthers(int dim1, int dim2) const
+   int GridSystem::LowOthers(size_t dim1, size_t dim2) const
    {
       int lothers = Size();
 
-      for(int i=0; i < _ndims; i++){
+      for(size_t i=0; i < grid_sys.dims(); i++){
          int ltmp = 1;
          if (i != dim1 || i != dim2) {
-            for(int j=0; j < i ; j++)
-               ltmp *= _dims[j];
+            for(size_t j=0; j < i ; j++)
+               ltmp *= grid_sys.dim(j).size();
          }
          if (ltmp < lothers) lothers = ltmp;
       }

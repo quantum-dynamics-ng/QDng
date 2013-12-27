@@ -309,6 +309,17 @@ namespace QDLIB {
             Re((cVec*) this);
          }
 
+         /**
+          * Serialize the content into a stream.
+          */
+         virtual void Serialize (ostream& os) = 0;
+
+         /**
+          * Restore the wavefucntion from a stream.
+          */
+         virtual void DeSerialize (istream& is) = 0;
+
+
    }; /* class WaveFunction */
 
    typedef Collector<WaveFunction> CollectorWF;

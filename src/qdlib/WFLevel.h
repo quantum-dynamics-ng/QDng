@@ -38,6 +38,10 @@ namespace QDLIB {
 
          WFLevel& operator=(WFLevel &Psi);
 
+         virtual void Serialize (ostream& os) {}
+
+         virtual void DeSerialize (istream& is) {}
+
    }; /* class WFLevel */
    
 } /* namespace QDLIB */

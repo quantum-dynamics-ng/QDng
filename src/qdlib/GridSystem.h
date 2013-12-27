@@ -2,6 +2,7 @@
 #define QDLIBGRIDSYSTEM_H
 
 #include "math/typedefs.h"
+#include "GridSystem.pro.pb.h"
 
 namespace QDLIB
 {
@@ -16,10 +17,7 @@ namespace QDLIB
    {
       private:
          /* Grid parameters */
-         int _ndims;
-         int _dims[MAX_DIMS];
-         double _xmin[MAX_DIMS];
-         double _xmax[MAX_DIMS];
+         int dimsizes_[MAX_DIMS];   /* TODO: remove here for compat reasons */
          double _dx[MAX_DIMS];
          int _lothers[MAX_DIMS];    /* Stripe size of dim */
          int _nothers[MAX_DIMS];    /* Replica points for each dim */
@@ -27,11 +25,12 @@ namespace QDLIB
          int _numactive;
 
          void _BuildInfo();
+
+      protected:
+         GridSystemHeader grid_sys;
       public:
          GridSystem();
-         GridSystem(int dims) : _ndims(dims) {}
-
-         ~GridSystem();
+         GridSystem(int dims);
 
          int Dim() const;
 
@@ -39,11 +38,11 @@ namespace QDLIB
 
          int DimSize(int dim) const;
 
-         const int* DimSizes();
-
          int Size() const;
 
-         void DimSize(int dim, int size);
+         void DimSize(int dim, uint32_t size);
+
+         const int* DimSizes();
 
          double Xmin(int dim) const;
 
@@ -66,7 +65,7 @@ namespace QDLIB
          /**
           *  Activate a dimension for index mapping.
           */
-         void ActiveDim(int dim) { _active = dim;  _numactive = _dims[dim]; }
+         void ActiveDim(int dim) { _active = dim;  _numactive = grid_sys.dim(dim).size(); }
 
          /**
           * Number of replica points for one index in activated dimension.
@@ -74,11 +73,11 @@ namespace QDLIB
           */
          int NumOthers() const { return _nothers[_active]; }
          int NumOthers(int dim) const { return _nothers[dim]; }
-         int NumOthers(int dim1, int dim2) const;
+         int NumOthers(size_t dim1, size_t dim2) const;
 
          int LowOthers() const { return _lothers[_active]; }
          int LowOthers(int dim) const { return _lothers[dim]; }
-         int LowOthers(int dim1, int dim2) const;
+         int LowOthers(size_t dim1, size_t dim2) const;
 
          /**
           * Number of points in active dimension.

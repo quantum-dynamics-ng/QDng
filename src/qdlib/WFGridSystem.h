@@ -41,6 +41,10 @@ namespace QDLIB {
           */
          virtual dcomplex Integral() = 0;
 
+         virtual void Serialize (ostream& os) {}
+
+         virtual void DeSerialize (istream& is) {}
+
    }; /* class WFGridSystem */
    
 } /* namespace QDLIB */
