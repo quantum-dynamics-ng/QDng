@@ -2,6 +2,7 @@
 #include "WFLevel.h"
 #include "tools/Exception.h"
 #include "linalg/LapackDiag.h"
+#include "tools/ZCopyStream.h"
 
 namespace QDLIB {
 
@@ -269,6 +270,31 @@ namespace QDLIB {
 
       LAPACK::FullDiagHermitian(_X, _dspace);
       _valid = true;
+   }
+
+   void OHermitianMatrix::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   {
+      // Write header, keep it simple here
+     uint32 rows_cols = dMat::rows();
+
+     WriteToZeroCopyStream(os, reinterpret_cast<char*>(&rows_cols), sizeof(rows_cols));
+     WriteToZeroCopyStream(os, reinterpret_cast<char*>(&rows_cols), sizeof(rows_cols));
+
+      // Write data
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin()), sizeBytes());
+   }
+
+   void OHermitianMatrix::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   {
+      // read header
+      uint32_t size;
+
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&size), sizeof(uint32_t));
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&size), sizeof(uint32_t));
+
+      newsize(size, size);
+
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin()), sizeBytes());
    }
 
 } /* namespace QDLIB */

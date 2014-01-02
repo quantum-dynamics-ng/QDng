@@ -205,26 +205,24 @@ namespace QDLIB {
                wfm->Add( LoadWaveFunctionByMeta(), i ); /* Load module */
             }
             //cout << "rank : " << rank << endl << *wf<< endl;
-            wf->SyncStrides();
+            wfm->SyncStrides();
+            wfm->Init(p);
          } else if (Format() == stream) { /* Read packed format from stream */
-            int counter = Counter();
+            ReadDataFromStream(wfm);  // Do a dummy read
 
-            vector<int> list;
-            p.GetArray("StateList", list);
+            int counter = Counter();
 
             unsigned int i=0;
             while (GetMeta().more_files_follow()) { /* Try to get all WFs in list */
                Counter(counter);
-               if (i < list.size())
-                  wfm->Add( LoadWaveFunctionByMeta(), list[i] );
-               else
-                  break;
+               wfm->Add( LoadWaveFunctionByMeta(), i);
                i++;
             }
-            if (i != list.size())
-               throw(EIOError("Number of states given list doesn't match number of states in files"));
+
+            wfm->Init(i);
          }
-         wfm->Init(p);
+
+
          wf = wfm;
       } else { /* handling for Single state WFs */
          wf = ModuleLoader::Instance()->LoadWF(classname);
@@ -273,26 +271,22 @@ namespace QDLIB {
 
             Name(basename); /* We modified the name => switch back to original */
 
+            ParamContainer p = meta.params();
+            wfm->Init(p);
+
          } else if (Format() == stream) { /* Read packed format from stream */
-            vector<int> list;
-            ParamContainer pm = meta.params();
-            pm.GetArray("StateList", list);
+            ReadDataFromStream(data);  // Do a dummy read
 
             unsigned int i=0;
             while (GetMeta().more_files_follow()) {
                Counter(counter);
-               if (i < list.size())
-                  ReadWaveFunction(wfm->State(list[i]));
-               else
-                  break;
+               ReadWaveFunction(wfm->State(i));
                i++;
             }
-            if (i != list.size())
-               throw(EIOError("Number of states given list doesn't match number of states in files"));
+
+            wfm->Init(i);
          }
 
-         ParamContainer p = meta.params();
-         wfm->Init(p);
          wfm->SyncStrides();
       } else { /* Load Single WaveFunction */
 
@@ -350,20 +344,17 @@ namespace QDLIB {
                WriteMeta(p);
             }
          } else if (Format() == stream){
-            int* list = new int[wfm->States()];
 
-            for (int i=0; i < wfm->States(); i++) list[i] = i;
-            data->Params().SetArray("StateList", list, (int) wfm->States());  /* State list tells us what is really stored */
-            WriteMeta(data, true, true); /* This is the Multistate header */
+            WriteMeta(data, true, false); /* This is the Multistate header */
 
-            for (int i=0; i < wfm->States(); i++){ /* Right now we just save all states \TODO add save threshold */
+            for (int i=0; i < wfm->States(); i++){
                Counter(counter);
                if (i == wfm->States()-1 && more_files_follow == false)
                   WriteWaveFunction(wfm->State(i), false);
                else
                   WriteWaveFunction(wfm->State(i), true);
             }
-            delete[] list;
+
          }
       } else { /* Write single file */
          if (_compress) {

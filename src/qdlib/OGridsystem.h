@@ -35,6 +35,9 @@ namespace QDLIB
             return NULL;
          }
 
+         virtual void Serialize (::google::protobuf::io::ZeroCopyOutputStream& os);
+
+         virtual void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is);
    };
 
 } /* namespace QDLIB */

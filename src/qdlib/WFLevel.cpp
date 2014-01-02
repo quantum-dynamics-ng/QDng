@@ -1,6 +1,8 @@
 #include "WFLevel.h"
 #include "tools/Exception.h"
+#include "tools/ZCopyStream.h"
 
+#include <stdint.h>
 
 namespace QDLIB {
    
@@ -118,5 +120,31 @@ namespace QDLIB {
       _IsKspace = false;
    }
    
+
+   void WFLevel::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   {
+      // Simple data format:
+      uint64_t sizee=cVec::size();
+      uint64_t sizeb=sizeBytes();
+
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&sizee), sizeof(sizee));
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&sizeb), sizeof(sizeb));
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin(0)), sizeb);
+   }
+
+   void WFLevel::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   {
+      uint64_t sizee, sizeb;
+
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&sizee), sizeof(sizee));
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&sizeb), sizeof(sizeb));
+
+      if (sizee * sizeof(dcomplex) != sizeb)
+         throw( EIOError("Can't read WFLevel: wrong header") );
+
+      newsize(sizee);
+
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin(0)), sizeb);
+   }
 } /* namespace QDLIB */
 

@@ -21,46 +21,11 @@ namespace QDLIB {
    }
 
 
-   /**
-    * Supply a protobuf message.
-    */
-   void ProtobufInit(const string& message)
-   {
-
-   }
-
    void WFGridCartesian::Init(ParamContainer &params)
    {
-      string s;
-      int n;
-      double d;
-   
       _params = params;
-      
-      /* Get all the params from the ParamContainer */
-      _params.GetValue( "dims", n );
-      if ( n <= 0 ) throw ( EParamProblem("Zero number of dimension defined") );
-      GridSystem::Dim(n);
-  
-      int i=0;
-      char c[256];
-      sprintf (c, "%d", i);
-      s = string("N") + string(c);
-      while ( _params.isPresent(s) && i < GridSystem::Dim()){
-	 _params.GetValue( string("N") + string(c), n);
-	 
-	 if ( n <= 0) throw ( EParamProblem("Zero elements grid defined") );
-	 GridSystem::DimSize(i, n);
-	 _params.GetValue( string("xmin") + string(c), d);
-	 GridSystem::Xmin(i, d);
-	 _params.GetValue( string("xmax") + string(c), d);
-	 GridSystem::Xmax(i, d);
-	 if ( (GridSystem::Xmax(i) - GridSystem::Xmin(i)) <= 0 )
-	    throw ( EParamProblem("Zero length grid defined") );
 
-	 i++;
-	 sprintf (c, "%d", i);
-      }
+      grid_sys.InitFromParamContainer(params);
       
       cVec::newsize(GridSystem::Size());
       

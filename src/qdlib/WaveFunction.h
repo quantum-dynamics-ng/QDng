@@ -7,6 +7,8 @@
 #include "tools/Exception.h"
 #include "tools/Collector.h"
 
+#include "google/protobuf/io/zero_copy_stream.h"
+
 #define DELETE_WF(WF) Collector<WaveFunction>::Instance()->Delete(WF)
 #define DELETE_ALL_WF() Collector<WaveFunction>::Instance()->Delete()
 
@@ -312,12 +314,12 @@ namespace QDLIB {
          /**
           * Serialize the content into a stream.
           */
-         virtual void Serialize (ostream& os) = 0;
+         virtual void Serialize (::google::protobuf::io::ZeroCopyOutputStream& os) = 0;
 
          /**
           * Restore the wavefucntion from a stream.
           */
-         virtual void DeSerialize (istream& is) = 0;
+         virtual void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is) = 0;
 
 
    }; /* class WaveFunction */

@@ -3,9 +3,16 @@
 
 #include "math/typedefs.h"
 #include "GridSystem.pro.pb.h"
+#include "tools/ParamContainer.h"
 
 namespace QDLIB
 {
+
+   class GridSystemHeaderPm : public GridSystemHeader
+   {
+      public:
+         void InitFromParamContainer(ParamContainer& pm);
+   };
 
    /**
     * Simple container class for the usual grid system parameters.
@@ -17,7 +24,7 @@ namespace QDLIB
    {
       private:
          /* Grid parameters */
-         int dimsizes_[MAX_DIMS];   /* TODO: remove here for compat reasons */
+         int dimsizes_[MAX_DIMS];   /* TODO: remove, here for compat reasons */
          double _dx[MAX_DIMS];
          int _lothers[MAX_DIMS];    /* Stripe size of dim */
          int _nothers[MAX_DIMS];    /* Replica points for each dim */
@@ -27,7 +34,7 @@ namespace QDLIB
          void _BuildInfo();
 
       protected:
-         GridSystemHeader grid_sys;
+         GridSystemHeaderPm grid_sys;
       public:
          GridSystem();
          GridSystem(int dims);

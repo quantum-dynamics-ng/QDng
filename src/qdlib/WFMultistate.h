@@ -30,6 +30,8 @@ namespace QDLIB
 	 lint States();
 	 WaveFunction* State(lint index);
 	 
+	 void Init(int reqstates);
+
 	 /* Interface implementation WaveFunction */
 	 virtual WaveFunction* NewInstance();
 	 
@@ -55,9 +57,9 @@ namespace QDLIB
 
          virtual void Reaquire();
 
-         virtual void Serialize (ostream& os) {}
+         virtual void Serialize (::google::protobuf::io::ZeroCopyOutputStream& os);
 
-         virtual void DeSerialize (istream& is) {}
+         virtual void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is);
    };
 
 }

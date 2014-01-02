@@ -38,9 +38,9 @@ namespace QDLIB {
 
          WFLevel& operator=(WFLevel &Psi);
 
-         virtual void Serialize (ostream& os) {}
+         virtual void Serialize (::google::protobuf::io::ZeroCopyOutputStream& os);
 
-         virtual void DeSerialize (istream& is) {}
+         virtual void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is);
 
    }; /* class WFLevel */
    

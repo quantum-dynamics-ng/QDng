@@ -1,5 +1,6 @@
 #include "Laser.h"
 #include "tools/Exception.h"
+#include "tools/ZCopyStream.h"
 
 namespace QDLIB {
    
@@ -198,7 +199,40 @@ namespace QDLIB {
       _params.SetValue("Nt",size) ;
    }
    
-   
+   void Laser::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   {
+      // Keep format simple
+      uint64_t size = dVec::size();
+
+      if (size == 0) return;
+
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&size), sizeof(size));
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&_dt), sizeof(_dt));
+
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin(0)), sizeBytes());
+   }
+
+   void Laser::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   {
+      uint64_t size;
+
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&size), sizeof(size));
+
+      if (size == 0)
+         throw(EParamProblem("Laser field has zero size"));
+
+      double dt;
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&dt), sizeof(dt));
+
+      if (dt <= 0)
+         throw(EParamProblem("Laser field got a non-sense dt: ", dt));
+
+      _dt = dt;
+
+      newsize(size);
+
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin(0)), sizeBytes());
+   }
    
 }
 

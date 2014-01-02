@@ -22,16 +22,21 @@
 /** Length of the magic + terminating zero */
 #define ZLIB_MLEN 8
 
+
+#include "ZCopyStream.h"
 #include "FileSingleHeader.pb.h"
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/gzip_stream.h>
 
 #include "ParamContainer.h"
 #include "Exception.h"
 
 #include "qdlib/WaveFunction.h"
 #include "qdlib/Operator.h"
+
+#include <stdint.h>
 
 #define BINARY_WF_SUFFIX ".wf"
 #define BINARY_O_SUFFIX ".op"
@@ -46,7 +51,8 @@
 
 
 using namespace std;
-using ::google::protobuf::Message;
+using namespace ::google::protobuf;
+using namespace ::google::protobuf::io;
 
 namespace QDLIB
 {
@@ -130,6 +136,7 @@ namespace QDLIB
             version(PBUF_VERSION)  { memcpy(magic, PBUF_MAGIC, sizeof(PBUF_MAGIC)); }
    };
 
+
    /**
     * I/O base class for a single data file.
     * This is a template class which can handle all general
@@ -195,11 +202,13 @@ namespace QDLIB
          int _counter;
          int _increment;
 
-         istream* _sin; /* I/O streams used for StorageType streams */
+         istream* _sin;            /* I/O streams used for StorageType streams */
+         ZeroCopyInputStream* _zin; /* We this is used for access */
          bool _our_in_stream;
          bool _intro_read;
 
          ostream* _sout;
+         ZeroCopyOutputStream* _zout; /* This is used to put the data in */
          bool _our_out_stream;
          bool _intro_written;
 
@@ -247,9 +256,10 @@ namespace QDLIB
          void BuildDataFileName(string &name);
 
          /* Stream related functions */
-         void WriteMetaToStream(C* data, bool more_files_follow = false, bool ingore_data = false);
+         void WriteMetaToStream(C* data, size_t payload_size, bool more_files_follow = false, bool ingore_data = false);
          void WriteIntroToStream();
-         void WriteDataToStream();
+         void PrepareStreamPayload(C *data, ZeroCopyOutputStream* buffer);
+         void WriteDataToStream(string &data_buf);
          void FinalizeOutStream();
          void WriteSingleFileToStream(C *data);
 
@@ -303,6 +313,7 @@ namespace QDLIB
          void SetInputStream(istream& s)
          {
             _sin = &s;
+            _zin = new IstreamInputStream(_sin); // BUG: When to close _zin???
          }
 
          /**
@@ -313,6 +324,7 @@ namespace QDLIB
          void SetOutputStream(ostream& s)
          {
             _sout = &s;
+            _zout = new OstreamOutputStream(_sout); // BUG: When to close _zout???
          }
 
          void Format(const StorageType type);
@@ -388,8 +400,8 @@ namespace QDLIB
    template<class C>
    FileSingle<C>::FileSingle() :
      _type(autodetect), _sequence(false), _sequence_init(false),
-     _counter(0), _increment(1), _sin(NULL), _our_in_stream(false), _intro_read(false),
-     _sout(NULL), _our_out_stream(false), _intro_written(false),
+     _counter(0), _increment(1), _sin(NULL), _zin(NULL), _our_in_stream(false), _intro_read(false),
+     _sout(NULL), _zout(NULL), _our_out_stream(false), _intro_written(false),
      _buffer(NULL), _buffer_size(0),
      _drop_meta(false), _counter_last(0),  _fsize(0), _freadsize(0), _compMethod(UNCOMPRESSED)
    {
@@ -781,7 +793,7 @@ namespace QDLIB
     * Write meta data to stream.
     */
    template<class C>
-   void FileSingle<C>::WriteMetaToStream(C* data, bool more_files_follow, bool ignore_data)
+   void FileSingle<C>::WriteMetaToStream(C* data, size_t payload_size, bool more_files_follow, bool ignore_data)
    {
       string s;
 
@@ -799,14 +811,12 @@ namespace QDLIB
       if (ignore_data)
          MetaData.set_payload_size(0);
       else
-         MetaData.set_payload_size(_buffer_size);
+         MetaData.set_payload_size(payload_size);
 
       switch (_compMethod){
+         case BZIP:
          case ZLIB:
             MetaData.set_compression(FileSingleHeader_Compression_ZLIB);
-            break;
-         case BZIP:
-            MetaData.set_compression(FileSingleHeader_Compression_BZIP);
             break;
          case UNCOMPRESSED:
             MetaData.set_compression(FileSingleHeader_Compression_UNCOMPRESSED);
@@ -815,10 +825,11 @@ namespace QDLIB
             throw (EIOError("Can't write meta data to stream since compression is INVALID"));
       }
 
-      int size = MetaData.ByteSize();
-      _sout->write((char*) &size, sizeof(int)); /* Put message length in front */
+      uint32_t size = MetaData.ByteSize();
+      /* Put message length in front */
+      WriteToZeroCopyStream(*_zout, reinterpret_cast<char*>(&size), sizeof(uint32_t));
 
-      if(!MetaData.SerializeToOstream(_sout))
+      if(!MetaData.SerializeToZeroCopyStream(_zout))
          throw(EIOError("Can't write meta data to stream"));
    }
 
@@ -852,6 +863,35 @@ namespace QDLIB
    }
 
    /**
+    * Prepare content data for writing.
+    */
+   template<class C>
+   void FileSingle<C>::PrepareStreamPayload(C *data, ZeroCopyOutputStream* buffer)
+   {
+      switch (_compMethod) {
+         case UNCOMPRESSED: /* just copy to buffer */
+            data->Serialize(*buffer);
+            break;
+         case BZIP:     // There's no BZIP compression for streams, just redirect to ZLIB
+         case ZLIB:
+            {
+               GzipOutputStream gzip(buffer);
+               data->Serialize(gzip);
+
+               if (!gzip.Close()){
+                  throw (EIOError("Error compressing stream", gzip.ZlibErrorMessage()));
+               }
+            }
+            break;
+         case INVALID:
+            throw (EIOError("Can't prepare meta data for stream since compression is INVALID"));
+
+      }
+
+
+   }
+
+   /**
     * Write header data to stream.
     */
    template<class C>
@@ -859,7 +899,7 @@ namespace QDLIB
    {
       /* Create file if needed */
       if (_sout == NULL){
-         ofstream* out = new ofstream();
+         ofstream* out = new ofstream(); // TODO: Fix this. don't go via an ofstream
          _our_out_stream = true;
 
          string name;
@@ -874,35 +914,22 @@ namespace QDLIB
          _our_out_stream = true;
       }
 
+      if (_zout == NULL) _zout = new OstreamOutputStream(_sout);
+
       if (!_intro_written){
          /* Write intro */
          PbufHeader intro;
 
-         _sout->write(reinterpret_cast<char*> (&intro), sizeof(intro));
-         if (_sout->bad()){
-            FinalizeOutStream();
-            throw(EIOError("Can not write intro to stream"));
-         }
+         WriteToZeroCopyStream(*_zout, reinterpret_cast<char*> (&intro), sizeof(intro));
          _intro_written = true;
       }
    }
 
 
    template<class C>
-   void FileSingle<C>::WriteDataToStream()
+   void FileSingle<C>::WriteDataToStream(string &data_buf)
    {
-      if (_buffer != NULL){
-         _sout->write(_buffer, _buffer_size);
-
-         if (_sout->bad())
-            throw(EIOError("Failed to write data to stream."));
-
-         /* Invalidate buffer */
-         Memory::Instance().Free(_buffer);
-         _buffer = NULL;
-         _buffer_size = 0;
-      } else
-         throw (EMemError("No data in stream buffer."));
+      WriteToZeroCopyStream(*_zout, reinterpret_cast<const char*>(data_buf.data()), data_buf.size());
    }
 
    /**
@@ -912,6 +939,8 @@ namespace QDLIB
    void FileSingle<C>::FinalizeOutStream()
    {
       if (_our_out_stream){
+         delete _zout;
+         _zout = NULL;
          dynamic_cast<ofstream*>(_sout)->close();
          delete _sout;
          _sout = NULL;
@@ -926,11 +955,19 @@ namespace QDLIB
    template<class C>
    void FileSingle<C>::WriteSingleFileToStream(C *data)
    {
-      WriteIntroToStream();
-      PrepareData(data);
-      WriteMetaToStream(data);
-      WriteDataToStream();
-      FinalizeOutStream();
+      WriteIntroToStream();     // Header
+
+      // Get raw data (payload) from class (subheader + data), compress if requested
+      string sbuf;
+      StringOutputStream *payload = new StringOutputStream(&sbuf);
+      PrepareStreamPayload(data, payload);
+
+      // put payload size in header and write header to stream
+      WriteMetaToStream(data, sbuf.size());
+
+      // write payload to stream
+      WriteDataToStream(sbuf);
+      FinalizeOutStream();      // close stream
       if (_sequence) _counter += _increment;
    }
 
@@ -955,6 +992,8 @@ namespace QDLIB
          _our_in_stream = true;
          _intro_read = false;
       }
+
+      if (_zin == NULL) _zin = new IstreamInputStream(_sin);
    }
 
    /**
@@ -970,10 +1009,7 @@ namespace QDLIB
       /* Check for correct header */
       PbufHeader intro;
 
-      _sin->read(reinterpret_cast<char*>(&intro), sizeof(PbufHeader));
-      if (_sin->bad() || _sin->gcount() != sizeof(PbufHeader)){
-         throw(EIOError("Can not read intro from stream"));
-      }
+      ReadFromZeroCopyStream(*_zin, reinterpret_cast<char*>(&intro), sizeof(PbufHeader));
 
       if (string(intro.magic) != PBUF_MAGIC)
          throw(EIOError("Malformated stream. No stream magic found."));
@@ -990,20 +1026,16 @@ namespace QDLIB
    template<class C>
    const FileSingleHeaderPm& FileSingle<C>::ReadMetaFromStream()
    {
-      int size;
-      _sin->read((char*) &size, sizeof(int));  /* message/meta data length */
+      uint32_t mlen=0;
 
-      char* buffer = new char[size];
-      _sin->read(buffer, size);
+      /* message/meta data length */
+      ReadFromZeroCopyStream(*_zin, reinterpret_cast<char*>(&mlen), sizeof(uint32_t));
 
+      // Parse header
       MetaData.Clear();
-
-      bool res = MetaData.ParseFromArray((void*) buffer, size);
-
-      delete[] buffer;
-
-      if (!res)
+      if (!MetaData.ParseFromBoundedZeroCopyStream(_zin, mlen))
          throw(EIOError("Error reading meta data from stream"));
+
 
 //      google::protobuf::io::OstreamOutputStream zcout(&cout);
 //      google::protobuf::TextFormat::Print(MetaData, &zcout);
@@ -1063,32 +1095,29 @@ namespace QDLIB
    void FileSingle<C>::ReadDataFromStream(C *data)
    {
 
+
       if (MetaData.payload_size() > 0){
+
          switch(MetaData.compression())
          {
             case FileSingleHeader_Compression_UNCOMPRESSED:
-               /* Perform a direct read */
-               if ((size_t) MetaData.payload_size() != data->sizeBytes())
-                  throw(EIOError("Data size from stream doesn't match array size"));
-
-               _sin->read(reinterpret_cast<char*>(data->begin(0)), MetaData.payload_size());
-
-               if (_sin->bad() || ((size_t) _sin->gcount()) != MetaData.payload_size())
-                  throw(EIOError("Error reading data from stream"));
-
-               break;
-            case FileSingleHeader_Compression_ZLIB:
-               _DecompressZLIB(_sin, MetaData.payload_size(), data);
+               data->DeSerialize(*_zin);
                break;
             case FileSingleHeader_Compression_BZIP:
-               _DecompressBZIP(_sin, MetaData.payload_size(), data);
+            case FileSingleHeader_Compression_ZLIB:
+               GzipInputStream gzip(_zin);
+
+               data->DeSerialize(gzip);
+
                break;
          }
       }
 
       /* Close */
       if (_our_in_stream &&  ! MetaData.more_files_follow() ){
-         dynamic_cast<ifstream*>(_sin)->close();
+         delete _zin;
+         _zin = NULL;
+         dynamic_cast<ifstream*>(_sin)->close(); // We know here that it must be an ifstream.
          delete _sin;
          _sin = NULL;
          _our_in_stream = false;
@@ -1105,7 +1134,6 @@ namespace QDLIB
    {
       CheckIntroFromStream();
       ReadMetaFromStream();
-      InitDataStorage(data);
       ReadDataFromStream(data);
 
       if (_sequence) _counter += _increment;
@@ -1340,7 +1368,6 @@ namespace QDLIB
    {
       switch (_type){
          case stream:
-            InitDataStorage(data);
             ReadDataFromStream(data);
             break;
          case binary:
@@ -1363,10 +1390,23 @@ namespace QDLIB
 
       switch (_type){
          case stream:
+         {
             WriteIntroToStream();
-            if (!ingore_data) PrepareData(data);
-            WriteMetaToStream(data, more_files_follow, ingore_data);
+
+            string sbuf;
+
+            StringOutputStream *payload = new StringOutputStream(&sbuf);
+            PrepareStreamPayload(data, payload);
+
+            // put payload size in header and write header to stream
+            WriteMetaToStream(data, sbuf.size(), more_files_follow, ingore_data);
+
+            // write payload to stream
+            WriteDataToStream(sbuf);
+
+            if (!MetaData.more_files_follow()) FinalizeOutStream();
             break;
+         }
          case binary:
             if (!ingore_data) PrepareData(data);
             WriteMetaToRaw(data);
@@ -1382,8 +1422,10 @@ namespace QDLIB
    {
          switch (_type){
             case stream:
-               WriteDataToStream();
-               if (!MetaData.more_files_follow()) FinalizeOutStream();
+               {
+                  // Data is written in WriteMeta(),
+                  // since meta data and payload can't be separated in a stream
+               }
                break;
             case binary:
                break;

@@ -23,7 +23,6 @@ namespace QDLIB {
       private:
          string _name;
 
-         void ProtobufInit(const string& message);
       public:
          WFGridCartesian();
 

@@ -33,8 +33,8 @@ class WFT : public QDLIB::WaveFunction
       virtual void Reduce(double tolerance) {}
       virtual void Restore() {}
 
-      virtual void Serialize(ostream& os) {};
-      virtual void DeSerialize(istream& is) {};
+      virtual void Serialize (::google::protobuf::io::ZeroCopyOutputStream& os) {}
+      virtual void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is) {}
 };
 
 

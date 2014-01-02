@@ -9,6 +9,48 @@
 
 namespace QDLIB {
 
+   void GridSystemHeaderPm::InitFromParamContainer(ParamContainer& pm)
+   {
+      Clear();
+
+      /* Get all the params from the ParamContainer */
+      int dims;
+      pm.GetValue( "dims", dims);
+
+      set_dims(dims);
+      if ( dims <= 0 ) throw ( EParamProblem("Zero number of dimension defined") );
+
+      int i = 0;
+      int n = 0;
+      double d = 0;
+      char c[256];
+      sprintf(c, "%d", i);
+      string s = string("N") + string(c);
+
+      while (pm.isPresent(s) && i < dims) {
+         dim_description_t* dimd = add_dim();
+
+         pm.GetValue(string("N") + string(c), n);
+
+         if (n <= 0)
+            throw(EParamProblem("Zero elements grid defined"));
+
+         dimd->set_size(n);
+
+         pm.GetValue(string("xmin") + string(c), d);
+         dimd->set_xmin(d);
+
+         pm.GetValue(string("xmax") + string(c), d);
+         dimd->set_xmax(d);
+
+         if ((dimd->xmax() - dimd->xmin()) <= 0)
+            throw(EParamProblem("Zero length grid defined"));
+
+         i++;
+         sprintf(c, "%d", i);
+      }
+   }
+
    GridSystem::GridSystem()
    {
       grid_sys.set_dims(0);
@@ -146,7 +188,8 @@ namespace QDLIB {
     */
    double GridSystem::Dx (int dim) const
    {
-      return _dx[dim];
+      return ( grid_sys.dim(dim).xmax() - grid_sys.dim(dim).xmin())/(double(grid_sys.dim(dim).size()-1));
+      //return _dx[dim];
    }
    
    /**

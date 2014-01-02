@@ -12,6 +12,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "tools/FileSingle.h"
+#include "tools/ZCopyStream.h"
 
 using namespace QDLIB;
 
@@ -53,6 +54,8 @@ class FileSingleTest : public CppUnit::TestFixture
          public:
             DataClass() : _init(false), _size(20)
             {
+               for (int i=0; i < _size; i++)
+                  _data[i] = 0;
             }
 
             DataClass(bool init) : _init(init), _size(20)
@@ -81,8 +84,33 @@ class FileSingleTest : public CppUnit::TestFixture
 
                _init = true;
             }
+
+            void Serialize(::google::protobuf::io::ZeroCopyOutputStream& os)
+            {
+               uint64_t siz = size();
+
+               WriteToZeroCopyStream(os, reinterpret_cast<char*>(&siz), sizeof(siz));
+               WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin(0)), sizeBytes());
+            }
+
+            /**
+             * Restore the wavefucntion from a stream.
+             */
+            void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+            {
+               uint64_t siz;
+
+               ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&siz), sizeof(siz));
+
+               CPPUNIT_ASSERT(siz == 20);
+
+               _init = true;
+               ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin(0)), sizeBytes());
+
+            }
       };
 
 };
 
 #endif /* FILESINGLETEST_H_ */
+

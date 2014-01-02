@@ -57,7 +57,6 @@ void FileWFTest::IO_Test_Single()
    ParamContainer p, p_in;
    WaveFunction *psi, *psi_in;
    string s;
-   int n;
    
    /* Init Test WF */
    psi = new WFGridCartesian();
@@ -90,15 +89,12 @@ void FileWFTest::IO_Test_Single()
    CPPUNIT_ASSERT( psi->size() == psi_in->size() );
 
    CPPUNIT_ASSERT(file.GetMeta().class_() == "WFGridCartesian");
-   
-   p_in.GetValue("dims",n);
-   CPPUNIT_ASSERT(n == 1);
-   p_in.GetValue("N0", n);
-   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
-   p_in.GetValue("xmin0", n);
-   CPPUNIT_ASSERT(n == -5);
-   p_in.GetValue("xmax0", n);
-   CPPUNIT_ASSERT(n == 5);
+
+   WFGridCartesian* psi_in_gs = dynamic_cast<WFGridCartesian*>(psi_in);
+   CPPUNIT_ASSERT( psi_in_gs->Dim() == 1 );
+   CPPUNIT_ASSERT( psi_in_gs->DimSize(0) ==  WF_TEST_SIZE);
+   CPPUNIT_ASSERT( psi_in_gs->Xmin(0) ==  -5);
+   CPPUNIT_ASSERT( psi_in_gs->Xmax(0) ==   5);
    
    /* Values should match exactly */
    for (int i=0; i < psi->size(); i++){
@@ -121,14 +117,11 @@ void FileWFTest::IO_Test_Single()
 
    CPPUNIT_ASSERT(file.GetMeta().class_() == "WFGridCartesian");
    
-   p_in.GetValue("dims",n);
-   CPPUNIT_ASSERT(n == 1);
-   p_in.GetValue("N0", n);
-   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
-   p_in.GetValue("xmin0", n);
-   CPPUNIT_ASSERT(n == -5);
-   p_in.GetValue("xmax0", n);
-   CPPUNIT_ASSERT(n == 5);
+   psi_in_gs = dynamic_cast<WFGridCartesian*>(psi_in);
+   CPPUNIT_ASSERT( psi_in_gs->Dim() == 1 );
+   CPPUNIT_ASSERT( psi_in_gs->DimSize(0) ==  WF_TEST_SIZE);
+   CPPUNIT_ASSERT( psi_in_gs->Xmin(0) ==  -5);
+   CPPUNIT_ASSERT( psi_in_gs->Xmax(0) ==   5);
    
    /* Values should match exactly */
    for (int i=0; i < psi->size(); i++){
@@ -151,7 +144,6 @@ void FileWFTest::IO_Test_ZLIB()
    ParamContainer p, p_in;
    WaveFunction *psi, *psi_in;
    string s;
-   int n;
 
    /* Init Test WF */
    psi = new WFGridCartesian();
@@ -184,14 +176,11 @@ void FileWFTest::IO_Test_ZLIB()
    p_in = psi_in->Params();
    CPPUNIT_ASSERT( psi->size() == psi_in->size() );
 
-   p_in.GetValue("dims",n);
-   CPPUNIT_ASSERT(n == 1);
-   p_in.GetValue("N0", n);
-   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
-   p_in.GetValue("xmin0", n);
-   CPPUNIT_ASSERT(n == -5);
-   p_in.GetValue("xmax0", n);
-   CPPUNIT_ASSERT(n == 5);
+   WFGridCartesian* psi_in_gs = dynamic_cast<WFGridCartesian*>(psi_in);
+   CPPUNIT_ASSERT( psi_in_gs->Dim() == 1 );
+   CPPUNIT_ASSERT( psi_in_gs->DimSize(0) ==  WF_TEST_SIZE);
+   CPPUNIT_ASSERT( psi_in_gs->Xmin(0) ==  -5);
+   CPPUNIT_ASSERT( psi_in_gs->Xmax(0) ==   5);
 
    /* Values should match roughly due to lossy compression */
    for (int i=0; i < psi->size(); i++){
@@ -217,7 +206,6 @@ void FileWFTest::IO_Test_BZIP()
    ParamContainer p, p_in;
    WaveFunction *psi, *psi_in;
    string s;
-   int n;
 
    /* Init Test WF */
    psi = new WFGridCartesian();
@@ -252,14 +240,11 @@ void FileWFTest::IO_Test_BZIP()
    p_in = psi_in->Params();
    CPPUNIT_ASSERT( psi->size() == psi_in->size() );
 
-   p_in.GetValue("dims",n);
-   CPPUNIT_ASSERT(n == 1);
-   p_in.GetValue("N0", n);
-   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
-   p_in.GetValue("xmin0", n);
-   CPPUNIT_ASSERT(n == -5);
-   p_in.GetValue("xmax0", n);
-   CPPUNIT_ASSERT(n == 5);
+   WFGridCartesian* psi_in_gs = dynamic_cast<WFGridCartesian*>(psi_in);
+   CPPUNIT_ASSERT( psi_in_gs->Dim() == 1 );
+   CPPUNIT_ASSERT( psi_in_gs->DimSize(0) ==  WF_TEST_SIZE);
+   CPPUNIT_ASSERT( psi_in_gs->Xmin(0) ==  -5);
+   CPPUNIT_ASSERT( psi_in_gs->Xmax(0) ==   5);
 
    /* Values should match roughly due to lossy compression */
    for (int i=0; i < psi->size(); i++){
@@ -305,7 +290,7 @@ void FileWFTest::IO_Test_Multistate()
    fgen_sin_norm(*psi0, -5, 5);
    *psi0 *= cexpI(M_PI);
 
-   p.SetValue("xmax0", 6);
+   p.SetValue("xmax0", 6); // Assure that we can distinguish state 0 and 1
    psi1->Init(p);
    fgen_sin_norm(*psi1, -5, 6);
    *psi1 *= cexpI(M_PI/3);
@@ -348,18 +333,12 @@ void FileWFTest::IO_Test_Multistate()
 
    /* both wfs should match */
    psi0_in = wfm_in->State(0);
-   p_in.clear();
-   p_in = psi0_in->Params();
    CPPUNIT_ASSERT( psi0->size() == psi0_in->size() );
    
-   p_in.GetValue("dims",n);
-   CPPUNIT_ASSERT(n == 1);
-   p_in.GetValue("N0", n);
-   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
-   p_in.GetValue("xmin0", n);
-   CPPUNIT_ASSERT(n == -5);
-   p_in.GetValue("xmax0", n);
-   CPPUNIT_ASSERT(n == 5);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->Dim() == 1);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->DimSize(0) == WF_TEST_SIZE);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->Xmin(0) == -5);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->Xmax(0) == 5);
   
    /* Values should match exactly */
    for (int i=0; i < psi0->size(); i++){

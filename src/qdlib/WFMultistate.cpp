@@ -1,5 +1,6 @@
 #include "WFMultistate.h"
 #include "tools/Exception.h"
+#include "tools/ZCopyStream.h"
 
 namespace QDLIB
 {
@@ -81,49 +82,42 @@ namespace QDLIB
       return r;
    }
 
-   
-   void WFMultistate::Init( ParamContainer & params )
+   void WFMultistate::Init( int reqsize )
    {
-      int reqsize;
+      
       WaveFunction *wflast = NULL;
-      
-      _params = params;
-      
-      _params.GetValue("states", reqsize);
-      
+
       /* look for empty states */
       for (int i=0; i < _nstates; i++){
-	 if (_states[i] != NULL)
-	    wflast = _states[i];
-	 else if (wflast != NULL){
-	    _states[i] = wflast->NewInstance();
-	    *((cVec*) _states[i]) = dcomplex(0,0);
-	 }
+       if (_states[i] != NULL)
+          wflast = _states[i];
+       else if (wflast != NULL){
+          _states[i] = wflast->NewInstance();
+          *((cVec*) _states[i]) = dcomplex(0,0);
+       }
       }
 
       /* same thing again to refill lower states */
       for (int i=0; i < _nstates; i++){
-	 if (_states[i] != NULL)
-	    wflast = _states[i];
-	 else if (wflast != NULL){
-	    _states[i] = wflast->NewInstance();
-	    *((cVec*) _states[i]) = dcomplex(0,0);
-	 }
+       if (_states[i] != NULL)
+          wflast = _states[i];
+       else if (wflast != NULL){
+          _states[i] = wflast->NewInstance();
+          *((cVec*) _states[i]) = dcomplex(0,0);
+       }
       }
 
       if (wflast == NULL)
-	 throw (EParamProblem("Empty multi state wave function"));
+       throw (EParamProblem("Empty multi state wave function"));
       
       /* resize if needed */
       if (_nstates < reqsize){
-	 for (int i=_nstates; i < reqsize; i++){
-	    _states[i] = wflast->NewInstance();
-	    *((cVec*) _states[i]) = dcomplex(0,0);
-	 }
+       for (int i=_nstates; i < reqsize; i++){
+          _states[i] = wflast->NewInstance();
+          *((cVec*) _states[i]) = dcomplex(0,0);
+       }
          _nstates = reqsize;
       }
-      
-      _params.SetValue("states", _nstates);
       
       /* Link states into our vector space */
 
@@ -138,6 +132,18 @@ namespace QDLIB
       }
       
       SyncStrides();
+   }
+
+   void WFMultistate::Init( ParamContainer & params )
+   {
+      int reqsize;
+      _params = params;
+
+      _params.GetValue("states", reqsize);
+
+      Init(reqsize);
+
+      _params.SetValue("states", _nstates);
    }
 
    const string & WFMultistate::Name( )
@@ -261,6 +267,22 @@ namespace QDLIB
       ReaquireStorage();
    }
 
+
+   void WFMultistate::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   {
+      // Just write the number of states here.
+      // The rest has to be done by the FileWF class, since we
+      // don't own the sub data.
+      uint32_t states = States();
+      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&states), sizeof(uint32_t));
+   }
+
+   void WFMultistate::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   {
+      // The info here is useless right now. Ignore it.
+      uint32_t states = 0;
+      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&states), sizeof(uint32_t));
+   }
 
 }
 
