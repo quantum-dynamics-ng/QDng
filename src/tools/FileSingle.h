@@ -94,13 +94,18 @@ namespace QDLIB
             return _params;
          }
 
-         void set_params(const ParamContainer& pm)
+         void set_params(ParamContainer& pm)
          {
             _params = pm;
 
             stringstream ss;
             _params.Write(ss, true);
             FileSingleHeader::set_meta_data(ss.str());
+
+            string classname;
+            pm.GetValue("CLASS", classname);
+            FileSingleHeader::set_class_(classname);
+
          }
 
          void set_meta_data(const ::std::string& value)
@@ -939,13 +944,13 @@ namespace QDLIB
    void FileSingle<C>::FinalizeOutStream()
    {
       if (_our_out_stream){
-         delete _zout;
-         _zout = NULL;
          dynamic_cast<ofstream*>(_sout)->close();
          delete _sout;
          _sout = NULL;
          _our_out_stream = false;
       }
+      delete _zout;
+      _zout = NULL;
       _intro_written = false;
    }
 
@@ -1150,7 +1155,17 @@ namespace QDLIB
       BuildMetaFileName(name);
 
       ParamContainer pm;
-      pm.ReadFromFile(name);
+      if (!pm.ReadFromFile(name)){
+         // Retry stripping by stripping a sequence index
+         if (name.rfind('_') != string::npos) {
+            name = name.substr(0,name.rfind('_')) + METAFILE_SUFFIX;
+
+            if ( !pm.ReadFromFile(name) )
+               throw( EIOError("Can not read meta file", name + " or " + _name) );
+         } else {
+            throw( EIOError("Can not read meta file", name + " or " + _name) );
+         }
+      }
 
       MetaData.set_params(pm);
    }
@@ -1425,6 +1440,10 @@ namespace QDLIB
                {
                   // Data is written in WriteMeta(),
                   // since meta data and payload can't be separated in a stream
+
+                  if (!MetaData.more_files_follow()){
+                     FinalizeOutStream();
+                  }
                }
                break;
             case binary:

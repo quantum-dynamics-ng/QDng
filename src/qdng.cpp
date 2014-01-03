@@ -311,8 +311,15 @@ int main(int argc, char **argv)
 
       if (CmdMode) { /* */
          log.cout() << "Running in interactive mode" << endl;
-         CmdHandler cmd(cin, cout);
-         cmd.RunInteractive("");
+         log.flush();
+
+         if (fname == "-"){
+            CmdHandler cmd(cin, cout);    // stdin/stdout version
+            cmd.RunInteractive(dir);
+         } else {
+            CmdHandler cmd(fname);        // connect via FIFO
+            cmd.RunInteractive(dir);
+         }
       } else
          RunProgrammes(fname, dir);
 

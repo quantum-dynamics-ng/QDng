@@ -179,6 +179,9 @@ namespace QDLIB {
       ParamContainer p = meta.params();
       string classname = meta.class_();
       
+      if (classname.size() == 0)
+         throw (EParamProblem("No CLASS information found. LoadWaveFunctionByMeta failed."));
+
       if (classname == "WFMultistate"){ /* Explicit Multistate handling */
          WFMultistate *wfm = new WFMultistate();
          /** \todo register WF with collector? */
@@ -363,6 +366,7 @@ namespace QDLIB {
             else
                data->Reduce(_compTolerance);
          }
+
          WriteMeta(data, more_files_follow);
          WriteData(data);
 

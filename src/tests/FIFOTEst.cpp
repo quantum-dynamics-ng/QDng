@@ -20,13 +20,9 @@ void FIFOTEst::IO_Test()
     */
    CPPUNIT_ASSERT_NO_THROW(fifo = new FIFO());
 
-   cout << fifo->GetName() << endl;
 
-   fstream& serverRecv = fifo->GetRecvStream();
-   fstream& serverSend = fifo->GetSendStream();
-
-   CPPUNIT_ASSERT( serverRecv.is_open() );
-   CPPUNIT_ASSERT( serverSend.is_open() );
+   istream* serverRecv = fifo->GetRecvStream();
+   ostream* serverSend = fifo->GetSendStream();
 
    /**
     * Create another end point for testing.
@@ -63,16 +59,56 @@ void FIFOTEst::IO_Test()
 //      cout << buf <<endl;
 //   }
 
-   serverSend << mesg << endl;
+   *serverSend << mesg << endl;
    clientRecv.getline(buf, 256);
 
    CPPUNIT_ASSERT( mesg == buf);
 
    mesg = "c->s";
    clientSend << mesg << endl;
-   serverRecv.getline(buf, 256);
+   serverRecv->getline(buf, 256);
 
    CPPUNIT_ASSERT( mesg == buf);
 
    CPPUNIT_ASSERT_NO_THROW(delete fifo);
+}
+
+void FIFOTEst::IO_RxTest()
+{
+   FIFO fifo("fifo_test");
+
+   istream* fin = fifo.GetRecvStream();
+   ofstream cl_out("fifo_testrx", ios::app);
+
+   int num = 12345; // This is a magic number
+   int num_in = 0;
+   CPPUNIT_ASSERT(cl_out.is_open());
+   cl_out.write(reinterpret_cast<char*>(&num), sizeof(num));
+   cl_out.close();
+
+   fin->read(reinterpret_cast<char*>(&num_in), sizeof(num_in));
+
+   CPPUNIT_ASSERT(num == num_in);
+}
+
+
+void FIFOTEst::IO_TxTest()
+{
+   FIFO fifo("fifo_test");
+
+   ostream* fout = fifo.GetSendStream();
+   ifstream cl_in("fifo_testtx", ios::app);
+
+   int num = 12345; // This is a magic number
+   int num_in = 0;
+
+   fout->write(reinterpret_cast<char*>(&num), sizeof(num));
+   fout->flush();
+
+   CPPUNIT_ASSERT(cl_in.is_open());
+   cl_in.read(reinterpret_cast<char*>(&num_in), sizeof(num_in));
+   cl_in.close();
+
+
+   CPPUNIT_ASSERT(num == num_in);
 }

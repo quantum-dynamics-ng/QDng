@@ -1,0 +1,34 @@
+package QDLIB;
+
+//
+// Message containing a command to QDng
+//
+message Command {
+	required command_t cmd = 1 [default = QUIT];
+	optional string XML = 2;
+	optional string param1 = 3; 
+	optional string param2 = 4;
+	optional string param3 = 5;
+	
+	enum command_t {
+	    QUIT	 = 0;
+		RUN_PROG = 1;
+		READ_WF  = 2;
+		WRITE_WF = 3;
+//		LOAD_OP  = 4;
+//		GET_EXPEC = 5;
+//		GET_MATEL = 6;
+//		APPLY_OP  = 7;		
+	}
+}
+
+message Response {
+	required response_t response = 1 [ default = OK ];
+	optional string msg = 2;
+	
+	enum response_t {
+		OK = 0;
+		ERROR_MSG = 1;
+		ERROR = 2;
+	}
+}

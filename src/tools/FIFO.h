@@ -39,12 +39,12 @@ namespace QDLIB
          /**
           * Get the associated stream object for input.
           */
-         fstream& GetRecvStream() { return _istream; };
+         istream* GetRecvStream() { return &_istream; };
 
          /**
           * Get the associated stream object for output.
           */
-         fstream& GetSendStream() { return _ostream; };
+         ostream* GetSendStream() { return &_ostream; };
 
          /**
           * Get the path to the FIFO file.

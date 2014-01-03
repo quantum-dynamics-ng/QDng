@@ -7,10 +7,6 @@
 
 #include "CmdHandler.h"
 
-#include <cstdlib>
-#include <time.h>
-#include <sys/times.h>
-
 #include "tools/Exception.h"
 #include "tools/XmlParser.h"
 #include "tools/Logger.h"
@@ -27,8 +23,23 @@
 #include "ProgEigen.h"
 #include "ProgOCT.h"
 
+#include <cstdlib>
+#include <time.h>
+#include <sys/times.h>
+
 namespace QDLIB
 {
+
+   void CmdHandler::SendResponse(Response& resp)
+   {
+      uint32_t msg_size = resp.ByteSize();
+
+      sout_->write(reinterpret_cast<char*>(&msg_size), sizeof(msg_size));
+
+      if (!resp.SerializeToOstream(sout_))
+         throw(EIOError("Couldn't send response to last command"));
+
+   }
 
    /**
     * Run XML the main programmes by XML defintions.
@@ -175,7 +186,7 @@ namespace QDLIB
    /**
     * Initialize interactive mode with given I/O streams to exchange commands.
     */
-   CmdHandler::CmdHandler(istream& in, ostream& out) : _fifo(NULL), _sin(&in), _sout(&out)
+   CmdHandler::CmdHandler(istream& in, ostream& out) : fifo_(NULL), sin_(&in), sout_(&out)
    {
    }
 
@@ -183,19 +194,23 @@ namespace QDLIB
    /**
     * Initialize interactive mdoe with base name for FIFO file.
     */
-   CmdHandler::CmdHandler(const string& file)
+   CmdHandler::CmdHandler(const string& file) : buffer(NULL)
    {
-      _fifo = new FIFO(file);
+      fifo_ = new FIFO(file);
+
+      sin_ = fifo_->GetRecvStream();
+      sout_ = fifo_->GetSendStream();
    }
 
-   CmdHandler::CmdHandler() : _fifo(NULL), _sin(NULL), _sout(NULL)
+   CmdHandler::CmdHandler() : buffer(NULL), fifo_(NULL), sin_(NULL), sout_(NULL)
    {
 
    }
 
    CmdHandler::~CmdHandler()
    {
-      if (_fifo != NULL) delete _fifo;
+      if (fifo_ != NULL) delete fifo_;
+      if (buffer != NULL) delete[] buffer;
    }
 
 
@@ -219,99 +234,117 @@ namespace QDLIB
 
       Logger& log = Logger::InstanceRef();
 
-      string cmd;
+      uint32_t msg_size;
+      Command cmd;
+      Response resp;
 
-      while (cmd != "quit"){ /* command loop */
-         *_sin >> cmd;
-
-         if (cmd == "XML"){ /* run pure XML input */
-            size_t size;
-            char* buf;
-
-            *_sin >> size;
-            buf = (char*) malloc(size+1);
-            _sin->read(buf, size);
-
-            log.coutdbg() << buf << endl;
-            log.cout() << "Running XML input...\n";
-            log.flush();
-
-            RunXML(buf, size, dir);
-            free(buf);
-         } else if (cmd == "lsop") { /* list available operators */
-            GlobalOpList& oplist = GlobalOpList::Instance();
-            oplist.PrintList();
-         } else if (cmd == "lswf") {
-            GlobalWFList& wflist = GlobalWFList::Instance();
-            wflist.PrintList();
-         } else if (cmd == "showgp") {
-            ParamContainer& pm = GlobalParams::Instance();
-            *_sout << pm << endl;
-         } else if (cmd == "showop") {
-            GlobalOpList& oplist = GlobalOpList::Instance();
-            string name;
-
-            *_sin >> name;
-            *_sout << oplist[name]->Params() << endl;
-         } else if (cmd == "getwf") {
-            GlobalWFList& wflist = GlobalWFList::Instance();
-            FileWF io;
-            string name;
-
-            /* get name */
-            *_sin >> name;
-
-            /* get wf */
-            WaveFunction* wf = wflist.GetCopy(name);
-
-            /* Prepare for stream writing */
-            io.Compress(false);
-            io.SetOutputStream(*_sout);
-            io.Format(FileSingle<WaveFunction>::stream);
-
-            io << wf;
-
-            DELETE_WF(wf);
-         } else if (cmd == "setwf") {
-            GlobalWFList& wflist = GlobalWFList::Instance();
-            FileWF io;
-            WaveFunction* wf;
-            string name;
-
-            /* get name */
-            *_sin >> name;
-
-            /* set wf */
-
-            /* Prepare for stream reading */
-            io.Compress(false);
-            io.SetOutputStream(*_sout);
-            io.SetInputStream(*_sin);
-            io.Format(FileSingle<WaveFunction>::stream);
-
-            wf = io.LoadWaveFunctionByMeta();
-
-            wflist.Set(name, wf);
-
-            DELETE_WF(wf);
-         }
-
+      do { /* command loop */
+         log.coutdbg() << "Waiting for input.." << endl;
          log.flush();
-         *_sout << "ENDOFCMD" << endl;
-      }
-      // Open cmd pipe line
-      // loop over commands
-         // run pure XML
-         // Get Op
-            //name
-         // Get WF
-         // Apply Op
-         // Matel/Expec
-         // Create WF
-         // Create Op
-         // lsop
-         // lswf
-         // exit
+         sin_->read(reinterpret_cast<char*>(&msg_size), sizeof(msg_size));
+         cout << "msg_size: " << msg_size << endl;
+
+         buffer = new char[msg_size];
+         sin_->read(reinterpret_cast<char*>(buffer), msg_size);
+
+         if ( !cmd.ParseFromArray(buffer, msg_size) )
+            throw (EParamProblem("Parsing the command from input failed"));
+
+         delete[] buffer; buffer = NULL;
+
+         switch (cmd.cmd()){
+            case Command_command_t_RUN_PROG:
+            {
+               log.coutdbg() << "Received RUN_PROG" << endl;
+               log.flush();
+
+               resp.Clear();
+
+               if (!cmd.has_xml())
+                  throw (EParamProblem("RUN_PROG is missing the XML input"));
+
+               try {
+                  RunXML(cmd.xml().c_str(), cmd.xml().size(), dir);
+                  resp.set_response(Response_response_t_OK);
+                  SendResponse(resp);
+               } catch (Exception& e) {
+                  resp.set_response(Response_response_t_ERROR_MSG);
+                  resp.set_msg(e.GetMessage());
+                  SendResponse(resp);
+                  throw (e);
+               }
+            }
+               break;
+            case Command_command_t_READ_WF:
+            {
+               if (!cmd.has_param1())
+                  throw (EParamProblem("READ_WF is missing a file name"));
+
+               resp.Clear();
+
+               FileWF file;
+               WaveFunction* wf;
+
+               // Load WF;
+               file.Name(cmd.param1());
+
+               try {
+                  wf = file.LoadWaveFunctionByMeta();
+               } catch (Exception& e) {
+                  resp.set_response(Response_response_t_ERROR_MSG);
+                  resp.set_msg(e.GetMessage());
+                  SendResponse(resp);
+                  throw (e);
+               }
+
+               // Write to stream
+               file.Compress(false);
+               file.SetOutputStream(*sout_);
+               file.Format(FileSingle<WaveFunction>::stream);
+
+               try {
+                  file.WriteWaveFunction(wf);
+                  sout_->flush();
+               }  catch (Exception& e) {
+                  resp.set_response(Response_response_t_ERROR_MSG);
+                  resp.set_msg(e.GetMessage());
+                  SendResponse(resp);
+                  throw (e);
+               }
+
+               DELETE_WF(wf);
+
+
+            }
+               break;
+            case Command_command_t_WRITE_WF:
+            {
+               if (!cmd.has_param1())
+                  throw (EParamProblem("WRITE_WF is missing a file name"));
+
+               FileWF file;
+               WaveFunction* wf;
+
+               // Read from Stream;
+               file.SetInputStream(*sin_);
+               wf = file.LoadWaveFunctionByMeta();
+
+               // Write to file
+               file.Name(cmd.param1());
+               file.Format(FileSingle<WaveFunction>::stream);
+
+               DELETE_WF(wf);
+            }
+               break;
+            case Command_command_t_QUIT:
+               log.coutdbg() << "Received QUIT" << endl;
+               log.flush();
+               break;
+            default:
+            break;
+         }
+      } while  (cmd.cmd() != Command_command_t_QUIT);
+
    }
 
 } /* namespace QDLIB */

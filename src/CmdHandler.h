@@ -8,9 +8,12 @@
 #ifndef CMDHANDLER_H_
 #define CMDHANDLER_H_
 
+#include "tools/FIFO.h"
+#include "IACmds.pb.h"
+
 #include <string>
 #include <iostream>
-#include "tools/FIFO.h"
+
 
 using namespace std;
 
@@ -23,12 +26,15 @@ namespace QDLIB
          static void RunXML(const char* buf, size_t size, const string& dir);
 
       private:
-         FIFO* _fifo;
-         istream* _sin;
-         ostream* _sout;
+         char* buffer;
+         FIFO* fifo_;
+         istream* sin_;
+         ostream* sout_;
 
          void SendBinary();
          void RecvBinary();
+
+         void SendResponse(Response& resp);
       public:
          CmdHandler(istream& in, ostream& out);
          CmdHandler(const string& file);
