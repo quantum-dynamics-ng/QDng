@@ -199,30 +199,30 @@ namespace QDLIB {
       _params.SetValue("Nt",size) ;
    }
    
-   void Laser::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   void Laser::Serialize (std::ostream& os)
    {
       // Keep format simple
       uint64_t size = dVec::size();
 
       if (size == 0) return;
 
-      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&size), sizeof(size));
-      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&_dt), sizeof(_dt));
+      os.write(reinterpret_cast<char*>(&size), sizeof(size));
+      os.write(reinterpret_cast<char*>(&_dt), sizeof(_dt));
 
-      WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin(0)), sizeBytes());
+      os.write(reinterpret_cast<char*>(begin(0)), sizeBytes());
    }
 
-   void Laser::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   void Laser::DeSerialize (std::istream&is)
    {
       uint64_t size;
 
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&size), sizeof(size));
+      is.read(reinterpret_cast<char*>(&size), sizeof(size));
 
       if (size == 0)
          throw(EParamProblem("Laser field has zero size"));
 
       double dt;
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&dt), sizeof(dt));
+      is.read(reinterpret_cast<char*>(&dt), sizeof(dt));
 
       if (dt <= 0)
          throw(EParamProblem("Laser field got a non-sense dt: ", dt));
@@ -231,7 +231,7 @@ namespace QDLIB {
 
       newsize(size);
 
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin(0)), sizeBytes());
+      is.read(reinterpret_cast<char*>(begin(0)), sizeBytes());
    }
    
 }

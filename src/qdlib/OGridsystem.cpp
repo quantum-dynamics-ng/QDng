@@ -56,35 +56,39 @@ namespace QDLIB {
    }
 
 
-   void OGridSystem::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   void OGridSystem::Serialize (std::ostream& os)
    {
       // Write header
       grid_sys.set_data_size(sizeBytes());
 
       uint32_t size = grid_sys.ByteSize();
-      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&size), sizeof(size));
+      os.write(reinterpret_cast<char*>(&size), sizeof(size));
 
-      if (! grid_sys.SerializeToZeroCopyStream(&os) )
+      if (! grid_sys.SerializeToOstream(&os) )
          throw(EIOError("Can't write Operator to stream"));
 
       // Write data
-      WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin(0)), sizeBytes());
+      os.write(reinterpret_cast<char*>(begin(0)), sizeBytes());
    }
 
-   void OGridSystem::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   void OGridSystem::DeSerialize (std::istream& is)
    {
       // read header
       uint32_t size;
 
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&size), sizeof(uint32_t));
+      is.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
 
-      if (! grid_sys.ParseFromBoundedZeroCopyStream(&is, size) )
+      char* buf = new char[size];
+      is.read(buf, size);
+      if (! grid_sys.ParseFromArray(buf, size) )
          throw(EIOError("Can't read WF from stream"));
+
+      delete[] buf;
 
       newsize(GridSystem::Size());
       grid_sys.set_data_size(GridSystem::Size() * sizeof(*begin(0)));
 
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin(0)), sizeBytes());
+      is.read(reinterpret_cast<char*>(begin(0)), sizeBytes());
    }
 
 } /* namespace QDLIB */

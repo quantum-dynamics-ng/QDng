@@ -1,9 +1,12 @@
 function [data, meta, header] = qd_read_wf(fname, decode_fcn)
 %
+% [data, meta, header] = qd_read_wf(fname)
+% [data, meta, header] = qd_read_wf(fname, decode_fcn)
+%
 % Read a wave function through a running QDng 
 % 
 
-fd = qd_get_socket('tx')
+fd = qd_get_socket('tx');
 
 % request the WF
 cmd = pb_read_QDLIB__Command([]);

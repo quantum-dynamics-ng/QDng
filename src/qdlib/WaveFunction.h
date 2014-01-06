@@ -314,12 +314,12 @@ namespace QDLIB {
          /**
           * Serialize the content into a stream.
           */
-         virtual void Serialize (::google::protobuf::io::ZeroCopyOutputStream& os) = 0;
+         virtual void Serialize (std::ostream& os) = 0;
 
          /**
           * Restore the wavefucntion from a stream.
           */
-         virtual void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is) = 0;
+         virtual void DeSerialize (std::istream& is) = 0;
 
 
    }; /* class WaveFunction */

@@ -268,20 +268,20 @@ namespace QDLIB
    }
 
 
-   void WFMultistate::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   void WFMultistate::Serialize (std::ostream& os)
    {
       // Just write the number of states here.
       // The rest has to be done by the FileWF class, since we
       // don't own the sub data.
       uint32_t states = States();
-      WriteToZeroCopyStream(os, reinterpret_cast<char*>(&states), sizeof(uint32_t));
+      os.write(reinterpret_cast<char*>(&states), sizeof(uint32_t));
    }
 
-   void WFMultistate::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   void WFMultistate::DeSerialize (std::istream& is)
    {
       // The info here is useless right now. Ignore it.
       uint32_t states = 0;
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&states), sizeof(uint32_t));
+      is.read(reinterpret_cast<char*>(&states), sizeof(uint32_t));
    }
 
 }

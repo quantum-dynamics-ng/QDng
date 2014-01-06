@@ -8,10 +8,10 @@ package QDLIB;
 
 message FileSingleHeader {
    required bool more_files_follow = 1 [default = false];
-   required string class = 2; 
+   required string class = 2 [default = "NoClass"]; 
    optional string name = 3;
    optional uint32 sequence_number = 4;
-   required string meta_data = 5;
+   optional string meta_data = 5;
    required uint64 payload_size  = 6 [default = 0];
    required Compression compression = 7 [default = UNCOMPRESSED];
    enum Compression {

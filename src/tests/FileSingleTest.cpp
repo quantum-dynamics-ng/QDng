@@ -49,7 +49,7 @@ void FileSingleTest::Stream_Test()
 
    CPPUNIT_ASSERT(file_detect.Format() == FileSingle<DataClass>::stream );
 
-   CPPUNIT_ASSERT_NO_THROW(FS::Remove("DataClassTestFile.pbf"));
+   //CPPUNIT_ASSERT_NO_THROW(FS::Remove("DataClassTestFile.pbf"));
 }
 
 

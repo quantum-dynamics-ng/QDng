@@ -11,10 +11,10 @@ function [file_single_header] = pb_read_QDLIB__FileSingleHeader(buffer, buffer_s
 %
 %   MEMBERS:
 %     more_files_follow: required uint32, defaults to uint32(0).
-%     class          : required string, defaults to ''.
+%     class          : required string, defaults to 'NoClass'.
 %     name           : optional string, defaults to ''.
 %     sequence_number: optional uint32, defaults to uint32(0).
-%     meta_data      : required string, defaults to ''.
+%     meta_data      : optional string, defaults to ''.
 %     payload_size   : required uint64, defaults to uint64(0).
 %     compression    : required enum, defaults to int32(0).
 %     sub_header     : optional uint8 vector, defaults to uint8('').

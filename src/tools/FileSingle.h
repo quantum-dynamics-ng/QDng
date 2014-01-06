@@ -208,12 +208,10 @@ namespace QDLIB
          int _increment;
 
          istream* _sin;            /* I/O streams used for StorageType streams */
-         ZeroCopyInputStream* _zin; /* We this is used for access */
          bool _our_in_stream;
          bool _intro_read;
 
          ostream* _sout;
-         ZeroCopyOutputStream* _zout; /* This is used to put the data in */
          bool _our_out_stream;
          bool _intro_written;
 
@@ -263,8 +261,8 @@ namespace QDLIB
          /* Stream related functions */
          void WriteMetaToStream(C* data, size_t payload_size, bool more_files_follow = false, bool ingore_data = false);
          void WriteIntroToStream();
-         void PrepareStreamPayload(C *data, ZeroCopyOutputStream* buffer);
-         void WriteDataToStream(string &data_buf);
+         void PrepareStreamPayload(C *data, stringstream& buffer);
+         void WriteDataToStream(const string &data_buf);
          void FinalizeOutStream();
          void WriteSingleFileToStream(C *data);
 
@@ -318,7 +316,6 @@ namespace QDLIB
          void SetInputStream(istream& s)
          {
             _sin = &s;
-            _zin = new IstreamInputStream(_sin); // BUG: When to close _zin???
          }
 
          /**
@@ -329,7 +326,6 @@ namespace QDLIB
          void SetOutputStream(ostream& s)
          {
             _sout = &s;
-            _zout = new OstreamOutputStream(_sout); // BUG: When to close _zout???
          }
 
          void Format(const StorageType type);
@@ -405,8 +401,8 @@ namespace QDLIB
    template<class C>
    FileSingle<C>::FileSingle() :
      _type(autodetect), _sequence(false), _sequence_init(false),
-     _counter(0), _increment(1), _sin(NULL), _zin(NULL), _our_in_stream(false), _intro_read(false),
-     _sout(NULL), _zout(NULL), _our_out_stream(false), _intro_written(false),
+     _counter(0), _increment(1), _sin(NULL), _our_in_stream(false), _intro_read(false),
+     _sout(NULL), _our_out_stream(false), _intro_written(false),
      _buffer(NULL), _buffer_size(0),
      _drop_meta(false), _counter_last(0),  _fsize(0), _freadsize(0), _compMethod(UNCOMPRESSED)
    {
@@ -832,9 +828,9 @@ namespace QDLIB
 
       uint32_t size = MetaData.ByteSize();
       /* Put message length in front */
-      WriteToZeroCopyStream(*_zout, reinterpret_cast<char*>(&size), sizeof(uint32_t));
+      _sout->write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
 
-      if(!MetaData.SerializeToZeroCopyStream(_zout))
+      if(!MetaData.SerializeToOstream(_sout))
          throw(EIOError("Can't write meta data to stream"));
    }
 
@@ -871,17 +867,41 @@ namespace QDLIB
     * Prepare content data for writing.
     */
    template<class C>
-   void FileSingle<C>::PrepareStreamPayload(C *data, ZeroCopyOutputStream* buffer)
+   void FileSingle<C>::PrepareStreamPayload(C *data, stringstream& buffer)
    {
       switch (_compMethod) {
          case UNCOMPRESSED: /* just copy to buffer */
-            data->Serialize(*buffer);
+            data->Serialize(buffer);
             break;
          case BZIP:     // There's no BZIP compression for streams, just redirect to ZLIB
          case ZLIB:
             {
-               GzipOutputStream gzip(buffer);
-               data->Serialize(gzip);
+               // get raw data
+               stringstream outbuf;
+               data->Serialize(outbuf);
+               outbuf.seekg(0);
+
+               OstreamOutputStream osbuf(&buffer);
+               GzipOutputStream gzip(&osbuf);
+
+               int size;
+               void* buf;
+               size_t written=0;
+               size_t len;
+
+               // Compress
+               while (written < outbuf.str().size() ){
+                  if(!gzip.Next(&buf, &size))
+                     throw(EIOError("GzipOutputStream failed"));
+
+                  len = size;
+                  if ((size_t) size > outbuf.str().size() - written) len = outbuf.str().size() - written;
+                  outbuf.read(reinterpret_cast<char*>(buf), len);
+                  written += len;
+               }
+
+               if ((size_t) size - len > 0) gzip.BackUp(size - len);
+
 
                if (!gzip.Close()){
                   throw (EIOError("Error compressing stream", gzip.ZlibErrorMessage()));
@@ -919,22 +939,20 @@ namespace QDLIB
          _our_out_stream = true;
       }
 
-      if (_zout == NULL) _zout = new OstreamOutputStream(_sout);
-
       if (!_intro_written){
          /* Write intro */
          PbufHeader intro;
 
-         WriteToZeroCopyStream(*_zout, reinterpret_cast<char*> (&intro), sizeof(intro));
+         _sout->write(reinterpret_cast<char*> (&intro), sizeof(intro));
          _intro_written = true;
       }
    }
 
 
    template<class C>
-   void FileSingle<C>::WriteDataToStream(string &data_buf)
+   void FileSingle<C>::WriteDataToStream(const string &data_buf)
    {
-      WriteToZeroCopyStream(*_zout, reinterpret_cast<const char*>(data_buf.data()), data_buf.size());
+      _sout->write(reinterpret_cast<const char*>(data_buf.data()), data_buf.size());
    }
 
    /**
@@ -949,8 +967,7 @@ namespace QDLIB
          _sout = NULL;
          _our_out_stream = false;
       }
-      delete _zout;
-      _zout = NULL;
+
       _intro_written = false;
    }
 
@@ -963,15 +980,15 @@ namespace QDLIB
       WriteIntroToStream();     // Header
 
       // Get raw data (payload) from class (subheader + data), compress if requested
-      string sbuf;
-      StringOutputStream *payload = new StringOutputStream(&sbuf);
+      stringstream payload;
       PrepareStreamPayload(data, payload);
 
       // put payload size in header and write header to stream
-      WriteMetaToStream(data, sbuf.size());
+      WriteMetaToStream(data, payload.str().size());
 
       // write payload to stream
-      WriteDataToStream(sbuf);
+      const string& s = payload.str();
+      WriteDataToStream( s );
       FinalizeOutStream();      // close stream
       if (_sequence) _counter += _increment;
    }
@@ -998,7 +1015,6 @@ namespace QDLIB
          _intro_read = false;
       }
 
-      if (_zin == NULL) _zin = new IstreamInputStream(_sin);
    }
 
    /**
@@ -1014,7 +1030,7 @@ namespace QDLIB
       /* Check for correct header */
       PbufHeader intro;
 
-      ReadFromZeroCopyStream(*_zin, reinterpret_cast<char*>(&intro), sizeof(PbufHeader));
+      _sin->read(reinterpret_cast<char*>(&intro), sizeof(PbufHeader));
 
       if (string(intro.magic) != PBUF_MAGIC)
          throw(EIOError("Malformated stream. No stream magic found."));
@@ -1034,16 +1050,19 @@ namespace QDLIB
       uint32_t mlen=0;
 
       /* message/meta data length */
-      ReadFromZeroCopyStream(*_zin, reinterpret_cast<char*>(&mlen), sizeof(uint32_t));
+      _sin->read(reinterpret_cast<char*>(&mlen), sizeof(uint32_t));
+
+      char* buf = new char[mlen];
+      _sin->read(reinterpret_cast<char*>(buf), mlen);
 
       // Parse header
       MetaData.Clear();
-      if (!MetaData.ParseFromBoundedZeroCopyStream(_zin, mlen))
+      if (!MetaData.ParseFromArray(reinterpret_cast<const void*>(buf), mlen)){
+         delete[] buf;
          throw(EIOError("Error reading meta data from stream"));
+      }
 
-
-//      google::protobuf::io::OstreamOutputStream zcout(&cout);
-//      google::protobuf::TextFormat::Print(MetaData, &zcout);
+      delete[] buf;
 
       return MetaData;
    }
@@ -1106,27 +1125,46 @@ namespace QDLIB
          switch(MetaData.compression())
          {
             case FileSingleHeader_Compression_UNCOMPRESSED:
-               data->DeSerialize(*_zin);
+               data->DeSerialize(*_sin);
                break;
             case FileSingleHeader_Compression_BZIP:
             case FileSingleHeader_Compression_ZLIB:
-               GzipInputStream gzip(_zin);
+               char* inbuf = new char[MetaData.payload_size()];
 
-               data->DeSerialize(gzip);
+               _sin->read(inbuf, MetaData.payload_size());
 
+               if ( (size_t) _sin->gcount() != MetaData.payload_size() )
+                  throw(EIOError("Reading from stream failed"));
+
+               ArrayInputStream arrin(inbuf, MetaData.payload_size());
+               GzipInputStream gzip(&arrin);
+               stringstream outbuf;
+
+               const void* gzbuf;
+               int size;
+
+               while (gzip.Next(&gzbuf, &size)){
+                  outbuf.write(reinterpret_cast<const char*>(gzbuf), size);
+               }
+
+               outbuf.seekg(0);
+               data->DeSerialize(outbuf);
+
+               delete[] inbuf;
                break;
          }
       }
 
-      /* Close */
-      if (_our_in_stream &&  ! MetaData.more_files_follow() ){
-         delete _zin;
-         _zin = NULL;
-         dynamic_cast<ifstream*>(_sin)->close(); // We know here that it must be an ifstream.
-         delete _sin;
-         _sin = NULL;
-         _our_in_stream = false;
+      if (! MetaData.more_files_follow()) {
          _intro_read = false;
+
+         /* Close */
+         if (_our_in_stream ){
+            dynamic_cast<ifstream*>(_sin)->close(); // We know here that it must be an ifstream.
+            delete _sin;
+            _sin = NULL;
+            _our_in_stream = false;
+         }
       }
    }
 
@@ -1408,16 +1446,14 @@ namespace QDLIB
          {
             WriteIntroToStream();
 
-            string sbuf;
-
-            StringOutputStream *payload = new StringOutputStream(&sbuf);
+            stringstream payload;
             PrepareStreamPayload(data, payload);
 
             // put payload size in header and write header to stream
-            WriteMetaToStream(data, sbuf.size(), more_files_follow, ingore_data);
+            WriteMetaToStream(data, payload.str().size(), more_files_follow, ingore_data);
 
             // write payload to stream
-            WriteDataToStream(sbuf);
+            WriteDataToStream(payload.str());
 
             if (!MetaData.more_files_follow()) FinalizeOutStream();
             break;

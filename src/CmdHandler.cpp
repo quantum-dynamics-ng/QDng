@@ -39,6 +39,8 @@ namespace QDLIB
       if (!resp.SerializeToOstream(sout_))
          throw(EIOError("Couldn't send response to last command"));
 
+      sout_->flush();
+
    }
 
    /**
@@ -302,6 +304,10 @@ namespace QDLIB
                file.SetOutputStream(*sout_);
                file.Format(FileSingle<WaveFunction>::stream);
 
+               // The format in the stream is as follows:
+               // In case of success the file is sent which can
+               // be detected by the file header
+               // In case of an error a message is sent: msg_len, Response.
                try {
                   file.WriteWaveFunction(wf);
                   sout_->flush();
@@ -313,8 +319,6 @@ namespace QDLIB
                }
 
                DELETE_WF(wf);
-
-
             }
                break;
             case Command_command_t_WRITE_WF:
@@ -324,14 +328,34 @@ namespace QDLIB
 
                FileWF file;
                WaveFunction* wf;
+               resp.Clear();
 
                // Read from Stream;
                file.SetInputStream(*sin_);
-               wf = file.LoadWaveFunctionByMeta();
+
+               try {
+                  wf = file.LoadWaveFunctionByMeta();
+               } catch (Exception& e) {
+                  resp.set_response(Response_response_t_ERROR_MSG);
+                  resp.set_msg(e.GetMessage());
+                  SendResponse(resp);
+                  throw (e);
+               }
 
                // Write to file
-               file.Name(cmd.param1());
-               file.Format(FileSingle<WaveFunction>::stream);
+               try {
+                  file.Name(cmd.param1());
+                  file.Format(FileSingle<WaveFunction>::stream);
+                  file.WriteWaveFunction(wf);
+               } catch (Exception& e) {
+                  resp.set_response(Response_response_t_ERROR_MSG);
+                  resp.set_msg(e.GetMessage());
+                  SendResponse(resp);
+                  throw (e);
+               }
+
+               resp.set_response(Response_response_t_OK);
+               SendResponse(resp);
 
                DELETE_WF(wf);
             }

@@ -272,29 +272,29 @@ namespace QDLIB {
       _valid = true;
    }
 
-   void OHermitianMatrix::Serialize (::google::protobuf::io::ZeroCopyOutputStream& os)
+   void OHermitianMatrix::Serialize (std::ostream& os)
    {
       // Write header, keep it simple here
      uint32 rows_cols = dMat::rows();
 
-     WriteToZeroCopyStream(os, reinterpret_cast<char*>(&rows_cols), sizeof(rows_cols));
-     WriteToZeroCopyStream(os, reinterpret_cast<char*>(&rows_cols), sizeof(rows_cols));
+     os.write(reinterpret_cast<char*>(&rows_cols), sizeof(rows_cols));
+     os.write(reinterpret_cast<char*>(&rows_cols), sizeof(rows_cols));
 
       // Write data
-      WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin()), sizeBytes());
+     os.write(reinterpret_cast<char*>(begin()), sizeBytes());
    }
 
-   void OHermitianMatrix::DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+   void OHermitianMatrix::DeSerialize (std::istream& is)
    {
       // read header
       uint32_t size;
 
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&size), sizeof(uint32_t));
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&size), sizeof(uint32_t));
+      is.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+      is.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
 
       newsize(size, size);
 
-      ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin()), sizeBytes());
+      is.read(reinterpret_cast<char*>(begin()), sizeBytes());
    }
 
 } /* namespace QDLIB */

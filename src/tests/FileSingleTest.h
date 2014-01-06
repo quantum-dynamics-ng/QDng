@@ -85,27 +85,27 @@ class FileSingleTest : public CppUnit::TestFixture
                _init = true;
             }
 
-            void Serialize(::google::protobuf::io::ZeroCopyOutputStream& os)
+            void Serialize(std::ostream& os)
             {
                uint64_t siz = size();
 
-               WriteToZeroCopyStream(os, reinterpret_cast<char*>(&siz), sizeof(siz));
-               WriteToZeroCopyStream(os, reinterpret_cast<char*>(begin(0)), sizeBytes());
+               os.write(reinterpret_cast<char*>(&siz), sizeof(siz));
+               os.write(reinterpret_cast<char*>(begin(0)), sizeBytes());
             }
 
             /**
              * Restore the wavefucntion from a stream.
              */
-            void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is)
+            void DeSerialize (std::istream& is)
             {
                uint64_t siz;
 
-               ReadFromZeroCopyStream(is, reinterpret_cast<char*>(&siz), sizeof(siz));
+               is.read(reinterpret_cast<char*>(&siz), sizeof(siz));
 
                CPPUNIT_ASSERT(siz == 20);
 
                _init = true;
-               ReadFromZeroCopyStream(is, reinterpret_cast<char*>(begin(0)), sizeBytes());
+               is.read(reinterpret_cast<char*>(begin(0)), sizeBytes());
 
             }
       };

@@ -77,9 +77,9 @@ namespace QDLIB
 
          OHermitianMatrix& operator=(OHermitianMatrix &O);
 
-         virtual void Serialize (::google::protobuf::io::ZeroCopyOutputStream& os);
+         virtual void Serialize (std::ostream& os);
 
-         virtual void DeSerialize (::google::protobuf::io::ZeroCopyInputStream& is);
+         virtual void DeSerialize (std::istream& is);
    };
 
 }
