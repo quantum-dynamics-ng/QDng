@@ -106,15 +106,18 @@ void protobuf_AddDesc_IACmds_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\014IACmds.proto\022\005QDLIB\"\263\001\n\007Command\022+\n\003cmd"
+    "\n\014IACmds.proto\022\005QDLIB\"\266\002\n\007Command\022+\n\003cmd"
     "\030\001 \002(\0162\030.QDLIB.Command.command_t:\004QUIT\022\013"
     "\n\003XML\030\002 \001(\t\022\016\n\006param1\030\003 \001(\t\022\016\n\006param2\030\004 "
-    "\001(\t\022\016\n\006param3\030\005 \001(\t\">\n\tcommand_t\022\010\n\004QUIT"
-    "\020\000\022\014\n\010RUN_PROG\020\001\022\013\n\007READ_WF\020\002\022\014\n\010WRITE_W"
-    "F\020\003\"y\n\010Response\0220\n\010response\030\001 \002(\0162\032.QDLI"
-    "B.Response.response_t:\002OK\022\013\n\003msg\030\002 \001(\t\"."
-    "\n\nresponse_t\022\006\n\002OK\020\000\022\r\n\tERROR_MSG\020\001\022\t\n\005E"
-    "RROR\020\002", 326);
+    "\001(\t\022\016\n\006param3\030\005 \001(\t\"\300\001\n\tcommand_t\022\010\n\004QUI"
+    "T\020\000\022\014\n\010RUN_PROG\020\001\022\013\n\007READ_WF\020\002\022\014\n\010WRITE_"
+    "WF\020\003\022\013\n\007READ_OP\020\004\022\014\n\010WRITE_OP\020\005\022\013\n\007LOAD_"
+    "OP\020\006\022\r\n\tGET_EXPEC\020\007\022\r\n\tGET_MATEL\020\010\022\014\n\010AP"
+    "PLY_OP\020\t\022\025\n\021GET_GLOBAL_PARAMS\020\024\022\025\n\021SET_G"
+    "LOBAL_PARAMS\020\025\"y\n\010Response\0220\n\010response\030\001"
+    " \002(\0162\032.QDLIB.Response.response_t:\002OK\022\013\n\003"
+    "msg\030\002 \001(\t\".\n\nresponse_t\022\006\n\002OK\020\000\022\r\n\tERROR"
+    "_MSG\020\001\022\t\n\005ERROR\020\002", 457);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "IACmds.proto", &protobuf_RegisterTypes);
   Command::default_instance_ = new Command();
@@ -144,6 +147,14 @@ bool Command_command_t_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 20:
+    case 21:
       return true;
     default:
       return false;
@@ -155,6 +166,14 @@ const Command_command_t Command::QUIT;
 const Command_command_t Command::RUN_PROG;
 const Command_command_t Command::READ_WF;
 const Command_command_t Command::WRITE_WF;
+const Command_command_t Command::READ_OP;
+const Command_command_t Command::WRITE_OP;
+const Command_command_t Command::LOAD_OP;
+const Command_command_t Command::GET_EXPEC;
+const Command_command_t Command::GET_MATEL;
+const Command_command_t Command::APPLY_OP;
+const Command_command_t Command::GET_GLOBAL_PARAMS;
+const Command_command_t Command::SET_GLOBAL_PARAMS;
 const Command_command_t Command::command_t_MIN;
 const Command_command_t Command::command_t_MAX;
 const int Command::command_t_ARRAYSIZE;

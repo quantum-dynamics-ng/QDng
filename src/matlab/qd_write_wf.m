@@ -25,6 +25,9 @@ end
 cmd = pb_read_QDLIB__Command();
 cmd = pblib_set(cmd, 'cmd', 3); 
 cmd = pblib_set(cmd, 'param1', name);
+if compression > 0
+    cmd = pblib_set(cmd, 'param2', 'gzip');
+end
 
 qd_write_cmd(cmd, stream);
 

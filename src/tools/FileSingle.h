@@ -264,26 +264,22 @@ namespace QDLIB
          void PrepareStreamPayload(C *data, stringstream& buffer);
          void WriteDataToStream(const string &data_buf);
          void FinalizeOutStream();
-         void WriteSingleFileToStream(C *data);
+
 
          void OpenINStream();
          void CheckIntroFromStream();
          const FileSingleHeaderPm& ReadMetaFromStream();
 
          void ReadDataFromStream(C *data);
-         void ReadSingleFileFromStream(C *data);
 
          /* Raw binary functions */
          void ReadMetaFromRaw();
-         void ReadSingleFileFromRaw(C *data);
          void ReadDataFromRaw(C* data);
 
          void WriteMetaToRaw(C *data);
          void WriteDataToRaw(C *data);
-         void WriteSingleFileToRaw(C *data);
 
          /* General */
-
          void PrepareData(C *data);
          void InitDataStorage(C* data);
          const FileSingleHeaderPm& ReadMeta();
@@ -380,6 +376,13 @@ namespace QDLIB
 
          void ReadFile(C *data);
          void WriteFile(C *data);
+
+         void ReadSingleFileFromStream(C *data);
+         void ReadSingleFileFromRaw(C *data);
+
+         void WriteSingleFileToStream(C *data);
+         void WriteSingleFileToRaw(C *data);
+
 
          void operator<<(C *out);
    };
@@ -1007,7 +1010,7 @@ namespace QDLIB
          in->open(name.c_str(), ios_base::binary);
 
          if (! in->is_open() ){
-            throw(EIOError("Can not open binary stream for reading", name));
+            throw(EIOError("Can not open binary stream file for reading", name));
          }
 
          _sin = in;

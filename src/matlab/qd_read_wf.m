@@ -66,7 +66,3 @@ switch(header.class')
 end
 
 
-
-
-
-

@@ -7,6 +7,9 @@
 
 #include "CmdHandler.h"
 
+#include "modules/ModuleLoader.h"
+#include "qdlib/Serializable.h"
+
 #include "tools/Exception.h"
 #include "tools/XmlParser.h"
 #include "tools/Logger.h"
@@ -216,20 +219,293 @@ namespace QDLIB
    }
 
 
+   void CmdHandler::cmd_run_prog(Command& cmd, const string& dir)
+   {
+      Response resp;
+
+   //         log.coutdbg() << "Received RUN_PROG" << endl;
+   //         log.flush();
+
+      resp.Clear();
+
+      if (!cmd.has_xml())
+         throw (EParamProblem("RUN_PROG is missing the XML input"));
+
+      try {
+         RunXML(cmd.xml().c_str(), cmd.xml().size(), dir);
+         resp.set_response(Response_response_t_OK);
+         SendResponse(resp);
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw (e);
+      }
+
+   }
+
+   void CmdHandler::cmd_read_wf(Command& cmd)
+   {
+      Response resp;
+
+      if (!cmd.has_param1())
+         throw (EParamProblem("READ_WF is missing a file name"));
+
+      resp.Clear();
+
+      FileWF file;
+      WaveFunction* wf;
+
+      // Load WF;
+      file.Name(cmd.param1());
+
+      try {
+         wf = file.LoadWaveFunctionByMeta();
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw (e);
+      }
+
+      // Write to stream
+      file.Compress(false);
+      file.SetOutputStream(*sout_);
+      file.Format(FileSingle<WaveFunction>::stream);
+
+      // The format in the stream is as follows:
+      // In case of success the file is sent which can
+      // be detected by the file header
+      // In case of an error a message is sent: msg_len, Response.
+      try {
+         file.WriteWaveFunction(wf);
+         sout_->flush();
+      }  catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw (e);
+      }
+
+      DELETE_WF(wf);
+   }
+
+
+   void CmdHandler::cmd_write_wf(Command& cmd)
+   {
+      Response resp;
+
+      if (!cmd.has_param1())
+         throw (EParamProblem("WRITE_WF is missing a file name"));
+
+      FileWF file;
+      WaveFunction* wf;
+      resp.Clear();
+
+      // Read from Stream;
+      file.SetInputStream(*sin_);
+
+      // Set compression
+      if (cmd.has_param2()){
+         if (cmd.param2() == "gzip")
+            file.Compress(true);
+      }
+
+      try {
+         wf = file.LoadWaveFunctionByMeta();
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw (e);
+      }
+
+      // Write to file
+      try {
+         file.Name(cmd.param1());
+         file.Format(FileSingle<WaveFunction>::stream);
+         file.WriteWaveFunction(wf);
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw (e);
+      }
+
+      resp.set_response(Response_response_t_OK);
+      SendResponse(resp);
+
+      DELETE_WF(wf);
+   }
+
+   void CmdHandler::cmd_read_op(Command& cmd)
+   {
+      Response resp;
+
+      if (!cmd.has_param1())
+         throw (EParamProblem("READ_OP is missing a file name"));
+
+
+      if (!cmd.has_param2())
+         throw (EParamProblem("READ_OP is missing a class name"));
+
+      Operator* op = ModuleLoader::Instance()->LoadOp(cmd.param2());
+
+      if (op == NULL)
+         throw(EParamProblem("Operator module not found"));
+
+
+      Serializiable* ser = dynamic_cast<Serializiable*>(op);
+
+      if (ser == NULL)
+         throw(EIncompatible("Not a serializable object", op->Name()));
+
+      // Read Operator from file
+      FileSingle<Serializiable> file;
+
+      file.Name(cmd.param1());
+
+      try {
+         file.ReadSingleFileFromStream(ser);
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw(e);
+      }
+
+      file.Compression(FileSingle<Serializiable>::UNCOMPRESSED);
+      file.SetOutputStream(*sout_);
+
+      // Write operator to stream
+      try {
+         file.WriteSingleFileToStream(ser);
+         sout_->flush();
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw(e);
+      }
+
+      DELETE_OP(op);
+   }
+
+   void CmdHandler::cmd_write_op(Command& cmd)
+   {
+      Response resp;
+
+      if (!cmd.has_param1())
+         throw (EParamProblem("WRITE_OP is missing a file name"));
+
+
+      if (!cmd.has_param2())
+         throw (EParamProblem("WRITE_OP is missing a class name"));
+
+      // Load respective class
+      Operator* op=NULL;
+      Laser* laser=NULL;
+      Serializiable* ser;
+
+      if (cmd.param2() == "Laser") {
+         laser = new Laser();
+         ser = dynamic_cast<Serializiable*>(laser);
+      } else {
+         op = ModuleLoader::Instance()->LoadOp(cmd.param2());
+
+         if (op == NULL)
+            throw(EParamProblem("Operator module not found"));
+
+         ser = dynamic_cast<Serializiable*>(op);
+
+         if (ser == NULL)
+            throw(EIncompatible("Not a serializable object", op->Name()));
+      }
+
+      FileSingle<Serializiable> file;
+
+      // Read from Stream;
+      file.SetInputStream(*sin_);
+
+      try {
+         file.ReadSingleFileFromStream(ser);
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw (e);
+      }
+
+      // Set compression
+      if (cmd.has_param3()){
+         if (cmd.param3() == "gzip")
+            file.Compression(FileSingle<Serializiable>::ZLIB);
+      }
+
+      // Write to file
+      try {
+         file.Name(cmd.param1());
+         file.Format(FileSingle<Serializiable>::stream);
+         file.WriteSingleFileToStream(ser);
+      } catch (Exception& e) {
+         resp.set_response(Response_response_t_ERROR_MSG);
+         resp.set_msg(e.GetMessage());
+         SendResponse(resp);
+         throw (e);
+      }
+
+      resp.set_response(Response_response_t_OK);
+      SendResponse(resp);
+
+      if (op != NULL)
+         DELETE_OP(op);
+      else
+         delete laser;
+   }
+
+   void CmdHandler::cmd_set_global_params(Command& cmd)
+   {
+      Response resp;
+
+      if (!cmd.has_param1())
+         throw (EParamProblem("SET_GLOBAL_PARAMS is missing key/values"));
+
+      ParamContainer pm;
+      pm.Parse(cmd.param1());
+
+      ParamContainer& gp = GlobalParams::Instance();
+      gp += pm;  // Add to paraemters
+
+      string s;
+      gp.Write(s, false);
+
+      resp.set_response(Response_response_t_OK);
+      resp.set_msg(s);
+
+      SendResponse(resp);
+   }
+
+
+   void CmdHandler::cmd_get_global_params(Command& cmd)
+   {
+
+
+      ParamContainer& gp = GlobalParams::Instance();
+
+      string s;
+      gp.Write(s, false);
+
+      Response resp;
+      resp.set_response(Response_response_t_OK);
+      resp.set_msg(s);
+
+      SendResponse(resp);
+   }
+
 
    /**
     * Run commands.
     *
-    * accepted commands:
-    *
-    * \li quit end interactive mode
-    * \li XML run XML code as from file input.
-    *     format:
-    *        XML
-    *        <size>
-    *        <XML input>
-    *
-    * \li
     */
    void CmdHandler::RunInteractive(const string& dir)
    {
@@ -252,113 +528,33 @@ namespace QDLIB
          if ( !cmd.ParseFromArray(buffer, msg_size) )
             throw (EParamProblem("Parsing the command from input failed"));
 
+         cout << "cmd_type: " << cmd.cmd() << endl;
+
          delete[] buffer; buffer = NULL;
 
          switch (cmd.cmd()){
             case Command_command_t_RUN_PROG:
-            {
-               log.coutdbg() << "Received RUN_PROG" << endl;
-               log.flush();
-
-               resp.Clear();
-
-               if (!cmd.has_xml())
-                  throw (EParamProblem("RUN_PROG is missing the XML input"));
-
-               try {
-                  RunXML(cmd.xml().c_str(), cmd.xml().size(), dir);
-                  resp.set_response(Response_response_t_OK);
-                  SendResponse(resp);
-               } catch (Exception& e) {
-                  resp.set_response(Response_response_t_ERROR_MSG);
-                  resp.set_msg(e.GetMessage());
-                  SendResponse(resp);
-                  throw (e);
-               }
-            }
+               cmd_run_prog(cmd, dir);
                break;
             case Command_command_t_READ_WF:
-            {
-               if (!cmd.has_param1())
-                  throw (EParamProblem("READ_WF is missing a file name"));
-
-               resp.Clear();
-
-               FileWF file;
-               WaveFunction* wf;
-
-               // Load WF;
-               file.Name(cmd.param1());
-
-               try {
-                  wf = file.LoadWaveFunctionByMeta();
-               } catch (Exception& e) {
-                  resp.set_response(Response_response_t_ERROR_MSG);
-                  resp.set_msg(e.GetMessage());
-                  SendResponse(resp);
-                  throw (e);
-               }
-
-               // Write to stream
-               file.Compress(false);
-               file.SetOutputStream(*sout_);
-               file.Format(FileSingle<WaveFunction>::stream);
-
-               // The format in the stream is as follows:
-               // In case of success the file is sent which can
-               // be detected by the file header
-               // In case of an error a message is sent: msg_len, Response.
-               try {
-                  file.WriteWaveFunction(wf);
-                  sout_->flush();
-               }  catch (Exception& e) {
-                  resp.set_response(Response_response_t_ERROR_MSG);
-                  resp.set_msg(e.GetMessage());
-                  SendResponse(resp);
-                  throw (e);
-               }
-
-               DELETE_WF(wf);
-            }
+               cmd_read_wf(cmd);
                break;
             case Command_command_t_WRITE_WF:
-            {
-               if (!cmd.has_param1())
-                  throw (EParamProblem("WRITE_WF is missing a file name"));
-
-               FileWF file;
-               WaveFunction* wf;
-               resp.Clear();
-
-               // Read from Stream;
-               file.SetInputStream(*sin_);
-
-               try {
-                  wf = file.LoadWaveFunctionByMeta();
-               } catch (Exception& e) {
-                  resp.set_response(Response_response_t_ERROR_MSG);
-                  resp.set_msg(e.GetMessage());
-                  SendResponse(resp);
-                  throw (e);
-               }
-
-               // Write to file
-               try {
-                  file.Name(cmd.param1());
-                  file.Format(FileSingle<WaveFunction>::stream);
-                  file.WriteWaveFunction(wf);
-               } catch (Exception& e) {
-                  resp.set_response(Response_response_t_ERROR_MSG);
-                  resp.set_msg(e.GetMessage());
-                  SendResponse(resp);
-                  throw (e);
-               }
-
-               resp.set_response(Response_response_t_OK);
-               SendResponse(resp);
-
-               DELETE_WF(wf);
-            }
+               cmd_write_wf(cmd);
+               break;
+            case Command_command_t_GET_GLOBAL_PARAMS:
+               cmd_get_global_params(cmd);
+               break;
+            case Command_command_t_SET_GLOBAL_PARAMS:
+               cmd_set_global_params(cmd);
+               break;
+            case Command_command_t_LOAD_OP:
+               break;
+            case Command_command_t_READ_OP:
+               cmd_read_op(cmd);
+               break;
+            case Command_command_t_WRITE_OP:
+               cmd_write_op(cmd);
                break;
             case Command_command_t_QUIT:
                log.coutdbg() << "Received QUIT" << endl;

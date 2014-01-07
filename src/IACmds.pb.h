@@ -39,11 +39,19 @@ enum Command_command_t {
   Command_command_t_QUIT = 0,
   Command_command_t_RUN_PROG = 1,
   Command_command_t_READ_WF = 2,
-  Command_command_t_WRITE_WF = 3
+  Command_command_t_WRITE_WF = 3,
+  Command_command_t_READ_OP = 4,
+  Command_command_t_WRITE_OP = 5,
+  Command_command_t_LOAD_OP = 6,
+  Command_command_t_GET_EXPEC = 7,
+  Command_command_t_GET_MATEL = 8,
+  Command_command_t_APPLY_OP = 9,
+  Command_command_t_GET_GLOBAL_PARAMS = 20,
+  Command_command_t_SET_GLOBAL_PARAMS = 21
 };
 bool Command_command_t_IsValid(int value);
 const Command_command_t Command_command_t_command_t_MIN = Command_command_t_QUIT;
-const Command_command_t Command_command_t_command_t_MAX = Command_command_t_WRITE_WF;
+const Command_command_t Command_command_t_command_t_MAX = Command_command_t_SET_GLOBAL_PARAMS;
 const int Command_command_t_command_t_ARRAYSIZE = Command_command_t_command_t_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Command_command_t_descriptor();
@@ -135,6 +143,14 @@ class Command : public ::google::protobuf::Message {
   static const command_t RUN_PROG = Command_command_t_RUN_PROG;
   static const command_t READ_WF = Command_command_t_READ_WF;
   static const command_t WRITE_WF = Command_command_t_WRITE_WF;
+  static const command_t READ_OP = Command_command_t_READ_OP;
+  static const command_t WRITE_OP = Command_command_t_WRITE_OP;
+  static const command_t LOAD_OP = Command_command_t_LOAD_OP;
+  static const command_t GET_EXPEC = Command_command_t_GET_EXPEC;
+  static const command_t GET_MATEL = Command_command_t_GET_MATEL;
+  static const command_t APPLY_OP = Command_command_t_APPLY_OP;
+  static const command_t GET_GLOBAL_PARAMS = Command_command_t_GET_GLOBAL_PARAMS;
+  static const command_t SET_GLOBAL_PARAMS = Command_command_t_SET_GLOBAL_PARAMS;
   static inline bool command_t_IsValid(int value) {
     return Command_command_t_IsValid(value);
   }

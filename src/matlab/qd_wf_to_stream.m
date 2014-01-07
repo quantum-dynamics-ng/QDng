@@ -26,12 +26,6 @@ header = pblib_set (header, 'more_files_follow', 0);
 %header = pblib_set (header, 'name', name);
 header = pblib_set (header, 'payload_size', numel(payload));
 
-if nargin > 4 
-    if (compression > 0)
-        header = pblib_set(header, 'compression', 1); % ZLIB compression
-    end
-end
-
 stream = qd_get_stream_intro();
 
 header_buf = pblib_generic_serialize_to_string(header);

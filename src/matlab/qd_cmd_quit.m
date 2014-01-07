@@ -4,7 +4,7 @@ function qd_cmd_quit()
 % 
 
 % Assemble message
-cmd = pb_read_QDLIB__Command([]);
+cmd = pblib_create_message(pb_descriptor_QDLIB__Command);
 cmd = pblib_set(cmd, 'cmd', 0);
 
 qd_write_cmd(cmd);

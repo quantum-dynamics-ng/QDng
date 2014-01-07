@@ -35,6 +35,13 @@ namespace QDLIB
          void RecvBinary();
 
          void SendResponse(Response& resp);
+         void cmd_run_prog(Command& cmd, const string& dir);
+         void cmd_read_wf(Command& cmd);
+         void cmd_write_wf(Command& cmd);
+         void cmd_read_op(Command& cmd);
+         void cmd_write_op(Command& cmd);
+         void cmd_set_global_params(Command& cmd);
+         void cmd_get_global_params(Command& cmd);
       public:
          CmdHandler(istream& in, ostream& out);
          CmdHandler(const string& file);

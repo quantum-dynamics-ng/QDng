@@ -15,10 +15,14 @@ message Command {
 		RUN_PROG = 1;
 		READ_WF  = 2;
 		WRITE_WF = 3;
-//		LOAD_OP  = 4;
-//		GET_EXPEC = 5;
-//		GET_MATEL = 6;
-//		APPLY_OP  = 7;		
+		READ_OP = 4;
+		WRITE_OP = 5;
+		LOAD_OP  = 6;
+		GET_EXPEC = 7;
+		GET_MATEL = 8;
+		APPLY_OP = 9;
+		GET_GLOBAL_PARAMS = 20;
+		SET_GLOBAL_PARAMS = 21;
 	}
 }
 
