@@ -31,7 +31,7 @@ namespace QDLIB
       _doc = xmlReadFile(name.c_str(), NULL, XML_PARSE_NOBLANKS);
 
       if (_doc == NULL) {
-	 throw ( EIOError("Can not parse XML file: ") );
+	 throw ( EIOError("Can not parse XML file: ", name) );
       }
 
       /*Get the root element node */
