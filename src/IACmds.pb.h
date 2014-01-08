@@ -355,6 +355,18 @@ class Response : public ::google::protobuf::Message {
   inline ::std::string* mutable_msg();
   inline ::std::string* release_msg();
   
+  // repeated double result = 3;
+  inline int result_size() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 3;
+  inline double result(int index) const;
+  inline void set_result(int index, double value);
+  inline void add_result(double value);
+  inline const ::google::protobuf::RepeatedField< double >&
+      result() const;
+  inline ::google::protobuf::RepeatedField< double >*
+      mutable_result();
+  
   // @@protoc_insertion_point(class_scope:QDLIB.Response)
  private:
   inline void set_has_response();
@@ -365,10 +377,11 @@ class Response : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::std::string* msg_;
+  ::google::protobuf::RepeatedField< double > result_;
   int response_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_IACmds_2eproto();
   friend void protobuf_AssignDesc_IACmds_2eproto();
@@ -722,6 +735,31 @@ inline ::std::string* Response::release_msg() {
     msg_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// repeated double result = 3;
+inline int Response::result_size() const {
+  return result_.size();
+}
+inline void Response::clear_result() {
+  result_.Clear();
+}
+inline double Response::result(int index) const {
+  return result_.Get(index);
+}
+inline void Response::set_result(int index, double value) {
+  result_.Set(index, value);
+}
+inline void Response::add_result(double value) {
+  result_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< double >&
+Response::result() const {
+  return result_;
+}
+inline ::google::protobuf::RepeatedField< double >*
+Response::mutable_result() {
+  return &result_;
 }
 
 

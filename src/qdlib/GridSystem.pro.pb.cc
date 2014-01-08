@@ -101,11 +101,12 @@ void protobuf_AddDesc_GridSystem_2epro() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\016GridSystem.pro\022\005QDLIB\"\252\001\n\020GridSystemHe"
-    "ader\022\014\n\004dims\030\001 \002(\r\0226\n\003dim\030\002 \003(\0132).QDLIB."
-    "GridSystemHeader.dim_description_t\022\021\n\tda"
-    "ta_size\030\003 \001(\004\032=\n\021dim_description_t\022\014\n\004si"
-    "ze\030\001 \002(\r\022\014\n\004xmin\030\002 \002(\001\022\014\n\004xmax\030\003 \002(\001", 196);
+    "\n\016GridSystem.pro\022\005QDLIB\"\271\001\n\020GridSystemHe"
+    "ader\022\017\n\004dims\030\001 \002(\r:\0010\0226\n\003dim\030\002 \003(\0132).QDL"
+    "IB.GridSystemHeader.dim_description_t\022\024\n"
+    "\tdata_size\030\003 \001(\004:\0010\032F\n\021dim_description_t"
+    "\022\017\n\004size\030\001 \002(\r:\0010\022\017\n\004xmin\030\002 \002(\001:\0010\022\017\n\004xm"
+    "ax\030\003 \002(\001:\0010", 211);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "GridSystem.pro", &protobuf_RegisterTypes);
   GridSystemHeader::default_instance_ = new GridSystemHeader();
@@ -198,7 +199,7 @@ bool GridSystemHeader_dim_description_t::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required uint32 size = 1;
+      // required uint32 size = 1 [default = 0];
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -213,7 +214,7 @@ bool GridSystemHeader_dim_description_t::MergePartialFromCodedStream(
         break;
       }
       
-      // required double xmin = 2;
+      // required double xmin = 2 [default = 0];
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
@@ -229,7 +230,7 @@ bool GridSystemHeader_dim_description_t::MergePartialFromCodedStream(
         break;
       }
       
-      // required double xmax = 3;
+      // required double xmax = 3 [default = 0];
       case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
@@ -263,17 +264,17 @@ bool GridSystemHeader_dim_description_t::MergePartialFromCodedStream(
 
 void GridSystemHeader_dim_description_t::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required uint32 size = 1;
+  // required uint32 size = 1 [default = 0];
   if (has_size()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->size(), output);
   }
   
-  // required double xmin = 2;
+  // required double xmin = 2 [default = 0];
   if (has_xmin()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(2, this->xmin(), output);
   }
   
-  // required double xmax = 3;
+  // required double xmax = 3 [default = 0];
   if (has_xmax()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(3, this->xmax(), output);
   }
@@ -286,17 +287,17 @@ void GridSystemHeader_dim_description_t::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* GridSystemHeader_dim_description_t::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required uint32 size = 1;
+  // required uint32 size = 1 [default = 0];
   if (has_size()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->size(), target);
   }
   
-  // required double xmin = 2;
+  // required double xmin = 2 [default = 0];
   if (has_xmin()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(2, this->xmin(), target);
   }
   
-  // required double xmax = 3;
+  // required double xmax = 3 [default = 0];
   if (has_xmax()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(3, this->xmax(), target);
   }
@@ -312,19 +313,19 @@ int GridSystemHeader_dim_description_t::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required uint32 size = 1;
+    // required uint32 size = 1 [default = 0];
     if (has_size()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->size());
     }
     
-    // required double xmin = 2;
+    // required double xmin = 2 [default = 0];
     if (has_xmin()) {
       total_size += 1 + 8;
     }
     
-    // required double xmax = 3;
+    // required double xmax = 3 [default = 0];
     if (has_xmax()) {
       total_size += 1 + 8;
     }
@@ -481,7 +482,7 @@ bool GridSystemHeader::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required uint32 dims = 1;
+      // required uint32 dims = 1 [default = 0];
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -511,7 +512,7 @@ bool GridSystemHeader::MergePartialFromCodedStream(
         break;
       }
       
-      // optional uint64 data_size = 3;
+      // optional uint64 data_size = 3 [default = 0];
       case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -545,7 +546,7 @@ bool GridSystemHeader::MergePartialFromCodedStream(
 
 void GridSystemHeader::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required uint32 dims = 1;
+  // required uint32 dims = 1 [default = 0];
   if (has_dims()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->dims(), output);
   }
@@ -556,7 +557,7 @@ void GridSystemHeader::SerializeWithCachedSizes(
       2, this->dim(i), output);
   }
   
-  // optional uint64 data_size = 3;
+  // optional uint64 data_size = 3 [default = 0];
   if (has_data_size()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->data_size(), output);
   }
@@ -569,7 +570,7 @@ void GridSystemHeader::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* GridSystemHeader::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required uint32 dims = 1;
+  // required uint32 dims = 1 [default = 0];
   if (has_dims()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->dims(), target);
   }
@@ -581,7 +582,7 @@ void GridSystemHeader::SerializeWithCachedSizes(
         2, this->dim(i), target);
   }
   
-  // optional uint64 data_size = 3;
+  // optional uint64 data_size = 3 [default = 0];
   if (has_data_size()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(3, this->data_size(), target);
   }
@@ -597,14 +598,14 @@ int GridSystemHeader::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required uint32 dims = 1;
+    // required uint32 dims = 1 [default = 0];
     if (has_dims()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->dims());
     }
     
-    // optional uint64 data_size = 3;
+    // optional uint64 data_size = 3 [default = 0];
     if (has_data_size()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt64Size(

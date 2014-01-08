@@ -29,6 +29,7 @@ message Command {
 message Response {
 	required response_t response = 1 [ default = OK ];
 	optional string msg = 2;
+	repeated double result = 3;
 	
 	enum response_t {
 		OK = 0;

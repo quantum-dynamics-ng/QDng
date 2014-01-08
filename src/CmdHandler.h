@@ -11,6 +11,9 @@
 #include "tools/FIFO.h"
 #include "IACmds.pb.h"
 
+#include "qdlib/FileWF.h"
+#include "qdlib/Operator.h"
+
 #include <string>
 #include <iostream>
 
@@ -34,12 +37,22 @@ namespace QDLIB
          void SendBinary();
          void RecvBinary();
 
-         void SendResponse(Response& resp);
+         Operator* get_operator_from_command(Command& cmd);
+         WaveFunction* get_wf(FileWF& file);
+         void put_wf_to_stream(FileWF& file, WaveFunction* wf);
+
+         void send_response(Response& resp);
+         void send_OK();
+         void send_error_message(const string& msg);
          void cmd_run_prog(Command& cmd, const string& dir);
          void cmd_read_wf(Command& cmd);
          void cmd_write_wf(Command& cmd);
          void cmd_read_op(Command& cmd);
          void cmd_write_op(Command& cmd);
+         void cmd_load_op(Command& cmd);
+         void cmd_get_matel(Command& cmd);
+         void cmd_get_expec(Command& cmd);
+         void cmd_apply_op(Command& cmd);
          void cmd_set_global_params(Command& cmd);
          void cmd_get_global_params(Command& cmd);
       public:

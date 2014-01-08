@@ -56,9 +56,10 @@ void protobuf_AssignDesc_IACmds_2eproto() {
       sizeof(Command));
   Command_command_t_descriptor_ = Command_descriptor_->enum_type(0);
   Response_descriptor_ = file->message_type(1);
-  static const int Response_offsets_[2] = {
+  static const int Response_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, response_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, msg_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Response, result_),
   };
   Response_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -114,10 +115,10 @@ void protobuf_AddDesc_IACmds_2eproto() {
     "WF\020\003\022\013\n\007READ_OP\020\004\022\014\n\010WRITE_OP\020\005\022\013\n\007LOAD_"
     "OP\020\006\022\r\n\tGET_EXPEC\020\007\022\r\n\tGET_MATEL\020\010\022\014\n\010AP"
     "PLY_OP\020\t\022\025\n\021GET_GLOBAL_PARAMS\020\024\022\025\n\021SET_G"
-    "LOBAL_PARAMS\020\025\"y\n\010Response\0220\n\010response\030\001"
-    " \002(\0162\032.QDLIB.Response.response_t:\002OK\022\013\n\003"
-    "msg\030\002 \001(\t\".\n\nresponse_t\022\006\n\002OK\020\000\022\r\n\tERROR"
-    "_MSG\020\001\022\t\n\005ERROR\020\002", 457);
+    "LOBAL_PARAMS\020\025\"\211\001\n\010Response\0220\n\010response\030"
+    "\001 \002(\0162\032.QDLIB.Response.response_t:\002OK\022\013\n"
+    "\003msg\030\002 \001(\t\022\016\n\006result\030\003 \003(\001\".\n\nresponse_t"
+    "\022\006\n\002OK\020\000\022\r\n\tERROR_MSG\020\001\022\t\n\005ERROR\020\002", 474);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "IACmds.proto", &protobuf_RegisterTypes);
   Command::default_instance_ = new Command();
@@ -646,6 +647,7 @@ const int Response::response_t_ARRAYSIZE;
 #ifndef _MSC_VER
 const int Response::kResponseFieldNumber;
 const int Response::kMsgFieldNumber;
+const int Response::kResultFieldNumber;
 #endif  // !_MSC_VER
 
 Response::Response()
@@ -710,6 +712,7 @@ void Response::Clear() {
       }
     }
   }
+  result_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -753,6 +756,28 @@ bool Response::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(25)) goto parse_result;
+        break;
+      }
+      
+      // repeated double result = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+         parse_result:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 1, 25, input, this->mutable_result())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_LENGTH_DELIMITED) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, this->mutable_result())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(25)) goto parse_result;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -790,6 +815,12 @@ void Response::SerializeWithCachedSizes(
       2, this->msg(), output);
   }
   
+  // repeated double result = 3;
+  for (int i = 0; i < this->result_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(
+      3, this->result(i), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -812,6 +843,12 @@ void Response::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->msg(), target);
+  }
+  
+  // repeated double result = 3;
+  for (int i = 0; i < this->result_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteDoubleToArray(3, this->result(i), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -839,6 +876,13 @@ int Response::ByteSize() const {
     }
     
   }
+  // repeated double result = 3;
+  {
+    int data_size = 0;
+    data_size = 8 * this->result_size();
+    total_size += 1 * this->result_size() + data_size;
+  }
+  
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -864,6 +908,7 @@ void Response::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Response::MergeFrom(const Response& from) {
   GOOGLE_CHECK_NE(&from, this);
+  result_.MergeFrom(from.result_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_response()) {
       set_response(from.response());
@@ -897,6 +942,7 @@ void Response::Swap(Response* other) {
   if (other != this) {
     std::swap(response_, other->response_);
     std::swap(msg_, other->msg_);
+    result_.Swap(&other->result_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

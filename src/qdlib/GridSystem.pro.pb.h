@@ -91,21 +91,21 @@ class GridSystemHeader_dim_description_t : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required uint32 size = 1;
+  // required uint32 size = 1 [default = 0];
   inline bool has_size() const;
   inline void clear_size();
   static const int kSizeFieldNumber = 1;
   inline ::google::protobuf::uint32 size() const;
   inline void set_size(::google::protobuf::uint32 value);
   
-  // required double xmin = 2;
+  // required double xmin = 2 [default = 0];
   inline bool has_xmin() const;
   inline void clear_xmin();
   static const int kXminFieldNumber = 2;
   inline double xmin() const;
   inline void set_xmin(double value);
   
-  // required double xmax = 3;
+  // required double xmax = 3 [default = 0];
   inline bool has_xmax() const;
   inline void clear_xmax();
   static const int kXmaxFieldNumber = 3;
@@ -195,7 +195,7 @@ class GridSystemHeader : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required uint32 dims = 1;
+  // required uint32 dims = 1 [default = 0];
   inline bool has_dims() const;
   inline void clear_dims();
   static const int kDimsFieldNumber = 1;
@@ -214,7 +214,7 @@ class GridSystemHeader : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::QDLIB::GridSystemHeader_dim_description_t >*
       mutable_dim();
   
-  // optional uint64 data_size = 3;
+  // optional uint64 data_size = 3 [default = 0];
   inline bool has_data_size() const;
   inline void clear_data_size();
   static const int kDataSizeFieldNumber = 3;
@@ -251,7 +251,7 @@ class GridSystemHeader : public ::google::protobuf::Message {
 
 // GridSystemHeader_dim_description_t
 
-// required uint32 size = 1;
+// required uint32 size = 1 [default = 0];
 inline bool GridSystemHeader_dim_description_t::has_size() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -273,7 +273,7 @@ inline void GridSystemHeader_dim_description_t::set_size(::google::protobuf::uin
   size_ = value;
 }
 
-// required double xmin = 2;
+// required double xmin = 2 [default = 0];
 inline bool GridSystemHeader_dim_description_t::has_xmin() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -295,7 +295,7 @@ inline void GridSystemHeader_dim_description_t::set_xmin(double value) {
   xmin_ = value;
 }
 
-// required double xmax = 3;
+// required double xmax = 3 [default = 0];
 inline bool GridSystemHeader_dim_description_t::has_xmax() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -321,7 +321,7 @@ inline void GridSystemHeader_dim_description_t::set_xmax(double value) {
 
 // GridSystemHeader
 
-// required uint32 dims = 1;
+// required uint32 dims = 1 [default = 0];
 inline bool GridSystemHeader::has_dims() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -368,7 +368,7 @@ GridSystemHeader::mutable_dim() {
   return &dim_;
 }
 
-// optional uint64 data_size = 3;
+// optional uint64 data_size = 3 [default = 0];
 inline bool GridSystemHeader::has_data_size() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }

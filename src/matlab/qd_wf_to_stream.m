@@ -18,7 +18,7 @@ switch (class)
 end
 
 % Create header
-header = pb_read_QDLIB__FileSingleHeader([]);
+header = pblib_create_message(@pb_descriptor_QDLIB__FileSingleHeader);
 header = pblib_set (header, 'class', class);
 header = pblib_set (header, 'meta_data', '');
 header = pblib_set (header, 'compression', 0);

@@ -33,7 +33,7 @@
 namespace QDLIB
 {
 
-   void CmdHandler::SendResponse(Response& resp)
+   void CmdHandler::send_response(Response& resp)
    {
       uint32_t msg_size = resp.ByteSize();
 
@@ -45,6 +45,22 @@ namespace QDLIB
       sout_->flush();
 
    }
+
+   void CmdHandler::send_OK()
+   {
+      Response resp;
+      resp.set_response(Response_response_t_OK);
+      send_response(resp);
+   }
+
+   void CmdHandler::send_error_message(const string& msg)
+   {
+      Response resp;
+      resp.set_response(Response_response_t_ERROR_MSG);
+      resp.set_msg(msg);
+      send_response(resp);
+   }
+
 
    /**
     * Run XML the main programmes by XML defintions.
@@ -219,54 +235,110 @@ namespace QDLIB
    }
 
 
+   Operator* CmdHandler::get_operator_from_command(Command& cmd)
+   {
+      try {
+         if (cmd.has_xml()) { // load by XML definition
+            XmlParser XMLfile;
+            Operator* op;
+
+            XMLfile.Parse(cmd.xml().c_str(), cmd.xml().size());
+
+            XmlNode& root = XMLfile.Root();
+            op = ChainLoader::LoadOperatorChain(&root, true);
+
+            if (op == NULL)
+               throw(EIncompatible("Operator load from command failed"));
+
+            return op;
+         } else if (cmd.has_param1()) { // get it from reference
+            GlobalOpList& gol = GlobalOpList::Instance();
+            Operator* op = gol[cmd.param1()];
+
+            if (op == NULL)
+               throw(EIncompatible("Operator load from command by reference failed"));
+
+            return op;
+         } else {
+            throw (EParamProblem("Can't load operator, neither XML nor reference is given."));
+         }
+
+      } catch (Exception& e) {
+         send_error_message(e.GetMessage());
+         throw (e);
+      }
+
+      return NULL;
+   }
+
+   /**
+    * Get a wf from stream.
+    *
+    * Shortcut with error response message.
+    */
+   WaveFunction* CmdHandler::get_wf(FileWF& file)
+   {
+      WaveFunction* wf = NULL;
+
+      try {
+         wf = file.LoadWaveFunctionByMeta();
+      } catch (Exception& e) {
+         send_error_message(e.GetMessage());
+         throw (e);
+      }
+
+      return wf;
+   }
+
+   /**
+    * put a wf the the com stream.
+    *
+    * Shortcut with error response message.
+    */
+   void CmdHandler::put_wf_to_stream(FileWF& file, WaveFunction* wf)
+   {
+      try {
+         file.WriteWaveFunction(wf);
+         sout_->flush();
+      }  catch (Exception& e) {
+         send_error_message(e.GetMessage());
+         throw (e);
+      }
+   }
+
    void CmdHandler::cmd_run_prog(Command& cmd, const string& dir)
    {
-      Response resp;
-
-   //         log.coutdbg() << "Received RUN_PROG" << endl;
-   //         log.flush();
-
-      resp.Clear();
-
       if (!cmd.has_xml())
          throw (EParamProblem("RUN_PROG is missing the XML input"));
 
       try {
          RunXML(cmd.xml().c_str(), cmd.xml().size(), dir);
-         resp.set_response(Response_response_t_OK);
-         SendResponse(resp);
       } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
+         send_error_message(e.GetMessage());
          throw (e);
       }
 
+      send_OK();
    }
 
    void CmdHandler::cmd_read_wf(Command& cmd)
    {
       Response resp;
 
-      if (!cmd.has_param1())
+      if (!cmd.has_param1()){
          throw (EParamProblem("READ_WF is missing a file name"));
+         return;
+      }
 
       resp.Clear();
 
       FileWF file;
-      WaveFunction* wf;
+
 
       // Load WF;
       file.Name(cmd.param1());
 
-      try {
-         wf = file.LoadWaveFunctionByMeta();
-      } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
-         throw (e);
-      }
+      WaveFunction* wf = get_wf(file);
 
       // Write to stream
       file.Compress(false);
@@ -277,15 +349,8 @@ namespace QDLIB
       // In case of success the file is sent which can
       // be detected by the file header
       // In case of an error a message is sent: msg_len, Response.
-      try {
-         file.WriteWaveFunction(wf);
-         sout_->flush();
-      }  catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
-         throw (e);
-      }
+
+      put_wf_to_stream(file, wf);
 
       DELETE_WF(wf);
    }
@@ -293,31 +358,22 @@ namespace QDLIB
 
    void CmdHandler::cmd_write_wf(Command& cmd)
    {
-      Response resp;
-
-      if (!cmd.has_param1())
+      if (!cmd.has_param1()){
          throw (EParamProblem("WRITE_WF is missing a file name"));
+         return;
+      }
 
       FileWF file;
-      WaveFunction* wf;
-      resp.Clear();
 
       // Read from Stream;
       file.SetInputStream(*sin_);
+
+      WaveFunction* wf = get_wf(file);
 
       // Set compression
       if (cmd.has_param2()){
          if (cmd.param2() == "gzip")
             file.Compress(true);
-      }
-
-      try {
-         wf = file.LoadWaveFunctionByMeta();
-      } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
-         throw (e);
       }
 
       // Write to file
@@ -326,14 +382,11 @@ namespace QDLIB
          file.Format(FileSingle<WaveFunction>::stream);
          file.WriteWaveFunction(wf);
       } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
+         send_error_message(e.GetMessage());
          throw (e);
       }
 
-      resp.set_response(Response_response_t_OK);
-      SendResponse(resp);
+      send_OK();
 
       DELETE_WF(wf);
    }
@@ -342,12 +395,16 @@ namespace QDLIB
    {
       Response resp;
 
-      if (!cmd.has_param1())
-         throw (EParamProblem("READ_OP is missing a file name"));
+      if (!cmd.has_param1()){
+         send_error_message("READ_OP is missing a file name");
+         return;
+      }
 
 
-      if (!cmd.has_param2())
-         throw (EParamProblem("READ_OP is missing a class name"));
+      if (!cmd.has_param2()){
+         send_error_message("READ_OP is missing a class name");
+         return;
+      }
 
       Operator* op = ModuleLoader::Instance()->LoadOp(cmd.param2());
 
@@ -368,9 +425,7 @@ namespace QDLIB
       try {
          file.ReadSingleFileFromStream(ser);
       } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
+         send_error_message(e.GetMessage());
          throw(e);
       }
 
@@ -382,9 +437,7 @@ namespace QDLIB
          file.WriteSingleFileToStream(ser);
          sout_->flush();
       } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
+         send_error_message(e.GetMessage());
          throw(e);
       }
 
@@ -393,14 +446,16 @@ namespace QDLIB
 
    void CmdHandler::cmd_write_op(Command& cmd)
    {
-      Response resp;
+      if (!cmd.has_param1()){
+         send_error_message("WRITE_OP is missing a file name");
+         return;
+      }
 
-      if (!cmd.has_param1())
-         throw (EParamProblem("WRITE_OP is missing a file name"));
 
-
-      if (!cmd.has_param2())
-         throw (EParamProblem("WRITE_OP is missing a class name"));
+      if (!cmd.has_param2()){
+         send_error_message("WRITE_OP is missing a class name");
+         return;
+      }
 
       // Load respective class
       Operator* op=NULL;
@@ -430,9 +485,7 @@ namespace QDLIB
       try {
          file.ReadSingleFileFromStream(ser);
       } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
+         send_error_message(e.GetMessage());
          throw (e);
       }
 
@@ -448,14 +501,11 @@ namespace QDLIB
          file.Format(FileSingle<Serializiable>::stream);
          file.WriteSingleFileToStream(ser);
       } catch (Exception& e) {
-         resp.set_response(Response_response_t_ERROR_MSG);
-         resp.set_msg(e.GetMessage());
-         SendResponse(resp);
+         send_error_message(e.GetMessage());
          throw (e);
       }
 
-      resp.set_response(Response_response_t_OK);
-      SendResponse(resp);
+      send_OK();
 
       if (op != NULL)
          DELETE_OP(op);
@@ -467,8 +517,9 @@ namespace QDLIB
    {
       Response resp;
 
-      if (!cmd.has_param1())
-         throw (EParamProblem("SET_GLOBAL_PARAMS is missing key/values"));
+      if (!cmd.has_param1()){
+         send_error_message("SET_GLOBAL_PARAMS is missing key/values");
+      }
 
       ParamContainer pm;
       pm.Parse(cmd.param1());
@@ -479,29 +530,134 @@ namespace QDLIB
       string s;
       gp.Write(s, false);
 
-      resp.set_response(Response_response_t_OK);
-      resp.set_msg(s);
-
-      SendResponse(resp);
+      send_OK();
    }
 
 
    void CmdHandler::cmd_get_global_params(Command& cmd)
    {
-
-
       ParamContainer& gp = GlobalParams::Instance();
 
       string s;
       gp.Write(s, false);
 
-      Response resp;
-      resp.set_response(Response_response_t_OK);
-      resp.set_msg(s);
-
-      SendResponse(resp);
+      send_OK();
    }
 
+   void CmdHandler::cmd_load_op(Command& cmd)
+   {
+      if (!cmd.has_xml())
+         send_error_message("LOAD_OP is missing a XML operator definition");
+
+      get_operator_from_command(cmd);
+
+      send_OK();
+   }
+
+   void CmdHandler::cmd_apply_op(Command& cmd)
+   {
+      // Load Operator
+      Operator* Op = get_operator_from_command(cmd);
+
+      send_OK();
+
+      // Receive WF
+      FileWF file;
+
+      file.SetInputStream(*sin_);
+
+      WaveFunction* wf = get_wf(file);
+
+      // Send Response
+      try {
+         if (!Op->Valid(wf)) Op->Init(wf);
+         if (!Op->Valid(wf)) {
+            send_error_message("Operator initialized with incompatible wfs");
+            return;
+         }
+         Op->Apply(wf);
+      } catch (Exception& e) {
+         send_error_message(e.GetMessage());
+         throw(e);
+      }
+
+      // Send back WF
+      file.SetOutputStream(*sout_);
+      put_wf_to_stream(file, wf);
+
+      DELETE_WF(wf);
+   }
+
+   void CmdHandler::cmd_get_matel(Command& cmd)
+   {
+      // Load Operator
+      Operator* Op = get_operator_from_command(cmd);
+
+      send_OK(); // acknowledge operator load
+
+      // Get bra and ket
+      FileWF file;
+      file.SetInputStream(*sin_);
+
+      WaveFunction* bra = get_wf(file);
+      WaveFunction* ket = get_wf(file);
+
+      // Send Response
+      try {
+         if (!Op->Valid(bra)) Op->Init(bra);
+         if (!Op->Valid(bra) || !Op->Valid(ket)) {
+            send_error_message("Operator initialized with incompatible wfs");
+            return;
+         }
+      } catch (Exception& e) {
+         send_error_message(e.GetMessage());
+         throw(e);
+      }
+
+      // Send response
+      dcomplex res = Op->MatrixElement(bra, ket);
+
+      Response resp;
+      resp.set_response(Response_response_t_OK);
+      resp.add_result(res.real());
+      resp.add_result(res.imag());
+      send_response(resp);
+
+      DELETE_WF(bra);
+      DELETE_WF(ket);
+   }
+
+   void CmdHandler::cmd_get_expec(Command& cmd)
+   {
+      // Load Operator
+      Operator* Op = get_operator_from_command(cmd);
+
+      send_OK(); // acknowledge operator load
+
+      // Get bra/ket
+      FileWF file;
+      file.SetInputStream(*sin_);
+
+      WaveFunction* bk = get_wf(file);
+
+      // Send Response
+      try {
+         if (!Op->Valid(bk)) Op->Init(bk);
+         if (!Op->Valid(bk)) {
+            send_error_message("Operator initialized with incompatible wfs");
+            return;
+         }
+      } catch (Exception& e) {
+         send_error_message(e.GetMessage());
+         throw(e);
+      }
+
+      double res = Op->Expec(bk);
+      Response resp;
+      resp.set_response(Response_response_t_OK);
+      resp.add_result(res);
+      send_response(resp);
+   }
 
    /**
     * Run commands.
@@ -549,6 +705,7 @@ namespace QDLIB
                cmd_set_global_params(cmd);
                break;
             case Command_command_t_LOAD_OP:
+               cmd_load_op(cmd);
                break;
             case Command_command_t_READ_OP:
                cmd_read_op(cmd);
@@ -560,7 +717,17 @@ namespace QDLIB
                log.coutdbg() << "Received QUIT" << endl;
                log.flush();
                break;
+            case Command_command_t_GET_EXPEC:
+               cmd_get_expec(cmd);
+               break;
+            case Command_command_t_GET_MATEL:
+               cmd_get_matel(cmd);
+               break;
+            case Command_command_t_APPLY_OP:
+               cmd_apply_op(cmd);
+               break;
             default:
+               throw(EParamProblem("Unknown command code: ", cmd.cmd()));
             break;
          }
       } while  (cmd.cmd() != Command_command_t_QUIT);
