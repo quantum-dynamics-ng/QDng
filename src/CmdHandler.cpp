@@ -7,6 +7,7 @@
 
 #include "CmdHandler.h"
 
+#include "fft/FFTGlobal.h"
 #include "modules/ModuleLoader.h"
 #include "qdlib/Serializable.h"
 
@@ -209,6 +210,9 @@ namespace QDLIB
     */
    CmdHandler::CmdHandler(istream& in, ostream& out) : fifo_(NULL), sin_(&in), sout_(&out)
    {
+      // this is a dummy, make sure fft handler is up early.
+      // fixes the problem of segfaults in the destruction process.
+      FFTGlobal::Instance();
    }
 
 
@@ -217,6 +221,10 @@ namespace QDLIB
     */
    CmdHandler::CmdHandler(const string& file) : buffer(NULL)
    {
+      // this is a dummy, make sure fft handler is up early.
+      // fixes the problem of segfaults in the destruction process.
+      FFTGlobal::Instance();
+
       fifo_ = new FIFO(file);
 
       sin_ = fifo_->GetRecvStream();
@@ -225,6 +233,9 @@ namespace QDLIB
 
    CmdHandler::CmdHandler() : buffer(NULL), fifo_(NULL), sin_(NULL), sout_(NULL)
    {
+      // this is a dummy, make sure fft handler is up early.
+      // fixes the problem of segfaults in the destruction process.
+      FFTGlobal::Instance();
 
    }
 
