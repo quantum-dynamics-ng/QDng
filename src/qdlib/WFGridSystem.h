@@ -23,6 +23,8 @@ namespace QDLIB {
       public:
          FFT& fft();
          WFGridSystem();
+         WFGridSystem(const GridSystem& grid);
+
 
          ~WFGridSystem();
 

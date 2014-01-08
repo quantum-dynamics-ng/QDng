@@ -17,6 +17,8 @@ namespace QDLIB {
          /* Interface implementation */
          WFLevel();
 
+         WFLevel(size_t size);
+
          ~WFLevel();
 
          WaveFunction* NewInstance();

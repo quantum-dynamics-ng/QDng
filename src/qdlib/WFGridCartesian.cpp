@@ -8,13 +8,22 @@ using google::protobuf::Message;
 namespace QDLIB {
 
    
-   QDNG_WAVEFUNCTION_NEW_INSTANCE_FUNCTION(WFGridCartesian)
+
+   WaveFunction* WFGridCartesian::NewInstance()
+   {
+      WFGridCartesian* p = new WFGridCartesian(static_cast<GridSystem&>(*this));
+      return p;
+   }
 	 
    WFGridCartesian::WFGridCartesian()
       : WFGridSystem(), _name("WFGridCartesian")
    {
    }
    
+   WFGridCartesian::WFGridCartesian(GridSystem& grid)
+      : WFGridSystem(grid), _name("WFGridCartesian")
+   {
+   }
    
    WFGridCartesian::~WFGridCartesian()
    {

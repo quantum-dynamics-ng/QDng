@@ -10,6 +10,12 @@ namespace QDLIB {
 	 _isKspace(false),  _fft(NULL)
    {}
 	    
+
+   WFGridSystem::WFGridSystem(const GridSystem& grid) :
+            WaveFunction(grid.Size()), GridSystem(grid), _isKspace(false),  _fft(NULL)
+   {
+   }
+
    WFGridSystem::~WFGridSystem()
    {
       if (_fft != NULL) delete _fft;

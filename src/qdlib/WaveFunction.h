@@ -12,18 +12,6 @@
 #define DELETE_WF(WF) Collector<WaveFunction>::Instance()->Delete(WF)
 #define DELETE_ALL_WF() Collector<WaveFunction>::Instance()->Delete()
 
-/**
- * Macro for implementing the NewInstance() method.
- */
-#define QDNG_WAVEFUNCTION_NEW_INSTANCE_FUNCTION(CLASSNAME) \
-   WaveFunction* CLASSNAME::NewInstance() \
-{ \
-      CLASSNAME* p; \
-      p = new CLASSNAME(); \
-      p->Init(_params); \
-      return p; \
-}
-
 namespace QDLIB { 
    /**
     * Abstract Wavefunction class.
@@ -46,7 +34,11 @@ namespace QDLIB {
          cVec *_spacebuffer;   /* transformation buffer for different basis */
          ParamContainer _params;
       public:
-         WaveFunction() :cVec() ,_IsKspace(false), _spacebuffer(NULL) {}
+         WaveFunction() : cVec() ,_IsKspace(false), _spacebuffer(NULL) {}
+
+         WaveFunction(size_t size) : cVec(size) ,_IsKspace(false), _spacebuffer(NULL) {}
+
+
          /**
           * Make the class pure virtual.
           */

@@ -26,6 +26,8 @@ namespace QDLIB {
       public:
          WFGridCartesian();
 
+         WFGridCartesian(GridSystem& grid);
+
          ~WFGridCartesian();
          /* Interface implementation, WaveFunction */
 
