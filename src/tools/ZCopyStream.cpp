@@ -16,7 +16,7 @@ namespace QDLIB
    {
       char* buf;
       int buf_size;
-      size_t len, size_written = 0;
+      size_t len=0, size_written = 0;
 
       while (size_written < size){
          if(!os.Next(reinterpret_cast<void**>(&buf), &buf_size))
@@ -37,7 +37,7 @@ namespace QDLIB
    {
       const char* buf;
       int buf_size;
-      size_t len, size_read = 0;
+      size_t len=0, size_read = 0;
 
       while (size_read < size){
          if(!is.Next(reinterpret_cast<const void**>(&buf), &buf_size))

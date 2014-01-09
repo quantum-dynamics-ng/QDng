@@ -12,6 +12,7 @@ namespace QDLIB
    {
       public:
          void InitFromParamContainer(ParamContainer& pm);
+         void DumpParams(ParamContainer& pm);
    };
 
    /**

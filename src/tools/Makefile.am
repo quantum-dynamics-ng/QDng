@@ -11,4 +11,4 @@ tools_HEADERS = Exception.h FileSingleDefs.h FileSingle.h fstools.h Getopt.h \
 	QDGlobalClock.h tnt_io.h XmlNode.h XmlParser.h Collector.h PeakFinder.h TmpFile.h \
 	Memory.h Thread.h SharedVar.h FIFO.h FileSingleHeader.pb.h ZCopyStream.h
 
-noinst_DATA = FileSingleHeader.proto
+dist_pkgdata_DATA = FileSingleHeader.proto

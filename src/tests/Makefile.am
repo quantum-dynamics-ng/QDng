@@ -13,7 +13,7 @@ noinst_HEADERS = ComplexNumbers.h TmpFileTest.h FIFOTEst.h MatrixTest.h LapackTe
         PeakFinderTest.h FFTnTest.h ParamContainerTest.h \
 	OGridHarmonic.h OGridNablaSqTest.h OGridNablaTest.h QDClock.h TestCheby.h \
 	TestGetopt.h TestLogger.h TestMathFunctions.h TestStridedVector.h TestViews.h \
-	Vector.h WFGridCartesian.h WFGridHarmonic.h WFGridSystemTest.h \
+	Vector.h WFGridCartesian.h WFGridCartesianTest.h WFGridHarmonic.h WFGridSystemTest.h \
 	WaveFunctionTest.h defs.h function_gens.h OHermitianMatrixTest.h WFLevelTest.h OMatDipoleTest.h OGSPOTest.h \
 	WFBufferTest.h MemoryTest.h ThreadTest.h OGridHOFDTest.h FileSingleTest.h
 

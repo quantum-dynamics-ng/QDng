@@ -135,6 +135,9 @@ namespace QDLIB {
 
       // Write data
       os.write(reinterpret_cast<char*>(begin(0)), sizeBytes());
+
+      // dump gridsystem parameters, so the get written to the meta data
+      grid_sys.DumpParams(_params);
    }
 
    void WFGridSystem::DeSerialize (std::istream& is)

@@ -274,7 +274,6 @@ void FileWFTest::IO_Test_Multistate()
    WaveFunction *psi0, *psi1, *psi0_in;
    WFMultistate *wfm, *wfm_in;
    string s;
-   int n;
    
    /* Init Test WF */
    wfm = new WFMultistate();
@@ -355,14 +354,10 @@ void FileWFTest::IO_Test_Multistate()
    p_in = psi0_in->Params();
    CPPUNIT_ASSERT( psi0->size() == psi0_in->size() );
 
-   p_in.GetValue("dims",n);
-   CPPUNIT_ASSERT(n == 1);
-   p_in.GetValue("N0", n);
-   CPPUNIT_ASSERT(n == WF_TEST_SIZE);
-   p_in.GetValue("xmin0", n);
-   CPPUNIT_ASSERT(n == -5);
-   p_in.GetValue("xmax0", n);
-   CPPUNIT_ASSERT(n == 6);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->Dim() == 1);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->DimSize(0) == WF_TEST_SIZE);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->Xmin(0) == -5);
+   CPPUNIT_ASSERT(dynamic_cast<GridSystem*>(psi0_in)->Xmax(0) == 6);
    
    /* Values should match exactly */
    for (int i=0; i < psi0->size(); i++){

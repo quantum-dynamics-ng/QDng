@@ -10,9 +10,6 @@ if CPPUNIT
   OPT_DIRS+=tests
 endif
 
-if HAVE_MATLAB
-  OPT_DIRS+=mex
-endif
 
 AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS) -DQDNG_BUILD_DATE="\"`date`\"" -DQDNG_BUILD_HOST="\"`uname -n`\"" \
 	      -DQDNG_BUILD_MACH="\"`uname -m`\"" -DQDNG_REV="\"`git rev-list --max-count=1 HEAD`\""

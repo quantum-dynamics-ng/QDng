@@ -1,8 +1,10 @@
+0.7
+  * Redone MATLAB interface from scratch.
+  * The old mex interface is removed
+  * Added new binary file format (pbuf) which is now default.
+
 0.6.2
   *** Uppsala changes:
-  * Redone MATLAB interface from scratch.
-  * Added new binary file format (pbuf) which is now default.
-  * Removed 
   * Added Lanczos method to ProgEigen. Suitable for non-hermitian problems
   * Added Perfectly Matched Layers (PML): OGridPML (+ GridGMat unstable)
   * Added Arnoldi Propagator (SIL for non-hermitian H's)

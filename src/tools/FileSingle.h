@@ -887,10 +887,10 @@ namespace QDLIB
                OstreamOutputStream osbuf(&buffer);
                GzipOutputStream gzip(&osbuf);
 
-               int size;
+               int size=0;
                void* buf;
                size_t written=0;
-               size_t len;
+               size_t len=0;
 
                // Compress
                while (written < outbuf.str().size() ){
@@ -903,7 +903,7 @@ namespace QDLIB
                   written += len;
                }
 
-               if ((size_t) size - len > 0) gzip.BackUp(size - len);
+               if (((size_t) size - len) > 0) gzip.BackUp(size - len);
 
 
                if (!gzip.Close()){

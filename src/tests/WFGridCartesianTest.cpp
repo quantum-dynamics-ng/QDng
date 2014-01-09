@@ -41,7 +41,6 @@ void WFGridCartesianTest::API_Test()
 {
    ParamContainer p2;
    string s;
-   int n;
    
    CPPUNIT_ASSERT(wf->Name() == "WFGridCartesian");
    
@@ -68,17 +67,10 @@ void WFGridCartesianTest::API_Test()
    p2 = wf2->Params();
    
    
-   p2.GetValue("dims",s);
-   CPPUNIT_ASSERT( s == "1");
-   
-   p2.GetValue("N0",n);
-   CPPUNIT_ASSERT( n == WF_TEST_SIZE);
-
-   p2.GetValue("xmin0",s);
-   CPPUNIT_ASSERT( s == "-5");
-
-   p2.GetValue("xmax0",s);
-   CPPUNIT_ASSERT( s == "5");
+   CPPUNIT_ASSERT( dynamic_cast<WFGridCartesian*>(wf2)->Dim() == 1);
+   CPPUNIT_ASSERT( dynamic_cast<WFGridCartesian*>(wf2)->DimSize(0) == WF_TEST_SIZE);
+   CPPUNIT_ASSERT( dynamic_cast<WFGridCartesian*>(wf2)->Xmin(0) == -5);
+   CPPUNIT_ASSERT( dynamic_cast<WFGridCartesian*>(wf2)->Xmax(0) == 5);
 
    CPPUNIT_ASSERT( wf->size() == wf2->size());
    

@@ -51,6 +51,21 @@ namespace QDLIB {
       }
    }
 
+   void GridSystemHeaderPm::DumpParams(ParamContainer& pm)
+   {
+      int d = dims();
+      pm.SetValue( "dims", d);
+
+      for (int i=0; i < d; i++){
+         char c[256];
+         sprintf(c, "%d", i);
+         int tmp = dim(i).size();
+         pm.SetValue("xmin" + string(c), dim(i).xmin());
+         pm.SetValue("xmax" + string(c), dim(i).xmax());
+         pm.SetValue("N" + string(c), tmp);
+      }
+   }
+
    GridSystem::GridSystem()
    {
       grid_sys.set_dims(0);
