@@ -49,9 +49,9 @@ namespace QDLIB
          
          virtual void IsKspace(bool is);
          
-         virtual void Reduce(double tolerance);
-         
-         virtual void Restore();
+         virtual WaveFunction* Reduce(double tolerance);
+
+         virtual void Restore(WaveFunction* Psi);
 
          virtual void Retire();
 

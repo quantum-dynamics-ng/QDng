@@ -95,11 +95,11 @@ namespace QDLIB {
       cVec::newsize(size);
    }
    
-   void WFLevel::Reduce(double tolerance)
+   WaveFunction* WFLevel::Reduce(double tolerance)
    {
-      cVec *out = GetSpaceBuffer(); /* Result is written in spacebuffer */
       double norm = Norm();
       int size = cVec::size();
+      WFLevel* out = dynamic_cast<WFLevel*>(NewInstance());
       
       norm = norm / double(size) * tolerance; /* This is the cut-off criteria */
       
@@ -116,14 +116,16 @@ namespace QDLIB {
             (*out)[i]._imag = (*this)[i].imag();
       }
       
-      IsKspace(true);
+      return out;
    }
 
-   void WFLevel::Restore()
+   void WFLevel::Restore(WaveFunction* Psi)
    {
-      /* Nothing to do here. Just switch the buffer to the right position */
-      cVec::swap(*_spacebuffer);
-      _IsKspace = false;
+      /* Nothing to do here. Just copy the content */
+      WFLevel* wf = dynamic_cast<WFLevel*>(Psi);
+
+      newsize(wf->size());
+      FastCopy(*wf);
    }
    
 

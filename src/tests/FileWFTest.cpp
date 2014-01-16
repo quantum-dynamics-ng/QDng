@@ -106,7 +106,7 @@ void FileWFTest::IO_Test_Single()
  
    /* Check class initialization by meta file */
    psi_in = NULL;
-   CPPUNIT_ASSERT_NO_THROW( file >> &psi_in );
+   CPPUNIT_ASSERT_NO_THROW( file >> (WaveFunction**) &psi_in );
    
    CPPUNIT_ASSERT (psi_in != NULL);
    CPPUNIT_ASSERT (psi_in->Name() == "WFGridCartesian");
@@ -229,6 +229,7 @@ void FileWFTest::IO_Test_BZIP()
    file.Compress(true);
    file.CompressionTolerance(ROUGH_EPS * 3);
    file.CompressMethod(FileWF::BZIP);
+   file.Format(FileWF::binary); // BZIP is only supported for the raw binary format
 
    CPPUNIT_ASSERT_NO_THROW(file << psi);
 

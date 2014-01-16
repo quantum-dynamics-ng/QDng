@@ -45,125 +45,6 @@ namespace QDLIB {
    {}
 
 
-#ifdef HAVE_LIBBZ2
-
-   void FileWF::_CompressBZIP(WaveFunction * data)
-   {
-//      data->Reduce(_compTolerance); /* Data reduction */
-//
-//      bool cfail = true;
-//      size_t fsize = 0;
-//
-//      /* bzip2 compression */
-//      if (_compLevel > 0) {
-//         bz_stream strm;
-//         dcomplex *in, *out;
-//
-//         /* Init bzip2 stream */
-//         strm.bzalloc = NULL;
-//         strm.bzfree = NULL;
-//         strm.opaque = NULL;
-//
-//         if (BZ2_bzCompressInit(&strm, _compLevel, 0, 0) != BZ_OK) /* Init stream no verbose, workfactor set to default */
-//            throw(EIOError("z-lib init failed"));
-//
-//         CheckBuf(data); /* Check if WF-buffer is intialized */
-//
-//         cfail = false;
-//         out = _buf->begin(0);
-//         in = data->begin(0);
-//
-//         strm.next_in = (char*) in;
-//         strm.avail_in = data->sizeBytes();
-//         /* output buffer */
-//         strm.next_out = (char*) out;
-//         strm.avail_out = data->sizeBytes();
-//
-//         /* hack to handle bad compression which is larger than input or invalid - just ignore compressed data */
-//         if (BZ2_bzCompress(&strm, BZ_FINISH) != BZ_STREAM_END)
-//         { /* Compression */
-//            cfail = true;
-//         }
-//
-//         if (BZ2_bzCompressEnd(&strm) != BZ_OK) cfail = true;
-//
-//         fsize = data->sizeBytes() - strm.avail_out;
-//         FileSize(fsize + 8); /* data + magic */
-//
-//         if (strm.avail_out < ZLIB_MLEN)
-//            cfail = true; /* compressed size + magic must be smaller than original size */
-//      }
-//
-//      if (!cfail)
-//      {
-//         ParamContainer& p = data->Params(); /* indicate compression in meta data */
-//         p.SetValue("compress", true);
-//         p.SetValue("compressLevel", _compLevel);
-//         p.SetValue("compressTol", _compTolerance);
-//         p.SetValue("compressMethod", "BZIP");
-////         data->swap(*_buf);
-//
-//         /* Append magic bytes */
-//         string magic(BZIP_MAGIC);
-//         char *c_magic = reinterpret_cast<char*> (data->begin(0));
-//
-//         magic.copy(&(c_magic[fsize]), ZLIB_MLEN - 1);
-//         c_magic[fsize + ZLIB_MLEN - 1] = '\0';
-//      }
-//      else {
-//         Logger& log = Logger::InstanceRef();
-//         log.coutdbg() << "bzip2 compression failed!" << endl;
-//         data->IsKspace(false); /* Do nothing if compression had failed */
-//      }
-//
-//      /* Write and switch back to real space */
-//      FileSingle<WaveFunction>::WriteFile( data);
-//
-//      if (!cfail)
-//      {
-////         data->swap(*_buf);
-//         data->IsKspace(false);
-//      }
-//
-//      FileSize(0);
-//
-   }
-
-   /**
-    * Decompress data with bzip2.
-    */
-   void FileWF::_DecompressBZIP(WaveFunction * data)
-   {
-      bz_stream strm;
-      dcomplex *in, *out;
-
-      /* Init bz stream */
-      strm.bzalloc = NULL;
-      strm.bzfree = NULL;
-      strm.opaque = NULL;
-
-      if ( BZ2_bzDecompressInit ( &strm, 0, 0) != BZ_OK) { /* Init with no verbose, no alternate algo */
-         throw(EIOError("Error while intializing bzDecompress"));
-      }
-
-      in = data->begin(0); /* compressed input is in real space */
-      out = data->GetSpaceBuffer()->begin(0); /* decompress into k-space buffer */
-
-      strm.next_in = (char*) in;
-      strm.avail_in = FileSize() - ZLIB_MLEN; /* Buffer - magic bytes */
-      /* output buffer */
-      strm.next_out = (char*) out;
-      strm.avail_out = data->sizeBytes();
-
-      if (BZ2_bzDecompress(&strm) != BZ_STREAM_END)
-         throw(EIOError("bz2 decompression failed"));
-
-      BZ2_bzDecompressEnd(&strm);
-
-      data->Restore();
-   }
-#endif
-
    /**
     * Create WF Instance based on meta file information.
     * 
@@ -292,16 +173,19 @@ namespace QDLIB {
 
          wfm->SyncStrides();
       } else { /* Load Single WaveFunction */
+         WaveFunction* tmp_data = data;
 
          FileSingleHeader_Compression compress = ReadMeta().compression();
          if (compress != FileSingleHeader_Compression_UNCOMPRESSED){
-            data->IsKspace(true); /* In this case the data must be placed in k-space buffer */
+            tmp_data = data->NewInstance();
          }
 
-         ReadData(data);
+         ReadData(tmp_data);
 
-         if (compress != FileSingleHeader_Compression_UNCOMPRESSED)
-            data->Restore();
+         if (compress != FileSingleHeader_Compression_UNCOMPRESSED){
+            data->Restore(tmp_data);
+            DELETE_WF(tmp_data);
+         }
       }
      
    }
@@ -360,18 +244,19 @@ namespace QDLIB {
 
          }
       } else { /* Write single file */
+         WaveFunction* tmp_data = data;
          if (_compress) {
             if (_compMethod == INVALID)
                throw( EParamProblem("Invalid file compression method given") );
             else
-               data->Reduce(_compTolerance);
+               tmp_data = data->Reduce(_compTolerance);
          }
 
-         WriteMeta(data, more_files_follow);
-         WriteData(data);
+         WriteMeta(tmp_data, more_files_follow);
+         WriteData(tmp_data);
 
          if (_compress)
-            data->IsKspace(false);
+            DELETE_WF(tmp_data);
       }
    }
    

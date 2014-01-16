@@ -31,9 +31,9 @@ namespace QDLIB {
 
          dcomplex operator*(WaveFunction *Psi);
 
-         virtual void Reduce(double tolerance);
+         virtual WaveFunction* Reduce(double tolerance);
 
-         virtual void Restore();
+         virtual void Restore(WaveFunction* Psi);
 
          /* Own methods */
          void Size(int size);

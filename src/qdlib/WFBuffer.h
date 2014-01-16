@@ -11,6 +11,7 @@
 #include "tools/TmpFile.h"
 
 #define DEFAULT_BUFFER_SIZE 1 * 1024*1024*1024  /* Default Max buffer size */
+#define DEFAULT_BUFFER_NAME "QDNG_WFBUFFER_"
 
 #define WFBUFFER_LOCK_LAST 2
 
@@ -24,50 +25,46 @@ namespace QDLIB {
     * WaveFunction Buffer 
     *   @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     */
-   class WFBuffer : private cVec {
+   class WFBuffer {
       friend class WFBufferTest;
       private:
          struct BufMap {
             WaveFunction* Psi;
             bool Locked;
-            int BufPos;         /* Position in  disk buffer */
-            BufMap() : Psi(NULL), Locked(false), BufPos(-1){}
+            bool ondisk;
+            BufMap() : Psi(NULL), Locked(false), ondisk(false) {}
          };
          
-         size_t _size;           /* Number of initialized wfs */
-         size_t _wfsize;
          size_t _LastLocks;      /* How much of the last access to keep valid */
          
-         size_t _inmem;         /* Actual num elements in memory */
+         // Book keeping stuff
          size_t _locked;        /* Actual number of explicit locks */
-         size_t _maxmem;        /* Maximum number of elements allowed to keep in mem */
          size_t _ondisk;        /* Actual number of wfs on disk */
          size_t _MaxBuf;        /* Maximum mem size in bytes */
-         
-         dcomplex* _diskbuf;
-         TmpFile<dcomplex> _File;
-         
+
          deque<size_t> _LastAccess; /* Lately accessed positions */
          
          vector<BufMap>  _buf;
-         vector<size_t> _diskmap;   /* key = diskpos, value = bufferpos */
          
-         size_t _FreeDiskPos();
+         string _fname;      /* The base name */
+
          WaveFunction* _ValidEntry();
          bool _IsLocked(size_t mempos);
          void _MoveToDisk();
          void _MoveToMem(size_t pos);
+         string _GetFileName(size_t pos);
+         size_t _BytesInMem();
       public:
          WFBuffer();
          ~WFBuffer();
           
          void ResizeBuffer(size_t size);
-         size_t Size() const {return _size;}
+         size_t Size() const {return _buf.size();}
          
          void Init(WaveFunction* Psi);
          
-         WaveFunction* Get(const size_t pos);
-         void Set(const size_t pos, WaveFunction *Psi);
+         WaveFunction* Get(size_t pos);
+         void Set(size_t pos, WaveFunction *Psi);
          void Add(WaveFunction *Psi);
          
          void SaveToFiles(const string&  name);

@@ -154,7 +154,7 @@ namespace QDLIB {
           * in most cases the reduction will be combined with a transformation.
           * The original Wavefunction must not be affected by this operation.
           */
-         virtual void Reduce(double tolerance) = 0;
+         virtual WaveFunction* Reduce(double tolerance) = 0;
          
          /**
           * This is the inverse operation of Reduce.
@@ -162,8 +162,14 @@ namespace QDLIB {
           * The input is present in the k-space buffer.
           * The result must be stored in real space.
           */
-         virtual void Restore() = 0;
+         virtual void Restore(WaveFunction* Psi) = 0;
          
+
+         /**
+          * Should return the amount of data storage in memory.
+          */
+         virtual size_t size_bytes() { return cVec::sizeBytes(); }
+
          /**
           * Retire the storage of the wave function.
           *

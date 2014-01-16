@@ -19,15 +19,9 @@ namespace QDLIB {
          int _compLevel;         /* Compression level 0..9; 0 = no compression, 9 = best */
          double _compTolerance;   /* Cut off factor for lossy compression */
 
-#ifdef HAVE_LIBZ
-
-         void _CompressBZIP(WaveFunction * data);
-         void _DecompressBZIP(WaveFunction * data);
-
-#endif
       public:
          FileWF();
-         ~FileWF();
+         virtual ~FileWF();
          WaveFunction* LoadWaveFunctionByMeta();
          virtual void ReadWaveFunction (WaveFunction *data);
          virtual void WriteWaveFunction (WaveFunction *data, bool more_files_follow = false);

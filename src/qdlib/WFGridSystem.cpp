@@ -83,9 +83,9 @@ namespace QDLIB {
 
    }
 
-   void WFGridSystem::Reduce(double tolerance)
+   WaveFunction* WFGridSystem::Reduce(double tolerance)
    {
-      double norm;
+      WaveFunction* res = NewInstance();
       int size = cVec::size();
  
       CheckFFT();
@@ -93,7 +93,7 @@ namespace QDLIB {
       _fft->forward();
       IsKspace(true);
       
-      norm = VecMax(*this) * tolerance; /* This is the cut-off criteria */
+      const double thr = VecMax(*this) * tolerance; /* This is the cut-off criteria */
       
       int i;
 #ifdef _OPENMP
@@ -101,24 +101,35 @@ namespace QDLIB {
 #endif
       for (i=0; i <  size; i++){
          /* cut down real & imag seperately */
-         if ( abs((*this)[i].real()) < norm )
-            (*this)[i]._real = 0;
+         if ( abs((*this)[i].real()) < thr )
+            (*res)[i]._real = 0;
+         else
+            (*res)[i]._real = (*this)[i].real() / double(size);
          
-         if ( abs((*this)[i].imag()) < norm )
-            (*this)[i]._imag = 0;
+         if ( abs((*this)[i].imag()) < thr )
+            (*res)[i]._imag = 0;
+         else
+            (*res)[i]._imag = (*this)[i].imag()  / double(size);
       }
-      
-      *this *= 1./sqrt(double(size)); /* Normalize */
+
+      IsKspace(false);
+
+      return res;
    }
 
-   void WFGridSystem::Restore()
+   void WFGridSystem::Restore(WaveFunction* Psi)
    {
+      WFGridSystem* psi = dynamic_cast<WFGridSystem*>(Psi);
+
+      // Copy
+      IsKspace(true);
+      *((GridSystem*) this) = *((GridSystem*) psi);
+      *((cVec*) this) = *((cVec*) psi);
+
       CheckFFT();
-      
       _fft->backward();
       IsKspace(false);
       
-      *this *= 1./sqrt(double(cVec::size())); /* Normalize */
    }
    
 

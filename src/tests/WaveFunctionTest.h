@@ -30,8 +30,8 @@ class WFT : public QDLIB::WaveFunction
       virtual WaveFunction* operator=(WaveFunction* Psi){return NULL;}
       virtual dcomplex operator*(WaveFunction* Psi){return dcomplex(0,9);}
       
-      virtual void Reduce(double tolerance) {}
-      virtual void Restore() {}
+      virtual WaveFunction* Reduce(double tolerance) { return NULL; }
+      virtual void Restore(WaveFunction* Psi) {}
 
       virtual void Serialize (std::ostream& os) {}
       virtual void DeSerialize (std::istream& is) {}

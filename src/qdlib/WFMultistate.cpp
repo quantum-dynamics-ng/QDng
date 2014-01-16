@@ -235,20 +235,24 @@ namespace QDLIB
    }
 
    
-   void WFMultistate::Reduce(double tolerance)
+   WaveFunction* WFMultistate::Reduce(double tolerance)
    {
-      for(lint i=0; i < _nstates; i++){
-         _states[i]->Reduce(tolerance);
-      }
-      IsKspace(true); /* Set our self also to k-space representation */
+      throw(EIncompatible("WFMultistate::Reduce should never be called"));
+      return NULL;
+
+//      for(lint i=0; i < _nstates; i++){
+//         _states[i]->Reduce(tolerance);
+//      }
+//      IsKspace(true); /* Set our self also to k-space representation */
    }
 
-   void WFMultistate::Restore()
+   void WFMultistate::Restore(WaveFunction*)
    { 
-      for(lint i=0; i < _nstates; i++){
-         _states[i]->Restore();
-      }
-      IsKspace(false); /* Set our self also to x-space representation */
+      throw(EIncompatible("WFMultistate::Restore should never be called"));
+//      for(lint i=0; i < _nstates; i++){
+//         _states[i]->Restore();
+//      }
+//      IsKspace(false); /* Set our self also to x-space representation */
    }
 
    void WFMultistate::Retire()

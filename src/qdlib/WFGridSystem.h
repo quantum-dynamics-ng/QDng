@@ -32,9 +32,9 @@ namespace QDLIB {
 
          void operator=(WFGridSystem *G);
 
-         virtual void Reduce(double tolerance);
+         virtual WaveFunction* Reduce(double tolerance);
 
-         virtual void Restore();
+         virtual void Restore(WaveFunction* Psi);
 
          virtual void Reaquire();
 

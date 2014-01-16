@@ -8,8 +8,8 @@
 
 namespace QDLIB {
 
-   WFBuffer::WFBuffer() : _size(0), _wfsize(0), _LastLocks(WFBUFFER_LOCK_LAST),
-                      _inmem(0), _locked(0), _maxmem(SIZE_MAX), _ondisk(0), _MaxBuf(DEFAULT_BUFFER_SIZE), _diskbuf(NULL)
+   WFBuffer::WFBuffer() : _LastLocks(WFBUFFER_LOCK_LAST),
+                       _locked(0), _ondisk(0), _MaxBuf(DEFAULT_BUFFER_SIZE)
    {
       ParamContainer& gp = GlobalParams::Instance();
             
@@ -25,6 +25,38 @@ namespace QDLIB {
          /* Use two third for free space for buffering */
          _MaxBuf = Memory::Instance().CurrentSizeAvail() * 2 / 3;
       }
+
+      string tmpdir;
+
+      /* Look for the tmp path */
+      if (gp.isPresent("tmpdir")){
+         gp.GetValue("tmpdir", tmpdir);
+      } else {
+         char *c;
+         c = getenv("TMPDIR");
+         if (c != NULL)
+            tmpdir = c;
+      }
+
+      /* Create a unique name and open the file */
+      if ( tmpdir.length() > 0 )
+         _fname = tmpdir + "/" + DEFAULT_BUFFER_NAME;
+      else
+         _fname = DEFAULT_BUFFER_NAME;
+
+      /* Get some random to avoid name clashes */
+      int fd = open("/dev/random",0);
+      if (fd == -1) throw (EIOError("WFBuffer: open /dev/random failed"));
+      uint32 num;
+      size_t got = read(fd, &num, sizeof(num));
+
+      if (got < sizeof(num)) throw (EIOError("WFBuffer: readin /dev/random failed"));
+      close(fd);
+
+      char hex[9];
+      sprintf(hex, "%X", num);
+
+      _fname += hex;
    }
 
 
@@ -33,24 +65,24 @@ namespace QDLIB {
       Clear();
    }   
   
-   /**
-    * Returns a free slot of the diskbuffer.
-    * Resizes the diskbuffer if needed.
-    */
-   size_t WFBuffer::_FreeDiskPos()
+   string WFBuffer::_GetFileName(size_t pos)
    {
-      for (size_t i=0; i < _diskmap.size(); i++){
-         if (_diskmap[i] == (size_t) -1) return i;
-      }
-      
-      _diskmap.push_back(-1);
-      if (_File.isOpen())
-         _diskbuf = _File.Resize(_diskmap.size()*_wfsize);
-      else
-         _diskbuf = _File.Open(_diskmap.size()*_wfsize,false);
-      
-      return _diskmap.size()-1;
+      char hex[9];
+      snprintf(hex, 9, "%X", (uint32_t) pos); // This limits us to a disk buffer size of 2^32 elements
+
+      return _fname + string(hex);
    }
+
+   size_t WFBuffer::_BytesInMem()
+   {
+      size_t inmem = 0;
+      for (size_t i=0; i < _buf.size(); i++){
+         if (_buf[i].Psi != NULL) inmem += _buf[i].Psi->size_bytes();
+      }
+
+      return inmem;
+   }
+
 
    /**
     * Search for a valid buffer entry.
@@ -66,33 +98,34 @@ namespace QDLIB {
    bool WFBuffer::_IsLocked(size_t mempos)
    {
       for (size_t i=0; i < _LastAccess.size(); i++){
-         if ( _LastAccess[i] == mempos || _buf[i].Locked ) return true;
+         if ( _LastAccess[i] == mempos) return true;
       }
+
+      for (size_t i=0; i < _buf.size(); i++){
+         if (_buf[i].Locked) return true;
+      }
+
       return false;
    }
    
    /**
     * Copy a membuf element into the disk buffer.
-    * \param lpos Don't move this buffer.
     */
    void WFBuffer::_MoveToDisk()
    {
       for (size_t i = _buf.size()-1; i > 0; i--){ /* walk through membuf - backwards */
-         if (_buf[i].BufPos == -1 && _buf[i].Psi != NULL && !_IsLocked(i)){ /* This is an Element in memory */
-            size_t dpos = _FreeDiskPos();
-            _diskmap[dpos] = i;
-            
-            /* Be sure to move all strides */
-            for (int s=0; s < _buf[i].Psi->strides(); s++){
-/*               memcpy(reinterpret_cast<void*>( & (_diskbuf[_wfsize*dpos + s * _buf[i].Psi->lsize()])),
-                      reinterpret_cast<void*>(_buf[i].Psi->begin(s)), _buf[i].Psi->sizeBytes());*/
-               _File.Seek(_wfsize*dpos + s * _buf[i].Psi->lsize());
-               _File.Write(_buf[i].Psi->begin(s), _buf[i].Psi->lsize());
-            }
-                   
+         if (_buf[i].Psi != NULL && !_buf[i].Locked){ /* This is an Element in memory */
+
+            // Dump to file
+            ofstream file;
+            file.open(_GetFileName(i).c_str(), ios_base::trunc);
+            _buf[i].Psi->Serialize(file); // TODO: Error checking!!
+            file.close();
+
+            // Book keeping
             _ondisk++;
-            _inmem--;
-            _buf[i].BufPos = dpos;
+
+            _buf[i].ondisk = true;
             DELETE_WF(_buf[i].Psi);
             _buf[i].Psi = NULL;
             return;
@@ -109,20 +142,13 @@ namespace QDLIB {
       /* Initialize buffer position */
       if (_buf[pos].Psi == NULL)
          _buf[pos].Psi = _ValidEntry()->NewInstance();
-      
-      for (int s=0; s < _buf[pos].Psi->strides(); s++){
-/*         memcpy(reinterpret_cast<void*>(_buf[pos].Psi->begin(s)),
-                reinterpret_cast<void*>(&(_diskbuf[_wfsize*_buf[pos].BufPos + s * _buf[pos].Psi->lsize()])), _buf[pos].Psi->sizeBytes());*/
-         _File.Seek(_wfsize*_buf[pos].BufPos + s * _buf[pos].Psi->lsize());
-         _File.Read(_buf[pos].Psi->begin(s), _buf[pos].Psi->lsize());
-      }
-      
-      /* Invalidate disk buffer element */ 
-      _diskmap[_buf[pos].BufPos] = -1;
-      _buf[pos].BufPos = -1;
+
+      ifstream file;
+      file.open(_GetFileName(pos).c_str());
+      _buf[pos].Psi->DeSerialize(file); // TODO: Error checking!!
+      file.close();
       
       _ondisk--;
-      _inmem++;
    }
 
    /**
@@ -136,16 +162,16 @@ namespace QDLIB {
          for (size_t i=oldsize-1; i >= size; i--){
             if (_buf[i].Psi != NULL){ /* Remove wf from memory */
                DELETE_WF(_buf[i].Psi);
-               _inmem--;
             }
-            if (_buf[i].BufPos > -1){ /* Remove wf from disk buf */
-               _diskmap[_buf[i].BufPos] = -1;
+
+            if (_buf[i].ondisk) { /* Remove wf from disk buf */
+               FS::Remove(_GetFileName(i));
                _ondisk--;
             }
-            if (_buf[i].Psi != NULL && _buf[i].BufPos > -1) _size--;
-            _buf.pop_back();
 
+            _buf.pop_back(); /* remove last element */
          }
+
          /* Clear all locks */
          _LastAccess.clear();
          _locked = 0;
@@ -161,24 +187,13 @@ namespace QDLIB {
    void WFBuffer::Init(WaveFunction* Psi)
    {
       if (_MaxBuf > 0){
-         _maxmem = _MaxBuf / Psi->sizeBytes();
-      
-         _wfsize = Psi->size();
-         
-         if (_maxmem < 1)
-            throw (EParamProblem("Not enough memory for buffer available"));
-            
-         if (_maxmem < _size){
-            _diskbuf = _File.Open((_size-_maxmem)*_wfsize,false);
-            _diskmap.assign(_size-_maxmem, -1);
-         }
-         
+         if (_MaxBuf < Psi->size_bytes())
+            throw (EParamProblem("Not enough memory for WFbuffer available"));
       }
 
       /* Have at least one valid entry */
       if (_buf.size() == 0){
          _buf.resize(1);
-         _inmem = 1;
       }
 
       _buf[0].Psi = Psi->NewInstance();
@@ -186,62 +201,73 @@ namespace QDLIB {
    
    /**
     * Set an element.
+    *
+    * The content is copied to the buffer.
     */
-   void WFBuffer::Set(const size_t pos, WaveFunction *Psi)
+   void WFBuffer::Set(size_t pos, WaveFunction *Psi)
    {
       /* Check for right map size */
       if (pos >= _buf.size()){
          _buf.resize(pos+1);
       }
 
-      if (pos >= _size)
-         _size = pos + 1;
-
-      if (_inmem >= _maxmem){/* Move an element to disk storage */
-         bool lock = _buf[pos].Locked;
-         _buf[pos].Locked = true;
+      /* Ensure we have some space */
+      if (_BytesInMem() >= _MaxBuf){/* Move an element to disk storage */
          _MoveToDisk();
-         _buf[pos].Locked = lock;
       }
             
-      if (_buf[pos].Psi == NULL) {
+      if (_buf[pos].Psi == NULL) { /* Create in mem element*/
          _buf[pos].Psi = Psi->NewInstance();
-         _inmem++;
-         if (_buf[pos].BufPos != -1){  /* Invalidate disk buf */
-            _diskmap[_buf[pos].BufPos] = -1;
-            _buf[pos].BufPos = -1;
-            _ondisk--;
-         }
       }
       
       *(_buf[pos].Psi) = Psi;
+
+      /* Make sure we're not to large */
+      if (_BytesInMem() >= _MaxBuf){/* Move an element to disk storage */
+         _MoveToDisk();
+      }
+
+      if (_BytesInMem() > _MaxBuf){
+         throw(EMemError("WFBuffer: buffer space execeeded. Increase MaxBufferSize."));
+      }
    }
    
    void WFBuffer::Add(WaveFunction *Psi)
    {
-      Set(_size, Psi);
+      Set(_buf.size(), Psi);
    }
    
-   WaveFunction* WFBuffer::Get(const size_t pos)
+   WaveFunction* WFBuffer::Get(size_t pos)
    {
       if (pos >= _buf.size())
          throw (EIncompatible("Tried to read invalid WFBuffer element"));
+
+      _buf[pos].Locked = true;
       
+      if (_LastLocks > 0 ) _LastAccess.push_front(pos);
+      if (_LastAccess.size() > _LastLocks) {
+         _buf[_LastAccess.back()].Locked = false;
+         _LastAccess.pop_back();
+      }
+
       if (_buf[pos].Psi == NULL){
-         if (_inmem >= _maxmem) {/* Move an element to disk storage */
-            _buf[pos].Locked = true;
+         if (_BytesInMem() >= _MaxBuf) {/* Move an element to disk storage */
             _MoveToDisk();
-            _buf[pos].Locked = false;
          }
 
-         if (_buf[pos].BufPos == -1){ /* This might happen if we request a postion which haven't been written before */
+         if (!_buf[pos].ondisk){ /* This might happen if we request a postion which haven't been written before */
             _buf[pos].Psi = _ValidEntry()->NewInstance();
          } else
             _MoveToMem(pos);
+
+         if (_BytesInMem() >= _MaxBuf) {/* Move an element to disk storage */
+            _MoveToDisk();
+         }
+
+         if (_BytesInMem() > _MaxBuf){
+            throw(EMemError("WFBuffer: buffer space execeeded. Increase MaxBufferSize."));
+         }
       }
-      
-      _LastAccess.push_front(pos);
-      if (_LastAccess.size() > _LastLocks) _LastAccess.pop_back();
 
       return _buf[pos].Psi;
    }
@@ -259,7 +285,7 @@ namespace QDLIB {
       wfile.ActivateSequence();
       wfile.ResetCounter();
       
-      for (size_t i=0; i < _size; i++) /* Write down files */
+      for (size_t i=0; i < _buf.size(); i++) /* Write down files */
          wfile << Get(i);
             
    }
@@ -299,8 +325,16 @@ namespace QDLIB {
     */
    void WFBuffer::Lock(size_t pos)
    {
-      if (_LastLocks + _locked + 1 > _maxmem )
-         throw (EParamProblem("Can't lock another wave function to memory. Increase MaxBufferSize"));
+      /* try to reduce the size */
+      if (_BytesInMem() >= _MaxBuf){
+         bool locked = _buf[pos].Locked;
+         _buf[pos].Locked = true;
+         _MoveToDisk();
+         _buf[pos].Locked = locked;
+      }
+
+      if (_BytesInMem() > _MaxBuf)
+         throw (EMemError("Can't lock another wave function to memory. Increase MaxBufferSize"));
 
       if (!_buf[pos].Locked) _locked++;
       _buf[pos].Locked = true;
@@ -323,34 +357,24 @@ namespace QDLIB {
     */
    void WFBuffer::AutoLock(size_t LastLocks)
    {
-      if ( LastLocks > _maxmem)
-         throw (EParamProblem("Can't lock enough wave functions to memory. Increase MaxBufferSize"));
-         
       _LastLocks = LastLocks;
    }
    
    /**
-    * Clear all Content of the buffer and remove the tmp file.
+    * Clear all Content of the buffer and remove the tmp files.
     */
    void WFBuffer::Clear()
    {
-      _File.Close();
-      
+
       while (! _buf.empty() ){
          DELETE_WF(_buf.back().Psi);
+         if (_buf.back().ondisk) FS::Remove(_GetFileName(_buf.size()-1));
          _buf.pop_back();
       }
       
-      while (! _LastAccess.empty())
-         _LastAccess.pop_back();
-      
-      _diskmap.clear();
-      
-      _size = 0;
-      _inmem = 0;
-      _maxmem = 0;
+      _LastAccess.clear();
       _ondisk = 0;
-      _diskbuf = NULL;
+      _locked = 0;
    }
 
 
