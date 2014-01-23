@@ -59,8 +59,8 @@ namespace QDLIB {
       FileSingleHeaderPm meta = ReadMeta();
       ParamContainer p = meta.params();
       string classname = meta.class_();
-      
-      if (classname.size() == 0)
+
+      if (classname.size() <= 1)
          throw (EParamProblem("No CLASS information found. LoadWaveFunctionByMeta failed."));
 
       if (classname == "WFMultistate"){ /* Explicit Multistate handling */

@@ -37,7 +37,7 @@ namespace QDLIB {
          }
 
          /** Set file compression. */
-         void Compress(bool on) { _compress = on; }
+         void Compress(bool on) { _compress = on; if (on) _compMethod = ZLIB; else _compMethod = UNCOMPRESSED; }
          
          /** Get file compression level */
          int CompressionLevel() const { return _compLevel ; }
