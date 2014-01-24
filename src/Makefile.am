@@ -20,7 +20,7 @@ if HAVEOPENMP
 endif
 
 
-SUBDIRS = fft linalg math modules qdlib slatec tools lib simpleXml $(OPT_DIRS)
+SUBDIRS = fft linalg slatec math qdlib modules tools lib simpleXml $(OPT_DIRS)
 
 bin_PROGRAMS = qdng qdz qdinfo
 qdng_SOURCES = IACmds.pb.cc CmdHandler.cpp GlobalOpList.cpp GlobalWFList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
