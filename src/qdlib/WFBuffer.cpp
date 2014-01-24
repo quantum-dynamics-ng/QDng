@@ -2,6 +2,7 @@
 #include "tools/GlobalParams.h"
 #include "qdlib/FileWF.h"
 
+#include <typeinfo>
 #include <unistd.h>
 #include <sys/mman.h>
 
@@ -45,12 +46,12 @@ namespace QDLIB {
          _fname = DEFAULT_BUFFER_NAME;
 
       /* Get some random to avoid name clashes */
-      int fd = open("/dev/random",0);
-      if (fd == -1) throw (EIOError("WFBuffer: open /dev/random failed"));
+      int fd = open("/dev/urandom",0);
+      if (fd == -1) throw (EIOError("WFBuffer: open /dev/urandom failed"));
       uint32 num;
       size_t got = read(fd, &num, sizeof(num));
 
-      if (got < sizeof(num)) throw (EIOError("WFBuffer: readin /dev/random failed"));
+      if (got < sizeof(num)) throw (EIOError("WFBuffer: readin /dev/urandom failed"));
       close(fd);
 
       char hex[9];
@@ -194,9 +195,21 @@ namespace QDLIB {
       /* Have at least one valid entry */
       if (_buf.size() == 0){
          _buf.resize(1);
+         _buf[0].Psi = Psi->NewInstance();
+      } else {
+         /* Check for validity */
+         WaveFunction* wf = _ValidEntry();
+
+         if (wf != NULL){
+            if (typeid(Psi) != typeid(wf))
+               throw (EIncompatible("WFBuffer: Incompatible types"));
+
+            if (Psi->size() != wf->size())
+               throw (EIncompatible("WFBuffer: Incompatible types"));
+         }
       }
 
-      _buf[0].Psi = Psi->NewInstance();
+
    }
    
    /**
@@ -305,6 +318,9 @@ namespace QDLIB {
       wfile.Counter(begin);
 
       wfile >> &psi; /* Load and init first wf by meta data */
+
+      Clear(); /* clear the buffer */
+
       Add(psi);
 
       int counter = 1;

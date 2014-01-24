@@ -3,11 +3,17 @@
 /* Operator list */
 #include "qdlib/OSum.h"
 #include "qdlib/OProduct.h"
+#include "qdlib/OProjection.h"
+#include "qdlib/OScalar.h"
 
+#include "qdlib/OArnoldi.h"
+#include "qdlib/OGridNabla.h"
+
+// move to external modules when supported
+#ifndef USE_DYNMODS
 #include "qdlib/OCheby.h"
 #include "qdlib/OGSPO.h"
 #include "qdlib/OSIL.h"
-#include "qdlib/OArnoldi.h"
 #include "qdlib/ORK4.h"
 
 #include "qdlib/OGridNablaSq.h"
@@ -19,20 +25,15 @@
 #include "qdlib/OGridPosition.h"
 #include "qdlib/OGridNAC.h"
 #include "qdlib/OGridKick.h"
-#include "qdlib/OGridStokes.h"
-#include "qdlib/OGridGStokes.h"
-#include "qdlib/OGridStokesAlbrecht.h"
 
 #include "qdlib/OHermitianMatrix.h"
 #include "qdlib/OMatDipole.h"
 
 #include "qdlib/OGobbler.h"
 #include "qdlib/OFlux.h"
-#include "qdlib/OProjection.h"
-#include "qdlib/OScalar.h"
 
 #include "qdlib/OGridHOFD.h"
-
+#endif
 
 /* Wavefunction list */
 #include "qdlib/WFGridCartesian.h"
@@ -66,11 +67,23 @@ namespace QDLIB
    /* Instance functions  */
    QDNG_OPERATOR_INSTANCE_FUNCTION(OSum)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OProduct)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OProjection)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OScalar)
 
+   /* Leave this here because we have an individual Constructor */
+   Operator* INT_Alias_OGridMomentum()
+   {
+      OGridNabla *p;
+      p = new OGridNabla(true);
+      return p;
+   }
+
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OArnoldi)
+
+#ifndef USE_DYNMODS
    QDNG_OPERATOR_INSTANCE_FUNCTION(OCheby)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGSPO)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OSIL)
-   QDNG_OPERATOR_INSTANCE_FUNCTION(OArnoldi)
 
    QDNG_OPERATOR_INSTANCE_FUNCTION(ORK4)
 
@@ -83,27 +96,15 @@ namespace QDLIB
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridPosition)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNabla)
 
-   /* Leave this here because we have an individual Constructor */
-   Operator* INT_Alias_OGridMomentum()
-   {
-      OGridNabla *p;
-      p = new OGridNabla(true);
-      return p;
-   }
-
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridHOFD)
 
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNAC)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridKick)
-   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridStokes)
-   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridGStokes)
-   QDNG_OPERATOR_INSTANCE_FUNCTION(OGridStokesAlbrecht)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGobbler)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OFlux)
-   QDNG_OPERATOR_INSTANCE_FUNCTION(OProjection)
-   QDNG_OPERATOR_INSTANCE_FUNCTION(OScalar)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OHermitianMatrix)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OMatDipole)
+#endif
 
    QDNG_WAVEFUNCTION_INSTANCE_FUNCTION(WFGridCartesian)
    QDNG_WAVEFUNCTION_INSTANCE_FUNCTION(WFLevel)
@@ -120,11 +121,18 @@ namespace QDLIB
    {
       QDNG_STRING_TO_INSTANCE_PTR(OSum)
       QDNG_STRING_TO_INSTANCE_PTR(OProduct)
+      QDNG_STRING_TO_INSTANCE_PTR(OProjection)
+      QDNG_STRING_TO_INSTANCE_PTR(OScalar)
 
+      /* This is an alias */
+      if (name == "INT_OGridMomentum") return &INT_Alias_OGridMomentum;
+
+      QDNG_STRING_TO_INSTANCE_PTR(OArnoldi)
+
+#ifndef USE_DYNMODS
       QDNG_STRING_TO_INSTANCE_PTR(OCheby)
       QDNG_STRING_TO_INSTANCE_PTR(OGSPO)
       QDNG_STRING_TO_INSTANCE_PTR(OSIL)
-      QDNG_STRING_TO_INSTANCE_PTR(OArnoldi)
       QDNG_STRING_TO_INSTANCE_PTR(ORK4)
 
       QDNG_STRING_TO_INSTANCE_PTR(OGridNablaSq)
@@ -136,23 +144,15 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(OGridPosition)
       QDNG_STRING_TO_INSTANCE_PTR(OGridHOFD)
 
-      /* This is an alias */
-      if (name == "INT_OGridMomentum") return &INT_Alias_OGridMomentum;
-
       QDNG_STRING_TO_INSTANCE_PTR(OGridNabla)
       QDNG_STRING_TO_INSTANCE_PTR(OGridNAC)
       QDNG_STRING_TO_INSTANCE_PTR(OGridKick)
-      QDNG_STRING_TO_INSTANCE_PTR(OGridStokes)
-      QDNG_STRING_TO_INSTANCE_PTR(OGridGStokes)
-      QDNG_STRING_TO_INSTANCE_PTR(OGridStokesAlbrecht)
 
       QDNG_STRING_TO_INSTANCE_PTR(OHermitianMatrix)
       QDNG_STRING_TO_INSTANCE_PTR(OMatDipole)
       QDNG_STRING_TO_INSTANCE_PTR(OGobbler)
       QDNG_STRING_TO_INSTANCE_PTR(OFlux)
-      QDNG_STRING_TO_INSTANCE_PTR(OProjection)
-      QDNG_STRING_TO_INSTANCE_PTR(OScalar)
-
+#endif
       return NULL;
    }
 

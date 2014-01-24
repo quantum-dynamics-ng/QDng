@@ -31,8 +31,6 @@ namespace QDLIB {
       if (Size() > 0)
          return;
 
-      WFBuffer::Init(Psi);
-
       _buf = Psi->NewInstance();
       _buf->Retire();
 
@@ -65,9 +63,13 @@ namespace QDLIB {
 
          ReadFromFiles(files, start, step, num);
 
-         if (uint(num) != Size())
+         if (uint(num) != Size()){
+            Logger& log = Logger::InstanceRef();
+            log.cout() << "wanted " << num << ", got " << Size() << endl;
             throw (EIOError("Projector: The Projection couldn't be read completely. Something is missing."));
+         }
 
+         WFBuffer::Init(Psi);
       }
    }
    

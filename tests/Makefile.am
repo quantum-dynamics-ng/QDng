@@ -22,7 +22,7 @@ TGE:
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
 	 echo "Running test $$name"; \
-	 ../src/qdng $${name}.qdi > $${name}.log;\
+	QD_MOD_PATH=$(top_builddir)/src/modules/.libs/ ../src/qdng $${name}.qdi > $${name}.log;\
 	done; \
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
@@ -32,7 +32,7 @@ TGP:
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
 	 echo "Running test $$name"; \
-	 ../src/qdng $${name}.qdi > $${name}.log;\
+	 QD_MOD_PATH=$(top_builddir)/src/modules/.libs/ ../src/qdng $${name}.qdi > $${name}.log;\
 	done; \
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
@@ -42,7 +42,7 @@ TLP:
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
 	 echo "Running test $$name"; \
-	 ../src/qdng $${name}.qdi > $${name}.log;\
+	 QD_MOD_PATH=$(top_builddir)/src/modules/.libs/ ../src/qdng $${name}.qdi > $${name}.log;\
 	done; \
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
@@ -52,7 +52,7 @@ TLO:
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
 	 echo "Running test $$name"; \
-	 ../src/qdng $${name}.qdi > $${name}.log;\
+	 QD_MOD_PATH=$(top_builddir)/src/modules/.libs/ ../src/qdng $${name}.qdi > $${name}.log;\
 	done; \
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 
@@ -62,7 +62,7 @@ TGO:
 	do\
 	 name=`echo $$n | sed s/\.qdi//`;\
 	 echo "Running test $$name"; \
-	../src/qdng $${name}.qdi > $${name}.log;\
+	QD_MOD_PATH=$(top_builddir)/src/modules/.libs/  ../src/qdng $${name}.qdi > $${name}.log;\
 	done; \
 	a=`grep "Normal termination" $${name}.log | wc -l`; \
 	test "$$a" -eq 1 ||  echo "!!!$${name} Unclean termination" 

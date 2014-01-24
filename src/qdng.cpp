@@ -165,7 +165,8 @@ int main(int argc, char **argv)
    cmdline.SetDescription("QD next generation");
 
 #ifdef USE_DYNMODS
-   ModuleLoader *mods = ModuleLoader::Instance();
+   ModuleLoader<WaveFunction> *mods_wf = ModuleLoader<WaveFunction>::Instance();
+   ModuleLoader<Operator> *mods_op = ModuleLoader<Operator>::Instance();
    cmdline.SetHelp( 'm', "module path", false,
             "User defined path to the wave function and operator modules", "");
 #endif
@@ -201,13 +202,15 @@ int main(int argc, char **argv)
       if (gp.isPresent("modpath")) {
          string path;
          gp.GetValue("modpath", path);
-         mods->UserPath( path );
+         mods_op->UserPath( path );
+         mods_wf->UserPath( path );
       }
 
       /* Provide a user path for module loading */
       if (cmdline.GetOption('m')) {
          cmdline.GetOption('m', fname);
-         mods->UserPath( fname );
+         mods_op->UserPath( fname );
+         mods_wf->UserPath( fname );
       }
 #endif
 

@@ -417,7 +417,7 @@ namespace QDLIB
          return;
       }
 
-      Operator* op = ModuleLoader::Instance()->LoadOp(cmd.param2());
+      Operator* op = ModuleLoader<Operator>::Instance()->Load(cmd.param2());
 
       if (op == NULL)
          throw(EParamProblem("Operator module not found"));
@@ -477,7 +477,7 @@ namespace QDLIB
          laser = new Laser();
          ser = dynamic_cast<Serializiable*>(laser);
       } else {
-         op = ModuleLoader::Instance()->LoadOp(cmd.param2());
+         op = ModuleLoader<Operator>::Instance()->Load(cmd.param2());
 
          if (op == NULL)
             throw(EParamProblem("Operator module not found"));

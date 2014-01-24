@@ -29,7 +29,7 @@ namespace QDLIB
     */
    Operator* ChainLoader::LoadOperatorChain( XmlNode * Onode, bool persist )
    {
-      ModuleLoader* mods = ModuleLoader::Instance();
+      ModuleLoader<Operator>* mods = ModuleLoader<Operator>::Instance();
       Logger& log = Logger::InstanceRef();
       GlobalOpList& OpList = GlobalOpList::Instance();
       
@@ -106,7 +106,7 @@ namespace QDLIB
 	 log.flush();
 	 log.IndentDec();
       } else { 
-	 O = mods->LoadOp( name );
+	 O = mods->Load( name );
          
          if (dynamic_cast<OList*>(O) != NULL){ /* Sum/Product operator and propagators */
             log.cout() << O->Name()<<endl;
@@ -171,7 +171,7 @@ namespace QDLIB
     */
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, int seqnum)
    {
-      ModuleLoader* mods = ModuleLoader::Instance();
+      ModuleLoader<WaveFunction>* mods = ModuleLoader<WaveFunction>::Instance();
       Logger& log = Logger::InstanceRef();
       
       ParamContainer pm;
@@ -286,7 +286,7 @@ namespace QDLIB
 	 string fname;
 	 
 	 if ( name.length() != 1 ){ /* modules name is given */
-	    WF = mods->LoadWF( name );
+	    WF = mods->Load( name );
 	    if (WF == NULL)
 	       throw ( EParamProblem("WaveFunction module loading failed") );
 	 }

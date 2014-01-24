@@ -109,7 +109,7 @@ namespace QDLIB {
 
          wf = wfm;
       } else { /* handling for Single state WFs */
-         wf = ModuleLoader::Instance()->LoadWF(classname);
+         wf = ModuleLoader<WaveFunction>::Instance()->Load(classname);
          ReadData(wf); /* Load data */
       }
       
