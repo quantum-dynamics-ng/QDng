@@ -336,7 +336,6 @@ int main(int argc, char **argv)
       retval = EXIT_FAILURE;
    }
 
-   log.Close();
 
 #ifdef HAVE_MPI
    MPI::Finalize();
@@ -347,5 +346,6 @@ int main(int argc, char **argv)
    PerfCounterList::Reference().PrintStats();
 #endif
 
+   log.Close();
    exit(retval);
 }
