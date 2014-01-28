@@ -477,7 +477,13 @@ namespace QDLIB
          laser = new Laser();
          ser = dynamic_cast<Serializiable*>(laser);
       } else {
-         op = ModuleLoader<Operator>::Instance()->Load(cmd.param2());
+         string op_name(cmd.param2());
+         if (op_name.length() == 0)
+            throw(EParamProblem("Empty operator name"));
+
+         if (op_name[0] == 'O') op_name.erase(0, 1); // Kill the leading O
+
+         op = ModuleLoader::Instance()->LoadOp(op_name);
 
          if (op == NULL)
             throw(EParamProblem("Operator module not found"));
@@ -508,7 +514,7 @@ namespace QDLIB
 
       // Write to file
       try {
-         file.Name(cmd.param1());
+         file.Name(cmd.param1() + BINARY_O_SUFFIX);
          file.Format(FileSingle<Serializiable>::stream);
          file.WriteSingleFileToStream(ser);
       } catch (Exception& e) {
