@@ -22,87 +22,21 @@
 #include <string.h>
 
 
-#ifdef HAVE_AVX
- #define QDLIB_DATA_ALIGNMENT 32    /* 32 byte - Alignment for SIMD (AVX) */
-#else
- #define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
-#endif
-
 #define MEMORY_SLOTS 1024    /* Size of slot array */
 
 namespace QDLIB
 {
 
-   Memory::Memory() : _nslots(MEMORY_SLOTS), _nused(0), _nfree(0), _used(0), _MaxUsed(0)
+   Memory::Memory() : _used(0), _MaxUsed(0)
    {
        Reconfigure();
-
-      /* Initialize Slot DB */
-      _Slots = new SlotEntry[MEMORY_SLOTS];
-      _SlotsF = new SlotEntry*[MEMORY_SLOTS];
-      for (int i=0; i < MEMORY_SLOTS; i++)
-         _SlotsF[i] = NULL;
-
    }
 
    Memory::~Memory()
    {
-      /* Free all memory still in use. */
-      for (int i=0; i < _nslots; i++) {
-         if (_Slots[i].p != NULL) free(_Slots[i].p);
-      }
-      delete[] _Slots;
-      delete[] _SlotsF;
    }
 
-   /**
-    *  Elongate the slot buffer
-    */
-   void Memory::ResizeSlotBuffer()
-   {
-      SlotEntry *newbuf = new SlotEntry[_nslots+MEMORY_SLOTS];
-      SlotEntry **newindex = new SlotEntry*[_nslots+MEMORY_SLOTS];
 
-      for (int i=0; i < _nslots+MEMORY_SLOTS; i++)
-        newindex[i] = NULL;
-
-
-      /* Copy to new storage */
-      int ind = 0;
-      for (int i=0; i < _nslots; i++) {
-         newbuf[i] = _Slots[i];
-         if ( newbuf[i].free && newbuf[i].p != NULL ){
-            newindex[ind] = &(newbuf[i]);
-            ind++;
-         }
-      }
-
-      _nslots += MEMORY_SLOTS;
-
-      delete[] _Slots;
-      delete[] _SlotsF;
-      _Slots = newbuf;
-      _SlotsF = newindex;
-   }
-
-   /**
-    * Comparison function for slot sorting.
-    *
-    */
-   bool Memory::Compare_SlotEntry(const SlotEntry &a, const SlotEntry &b)
-   {
-      if ( a.free && !b.free ) return true;
-      else return false;
-   }
-
-    /**
-     * Get an instance of the singleton.
-     */
-    Memory& Memory::Instance()
-    {
-       static Memory ref; /* Make it singleton */
-       return ref;
-    }
 
     /**
      * Get the maximum possible size/upper limit.
@@ -267,48 +201,34 @@ namespace QDLIB
     void Memory::Align(void **p, size_t size)
     {
        /* Check if we have enough free space */
-       if ( CurrentSizeAvail() < size )
+       if ( CurrentSizeAvail() < size)
           throw(EMemory());
 
-       if (_nused == _nslots)
-          ResizeSlotBuffer();
-
-       SlotEntry *entry = NULL;
+       // calc amounts of blocks needed
+       size_t nb = size / QDMEM_BLOCK_SIZE;
+       if (size % QDMEM_BLOCK_SIZE > 0) nb++;
 
        /* look for a free slot in the index */
-       for(int i=0; i < _nslots; i++) {
-          if (_SlotsF[i] != NULL)
-             if ( _SlotsF[i]->size == size ){
-                entry = _SlotsF[i];
-                _SlotsF[i] = NULL;      /* remove from "free index" */
-                _nfree--;
-                break;
-             }
-       }
+       multimap<size_t, map<void*, SlotEntry>::iterator>::iterator fit = free_map.find(nb);
+       //cout << nb << " "<< slot_map.size() << " " << free_map.size() << " " << CurrentSizeAvail() <<endl;
 
-       /* create a new slot */
-       if (entry == NULL){
-          /* search usable entry for allocation */
-          for(int i=0; i < _nslots; i++) {
-             if (_Slots[i].free && _Slots[i].p == NULL){
-                entry = &_Slots[i];
-                _nused++;
-                break;
-             }
-          }
+       if (fit == free_map.end()){
+          // Create a new entry
+          int ret = ::posix_memalign( p, QDLIB_DATA_ALIGNMENT, nb * QDMEM_BLOCK_SIZE);
+          if (ret != 0) throw(EMemory());
 
-          int ret = posix_memalign( & (entry->p), QDLIB_DATA_ALIGNMENT, size);
+          slot_map.insert(pair<void*, SlotEntry>(*p, SlotEntry(*p, nb)));
 
-          if (ret != 0)
-             throw(EMemory());
+          _used += nb * QDMEM_BLOCK_SIZE;
+       } else {
+          // take a free entry
+          *p = fit->second->second.p;
+          fit->second->second.free = false;
 
-          entry->size = size;
+          free_map.erase(fit);
        }
 
        /* book-keeping */
-       *p = entry->p;
-       entry->free = false;
-       _used += size;
        if (_used > _MaxUsed)
           _MaxUsed = _used;
 
@@ -320,21 +240,22 @@ namespace QDLIB
      */
     void Memory::Free(void *p)
     {
-       for (int i=_nused-1; i >= 0; i--){
-          if (_Slots[i].p == p){
-             _Slots[i].free = true;
-             _used -= _Slots[i].size;
-             _nfree++;
-             /* push free slot on index */
-             for (int j=0; j < _nslots; j++){
-                if (_SlotsF[j] == NULL){
-                   _SlotsF[j] = &(_Slots[i]);
-                   break;
-                }
-             }
-             break;
-          }
-       }
+       map<void*, SlotEntry>::iterator sit = slot_map.find(p);
+
+       if (sit == slot_map.end()) return;
+
+       //cout << "free" << free_map.size() << endl;
+
+#ifdef NDEBUG
+       sit->second.free = true;
+       free_map.insert(pair< size_t, map<void*, SlotEntry>::iterator >(sit->second.size, sit));
+#else
+       // If in debug mode, always allocate and free the slots
+       // this makes it easier to trace errors with e.g. valgrind
+       _used -= sit->second.size * QDMEM_BLOCK_SIZE;
+       free(sit->second.p);
+       slot_map.erase(sit);
+#endif
     }
 
     /**
@@ -342,18 +263,19 @@ namespace QDLIB
      */
     void Memory::Cleanup()
     {
-       for (int i=0; i < _nslots; i++){
-          if ( _Slots[i].free && _Slots[i].size > 0){
-             free(_Slots[i].p);
-             _used -= _Slots[i].size;
-             _Slots[i].size = 0;
-             _Slots[i].p = NULL;
-             _Slots[i].free = true;
-             _nused--;
-          }
+       map<void*, SlotEntry>::iterator sit = slot_map.begin();
 
-          _SlotsF[i] = NULL;
+       while (sit != slot_map.end()){
+          if (sit->second.free){
+             _used -= sit->second.size * QDMEM_BLOCK_SIZE;
+             free(sit->second.p);
+             slot_map.erase(sit);
+             sit = slot_map.begin();
+          } else
+             sit++;
        }
+
+       free_map.clear();
     }
 
 
