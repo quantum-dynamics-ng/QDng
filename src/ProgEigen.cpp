@@ -366,6 +366,7 @@ namespace QDLIB
          /* propagation loop */
          int s=0;
          double diff=1;
+         clock->Begin();
          while (s < _MaxSteps && diff > _convergence){
             *Psi_old = Psi;
             _U->Apply(Psi);
@@ -381,7 +382,7 @@ namespace QDLIB
             ++(*clock);                     /* Step the clock */
             s++;
          }
-         _P->Add(Psi);
+         _P->Set(i, Psi);
          _efile << Psi;
          
          _Energies_raw[i] = _H->Expec(Psi);
