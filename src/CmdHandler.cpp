@@ -483,7 +483,7 @@ namespace QDLIB
 
          if (op_name[0] == 'O') op_name.erase(0, 1); // Kill the leading O
 
-         op = ModuleLoader::Instance()->LoadOp(op_name);
+         op = ModuleLoader<Operator>::Instance()->Load(op_name);
 
          if (op == NULL)
             throw(EParamProblem("Operator module not found"));

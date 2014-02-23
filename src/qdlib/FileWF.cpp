@@ -9,16 +9,18 @@
 
 namespace QDLIB {
 
-   FileWF::FileWF() : _compress(FILEWF_COMPRESSION), _compTolerance(FILEWF_COMPRESSION_TOLERANCE)
+   FileWF::FileWF() : _compTolerance(FILEWF_COMPRESSION_TOLERANCE)
    {
       Suffix(BINARY_WF_SUFFIX);
 
 #if defined(HAVE_LIBZ)  || defined (HAVE_LIBBZ2)
       /* Compression options from global params */
       ParamContainer& gp = GlobalParams::Instance();
-      gp.GetValue("compress", _compress, FILEWF_COMPRESSION);
       
-      if ( _compress ) {
+      bool compress;
+      gp.GetValue("compress", compress, FILEWF_COMPRESSION);
+
+      if ( compress ) {
 
          if ( gp.isPresent("comptol") )
             gp.GetValue("comptol", _compTolerance);
@@ -245,7 +247,7 @@ namespace QDLIB {
          }
       } else { /* Write single file */
          WaveFunction* tmp_data = data;
-         if (_compress) {
+         if (_compMethod != UNCOMPRESSED) {
             if (_compMethod == INVALID)
                throw( EParamProblem("Invalid file compression method given") );
             else
@@ -255,7 +257,7 @@ namespace QDLIB {
          WriteMeta(tmp_data, more_files_follow);
          WriteData(tmp_data);
 
-         if (_compress)
+         if (_compMethod != UNCOMPRESSED)
             DELETE_WF(tmp_data);
       }
    }
