@@ -318,11 +318,6 @@ namespace QDLIB
       
       WaveFunction *Psi_old, *Psi, *buf;
       
-      /* Force backward imaginary time */
-      _U->ImaginaryTime();
-      _U->Backward();
-      _U->Init(_PsiInitial);
-      
       /* Report what the propagator has chosen */
       ParamContainer Upm;
     
@@ -688,7 +683,12 @@ namespace QDLIB
       log.IndentDec();
       
       /* Make sure our Propagator is initalized */
-      _U->Clock(clock);
+      clock->Begin();
+      _U->Clock( clock );
+      if (_method == imag){
+         _U->ImaginaryTime();
+         _U->Backward();
+      }
       _U->Init(_PsiInitial);
 
       _H = _U->Hamiltonian();
@@ -700,8 +700,6 @@ namespace QDLIB
       _PsiInitial->Normalize();
       
       /* Let the Propagator do it's initalisation */
-      clock->Begin();
-      _U->Clock( clock );
       _H->UpdateTime();
       
       /* Init file writer for wf output */

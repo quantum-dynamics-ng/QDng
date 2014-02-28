@@ -34,6 +34,9 @@ namespace QDLIB
 	 dcomplex _offset;    /* Energy offset of the hamiltonian */
          WaveFunction *ket0, *ket1, *ket2, *buf;
 	 
+         double raw_norm(WaveFunction *Psi);
+         void real_time_step(WaveFunction *Psi);
+         void imag_time_step(WaveFunction *Psi);
       public:
          OCheby();
          ~OCheby();

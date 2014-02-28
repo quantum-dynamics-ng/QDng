@@ -24,13 +24,13 @@ namespace QDLIB {
 	 /** Indicates forward propagation. */
 	 bool forward;
 	 /** Indicates imaginary time propagation. */
-	 bool imaginary;
+	 bool imaginary_time;
          /** The associated Hamiltonian
           * Must initialized by the implementing class after AddNeed is finished
           */
          Operator* H;
       public:
-	 OPropagator() : _c0(0,0), forward(true), imaginary(false), H(NULL)
+	 OPropagator() : _c0(0,0), forward(true), imaginary_time(false), H(NULL)
 	 {
 	 }
       
@@ -40,14 +40,14 @@ namespace QDLIB {
 	 virtual void Clock(QDClock *cl)
 	 {
 	    clock = cl;
-	    if (clock->Dt() > 0) forward = true;
-	    else {
-	       forward = false;
-	       _conj = true;
-	       OList::Conj(true);
-	    }
+	    _c0 = I*clock->Dt();
 
-	    _c0 = (-1)*I*clock->Dt();
+	    if (forward)
+	       _c0 *= -1;
+
+	    if (imaginary_time)
+	       _c0 = I * _c0;
+
 	 }
 	 	 
 	 /**
@@ -60,7 +60,7 @@ namespace QDLIB {
 	    if (clock == NULL)
 	       throw (EIncompatible("Propagator has no clock"));
 
-	    if (imaginary)
+	    if (imaginary_time)
 	       _c0 = clock->Dt();
 	    else
 	       _c0 = (-1)*I*clock->Dt();
@@ -80,7 +80,7 @@ namespace QDLIB {
        if (clock == NULL)
           throw (EIncompatible("Propagator has no clock"));
 
-	    if (imaginary)
+	    if (imaginary_time)
 	       _c0 = -clock->Dt();
 	    else
 	       _c0 = (1)* I *clock->Dt();
@@ -101,7 +101,7 @@ namespace QDLIB {
 	       _c0 = clock->Dt();
 	    else
 	       _c0 = (-1) * clock->Dt();
-	    imaginary = true;
+	    imaginary_time = true;
 	 }
 	 
 	 virtual void Conj(bool conj)
@@ -123,7 +123,7 @@ namespace QDLIB {
 	       _c0 =  (-1) * I * clock->Dt();
 	    else
 	       _c0 =  I * clock->Dt();
-	    imaginary = false;
+	    imaginary_time = false;
 	 }
 	 
 	
@@ -156,7 +156,7 @@ namespace QDLIB {
 	    clock = P->clock;
 	    _c0 = P->_c0;
 	    forward = P->forward;
-	    imaginary = P->imaginary;
+	    imaginary_time = P->imaginary_time;
 	   
 	    OList::Copy(O);
 	    return this;

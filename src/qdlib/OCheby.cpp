@@ -56,22 +56,39 @@ namespace QDLIB
       } else _order = 0;
    }
 
-   void OCheby::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
-   {
 
-      destPsi->FastCopy(*sourcePsi);
-      Apply(destPsi);
+   double OCheby::raw_norm(WaveFunction *Psi)
+   {
+      int rank = Psi->MPIrank();
+      int msize = Psi->MPIsize();
+
+      int strides = Psi->strides();
+      int size = Psi->lsize();
+
+      double norm(0);
+
+#ifdef _OPENMP
+#pragma omp parallel for shared(norm)
+#endif
+      for (int s = rank; s < strides; s += msize) {
+         double lnorm(0);
+         dcomplex* wf = Psi->begin(s);
+#ifdef _OPENMP
+#pragma omp parallel for private(lnorm)
+#endif
+         for (int j = 0; j < size; j++) {
+            lnorm += (conj(wf[j]) * wf[j]).real();
+         }
+         norm += lnorm;
+      }
+
+      return norm;
    }
 
-   void OCheby::Apply(WaveFunction * Psi)
+   void OCheby::real_time_step(WaveFunction *Psi)
    {
       WaveFunction *swap;
-      double norm = Psi->RawNorm();
-
-      ket0->Reaquire();
-      ket1->Reaquire();
-      ket2->Reaquire();
-      buf->Reaquire();
+      double norm = raw_norm(Psi);
 
       _exp = OPropagator::Exponent() / clock->Dt();
 
@@ -94,7 +111,6 @@ namespace QDLIB
       int size = Psi->lsize();
 
       dcomplex exp2 = 2 * _exp;
-
 
 
       for (int i = 2; i < _order; i++) {
@@ -148,8 +164,7 @@ namespace QDLIB
             for (j = 0; j < size; j++) {
                bf[j] = (bf[j] - _offset * k1[j]) / _scaling; /* Offset + Scaling */
                bf[j] *= exp2;
-               k2[j] = k0[j];
-               k2[j] += bf[j];
+               k2[j] = bf[j] + k0[j];
                k0[j] = k2[j];
                psi[j] += k2[j] * coeff;
                accnorm += conj(psi[j]) * psi[j];
@@ -161,11 +176,11 @@ namespace QDLIB
          /* Check for convergence */
          double nconv = abs(norm - accnorm.real()) / norm;
 
-         if (nconv  < _prec && Exponent().imag() == 0)
+         if (nconv  < _prec && _offset.imag() == 0)
             break;
 
          /* Convergence only make sense for norm preserving propagations*/
-         if (i == _order -1 && nconv  > _prec && !imaginary && _offset.imag() == 0 && Exponent().imag() == 0)
+         if (i == _order -1 && nconv  > _prec && _offset.imag() == 0)
             cout << "Warning: Chebychev series not converged: " << scientific << nconv << " > " << _prec  << endl;
 
 
@@ -174,6 +189,129 @@ namespace QDLIB
          ket0 = swap;
       }
       H->RecalcInternals(true); /* turn it on again */
+
+
+   }
+
+   void OCheby::imag_time_step(WaveFunction *Psi)
+   {
+      WaveFunction *swap;
+      double norm_last = 0;
+
+      _exp = OPropagator::Exponent() / clock->Dt();
+
+      ket0->FastCopy(*Psi); /* phi_0 */
+
+      H->Apply(ket1, Psi);
+      H->RecalcInternals(false); /* Non-linear operator should not re-calculate internal WF specific values until end of recursion */
+
+      AddElements((cVec*) ket1, (cVec*) Psi, -1 * _offset); /* Offset*/
+      MultElements((cVec*) ket1, _exp / _scaling);
+
+      MultElements((cVec*) Psi, _coeff[0] * cexp(OPropagator::Exponent() * _offset));
+      MultElementsCopy((cVec*) buf, (cVec*) ket1, _coeff[1] * cexp(OPropagator::Exponent() * _offset));
+
+      *Psi += buf;
+      dcomplex *k2, *bf, *k0, *k1, *psi;
+
+      int strides = Psi->strides();
+      int size = Psi->lsize();
+
+      dcomplex exp2 = 2 * _exp;
+
+
+      for (int i = 2; i < _order; i++) {
+         dcomplex accnorm(0);
+         dcomplex coeff = _coeff[i] * cexp(OPropagator::Exponent() * _offset);
+         H->Apply(buf, ket1);
+         int s, j;
+         int rank = Psi->MPIrank();
+         int msize = Psi->MPIsize();
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(s,j,k0,k1,k2,bf,psi)
+#endif
+         for (s = rank; s < strides; s += msize) {
+            k2 = ket2->begin(s);
+            bf = buf->begin(s);
+            k0 = ket0->begin(s);
+            k1 = ket1->begin(s);
+            psi = Psi->begin(s);
+#ifdef HAVE_SSE2
+            m128dc vk2, vbf, vk0, vk1, vpsi, v_o(_offset), v_exp2(exp2), v_coeff(coeff);
+            m128dc vnorm(accnorm);
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(j,vk2, vbf, vk0, vk1, vpsi)
+#endif
+            for(j=0; j< size; j++) {
+               vbf = bf[j];
+               vk0 = k0[j];
+               vk1 = k1[j];
+               vpsi = psi[j];
+
+               vbf = vbf - vk1 * v_o;
+               vbf *= (1/_scaling);
+               vbf *= v_exp2;
+               vk2 = vbf - vk0;
+               vk0 = vk2;
+               vpsi += vk2 * v_coeff;
+               vnorm += vpsi.conj() * vpsi;
+
+               vbf.Store(bf[j]);
+               vk0.Store(k0[j]);
+               vk1.Store(k1[j]);
+               vk2.Store(k2[j]);
+               vpsi.Store(psi[j]);
+            }
+            vnorm.Store(accnorm);
+         }
+#else
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(j)
+#endif
+            for (j = 0; j < size; j++) {
+               bf[j] = (bf[j] - _offset * k1[j]) / _scaling; /* Offset + Scaling */
+               bf[j] *= exp2;
+               k2[j] = bf[j] - k0[j]; // Here must be a minus for the imag_time polynomials
+               k0[j] = k2[j];
+               psi[j] += k2[j] * coeff;
+               accnorm += conj(psi[j]) * psi[j];
+            }
+
+         }
+#endif
+
+         /* Check for convergence */
+         if (abs(accnorm.real()-norm_last)/norm_last < _prec)
+            break;
+
+         norm_last = accnorm.real();
+
+         swap = ket1;
+         ket1 = ket0;
+         ket0 = swap;
+      }
+      H->RecalcInternals(true); /* turn it on again */
+
+   }
+
+   void OCheby::Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
+   {
+
+      destPsi->FastCopy(*sourcePsi);
+      Apply(destPsi);
+   }
+
+   void OCheby::Apply(WaveFunction * Psi)
+   {
+      ket0->Reaquire();
+      ket1->Reaquire();
+      ket2->Reaquire();
+      buf->Reaquire();
+
+      if (imaginary_time)
+         imag_time_step(Psi);
+      else
+         real_time_step(Psi);
 
       ket0->Retire();
       ket1->Retire();
@@ -240,11 +378,17 @@ namespace QDLIB
       buf->Retire();
 
       /* Energy range & offset */
-      _offset._real = (H->Emax() + H->Emin()).real() / 2; /* [-i:i] */
-      _offset._imag = (H->Emax() + H->Emin()).imag(); /* [-1:0] */
-      if (_offset.imag() != 0)
-         _scaling = cabs(H->Emax() - H->Emin());
-      else _scaling = cabs(H->Emax() - H->Emin()) / 2;
+      if (!imaginary_time){
+         _offset._real = (H->Emax() + H->Emin()).real() / 2; /* [-i:i] */
+         _offset._imag = (H->Emax() + H->Emin()).imag(); /* [-1:0] */
+      } else {
+         _offset = H->Emin() - cabs(H->Emin())*0.05; /* */
+      }
+
+      if (_offset.imag() != 0 || fabs(OPropagator::Exponent().imag()) == 0)
+         _scaling = cabs(H->Emax() - H->Emin())*1.05;
+      else
+         _scaling = cabs(H->Emax() - H->Emin()) / 2;
 
       /* This is an estimate for the recursion depth */
       if (_order <= 0)
@@ -271,8 +415,7 @@ namespace QDLIB
       if (fabs(OPropagator::Exponent().imag()) != 0 && fabs(OPropagator::Exponent().real()) == 0) {
          if (BesselJ0(_order, _scaling * clock->Dt(), bessel, zeroes) != 0)
             throw(EOverflow("Error while calculating Bessel coefficients"));
-      } else if (fabs(OPropagator::Exponent().imag()) == 0 && fabs(OPropagator::Exponent().real())
-               != 0) {
+      } else if (fabs(OPropagator::Exponent().imag()) == 0 && fabs(OPropagator::Exponent().real()) != 0) {
          if (BesselI0(_order, _scaling * clock->Dt(), bessel, zeroes) != 0)
             throw(EOverflow("Error while calculating Bessel coefficients"));
       } else {
@@ -296,7 +439,7 @@ namespace QDLIB
       }
 
       /* Check Recursion order */
-      if (_order > 0 && _order <= int(_scaling * clock->Dt()))
+      if (_order > 0 && !imaginary_time && _order <= int(_scaling * clock->Dt()))
          throw(EParamProblem("Chebychev recursion order is to small"));
 
       _params.SetValue("order", _order);
