@@ -112,7 +112,7 @@ namespace QDLIB
 
       /* Build EFs in diag basis & write to file */
       _efile.ResetCounter();
-      log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
+      log.cout() << "EF\tE [au]\tDelta E [au]\tDelta E [cm-1]\n";
       WaveFunction* Psi = _P->Get(0)->NewInstance();
       WaveFunction* buf = _P->Get(0)->NewInstance();
       for (int i = 0; i < _Nef; i++) {
@@ -124,7 +124,7 @@ namespace QDLIB
             *Psi += buf;
          }
          log.cout().precision(8);
-         log.cout() << i << "\t" << fixed << _Energies_diag[i] - _Energies_raw[i];
+         log.cout() << i << "\t" << fixed << _Energies_diag[i] << "\t" << _Energies_diag[i] - _Energies_raw[i];
          log.cout().precision(3);
          log.cout() << "\t" << fixed << (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
          log.flush();
