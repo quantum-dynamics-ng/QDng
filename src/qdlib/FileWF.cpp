@@ -38,6 +38,10 @@ namespace QDLIB {
             } else
                _compMethod = INVALID;
          }
+         else {
+            Compress(true);
+            CompressMethod(FileSingle<WaveFunction>::ZLIB);
+         }
       }
 #endif
    }
