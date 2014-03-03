@@ -121,7 +121,7 @@ namespace QDLIB {
 
          FileSingleHeader_Compression compress = meta.compression();
          if (compress != FileSingleHeader_Compression_UNCOMPRESSED){
-            tmp_data = wf->NewInstance();
+            tmp_data = ModuleLoader<WaveFunction>::Instance()->Load(classname);
          }
 
          ReadData(tmp_data);
