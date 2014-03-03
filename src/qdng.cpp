@@ -282,25 +282,6 @@ int main(int argc, char **argv)
       if (cmdline.GetOption('g'))
          log.Debug(true);
 
-      /* overide path from command line */
-      if (!dir.empty())
-         gp.SetValue("dir", dir);
-
-      if (gp.isPresent("dir")) {
-         gp.GetValue("dir", dir);
-         if (dir[dir.length() - 1] != '/' && !dir.empty())
-            dir += "/";
-         gp.SetValue("dir", dir);
-      }
-
-      if (gp.Size() > 0) {
-         log.cout() << endl;
-         log.Header("Global Parameters", Logger::SubSection);
-         log.cout() << gp;
-         log.cout() << endl;
-         log.flush();
-      }
-
       if (log.Debug())
          log.cout() << "Debug output on\n";
 #ifdef _OPENMP

@@ -116,7 +116,20 @@ namespace QDLIB {
          wf = wfm;
       } else { /* handling for Single state WFs */
          wf = ModuleLoader<WaveFunction>::Instance()->Load(classname);
-         ReadData(wf); /* Load data */
+
+         WaveFunction* tmp_data = wf;
+
+         FileSingleHeader_Compression compress = meta.compression();
+         if (compress != FileSingleHeader_Compression_UNCOMPRESSED){
+            tmp_data = wf->NewInstance();
+         }
+
+         ReadData(tmp_data);
+
+         if (compress != FileSingleHeader_Compression_UNCOMPRESSED){
+            wf->Restore(tmp_data);
+            DELETE_WF(tmp_data);
+         }
       }
       
       Name(basename); /* We modfied the name => switch back to original */

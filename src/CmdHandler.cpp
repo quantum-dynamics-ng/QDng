@@ -66,8 +66,9 @@ namespace QDLIB
    /**
     * Run XML the main programmes by XML defintions.
     */
-   void CmdHandler::RunXML(const char* buf, size_t size, const string& dir)
+   void CmdHandler::RunXML(const char* buf, size_t size, const string& def_dir)
    {
+      string dir(def_dir);
       Logger& log = Logger::InstanceRef();
       ParamContainer& gp = GlobalParams::Instance();
 
@@ -93,6 +94,25 @@ namespace QDLIB
       if (prognodes == NULL)
          throw(EParamProblem("Empty parameter file provided"));
 
+      /* overide path from command line */
+      if (!dir.empty())
+         gp.SetValue("dir", dir);
+
+      if (gp.isPresent("dir")) {
+         gp.GetValue("dir", dir);
+         if (dir[dir.length() - 1] != '/' && !dir.empty())
+            dir += "/";
+         gp.SetValue("dir", dir);
+      }
+
+      /* Print global parameters */
+      if (gp.Size() > 0) {
+         log.cout() << endl;
+         log.Header("Global Parameters", Logger::SubSection);
+         log.cout() << gp;
+         log.cout() << endl;
+         log.flush();
+      }
 
       /* Look for global Operator definitions */
       if (prognodes->Name() == "opdefs") {
