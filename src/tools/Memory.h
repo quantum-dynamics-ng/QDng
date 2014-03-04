@@ -10,9 +10,21 @@
 
 #include "tools/Exception.h"
 #include <string>
-#include <list>
+#include <map>
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef NDEBUG
+ #define QDMEM_BLOCK_SIZE 4096
+#else
+ #define QDMEM_BLOCK_SIZE 1    // In debug mode we want valgrind to detect possible segfaults
+#endif
+
+#ifdef HAVE_AVX
+ #define QDLIB_DATA_ALIGNMENT 32    /* 32 byte - Alignment for SIMD (AVX) */
+#else
+ #define QDLIB_DATA_ALIGNMENT 16    /* 16 byte - Alignment for SIMD (SSE2) */
+#endif
 
 namespace QDLIB
 {
@@ -29,34 +41,37 @@ namespace QDLIB
       private:
          class SlotEntry {
             public:
-               void *p;
-               size_t size;
-               bool free;
+               void *p;       // pointer to block
+               size_t size;   //  number of blocks
+               bool free;    // used/unused
+
                SlotEntry() : p(NULL), size(0), free(true) {}
-               SlotEntry(size_t s) : p(NULL), size(s), free(false) {}
+               SlotEntry(void* ptr, size_t s) : p(ptr), size(s), free(false) {}
          };
-
-         static bool Compare_SlotEntry(const SlotEntry &a, const SlotEntry &b);
-
-         void ResizeSlotBuffer();
 
          Memory();
          Memory(Memory &ref) {};
          ~Memory();
 
-         SlotEntry *_Slots;      /* Memory slots allocated with OS  */
-         SlotEntry **_SlotsF;      /* Memory slots allocated with OS* - Free slots index */
-         int _nslots;             /* Size of slots array */
-         int _nused;              /* num of used slots */
-         int _nfree;              /* num of free slots */
-         int _freemax;            /* maximum of free index */
+         map<void*, SlotEntry>   slot_map; /* Memory slots allocated with OS  */
+
+         /* Memory slots allocated with OS* - Free slots index */
+         multimap<size_t, map<void*, SlotEntry>::iterator> free_map;
+
          size_t _used;            /* amount of allocated mem */
          size_t _MaxMem;          /* upper bound set user or default value */
          size_t _MaxUsed;         /* Maximum used memory (peak value) */
 
       public:
 
-         static Memory& Instance();
+         /**
+          * Get an instance of the singleton.
+          */
+         static Memory& Instance()
+         {
+            static Memory ref; /* Make it singleton */
+            return ref;
+         }
 
          size_t MaximumSize() const;
          void Reconfigure();

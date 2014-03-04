@@ -15,7 +15,6 @@ namespace QDLIB {
    class FileWF : public FileSingle<WaveFunction>
    {
       private:
-         bool _compress;         /* Use compression on write */
          int _compLevel;         /* Compression level 0..9; 0 = no compression, 9 = best */
          double _compTolerance;   /* Cut off factor for lossy compression */
 
@@ -30,14 +29,14 @@ namespace QDLIB {
          virtual void operator<<(WaveFunction *data){ WriteWaveFunction(data); }
 
          /** Get file compression mode. */
-         bool Compress() const { return _compress; }
+         bool Compress() const { if ( _compMethod == UNCOMPRESSED) return false; else return true; }
 
          void CompressMethod(compMethod_t method){
             _compMethod = method;
          }
 
          /** Set file compression. */
-         void Compress(bool on) { _compress = on; if (on) _compMethod = ZLIB; else _compMethod = UNCOMPRESSED; }
+         void Compress(bool on) { if (on) _compMethod = ZLIB; else _compMethod = UNCOMPRESSED; }
          
          /** Get file compression level */
          int CompressionLevel() const { return _compLevel ; }

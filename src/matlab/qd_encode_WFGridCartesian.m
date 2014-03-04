@@ -10,31 +10,7 @@ function pl = qd_encode_WFGridCartesian(data, meta)
 %
 % data provides the (complex) WF data as a n-d array
 
-if ~isstruct(meta)
-    error('meta data must be a struct either in protobuf or raw form');
-end
-
-% prepare meta data
-if isfield(meta,'xmin') && isfield(meta,'xmax')
-    meta_pb = pblib_create_message(@pb_descriptor_QDLIB__GridSystemHeader);
-    dims = numel(size(data));
-    meta_pb = pblib_set (meta_pb, 'dims', dims);
-    
-    meta_pb.dim = pblib_create_message(@pb_descriptor_QDLIB__GridSystemHeader__dim_description_t);
-    put(meta_pb.has_field, 'dim', 1);
-     
-    for k=1:dims
-        meta_dim = pblib_create_message(@pb_descriptor_QDLIB__GridSystemHeader__dim_description_t);
-        meta_dim = pblib_set(meta_dim, 'size', size(data,k));
-        meta_dim = pblib_set(meta_dim, 'xmin', meta.xmin(k));
-        meta_dim = pblib_set(meta_dim, 'xmax', meta.xmax(k));
-        meta_pb.dim(k) = meta_dim;
-    end
-else
-    meta_pb = meta;
-end
-
-
+meta_pb = qd_convert_grid_meta_to_pb(data, meta);
 data = qd_convert_complex_to_uint8(data);
 
 % generate header and pack data

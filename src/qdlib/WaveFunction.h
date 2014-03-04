@@ -95,20 +95,7 @@ namespace QDLIB {
 
             return sqrt(c.real());
          }
-         
-         /**
-          * Raw Vector Norm.
-          */
-         virtual double RawNorm()
-         {
-            int size = cVec::size();
-            dcomplex c(0);
-            for (int i = 0; i < size; i++) {
-              c += conj( (*this)[i] ) * (*this)[i];
-            }
-            return c.real();
-         }
-         
+
          virtual void Normalize()
          {
             MultElements( (cVec*) this, 1/Norm() );

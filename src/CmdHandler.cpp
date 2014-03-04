@@ -66,8 +66,9 @@ namespace QDLIB
    /**
     * Run XML the main programmes by XML defintions.
     */
-   void CmdHandler::RunXML(const char* buf, size_t size, const string& dir)
+   void CmdHandler::RunXML(const char* buf, size_t size, const string& def_dir)
    {
+      string dir(def_dir);
       Logger& log = Logger::InstanceRef();
       ParamContainer& gp = GlobalParams::Instance();
 
@@ -93,6 +94,25 @@ namespace QDLIB
       if (prognodes == NULL)
          throw(EParamProblem("Empty parameter file provided"));
 
+      /* overide path from command line */
+      if (!dir.empty())
+         gp.SetValue("dir", dir);
+
+      if (gp.isPresent("dir")) {
+         gp.GetValue("dir", dir);
+         if (dir[dir.length() - 1] != '/' && !dir.empty())
+            dir += "/";
+         gp.SetValue("dir", dir);
+      }
+
+      /* Print global parameters */
+      if (gp.Size() > 0) {
+         log.cout() << endl;
+         log.Header("Global Parameters", Logger::SubSection);
+         log.cout() << gp;
+         log.cout() << endl;
+         log.flush();
+      }
 
       /* Look for global Operator definitions */
       if (prognodes->Name() == "opdefs") {
@@ -477,7 +497,13 @@ namespace QDLIB
          laser = new Laser();
          ser = dynamic_cast<Serializiable*>(laser);
       } else {
-         op = ModuleLoader<Operator>::Instance()->Load(cmd.param2());
+         string op_name(cmd.param2());
+         if (op_name.length() == 0)
+            throw(EParamProblem("Empty operator name"));
+
+         if (op_name[0] == 'O') op_name.erase(0, 1); // Kill the leading O
+
+         op = ModuleLoader<Operator>::Instance()->Load(op_name);
 
          if (op == NULL)
             throw(EParamProblem("Operator module not found"));
@@ -508,7 +534,7 @@ namespace QDLIB
 
       // Write to file
       try {
-         file.Name(cmd.param1());
+         file.Name(cmd.param1() + BINARY_O_SUFFIX);
          file.Format(FileSingle<Serializiable>::stream);
          file.WriteSingleFileToStream(ser);
       } catch (Exception& e) {

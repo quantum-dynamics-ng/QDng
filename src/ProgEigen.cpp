@@ -112,7 +112,7 @@ namespace QDLIB
 
       /* Build EFs in diag basis & write to file */
       _efile.ResetCounter();
-      log.cout() << "EF\tDelta E [au]\tDelta E [cm-1]\n";
+      log.cout() << "EF\tE [au]\tDelta E [au]\tDelta E [cm-1]\n";
       WaveFunction* Psi = _P->Get(0)->NewInstance();
       WaveFunction* buf = _P->Get(0)->NewInstance();
       for (int i = 0; i < _Nef; i++) {
@@ -124,7 +124,7 @@ namespace QDLIB
             *Psi += buf;
          }
          log.cout().precision(8);
-         log.cout() << i << "\t" << fixed << _Energies_diag[i] - _Energies_raw[i];
+         log.cout() << i << "\t" << fixed << _Energies_diag[i] << "\t" << _Energies_diag[i] - _Energies_raw[i];
          log.cout().precision(3);
          log.cout() << "\t" << fixed << (_Energies_diag[i] - _Energies_raw[i]) * AU2WAVENUMBERS << endl;
          log.flush();
@@ -318,11 +318,6 @@ namespace QDLIB
       
       WaveFunction *Psi_old, *Psi, *buf;
       
-      /* Force backward imaginary time */
-      _U->ImaginaryTime();
-      _U->Backward();
-      _U->Init(_PsiInitial);
-      
       /* Report what the propagator has chosen */
       ParamContainer Upm;
     
@@ -366,6 +361,7 @@ namespace QDLIB
          /* propagation loop */
          int s=0;
          double diff=1;
+         clock->Begin();
          while (s < _MaxSteps && diff > _convergence){
             *Psi_old = Psi;
             _U->Apply(Psi);
@@ -381,7 +377,7 @@ namespace QDLIB
             ++(*clock);                     /* Step the clock */
             s++;
          }
-         _P->Add(Psi);
+         _P->Set(i, Psi);
          _efile << Psi;
          
          _Energies_raw[i] = _H->Expec(Psi);
@@ -687,7 +683,12 @@ namespace QDLIB
       log.IndentDec();
       
       /* Make sure our Propagator is initalized */
-      _U->Clock(clock);
+      clock->Begin();
+      _U->Clock( clock );
+      if (_method == imag){
+         _U->ImaginaryTime();
+         _U->Backward();
+      }
       _U->Init(_PsiInitial);
 
       _H = _U->Hamiltonian();
@@ -699,8 +700,6 @@ namespace QDLIB
       _PsiInitial->Normalize();
       
       /* Let the Propagator do it's initalisation */
-      clock->Begin();
-      _U->Clock( clock );
       _H->UpdateTime();
       
       /* Init file writer for wf output */

@@ -19,8 +19,8 @@ namespace QDLIB {
    {
       double alpha =0;
       double argIm =0;
-      dVec bRe, bIm;
-      int kode=1;    /* taken from qdmpi*/
+      dVec bIm;
+      int kode=1;    /* don't scale the values */
       int ierr;
 	 
       if (n==0) return -1;
@@ -58,8 +58,8 @@ namespace QDLIB {
    {
       double alpha =0;
       double argIm =0;
-      dVec bRe, bIm;
-      int kode=1;    /* taken from qdmpi*/
+      dVec bIm;
+      int kode=2;    /* return values scaled by exp(-arg) */
       int ierr;
 	 
       if (n==0) return -1;
