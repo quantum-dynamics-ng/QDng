@@ -2,7 +2,7 @@
 #define QDLIBGRIDSYSTEM_H
 
 #include "math/typedefs.h"
-#include "protobuf/GridSystem.pb.h"
+#include "qdlib/GridSystem.pb.h"
 #include "tools/ParamContainer.h"
 
 namespace QDLIB

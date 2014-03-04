@@ -1,4 +1,4 @@
-dist_pkgdata_DATA = TGE-Arnoldi.qdi TGE-Cheby.qdi TGE-GSPO.qdi TGE-SIL.qdi TGE-SPO.qdi TGO-IR-Freq.qdi \
+dist_pkgdata_DATA = TGE-Arnoldi.qdi TGE-Cheby.qdi TGE-GSPO.qdi TGE-SIL.qdi TGO-IR-Freq.qdi \
 			  TGO-IR-Krotov-Projection.qdi TGO-IR-Krotov.qdi TGO-IR-Rabitz.qdi TGO-UV-Krotov.qdi TGP-Expec-HOFD.qdi \
 			  TGP-Expec.qdi TGP-Expec-SP.qdi TGP-Gmat.qdi TGP-Kick.qdi TGPL-IR-Pulse-Cheby.qdi TGPL-IR-Pulse-GSPO.qdi \
 			  TGPLMS-Cheby.qdi TGPLMS-SIL.qdi TGPMS-Cheby.qdi TGPMS-GSPO.qdi TGP-NIP-Cheby.qdi TLO-Cheby.qdi \

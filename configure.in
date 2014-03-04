@@ -250,7 +250,7 @@ AM_CONDITIONAL([CPPUNIT], [test "x$with_cppunit" != "xno"])
 
 
 AC_CONFIG_FILES(
-		[Makefile src/protobuf/Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
+		[Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
 		 src/fft/Makefile src/math/Makefile src/modules/Makefile
 		 src/tests/Makefile src/slatec/Makefile src/linalg/Makefile
 		 src/lib/Makefile tests/Makefile src/simpleXml/Makefile

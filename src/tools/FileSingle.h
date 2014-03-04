@@ -24,7 +24,7 @@
 
 
 #include "ZCopyStream.h"
-#include "protobuf/FileSingleHeader.pb.h"
+#include "tools/FileSingleHeader.pb.h"
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>

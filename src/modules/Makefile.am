@@ -48,7 +48,7 @@ libqd_OGobbler_la_SOURCES = mod-OGobbler.cpp $(top_builddir)/src/qdlib/OGobbler.
 libqd_OGobbler_la_LDFLAGS = -module
 
 libqd_OGridDipole_la_SOURCES = mod-OGridDipole.cpp $(top_builddir)/src/qdlib/OGridDipole.cpp \
-								$(top_builddir)/src/qdlib/OGridPotential.cpp \
+								$(top_builddir)/src/qdlib/OGridPotential.cpp
 libqd_OGridDipole_la_LDFLAGS = -module
 
 libqd_OGridGMat_la_SOURCES = mod-OGridGMat.cpp $(top_builddir)/src/qdlib/OGridGMat.cpp\
@@ -93,7 +93,7 @@ libqd_OGSPO_la_SOURCES = mod-OGSPO.cpp $(top_builddir)/src/qdlib/OGSPO.cpp
 libqd_OGSPO_la_LDFLAGS = -module
 
 libqd_OHermitianMatrix_la_SOURCES = mod-OHermitianMatrix.cpp $(top_builddir)/src/qdlib/OHermitianMatrix.cpp \
-									$(top_builddir)/src/qdlib/TransformMat.cpp \
+									$(top_builddir)/src/qdlib/TransformMat.cpp
 libqd_OHermitianMatrix_la_LDFLAGS = -module
 
 libqd_OMatDipole_la_SOURCES = mod-OMatDipole.cpp $(top_builddir)/src/qdlib/OMatDipole.cpp \

@@ -9,7 +9,7 @@
 #define CMDHANDLER_H_
 
 #include "tools/FIFO.h"
-#include "protobuf/IACmds.pb.h"
+#include "IACmds.pb.h"
 
 #include "qdlib/FileWF.h"
 #include "qdlib/Operator.h"
