@@ -31,7 +31,7 @@ namespace QDLIB
 
          Laser();
 
-         ~Laser();
+         virtual ~Laser();
 
          FileLaser& File();
 

@@ -1,10 +1,9 @@
 INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 -I$(FFTW_INCLUDE) $(all_includes)
 METASOURCES = AUTO
 
-AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
-#libqd_OGridNablaSq_la_LIBADD = $(top_builddir)/src/tools/libtools.la \
-#	$(top_builddir)/src/slatec/libslatecmin.a $(top_builddir)/src/qdlib/libqd.la $(top_builddir)/src/math/libmath.la \
-#	$(top_builddir)/src/fft/libfft.la $(LAPACK_LIBS)
+AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long
+
+
 noinst_LTLIBRARIES = libModuleLoader.la
 libModuleLoader_la_SOURCES = ModuleLoader.cpp InternalMods.cpp
 

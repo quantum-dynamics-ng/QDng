@@ -15,7 +15,7 @@ int yylex();
 int yyparse();
 
 extern void rewind(int n);
-extern int line_num = 1;
+int line_num = 1;
 
 
 FILE *_yyout = stdout;

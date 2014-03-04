@@ -1,6 +1,6 @@
 INCLUDES = -I$(top_srcdir)/src $(all_includes)
 AM_YFLAGS = -d
-AM_CXXFLAGS = 
+AM_CXXFLAGS = -Wno-error=sign-compare -Wno-error=unused-function
 
 noinst_LTLIBRARIES = libsimplexml.la
 

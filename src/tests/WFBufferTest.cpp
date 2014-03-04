@@ -28,7 +28,7 @@ void WFBufferTest::API_Test_DiskBuf()
    ParamContainer pm;
    
    WFBuffer *buf = NULL;
-   WaveFunction* wf;
+   WaveFunction* wf=NULL;
    
    gp.clear();
    gp.SetValue("MaxBufferSize", sizeof(dcomplex)*2); /* Buffer size in bytes => 2 WFs*/

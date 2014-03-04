@@ -36,7 +36,7 @@ namespace QDLIB
    void ReadFromZeroCopyStream(::google::protobuf::io::ZeroCopyInputStream& is, char* buffer, size_t size)
    {
       const char* buf;
-      int buf_size;
+      int buf_size = 0;
       size_t len=0, size_read = 0;
 
       while (size_read < size){

@@ -7,7 +7,7 @@ fftdir = $(pkgincludedir)/fft
 fft_HEADERS = fft.h
 noinst_HEADERS = FFTGlobal.h
 
-AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS)
+AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long
 
 if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)

@@ -40,6 +40,8 @@
 #include "PerfCounterList.h"
 #endif
 
+#include "config.h"
+
 using namespace std;
 using namespace QDLIB;
 

@@ -12,7 +12,8 @@ endif
 
 
 AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS) -DQDNG_BUILD_DATE="\"`date`\"" -DQDNG_BUILD_HOST="\"`uname -n`\"" \
-	      -DQDNG_BUILD_MACH="\"`uname -m`\"" -DQDNG_REV="\"`git rev-list --max-count=1 HEAD`\""
+	      -DQDNG_BUILD_MACH="\"`uname -m`\"" -DQDNG_REV="\"`git rev-list --max-count=1 HEAD`\"" \
+	      -Wno-long-long
 
 if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)

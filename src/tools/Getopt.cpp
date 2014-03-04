@@ -7,7 +7,7 @@
 #endif
 
 #include "Getopt.h"
-
+#include <unistd.h>
 
 namespace QDLIB {
 
