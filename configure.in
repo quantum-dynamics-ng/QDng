@@ -95,6 +95,8 @@ if test "x$with_protbuf" != "xno"; then
 	CXXFLAGS="$CXXFLAGS -I$with_protobuf/include"
 fi
 
+
+
 AC_CHECK_HEADER("google/protobuf/stubs/common.h",[],AC_MSG_ERROR(protobuf headers are missing))
 
 save_LIBS=$LIBS
@@ -106,6 +108,17 @@ AC_LINK_IFELSE(
   		[AC_MSG_ERROR([libprotobuf is not installed.])])
 
 LIBS=$save_LIBS
+
+dnl
+dnl Google Protobuf compiler
+dnl
+AC_ARG_WITH([protoc],
+    [AS_HELP_STRING([--with-protoc=PATH],
+        [location of the protoc protocol buffer compiler binary, defaults to protoc])],
+    [PROTOC="$withval"],
+    [PROTOC='protoc'])
+
+AC_SUBST([PROTOC])
 
 dnl
 dnl OpenMP
@@ -237,7 +250,7 @@ AM_CONDITIONAL([CPPUNIT], [test "x$with_cppunit" != "xno"])
 
 
 AC_CONFIG_FILES(
-		[Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
+		[Makefile src/protobuf/Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
 		 src/fft/Makefile src/math/Makefile src/modules/Makefile
 		 src/tests/Makefile src/slatec/Makefile src/linalg/Makefile
 		 src/lib/Makefile tests/Makefile src/simpleXml/Makefile
