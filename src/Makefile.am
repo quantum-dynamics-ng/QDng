@@ -19,7 +19,7 @@ if HAVEOPENMP
   AM_LDFLAGS = $(OPENMP_CXXFLAGS)
 endif
 
-SUBDIRS = tools linalg slatec math qdlib fft modules lib simpleXml $(OPT_DIRS)
+SUBDIRS = tools linalg slatec math qdlib fft modules lib simpleXml matlab $(OPT_DIRS)
 
 # protobuf related stuff
 %.pb.cc %.pb.h: %.proto
