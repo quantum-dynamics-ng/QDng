@@ -17,17 +17,27 @@ elseif nargin == 0
 else
 end
 
-basename = '/tmp/cmd_fifo';
+pid = feature('getpid'); % TODO: This is MATLAB specific
+
+basename = ['/tmp/cmd_fifo_' num2str(pid) '_'];
 
 % open socket 
 if  strcmp(rxtx, 'rx')
     if ~ exist([basename 'rx'],'file')
-        error(['fifo doesn''t exist: ' basename 'rx' '. Is qdng running?' ]);
+        system(['qdng_cmdsrv ' num2str(pid) ' &']);
+        pause(0.5)
+        if ~ exist([basename 'rx'],'file')
+            error(['fifo doesn''t exist: ' basename 'rx' '. Is qdng running?' ]);
+        end
     end
     fd = fopen([basename 'rx'], 'a');
 else
     if ~ exist([basename 'tx'],'file')
-        error(['fifo doesn''t exist: ' basename 'tx' '. Is qdng running?' ]);
+        system(['qdng_cmdsrv ' num2str(pid) ' &']);
+        pause(0.5)
+        if ~ exist([basename 'tx'],'file')
+            error(['fifo doesn''t exist: ' basename 'tx' '. Is qdng running?' ]);
+        end
     end    
     fd = fopen([basename 'tx'], 'r');
 end
