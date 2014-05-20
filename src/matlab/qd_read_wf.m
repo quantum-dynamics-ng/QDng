@@ -21,17 +21,9 @@ qd_write_cmd(cmd);
 
 [payload, header] = qd_read_stream(fd);
 
-switch(header.class)
-    case 'WFGridCartesian'
-        [data, meta] = qd_decode_WFGridCartesian(payload);
-    case 'WFLevel'
-        [data, meta] = qd_decode_WFLevel(payload);
-    otherwise
-        if (nargin == 2)
-            [data, meta] = decode_fcn(payload);
-        else
-            error(['Unknown class: ' header.class '\nprovide a decode fuction!']);
-        end
+if nargin == 2
+    [data, meta] = qd_decode_WF(fd, payload, header.class, decode_fcn);
+else
+    [data, meta] = qd_decode_WF(fd, payload, header.class);
 end
-
 
