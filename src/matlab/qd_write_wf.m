@@ -2,6 +2,11 @@ function qd_write_wf(name, data, meta, class, compression, encode_fcn)
 %
 % Write a wave function
 %
+% qd_write_wf(name, data, meta, class)
+% qd_write_wf(name, data, meta, class, compression)
+% qd_write_wf(name, data, meta, class, compression, encode_fcn)
+%
+%
 
 if (nargin > 5)
     stream = qd_wf_to_stream(data, meta, class, encode_fcn);
