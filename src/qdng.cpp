@@ -105,6 +105,7 @@ void CheckInput(string &name)
    if (type == QDSXML::SIMPLE) {
       log.cout() << "SimpleXML-Input format" << endl;
       log.cout() << "Converting to XML file... " << name + ".qdi" << endl;
+      log.flush();
       QDSXML::Convert(name, name + ".qdi");
       name = name + ".qdi";
    }
@@ -126,7 +127,7 @@ void RunProgrammes(const string& name, const string& dir)
    CheckInput(fname);
 
    fstream infile;
-   infile.open(name.c_str(), fstream::in);
+   infile.open(fname.c_str(), fstream::in);
 
    char* buf = (char*) malloc(QDNG_INPUT_BUFFER);
    size_t size = 0;
