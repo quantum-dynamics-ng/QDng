@@ -16,7 +16,7 @@ if ~exist('opts', 'var')
     opts.basename = 'WF';
     opts.pause = 0.1;
     opts.fh = figure();
-elseif ~isstruct('opts')
+elseif ~isstruct(opts)
     error('opts must be given as struct');
 end
 
@@ -29,6 +29,10 @@ if ~isfield(opts, 'pause')
     opts.pause = 0.1;
 end
 
+if ~isfield(opts, 'basename')
+    opts.basename = 'WF';
+end
+
 pmeta = qdlib_read_params([path '/Propagation.meta']);
 
 pmeta.Nt = str2double(pmeta.Nt); 
@@ -39,7 +43,12 @@ for i=0:ceil(pmeta.Nt/pmeta.Wcycle)
     opts.index = i;
     qd_view_wf(path, opts);
     fprintf('t = %.2f\n', pmeta.Wcycle*pmeta.dt*i);
-    pause(opts.pause);
+    if opts.pause > 0
+        pause(opts.pause);
+    else
+        drawnow();
+        input('Press key');
+    end
 end
 
 end

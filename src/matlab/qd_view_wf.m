@@ -11,6 +11,7 @@ function [fh, data, meta] = qd_view_wf(path, opts)
 % .decode_fcn a customized decode_fcn for qd_read_wf
 % .fh         a figure handle. If not given a new figure is created.
 % .dims       The dimensions to be shown. Is relevant for ndims >= 2
+% .split_view Show Multistate WF in separate graphs
 
 
 if exist('opts','var')
@@ -38,24 +39,37 @@ if exist('opts','var')
     else
         fh = figure();
     end
+    
+    if ~isfield(opts, 'split_view')
+        opts.split_view = true;
+    end
 else
     fh = figure();
     [data, meta] = qd_read_wf(path);
-    opts = struct();
+    opts = struct('split_view',true);
 end
-
+opts
 % check for multistate WF
 if iscell(data)
     X = prepare_axis(meta{1});
-    ah = axes;
-    set(ah, 'ColorOrder', [0 0 0; 0 0 1; 0 1 0; 1 0 0]);
-    set(gca, 'LineStyleOrder', {'-', '--', ':'});
-    hold all
-    for i=1:length(data)
-        y = prepare_data(data{i}, opts);
-        plot_wf(X, y, meta{i}.dims);
+    if ~opts.split_view
+        ah = axes;
+        set(ah, 'ColorOrder', [0 0 0; 0 0 1; 0 1 0; 1 0 0]);
+        set(gca, 'LineStyleOrder', {'-', '--', ':'});
+        hold all
+        for i=1:length(data)
+            y = prepare_data(data{i}, opts);
+            plot_wf(X, y, meta{i}.dims);
+        end
+        hold off
+    else
+        for i=1:length(data)
+            subplot(length(data),1,i);
+             y = prepare_data(data{i}, opts);
+             plot_wf(X, y, meta{i}.dims);
+        end
+             
     end
-    hold off
 else
     X = prepare_axis(meta);
     y = prepare_data(data, opts);
@@ -93,7 +107,7 @@ end
             case 1
                 plot(x, abs(y));
             case 2
-                surf(x{1}, x{2}, abs(y));
+                surf(x{1}, x{2}, abs(y), 'LineStyle', 'None');
             otherwise
                 error('Multi-dim view not implemented yet. Choose dimensions with opts.dims');
         end
