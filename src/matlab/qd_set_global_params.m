@@ -6,7 +6,7 @@ function pm = qd_set_global_params(keyval)
 %
 
 cmd = pblib_create_message(@pb_descriptor_QDLIB__Command);
-cmd = pblib_set(cmd, 'cmd', 21);
+cmd = pblib_set(cmd, 'cmd', 2);
 cmd = pblib_set(cmd, 'param1', keyval);
 qd_write_cmd(cmd);
 

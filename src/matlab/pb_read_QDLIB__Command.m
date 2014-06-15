@@ -12,9 +12,12 @@ function [command] = pb_read_QDLIB__Command(buffer, buffer_start, buffer_end)
 %   MEMBERS:
 %     cmd            : required enum, defaults to int32(0).
 %     XML            : optional string, defaults to ''.
-%     param1         : optional string, defaults to ''.
-%     param2         : optional string, defaults to ''.
-%     param3         : optional string, defaults to ''.
+%     param_s1       : optional string, defaults to ''.
+%     param_s2       : optional string, defaults to ''.
+%     param_s3       : optional string, defaults to ''.
+%     param_d1       : optional double, defaults to double(0).
+%     param_d2       : optional double, defaults to double(0).
+%     param_d3       : optional double, defaults to double(0).
 %
 %   See also pb_read_QDLIB__Response.
   

@@ -6,23 +6,29 @@ package QDLIB;
 message Command {
 	required command_t cmd = 1 [default = QUIT];
 	optional string XML = 2;
-	optional string param1 = 3; 
-	optional string param2 = 4;
-	optional string param3 = 5;
+	optional string param_s1 = 3; 
+	optional string param_s2 = 4;
+	optional string param_s3 = 5;
+	optional double param_d1 = 6;
+	optional double param_d2 = 7;
+	optional double param_d3 = 8;
 	
 	enum command_t {
-	    QUIT	 = 0;
-		RUN_PROG = 1;
-		READ_WF  = 2;
-		WRITE_WF = 3;
-		READ_OP = 4;
-		WRITE_OP = 5;
-		LOAD_OP  = 6;
-		GET_EXPEC = 7;
-		GET_MATEL = 8;
-		APPLY_OP = 9;
-		GET_GLOBAL_PARAMS = 20;
-		SET_GLOBAL_PARAMS = 21;
+	    QUIT	 = 0; 			// Quit programm
+		GET_GLOBAL_PARAMS = 1;
+		SET_GLOBAL_PARAMS = 2;
+		CLEAR_OBJECTS = 3;      // Clear all operators held in storage 
+		RUN_PROG = 10;			// Run a prog from XML definition
+		READ_WF  = 20;
+		WRITE_WF = 21;
+		READ_OP =  30;
+		WRITE_OP = 31;
+		LOAD_OP  = 32;			// Load operator to storage
+		LOAD_U =   33;			// Load a propagator
+		DELETE_OP = 34;
+		GET_EXPEC = 40;
+		GET_MATEL = 41;
+		APPLY_OP =  42;
 	}
 }
 
@@ -30,6 +36,7 @@ message Response {
 	required response_t response = 1 [ default = OK ];
 	optional string msg = 2;
 	repeated double result = 3;
+	required bool data_follows = 4 [ default = false ];
 	
 	enum response_t {
 		OK = 0;

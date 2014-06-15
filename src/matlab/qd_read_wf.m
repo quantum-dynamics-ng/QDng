@@ -6,19 +6,23 @@ function [data, meta, header] = qd_read_wf(fname, decode_fcn)
 % Read a wave function through a running QDng 
 % 
 
-fd = qd_get_socket('tx');
+
 
 % request the WF
 cmd = pblib_create_message(@pb_descriptor_QDLIB__Command);
-cmd = pblib_set(cmd, 'cmd', 2);
-cmd = pblib_set(cmd, 'param1', fname);
+cmd = pblib_set(cmd, 'cmd', 20);
+cmd = pblib_set(cmd, 'param_s1', fname);
 
-qd_write_cmd(cmd);
+resp = qd_write_cmd(cmd);
+
+if ~resp.data_follows
+    error('No data!');
+end
 
 %
-% handle the answer
+% handle the data
 %
-
+fd = qd_get_socket('tx');
 [payload, header] = qd_read_stream(fd);
 
 if nargin == 2

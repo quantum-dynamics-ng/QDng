@@ -11,17 +11,14 @@ function expec = qd_cmd_expec(data, meta, class, op, encode_fcn)
 
 % create command
 cmd = pblib_create_message(@pb_descriptor_QDLIB__Command);
-cmd = pblib_set(cmd, 'cmd', 7);
+cmd = pblib_set(cmd, 'cmd', 40);
 
 % Autodetect if op is given as reference or a full XML defintion
 if strncmp(op, '<', 1)
     cmd = pblib_set(cmd, 'XML', op);
 else
-    cmd = pblib_set(cmd, 'param1', op);
+    cmd = pblib_set(cmd, 'param_s1', op);
 end
-
-qd_write_cmd(cmd);
-qd_handle_response();
 
 % Send WF
 if (nargin > 4)
@@ -30,11 +27,6 @@ else
     stream = qd_wf_to_stream(data, meta, class);
 end
 
-fd = qd_get_socket('rx');
-fwrite(fd, stream, 'uint8');
-fclose(fd);
-
-% get result
-resp = qd_handle_response();
+resp = qd_write_cmd(cmd, stream);
 expec = resp.result;
 

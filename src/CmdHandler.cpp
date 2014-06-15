@@ -47,10 +47,11 @@ namespace QDLIB
 
    }
 
-   void CmdHandler::send_OK()
+   void CmdHandler::send_OK(bool data_follows)
    {
       Response resp;
       resp.set_response(Response_response_t_OK);
+      resp.set_data_follows(data_follows);
       send_response(resp);
    }
 
@@ -59,6 +60,7 @@ namespace QDLIB
       Response resp;
       resp.set_response(Response_response_t_ERROR_MSG);
       resp.set_msg(msg);
+      resp.set_data_follows(false);
       send_response(resp);
    }
 
@@ -282,9 +284,9 @@ namespace QDLIB
                throw(EIncompatible("Operator load from command failed"));
 
             return op;
-         } else if (cmd.has_param1()) { // get it from reference
+         } else if (cmd.has_param_s1()) { // get it from reference
             GlobalOpList& gol = GlobalOpList::Instance();
-            Operator* op = gol[cmd.param1()];
+            Operator* op = gol[cmd.param_s1()];
 
             if (op == NULL)
                throw(EIncompatible("Operator load from command by reference failed"));
@@ -296,7 +298,6 @@ namespace QDLIB
 
       } catch (Exception& e) {
          send_error_message(e.GetMessage());
-         throw (e);
       }
 
       return NULL;
@@ -315,7 +316,6 @@ namespace QDLIB
          wf = file.LoadWaveFunctionByMeta();
       } catch (Exception& e) {
          send_error_message(e.GetMessage());
-         throw (e);
       }
 
       return wf;
@@ -339,8 +339,10 @@ namespace QDLIB
 
    void CmdHandler::cmd_run_prog(Command& cmd, const string& dir)
    {
-      if (!cmd.has_xml())
-         throw (EParamProblem("RUN_PROG is missing the XML input"));
+      if (!cmd.has_xml()){
+         send_error_message("RUN_PROG is missing the XML input");
+         return;
+      }
 
       try {
          RunXML(cmd.xml().c_str(), cmd.xml().size(), dir);
@@ -349,25 +351,23 @@ namespace QDLIB
          throw (e);
       }
 
-      send_OK();
+      send_OK(false);
    }
 
    void CmdHandler::cmd_read_wf(Command& cmd)
    {
-      Response resp;
-
-      if (!cmd.has_param1()){
-         throw (EParamProblem("READ_WF is missing a file name"));
+      if (!cmd.has_param_s1()){
+         send_error_message("READ_WF is missing a file name");
          return;
       }
 
-      resp.Clear();
+      send_OK(true);
 
       FileWF file;
 
 
       // Load WF;
-      file.Name(cmd.param1());
+      file.Name(cmd.param_s1());
 
       WaveFunction* wf = get_wf(file);
 
@@ -389,10 +389,12 @@ namespace QDLIB
 
    void CmdHandler::cmd_write_wf(Command& cmd)
    {
-      if (!cmd.has_param1()){
-         throw (EParamProblem("WRITE_WF is missing a file name"));
+      if (!cmd.has_param_s1()){
+         send_error_message("WRITE_WF is missing a file name");
          return;
       }
+
+      send_OK(false);
 
       FileWF file;
 
@@ -400,16 +402,17 @@ namespace QDLIB
       file.SetInputStream(*sin_);
 
       WaveFunction* wf = get_wf(file);
+      if (wf == NULL) return;
 
       // Set compression
-      if (cmd.has_param2()){
-         if (cmd.param2() == "gzip")
+      if (cmd.has_param_s2()){
+         if (cmd.param_s2() == "gzip")
             file.Compress(true);
       }
 
       // Write to file
       try {
-         file.Name(cmd.param1());
+         file.Name(cmd.param_s1());
          file.Format(FileSingle<WaveFunction>::stream);
          file.WriteWaveFunction(wf);
       } catch (Exception& e) {
@@ -417,8 +420,7 @@ namespace QDLIB
          throw (e);
       }
 
-      send_OK();
-
+      send_OK(false);
       DELETE_WF(wf);
    }
 
@@ -426,18 +428,18 @@ namespace QDLIB
    {
       Response resp;
 
-      if (!cmd.has_param1()){
+      if (!cmd.has_param_s1()){
          send_error_message("READ_OP is missing a file name");
          return;
       }
 
 
-      if (!cmd.has_param2()){
+      if (!cmd.has_param_s2()){
          send_error_message("READ_OP is missing a class name");
          return;
       }
 
-      Operator* op = ModuleLoader<Operator>::Instance()->Load(cmd.param2());
+      Operator* op = ModuleLoader<Operator>::Instance()->Load(cmd.param_s2());
 
       if (op == NULL)
          throw(EParamProblem("Operator module not found"));
@@ -451,7 +453,7 @@ namespace QDLIB
       // Read Operator from file
       FileSingle<Serializiable> file;
 
-      file.Name(cmd.param1());
+      file.Name(cmd.param_s1());
 
       try {
          file.ReadSingleFileFromStream(ser);
@@ -477,13 +479,13 @@ namespace QDLIB
 
    void CmdHandler::cmd_write_op(Command& cmd)
    {
-      if (!cmd.has_param1()){
+      if (!cmd.has_param_s1()){
          send_error_message("WRITE_OP is missing a file name");
          return;
       }
 
 
-      if (!cmd.has_param2()){
+      if (!cmd.has_param_s2()){
          send_error_message("WRITE_OP is missing a class name");
          return;
       }
@@ -493,11 +495,11 @@ namespace QDLIB
       Laser* laser=NULL;
       Serializiable* ser;
 
-      if (cmd.param2() == "Laser") {
+      if (cmd.param_s2() == "Laser") {
          laser = new Laser();
          ser = dynamic_cast<Serializiable*>(laser);
       } else {
-         string op_name(cmd.param2());
+         string op_name(cmd.param_s2());
          if (op_name.length() == 0)
             throw(EParamProblem("Empty operator name"));
 
@@ -514,6 +516,8 @@ namespace QDLIB
             throw(EIncompatible("Not a serializable object", op->Name()));
       }
 
+      send_OK(false);
+
       FileSingle<Serializiable> file;
 
       // Read from Stream;
@@ -527,14 +531,14 @@ namespace QDLIB
       }
 
       // Set compression
-      if (cmd.has_param3()){
-         if (cmd.param3() == "gzip")
+      if (cmd.has_param_s3()){
+         if (cmd.param_s3() == "gzip")
             file.Compression(FileSingle<Serializiable>::ZLIB);
       }
 
       // Write to file
       try {
-         file.Name(cmd.param1() + BINARY_O_SUFFIX);
+         file.Name(cmd.param_s1() + BINARY_O_SUFFIX);
          file.Format(FileSingle<Serializiable>::stream);
          file.WriteSingleFileToStream(ser);
       } catch (Exception& e) {
@@ -542,7 +546,7 @@ namespace QDLIB
          throw (e);
       }
 
-      send_OK();
+      send_OK(false);
 
       if (op != NULL)
          DELETE_OP(op);
@@ -554,12 +558,12 @@ namespace QDLIB
    {
       Response resp;
 
-      if (!cmd.has_param1()){
+      if (!cmd.has_param_s1()){
          send_error_message("SET_GLOBAL_PARAMS is missing key/values");
       }
 
       ParamContainer pm;
-      pm.Parse(cmd.param1());
+      pm.Parse(cmd.param_s1());
 
       ParamContainer& gp = GlobalParams::Instance();
       gp += pm;  // Add to paraemters
@@ -567,9 +571,8 @@ namespace QDLIB
       string s;
       gp.Write(s, false);
 
-      send_OK();
+      send_OK(false);
    }
-
 
    void CmdHandler::cmd_get_global_params(Command& cmd)
    {
@@ -578,7 +581,20 @@ namespace QDLIB
       string s;
       gp.Write(s, false);
 
-      send_OK();
+      Response resp;
+      resp.set_msg(s);
+
+      send_response(resp);
+   }
+
+   /**
+    * Clear operator storage.
+    */
+   void CmdHandler::cmd_clear_objects()
+   {
+      GlobalOpList::Instance().Clear();
+      Collector<QDClock>::Instance()->Delete();
+      send_OK(false);
    }
 
    void CmdHandler::cmd_load_op(Command& cmd)
@@ -588,7 +604,43 @@ namespace QDLIB
 
       get_operator_from_command(cmd);
 
-      send_OK();
+      send_OK(false);
+   }
+
+   void CmdHandler::cmd_load_U(Command& cmd)
+   {
+      if (!cmd.has_xml())
+         send_error_message("LOAD_U is missing a XML operator definition");
+
+      if (!cmd.has_param_d1())
+         send_error_message("LOAD_U is missing a time step");
+
+      if (!cmd.has_param_d2())
+         send_error_message("LOAD_U is missing  Nt");
+
+      try {
+          XmlParser XMLfile;
+          OPropagator* U;
+
+          XMLfile.Parse(cmd.xml().c_str(), cmd.xml().size());
+
+          XmlNode& root = XMLfile.Root();
+          U = ChainLoader::LoadPropagator(&root, true);
+          if (U == NULL)
+             throw(EIncompatible("Propagator load from command failed"));
+
+          // Keep track of the clock for later deletion.
+          QDClock* cl = new QDClock(int(cmd.param_d2()), cmd.param_d1());
+          Collector<QDClock>::Instance()->Register(cl, false);
+
+          U->Clock( cl );
+
+       } catch (Exception& e) {
+          send_error_message(e.GetMessage());
+          throw (e);
+       }
+
+      send_OK(false);
    }
 
    void CmdHandler::cmd_apply_op(Command& cmd)
@@ -596,7 +648,25 @@ namespace QDLIB
       // Load Operator
       Operator* Op = get_operator_from_command(cmd);
 
-      send_OK();
+      // Chose time step
+      if (cmd.has_param_d1()){
+         QDClock* cl = Op->Clock();
+         if (cl == NULL) {
+            string err = "Operator has no clock";
+            send_error_message(err);
+            return;
+         }
+
+         int t = int(cmd.param_d1());
+         if (t < 0 || t > cl->Steps()){
+            string err = "Invalid time value chosen";
+            send_error_message(err);
+            return;
+         }
+         cl->TimeStep(t);
+      }
+
+      send_OK(true);
 
       // Receive WF
       FileWF file;
@@ -629,8 +699,6 @@ namespace QDLIB
    {
       // Load Operator
       Operator* Op = get_operator_from_command(cmd);
-
-      send_OK(); // acknowledge operator load
 
       // Get bra and ket
       FileWF file;
@@ -669,7 +737,7 @@ namespace QDLIB
       // Load Operator
       Operator* Op = get_operator_from_command(cmd);
 
-      send_OK(); // acknowledge operator load
+      send_OK(false);
 
       // Get bra/ket
       FileWF file;
@@ -686,7 +754,6 @@ namespace QDLIB
          }
       } catch (Exception& e) {
          send_error_message(e.GetMessage());
-         throw(e);
       }
 
       double res = Op->Expec(bk);
@@ -713,7 +780,7 @@ namespace QDLIB
          log.coutdbg() << "Waiting for input.." << endl;
          log.flush();
          sin_->read(reinterpret_cast<char*>(&msg_size), sizeof(msg_size));
-         cout << "msg_size: " << msg_size << endl;
+         log.coutdbg() << "msg_size: " << msg_size << endl;
 
          buffer = new char[msg_size];
          sin_->read(reinterpret_cast<char*>(buffer), msg_size);
@@ -721,7 +788,10 @@ namespace QDLIB
          if ( !cmd.ParseFromArray(buffer, msg_size) )
             throw (EParamProblem("Parsing the command from input failed"));
 
-         cout << "cmd_type: " << cmd.cmd() << endl;
+         log.cout() << "cmd_type: "
+                  << cmd.command_t_descriptor()->FindValueByNumber(cmd.cmd())->name() << endl;
+
+         log.flush();
 
          delete[] buffer; buffer = NULL;
 
@@ -741,8 +811,14 @@ namespace QDLIB
             case Command_command_t_SET_GLOBAL_PARAMS:
                cmd_set_global_params(cmd);
                break;
+            case Command_command_t_CLEAR_OBJECTS:
+               cmd_clear_objects();
+               break;
             case Command_command_t_LOAD_OP:
                cmd_load_op(cmd);
+               break;
+            case Command_command_t_LOAD_U:
+               cmd_load_U(cmd);
                break;
             case Command_command_t_READ_OP:
                cmd_read_op(cmd);
@@ -767,6 +843,9 @@ namespace QDLIB
                throw(EParamProblem("Unknown command code: ", cmd.cmd()));
             break;
          }
+
+         log.cout() << "completed\n";
+         log.flush();
       } while  (cmd.cmd() != Command_command_t_QUIT);
 
    }

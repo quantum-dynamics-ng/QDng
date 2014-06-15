@@ -27,13 +27,12 @@ end
 % end
 
 % Send command
-cmd = pb_read_QDLIB__Command();
-cmd = pblib_set(cmd, 'cmd', 3); 
-cmd = pblib_set(cmd, 'param1', name);
+cmd = pblib_create_message(@pb_descriptor_QDLIB__Command);
+cmd = pblib_set(cmd, 'cmd', 21); 
+cmd = pblib_set(cmd, 'param_s1', name);
 if compression > 0
-    cmd = pblib_set(cmd, 'param2', 'gzip');
+    cmd = pblib_set(cmd, 'param_s2', 'gzip');
 end
 
-qd_write_cmd(cmd, stream);
+qd_write_cmd(cmd,stream);
 
-qd_handle_response();

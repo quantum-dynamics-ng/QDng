@@ -48,7 +48,7 @@ else
     [data, meta] = qd_read_wf(path);
     opts = struct('split_view',true);
 end
-opts
+
 % check for multistate WF
 if iscell(data)
     X = prepare_axis(meta{1});
@@ -64,9 +64,10 @@ if iscell(data)
         hold off
     else
         for i=1:length(data)
-            subplot(length(data),1,i);
+            subplot(length(data),1,length(data)-i+1);
              y = prepare_data(data{i}, opts);
              plot_wf(X, y, meta{i}.dims);
+             title(['state ' num2str(i)'])
         end
              
     end
