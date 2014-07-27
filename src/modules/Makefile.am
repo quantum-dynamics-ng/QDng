@@ -1,7 +1,7 @@
 INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 -I$(FFTW_INCLUDE) $(all_includes)
 METASOURCES = AUTO
 
-AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long
+AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long -DQD_SYS_MOD_PATH='"$(libdir)/qdng/"'
 
 
 noinst_LTLIBRARIES = libModuleLoader.la
@@ -12,6 +12,7 @@ modules_HEADERS = ModuleLoader.h Module.h InternalMods.h
 
 
 if DYNMODS
+
 pkglib_LTLIBRARIES = \
 libqd-OCheby.la \
 libqd-OFlux.la \

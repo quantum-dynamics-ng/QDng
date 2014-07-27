@@ -213,6 +213,11 @@ namespace QDLIB {
             return _mod_map[name].Instance.Cptr();
       }
 
+      /* try the compiled in path */
+      s = string(QD_SYS_MOD_PATH) + _basename_lib + name + ".so";
+      if (try_lib_path(s, name))
+         return _mod_map[name].Instance.Cptr();
+
       /* try system path */
       s = _basename_lib + name;
 

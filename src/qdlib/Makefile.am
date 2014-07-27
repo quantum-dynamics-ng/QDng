@@ -37,7 +37,9 @@ qdlib_HEADERS = Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
 
 noinst_HEADERS = cfd_table_1.h cfd_table_2.h
 
-AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long
+AM_CPPFLAGS = -DQD_SYS_MOD_PATH='"$(libdir)/qdng"'
+AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-longi -DQD_SYS_MOD_PATH='"$(libdir)/qdng/"'
+
 libqd_la_LDFLAGS = -module
 
 

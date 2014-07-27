@@ -207,7 +207,9 @@ dnl Configure C/F77 mixed mode (RT libs)
 AC_F77_LIBRARY_LDFLAGS
 AC_F77_WRAPPERS
 
-
+dnl
+dnl dynamic modules
+dnl
 AC_ARG_ENABLE([mods],
 	      [AS_HELP_STRING([--enable-mods],[Enable dynamic loadable modules])],
 	      [
@@ -223,6 +225,7 @@ AC_ARG_ENABLE([mods],
 	      [DL_LIBS="";])
 
 AC_SUBST(DL_LIBS)
+
 AM_CONDITIONAL([DYNMODS], [test "x$enable_mods" = "xyes"])
 
 AC_ARG_ENABLE([mpi],
@@ -254,6 +257,7 @@ AC_CONFIG_FILES(
 		 src/fft/Makefile src/math/Makefile src/modules/Makefile
 		 src/tests/Makefile src/slatec/Makefile src/linalg/Makefile
 		 src/lib/Makefile tests/Makefile src/simpleXml/Makefile
+		 src/matlab/Makefile
 		 tests/TGE-GSPO.qdi tests/TGE-Arnoldi.qdi tests/TGE-Cheby.qdi tests/TGE-SIL.qdi
 		 tests/TGP-Expec.qdi tests/TGP-Expec-SP.qdi tests/TGP-Expec-HOFD.qdi tests/TGP-NIP-Cheby.qdi
 		 tests/TGP-Kick.qdi tests/TGP-Gmat.qdi
