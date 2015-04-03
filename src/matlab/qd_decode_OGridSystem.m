@@ -1,4 +1,4 @@
-function [data, meta] = qd_decode_OGridSystem(pl,~)
+function [data, meta] = qd_decode_OGridSystem(pl)
 %
 % [data, meta] = qd_decode_OGridSystem(pl)
 %

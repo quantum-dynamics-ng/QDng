@@ -1,4 +1,4 @@
-function pl = qd_encode_WFMultistate(data, meta, class, encode_fcn)
+function pl = qd_encode_WFMultistate(data, meta, encode_fcn)
 %
 % qd_encode_WFMultistate(data, meta, class)
 % qd_encode_WFMultistate(data, meta, class, encode_fcn)
@@ -21,12 +21,6 @@ for i=1:length(data);
     else
         m = meta;
     end
-    
-    if iscell(class)
-        c = class{i};
-    else
-        c = class;
-    end
 
     if nargin > 3
         if iscell(encode_fcn)
@@ -37,13 +31,13 @@ for i=1:length(data);
     end
     
     if nargin > 3
-        payload = qd_encode_WF(data{i}, m, c, e);
+        payload = qd_encode_WF(data{i}, m, e);
     else
-        payload = qd_encode_WF(data{i}, m, c);
+        payload = qd_encode_WF(data{i}, m);
     end
     
     header = pblib_create_message(@pb_descriptor_QDLIB__FileSingleHeader);
-    header = pblib_set (header, 'class', c);
+    header = pblib_set (header, 'class', m.class);
     header = pblib_set (header, 'meta_data', '');
     header = pblib_set (header, 'compression', 0);
     if i < length(data)
