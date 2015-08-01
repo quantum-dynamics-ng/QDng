@@ -17,7 +17,25 @@ elseif nargin == 0
 else
 end
 
-basename = '/tmp/cmd_fifo';
+if exist('getpid') == 5  
+    pid = getpid(); % octave
+else
+    pid = feature('getpid'); % MATLAB
+end
+
+basename = ['/tmp/cmd_fifo_' num2str(pid)];
+
+% check if we already have a running qdng
+persistent qdng_pid;
+
+if exist('qdng_pid') == 1
+    [res,out] = system(['ps ' num2str(qdng_pid)]);
+    if res == 0
+       qdng_pid = start_qdng(basename)
+    end
+else 
+    qdng_pid = start_qdng(basname);
+end
 
 % open socket 
 if  strcmp(rxtx, 'rx')
@@ -32,5 +50,14 @@ else
     fd = fopen([basename 'tx'], 'r');
 end
 
+
+function pid = start_qdng(basename)
+    [res, sout] = system(['qdng -c ' basename ' &']);
+    if res ~= 0
+       error('QDng startup failed');
+    end
+    pid = textscan(sout, '%d');
+    pid = pid{1}(1);
+end
 
 end

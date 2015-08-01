@@ -256,8 +256,11 @@ int main(int argc, char **argv)
          i++;
       }
 
-      if (cmdline.GetOption('c'))
+      if (cmdline.GetOption('c')){
          CmdMode = true;
+         /* First thing we do is stating our PID */
+         cout << getpid() << endl;
+      }
 
    } catch (Exception &e) {
       cerr << e.GetMessage() << "\n";
