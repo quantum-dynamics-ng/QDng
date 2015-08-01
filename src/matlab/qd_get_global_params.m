@@ -6,7 +6,7 @@ function pm = qd_get_global_params()
 %
 
 cmd = pblib_create_message(@pb_descriptor_QDLIB__Command);
-cmd = pblib_set(cmd, 'cmd', 20);
+cmd = pblib_set(cmd, 'cmd', 1);
 qd_write_cmd(cmd);
 
 fd = qd_get_socket('tx');

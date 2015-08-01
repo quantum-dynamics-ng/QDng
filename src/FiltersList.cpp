@@ -241,7 +241,7 @@ namespace QDLIB {
 
 	    /* Renormalize expectation value */
 	    if (_renorm)
-	       matel /= Psi->Norm();
+	       matel /= *Psi * Psi;
 
 	    if (_filter[i].integrate)
 	       _filter[i].sum += matel * _clock->Dt();

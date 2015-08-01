@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+
+if test -z "$1"; then
+   echo -e "\nUsage: $0 <ID>\n\n"
+   exit 1;
+fi 
+
+
+trap 'kill $pid; rm -f /tmp/cmd_fifo_$1_*; exit' SIGINT SIGQUIT SIGKILL
+
+echo > /tmp/qdng_$1.log
+
+export LD_LIBRARY_PATH='';
+while true; do
+   qdng -c /tmp/cmd_fifo_$1_ >> /tmp/qdng_$1.log
+   pid = $!
+   if [ $? == 0 ]; then break; fi
+done
+
+rm -f /tmp/cmd_fifo_$1_*
+
+
+
+

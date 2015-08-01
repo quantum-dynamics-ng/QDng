@@ -18,7 +18,7 @@ end
 if isfield(meta,'xmin') && isfield(meta,'xmax')
     
     meta_pb = pblib_create_message(@pb_descriptor_QDLIB__GridSystemHeader);
-    dims = ndims(data);
+    dims = length(meta.xmin);
     meta_pb = pblib_set (meta_pb, 'dims', dims);
     
     meta_pb.dim = pblib_create_message(@pb_descriptor_QDLIB__GridSystemHeader__dim_description_t);
@@ -26,10 +26,14 @@ if isfield(meta,'xmin') && isfield(meta,'xmax')
      
     for k=1:dims
         meta_dim = pblib_create_message(@pb_descriptor_QDLIB__GridSystemHeader__dim_description_t);
-        meta_dim = pblib_set(meta_dim, 'size', size(data,k));
+        if dims ==1 
+            meta_dim = pblib_set(meta_dim, 'size', length(data));
+        else
+            meta_dim = pblib_set(meta_dim, 'size', size(data,k));
+        end
         meta_dim = pblib_set(meta_dim, 'xmin', meta.xmin(k));
         meta_dim = pblib_set(meta_dim, 'xmax', meta.xmax(k));
-        meta_pb.dim(k) = meta_dim
+        meta_pb.dim(k) = meta_dim;
     end
 else
     meta_pb = meta;

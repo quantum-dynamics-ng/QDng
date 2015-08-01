@@ -885,7 +885,10 @@ namespace QDLIB
                outbuf.seekg(0);
 
                OstreamOutputStream osbuf(&buffer);
-               GzipOutputStream gzip(&osbuf);
+               GzipOutputStream::Options opts;
+               /* fix the format to libz ! */
+               opts.format = ZLIB;
+               GzipOutputStream gzip(&osbuf, opts);
 
                int size=0;
                void* buf;

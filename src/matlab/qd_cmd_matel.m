@@ -11,7 +11,7 @@ function expec = qd_cmd_matel(bra, ket, meta, class, op, encode_fcn)
 
 % create command
 cmd = pblib_create_message(@pb_descriptor_QDLIB__Command);
-cmd = pblib_set(cmd, 'cmd', 8);
+cmd = pblib_set(cmd, 'cmd', 41);
 
 % Autodetect if op is given as reference or a full XML defintion
 if strncmp(op, '<', 1)

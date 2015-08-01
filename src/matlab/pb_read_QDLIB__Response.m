@@ -13,6 +13,7 @@ function [response] = pb_read_QDLIB__Response(buffer, buffer_start, buffer_end)
 %     response       : required enum, defaults to int32(0).
 %     msg            : optional string, defaults to ''.
 %     result         : repeated double, defaults to double([]).
+%     data_follows   : required uint32, defaults to uint32(0).
 %
 %   See also pb_read_QDLIB__Command.
   

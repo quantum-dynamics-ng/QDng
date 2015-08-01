@@ -1,6 +1,8 @@
-function [payload, header] = qd_read_stream(fd)
+function [payload, header] = qd_read_stream(fd, header_only)
 %
 % [payload, header] = qd_read_stream(fd)
+% [header] = qd_read_stream(fd, header_only)
+% 
 % Read header and payload from a stream
 %
 
@@ -34,5 +36,9 @@ end
 msg_len = fread(fd, 1, 'uint32');
 buffer  = fread(fd, msg_len, '*uint8')';
 header = pb_read_QDLIB__FileSingleHeader(buffer);
+
+if nargin > 1 && header_only == 0
+    return
+end
 
 payload = fread(fd, header.payload_size, '*uint8');

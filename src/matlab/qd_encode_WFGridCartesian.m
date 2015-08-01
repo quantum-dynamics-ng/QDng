@@ -10,16 +10,33 @@ function pl = qd_encode_WFGridCartesian(data, meta)
 %
 % data provides the (complex) WF data as a n-d array
 
+% handle meta data
+cdata = qd_convert_complex_to_uint8(data);
 meta_pb = qd_convert_grid_meta_to_pb(data, meta);
-data = qd_convert_complex_to_uint8(data);
+meta_pb = pblib_set (meta_pb, 'data_size', numel(cdata));
 
-% generate header and pack data
-meta_pb = pblib_set (meta_pb, 'data_size', numel(data));
+% generate header
 meta_buf = pblib_generic_serialize_to_string(meta_pb);
+pl = [typecast(uint32(numel(meta_buf)), 'uint8') meta_buf];
 
-pl = [typecast(uint32(numel(meta_buf)), 'uint8') meta_buf data];
+% compression
+if meta.compress ~= 0
+    comp = 1;
+    if meta.compress == 1
+        comp = 1e-6;
+    else
+        comp = meta.compress;
+    end
 
+    data = fftn(data);
+    data(abs(data) < comp) = 0;
+    cdata = qd_convert_complex_to_uint8(data);
+end
 
+pl = [pl cdata(:)'];
 
+if meta.compress ~= 0
+    pl = qlib_zlib_compress(pl);
+end
 
-
+end

@@ -8,5 +8,5 @@ cmd = pblib_create_message(pb_descriptor_QDLIB__Command);
 cmd = pblib_set(cmd, 'cmd', 0);
 
 qd_write_cmd(cmd);
-
+pause(0.1);
 end

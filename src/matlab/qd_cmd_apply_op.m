@@ -11,7 +11,7 @@ function op_wf = qd_cmd_apply_op(data, meta, class, op, encode_fcn, decode_fcn)
 
 % create command
 cmd = pblib_create_message(@pb_descriptor_QDLIB__Command);
-cmd = pblib_set(cmd, 'cmd', 9);
+cmd = pblib_set(cmd, 'cmd', 42);
 
 % Autodetect if op is given as reference or a full XML defintion
 if strncmp(op, '<', 1)

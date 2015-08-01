@@ -16,5 +16,6 @@ if dt <= 0
 end
 
 data = typecast(pl(17:end), 'double');
+data = data(:);
 
 end
