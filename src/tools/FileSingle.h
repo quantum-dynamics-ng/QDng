@@ -887,7 +887,7 @@ namespace QDLIB
                OstreamOutputStream osbuf(&buffer);
                GzipOutputStream::Options opts;
                /* fix the format to libz ! */
-               opts.format = ZLIB;
+               opts.format = GzipOutputStream::ZLIB;
                GzipOutputStream gzip(&osbuf, opts);
 
                int size=0;
