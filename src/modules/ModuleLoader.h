@@ -3,6 +3,7 @@
 
 #ifdef USE_DYNMODS
  #include <dlfcn.h>
+ #include <wordexp.h>
 #endif
 
 #include "tools/Logger.h"
@@ -154,7 +155,12 @@ namespace QDLIB {
    {
       Logger& log = Logger::InstanceRef();
 
-      void* handle = dlopen(full_name.c_str(), RTLD_NOW | RTLD_LOCAL);
+      wordexp_t fname_res;
+      wordexp(full_name.c_str(), &fname_res, 0);
+
+      void* handle = dlopen(fname_res.we_wordv[0], RTLD_NOW | RTLD_LOCAL);
+
+      wordfree(&fname_res);
 
       if ( handle != NULL )
       {
