@@ -184,12 +184,12 @@ namespace QDLIB
 
    WaveFunction* ChainLoader::LoadWFMultimap_( XmlNode *WFNode, ParamContainer& pm,  int seqnum)
    {
+      Logger& log = Logger::InstanceRef();
+
       WFMultistate *wfin = dynamic_cast<WFMultistate*>(LoadWaveFunctionChain( WFNode, seqnum ));
 
       if (wfin == NULL)
-         throw(EIncompatible("Multimap needs a multi state wave function"));
-
-      WFMultistate *wfout = new WFMultistate();
+         throw(EIncompatible("Multimap needs a multi state wave function as input"));
 
       vector<int> statemap;
       vector<double> coeffs;
@@ -198,26 +198,48 @@ namespace QDLIB
          pm.GetArray("statemap", statemap);
       }
 
+      if (statemap.size() > wfin->States())
+	throw(EParamProblem("More states in statemap than input states available"));
+
+
       if (pm.isPresent("coeffs")){
          pm.GetArray("coeffs", coeffs);
       } else {
          coeffs.assign(statemap.size(), 1);
       }
 
-      for (size_t i=0; i < statemap.size(); i++){
-         double cf = 1;
-         if (statemap[i] >= wfin->States() || statemap[i] < 0)
-            throw (EParamProblem("Multimap: state index is invalid"));
+      /* Map Multistate to Multistate*/
+      if (statemap.size() > 1) {
+	WFMultistate *wfout = new WFMultistate();
+	for (size_t i=0; i < statemap.size(); i++){
+	   double cf = 1;
+	   if (statemap[i] >= wfin->States() || statemap[i] < 0)
+	      throw (EParamProblem("Multimap: state index is invalid"));
 
-         wfout->Add(wfin->State(i), statemap[i]);
+	   wfout->Add(wfin->State(i), statemap[i]);
 
-         if (i >= coeffs.size())
-            *(wfout->State(statemap[i])) *= 0;
-         else
-            *(wfout->State(statemap[i])) *= coeffs[i];
+	   if (i >= coeffs.size()) {
+	      *(wfout->State(statemap[i])) *= 0;
+	   } else {
+	      *(wfout->State(statemap[i])) *= coeffs[i];
+	      log.cout() << coeffs[i] << " * " << i << " -> " << statemap[i] << endl;
+	   }
+	}
+
+	ParamContainer mspm;
+	wfout->Init(mspm);
+
+	return wfout;
+      } else { /* Map Multistate to a single state WF */
+	   if (statemap[0] >= wfin->States() || statemap[0] < 0)
+	      throw (EParamProblem("Multimap: state index is invalid"));
+
+	  WaveFunction *wfout = wfin->State(statemap[0])->NewInstance();
+	  *wfout = wfin->State(statemap[0]);
+	  *wfout *= coeffs[0];
+
+	  return wfout;
       }
-
-      return wfout;
    }
    
    WaveFunction* ChainLoader::LoadWFLC_( XmlNode *WFNode, ParamContainer& pm,  int seqnum)
@@ -321,8 +343,7 @@ namespace QDLIB
          child->AdjustElementNode();
 
          WF = LoadWFMultimap_(child, pm, seqnum);
-
-         return WF;
+         log.IndentDec();
 
       } else if (name == "LC"){ /* Further recursion for linear combination */
 	 log.cout() << "Build linear combination from wave functions:" << endl;

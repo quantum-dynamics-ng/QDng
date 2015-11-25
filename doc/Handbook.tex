@@ -1062,6 +1062,41 @@ Define a superposition of two electronic states:
 </wf>
 \end{verbatim}
 
+\section{Remapping of electronic states}
+In the protobuf file format multi state wave functions are written into a single file,
+instead of one file per state. With the \verb|Multimap| module single states of an input 
+can be picked or reordered.
+
+\begin{options}
+ \option{statemap}{Indicies for the new ordering. The position of the index represents the position in the new wave function.}
+ \option{coeff}{The coefficient for a particular state [1.0]}
+\end{options}
+
+\subsubsection*{Examples}
+Pick just single state from a multi state input file (i.e. pick state 2). This is special case, since
+the output will not be of type \verb|Multistate| but of the particular type of the wave function.
+\begin{verbatim}
+wf { name=Multimap statemap=2
+  wf { file=WF }
+}
+\end{verbatim}
+
+Select a  subset of states, change the order, and scale them This does the following mapping:
+\begin{align}
+\begin{pmatrix}
+\Psi_0 \\ \Psi_1 \\ \Psi_2 \\ \Psi_3
+\end{pmatrix}
+\rightarrow
+\begin{pmatrix}
+0.2 \Psi_3 \\ 0.3 \Psi_0 \\ 0.4\Psi_1
+\end{pmatrix}
+\nonumber
+\end{align}
+\begin{verbatim}
+wf { name=Multimap statemap=3,0,1 coeffs=0.2,0.3,0.4
+  wf { file=WF }
+}
+\end{verbatim}
 
 \bibliographystyle{acm}
 \bibliography{qdng}
