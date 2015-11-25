@@ -153,8 +153,117 @@ namespace QDLIB
       return O;
    }
 
+   WaveFunction* ChainLoader::LoadWFMultistate_( XmlNode *WFNode, ParamContainer& pm, int seqnum)
+   {
+      Logger& log = Logger::InstanceRef();
 
+      WaveFunction *wfsub;
+
+      /* Read single WF definitions into Multistate */
+      WFMultistate *multi = new WFMultistate();
+      while (WFNode->EndNode()){
+         string name;
+         stringstream ss;
+         int state;
+
+         name = WFNode->Name();
+         ss << name.substr(2);
+         ss >> state;
+         log.cout() << "-State " << state << endl;
+
+         wfsub = LoadWaveFunctionChain( WFNode, seqnum );
+
+         multi->Add( wfsub, state);
+         WFNode->NextNode();
+      }
+
+      multi->Init(pm);
+
+      return multi;
+   }
+
+   WaveFunction* ChainLoader::LoadWFMultimap_( XmlNode *WFNode, ParamContainer& pm,  int seqnum)
+   {
+      WFMultistate *wfin = dynamic_cast<WFMultistate*>(LoadWaveFunctionChain( WFNode, seqnum ));
+
+      if (wfin == NULL)
+         throw(EIncompatible("Multimap needs a multi state wave function"));
+
+      WFMultistate *wfout = new WFMultistate();
+
+      vector<int> statemap;
+      vector<double> coeffs;
+
+      if (pm.isPresent("statemap")){
+         pm.GetArray("statemap", statemap);
+      }
+
+      if (pm.isPresent("coeffs")){
+         pm.GetArray("coeffs", coeffs);
+      } else {
+         coeffs.assign(statemap.size(), 1);
+      }
+
+      for (size_t i=0; i < statemap.size(); i++){
+         double cf = 1;
+         if (statemap[i] >= wfin->States() || statemap[i] < 0)
+            throw (EParamProblem("Multimap: state index is invalid"));
+
+         wfout->Add(wfin->State(i), statemap[i]);
+
+         if (i >= coeffs.size())
+            *(wfout->State(statemap[i])) *= 0;
+         else
+            *(wfout->State(statemap[i])) *= coeffs[i];
+      }
+
+      return wfout;
+   }
    
+   WaveFunction* ChainLoader::LoadWFLC_( XmlNode *WFNode, ParamContainer& pm,  int seqnum)
+   {
+      Logger& log = Logger::InstanceRef();
+      WaveFunction *wfadd;
+      WaveFunction *WF = NULL;
+      ParamContainer pm_child;
+
+      while (WFNode->EndNode()){
+         double coeff=0;
+
+         pm_child = WFNode->Attributes();
+         if (pm_child.isPresent("coeff")){
+            pm_child.GetValue("coeff", coeff);
+
+         } else if (pm_child.isPresent("coeff2")){
+            pm_child.GetValue("coeff2", coeff);
+            coeff = sqrt(coeff);
+         }
+         if(coeff != 0){
+            log.cout().precision(8);
+            log.cout() << fixed << "Coefficient = " << coeff << endl;
+            log.cout() << fixed << "Coefficient^2 = " << coeff*coeff << endl;
+         }
+
+         wfadd = LoadWaveFunctionChain( WFNode, seqnum );
+
+         if(coeff != 0)
+            MultElements((cVec*) wfadd, coeff);
+
+         if (WF == NULL){
+            WF = wfadd->NewInstance();
+            *WF = wfadd;
+         } else {
+            *WF += wfadd;
+         }
+
+         *WF += wfadd;
+         DELETE_WF(wfadd);
+         WFNode->NextNode();
+      }
+
+      return WF;
+   }
+
    /**
     * Load all wave functions from the input.
     * 
@@ -192,81 +301,37 @@ namespace QDLIB
 	 child = WFNode->NextChild();
 	 child->AdjustElementNode();
          
-         WaveFunction *wfsub;
-         
-         /* Read single WF definitions into Multistate */
-         WFMultistate *multi = new WFMultistate();
-         while (child->EndNode()){
-            string name;
-            stringstream ss;
-            int state;
-            
-            name = child->Name();
-            ss << name.substr(2);
-            ss >> state;
-            log.cout() << "-State " << state << endl;
-            
-            wfsub = LoadWaveFunctionChain( child, seqnum );
-            
-            multi->Add( wfsub, state);
-            child->NextNode();
-         }
-         
-	 multi->Init(pm);
+	 WF = LoadWFMultistate_( child, pm, seqnum);
+
          
          /* Print norm */
          if (log.Debug()){
             log.coutdbg().precision(8);
             log.coutdbg() << fixed;
-            log.coutdbg() << "Norm : " << multi->Norm() <<endl;
+            log.coutdbg() << "Norm : " << WF->Norm() <<endl;
          }
          
-	 pm.GetValue( "normalize", onoff);
-	 if ( onoff) {
-	    log.cout() << "Normalized\n";
-	    multi->Normalize();
-	 }
 	 log.IndentDec();
-	 
-	 return multi;
+      } else if (name== "Multimap") { /* Load a Multistate wave function and remap the states */
+         log.cout() << "Re-map multi state wave function" << endl;
+         log.IndentInc();
+
+         /* load the wf from the sub node */
+         child = WFNode->NextChild();
+         child->AdjustElementNode();
+
+         WF = LoadWFMultimap_(child, pm, seqnum);
+
+         return WF;
+
       } else if (name == "LC"){ /* Further recursion for linear combination */
 	 log.cout() << "Build linear combination from wave functions:" << endl;
 	 log.IndentInc();
 	 child = WFNode->NextChild();
 	 child->AdjustElementNode();
-	 WaveFunction *wfadd;
-	 ParamContainer pm_child;
-	 while (child->EndNode()){
-            double coeff=0;
-            
-            pm_child = child->Attributes();
-            if (pm_child.isPresent("coeff")){
-               pm_child.GetValue("coeff", coeff);
-               
-            } else if (pm_child.isPresent("coeff2")){
-               pm_child.GetValue("coeff2", coeff);
-               coeff = sqrt(coeff);
-            }
-            if(coeff != 0){
-               log.cout().precision(8);
-               log.cout() << fixed << "Coefficient = " << coeff << endl;
-               log.cout() << fixed << "Coefficient^2 = " << coeff*coeff << endl;
-            }
-                    
-            wfadd = LoadWaveFunctionChain( child, seqnum );
-            
-            if(coeff != 0)
-               MultElements((cVec*) wfadd, coeff);
-            
-	    if (WF == NULL){
-	       WF = wfadd->NewInstance();
-	       *((cVec*) WF) = dcomplex(0,0);
-	    }
-	    
-	    *WF += wfadd;
-	    DELETE_WF(wfadd);
-	    child->NextNode();
-	 }
+
+	 WF = ChainLoader::LoadWFLC_( child,  pm,  seqnum);
+
          /* Print norm */
          if (log.Debug()){
             log.coutdbg().precision(8);
@@ -274,12 +339,6 @@ namespace QDLIB
             log.coutdbg() << "Norm : " << WF->Norm() <<endl;
          }
 
-
-	 pm.GetValue( "normalize", onoff);
-	 if ( onoff) {
-	    log.cout() << "Normalized\n";
-	    WF->Normalize();
-	 }
 	 log.IndentDec();
 
       } else { /* load a specific wf */
@@ -317,11 +376,6 @@ namespace QDLIB
             log.coutdbg() << "Norm : " << WF->Norm() <<endl;
          }
          
-         pm.GetValue( "normalize", onoff);
-         if ( onoff) {
-            log.cout() << "Normalizing...\n";
-            WF->Normalize();
-         }
          if (pm.isPresent("phase")){
             double phase;
             pm.GetValue("phase", phase);
@@ -331,6 +385,12 @@ namespace QDLIB
 	 
 	 if ( name.length() == 1 ) log.cout() << WF->Params() << endl;
 	 log.cout() << pm << "------------------\n" << endl;
+      }
+
+      pm.GetValue( "normalize", onoff);
+      if ( onoff) {
+         log.cout() << "Normalizing...\n";
+         WF->Normalize();
       }
 
       /* Add to global container */

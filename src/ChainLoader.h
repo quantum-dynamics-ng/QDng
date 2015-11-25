@@ -19,7 +19,11 @@ namespace QDLIB
    class ChainLoader
    {
       private:
-         static int OpListAnonKey; /* Counter for anonymous key names */ 
+         static int OpListAnonKey; /* Counter for anonymous key names */
+
+         static WaveFunction* LoadWFMultimap_( XmlNode *WFNode, ParamContainer& pm, int seqnum);
+         static WaveFunction* LoadWFMultistate_( XmlNode *WFNode, ParamContainer& pm, int seqnum);
+         static WaveFunction* LoadWFLC_( XmlNode *WFNode, ParamContainer& pm, int seqnum);
       public:
 	 static Operator* LoadOperatorChain( XmlNode *Onode, bool persist = false );
 	 static WaveFunction* LoadWaveFunctionChain( XmlNode *WFNode, int seqnum=-1);
