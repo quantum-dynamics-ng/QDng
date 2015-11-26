@@ -33,7 +33,7 @@ dist_pkgdata_DATA = IACmds.proto
 
 bin_PROGRAMS = qdng qdz qdinfo
 qdng_SOURCES = CmdHandler.cpp GlobalOpList.cpp GlobalWFList.cpp ChainLoader.cpp FiltersList.cpp ProgEigen.cpp \
-	ProgOCT.cpp ProgPropa.cpp Reporter.cpp ProgFilter.cpp qdng.cpp
+	ProgOCT.cpp ProgPropa.cpp Reporter.cpp ProgFilter.cpp ProgCfun.cpp qdng.cpp
 qdng_LDADD =  $(top_builddir)/src/lib/libqdng.la $(LAPACK_LIBS) $(BLAS_LIBS) $(FFTW_LIBS) $(top_builddir)/src/simpleXml/libsimplexml.la $(DL_LIBS) -lprotobuf 
 
 nodist_qdng_SOURCES = $(builddir)/IACmds.pb.cc $(builddir)/IACmds.pb.h
@@ -47,5 +47,5 @@ qdinfo_SOURCES = qdng_info.cpp
 qdinfo_LDADD = $(top_builddir)/src/tools/libtools.la -lprotobuf
 
 noinst_HEADERS = GlobalOpList.h GlobalWFList.h ChainLoader.h FiltersList.h ProgAutocorr.h \
-	ProgEigen.h ProgPropa.h Reporter.h ProgOCT.h ProgFilter.h CmdHandler.h 
+	ProgEigen.h ProgPropa.h Reporter.h ProgOCT.h ProgFilter.h ProgCfun.h CmdHandler.h 
 

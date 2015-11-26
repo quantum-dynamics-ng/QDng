@@ -26,6 +26,7 @@
 #include "ProgFilter.h"
 #include "ProgEigen.h"
 #include "ProgOCT.h"
+#include "ProgCfun.h"
 
 #include <cstdlib>
 #include <time.h>
@@ -203,6 +204,11 @@ namespace QDLIB
             oct.SetDirectory(dir);
             log.Header("Optimal control theory", Logger::Chapter);
             oct.Run();
+         } else if (progname == "cfunc") {
+            ProgCfun cfunc(*prognodes);
+            cfunc.SetDirectory(dir);
+            log.Header("Multipoint Correlation Function", Logger::Chapter);
+            cfunc.Run();
          } else if (progname == "densmat") {
             throw(EParamProblem("Density matrix propagation not implementet yet"));
          } else {
