@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <sys/errno.h>
 #include <string.h>
+#include <fstream>
+#include <sstream>
 #include "tools/Exception.h"
 
 #define CHUNK 1024
@@ -10,6 +12,7 @@
 int yyparse();
 extern FILE* yyin;
 extern FILE* _yyout;
+extern stringstream ss_yy_buf;
 
 namespace QDSXML {
 
@@ -81,16 +84,34 @@ namespace QDSXML {
          throw (QDLIB::EIOError(errno, iname) );
       
       /* Open output file */
-      _yyout = fopen(oname.c_str(), "w");
+      std::ofstream of(oname.c_str(), std::ofstream::trunc);
+      //_yyout = fopen(oname.c_str(), "w");
       
-      if (!_yyout)
+      //if (!_yyout)
+      if (! of.is_open())
          throw (QDLIB::EIOError(errno, oname) );
 
       
       yyparse();
-      fclose(_yyout);
+
+      of << ss_yy_buf.str();
+      //fclose(_yyout);
+      of.close();
    }
 
+   /**
+    * Convert file from simple format to clean XML
+    */
+   void Parse(const string &iname, string &buf)
+   {
+      /* Open input file */
+      yyin = fopen(iname.c_str(), "r");
 
+      if (!yyin)
+         throw (QDLIB::EIOError(errno, iname) );
 
+      yyparse();
+
+      buf = ss_yy_buf.str();
+   }
 }

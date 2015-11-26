@@ -17,6 +17,7 @@ namespace QDSXML {
    
    FileType CheckType(const string &name);
    void Convert(const string &iname, const string &oname);
+   void Parse(const string &iname, string &buf);
 }
 
 #endif

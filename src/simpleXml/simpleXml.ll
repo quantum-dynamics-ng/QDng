@@ -1,5 +1,5 @@
 %{
-#include "grammar.h"
+#include "grammar.hh"
 #include "stdio.h"
 
 /* Helper for line numbers */

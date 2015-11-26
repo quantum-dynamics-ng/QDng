@@ -11,6 +11,8 @@
 #include "tools/Exception.h"
 #include <math.h>
 
+#define SIMPLEXML_BUF_SIZE 1024
+
 map<string, string> varlist;
 
 
@@ -99,27 +101,29 @@ class varstring
 
       void print()
       {
+	 char buf[SIMPLEXML_BUF_SIZE];
          for (size_t i = 0; i < seqlist.size(); i++) {
             if (seqtype[i] == str)
-               fprintf(_yyout, fmtlist[i].c_str(), seqlist[i].c_str());
+               snprintf(buf, SIMPLEXML_BUF_SIZE, fmtlist[i].c_str(), seqlist[i].c_str());
             else {
                string& s = fmtlist[i];
                char& fmt = s[s.length() - 1];
                switch (fmt) {
                   case 'd':
-                     fprintf(_yyout, fmtlist[i].c_str(), Str2Int(varlist[seqlist[i]]));
+                     snprintf(buf, SIMPLEXML_BUF_SIZE, fmtlist[i].c_str(), Str2Int(varlist[seqlist[i]]));
                      break;
                   case 'f':
-                     fprintf(_yyout, fmtlist[i].c_str(), Str2Double(varlist[seqlist[i]]));
+                    snprintf(buf, SIMPLEXML_BUF_SIZE, fmtlist[i].c_str(), Str2Double(varlist[seqlist[i]]));
 
                      break;
                   case 's':
                   default:
-                     fprintf(_yyout, fmtlist[i].c_str(), varlist[seqlist[i]].c_str());
+                    snprintf(buf, SIMPLEXML_BUF_SIZE, fmtlist[i].c_str(), varlist[seqlist[i]].c_str());
+                    printf(fmtlist[i].c_str(), varlist[seqlist[i]].c_str());
                      break;
                }
-
             }
+            ss_yy_buf << buf;
          }
 
       }
@@ -163,7 +167,8 @@ class block
       void Indent()
       {
          for (int i=0; i < depth; i++)
-            fprintf(_yyout, "   ");
+            //fprintf(_yyout, "   ");
+           ss_yy_buf << "   ";
       }
 
       /**
@@ -232,7 +237,8 @@ class forloop: public block
       virtual void execute()
       {
          Indent();
-         fprintf(_yyout, "<!-- for %s = %g %g %g -->\n", loopvar.c_str(), begin, end, step );
+         //fprintf(_yyout, "<!-- for %s = %g %g %g -->\n", loopvar.c_str(), begin, end, step );
+         ss_yy_buf << "<!-- for " << loopvar << " = " << begin << " " << end << " " << step << " -->\n";
          double d = begin;
          for (uint i=0; i <= int(fabs((begin-end)/step)); i++){
             char s[64];
@@ -271,21 +277,28 @@ class xmlnode: public block
       virtual void execute()
       {
          Indent();
-         fprintf(_yyout, "<%s", name.c_str());
+         //fprintf(_yyout, "<%s", name.c_str());
+         ss_yy_buf << "<" << name;
          for (uint i = 0; i < attributes.size(); i++) {
-            fprintf(_yyout, " ");
+            //fprintf(_yyout, " ");
+            ss_yy_buf << " ";
             attributes[i].print();
-            fprintf(_yyout, "=\"");
+            //fprintf(_yyout, "=\"");
+            ss_yy_buf << "=\"";
             values[i].print();
-            fprintf(_yyout, "\"");
+            //fprintf(_yyout, "\"");
+            ss_yy_buf << "\"";
          }
 
          if (children.size() > 0) {
-            fprintf(_yyout, ">\n");
+            //fprintf(_yyout, ">\n");
+            ss_yy_buf << ">\n";
             block::execute();
             Indent();
-            fprintf(_yyout, "</%s>\n", name.c_str());
-         } else fprintf(_yyout, "/>\n");
+            //fprintf(_yyout, "</%s>\n", name.c_str());
+            ss_yy_buf << "</" << name << ">\n";
+         } else //fprintf(_yyout, "/>\n");
+	    ss_yy_buf << "/>\n";
       }
 };
 

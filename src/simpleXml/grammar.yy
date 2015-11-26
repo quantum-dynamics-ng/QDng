@@ -14,6 +14,9 @@ using namespace std;
 int yylex();
 int yyparse();
 
+stringstream ss_yy_buf;
+
+
 extern void rewind(int n);
 int line_num = 1;
 

@@ -95,7 +95,7 @@ void show_memory_info()
 /**
  * Check input format type & convert if needed.
  */
-void CheckInput(string &name)
+void CheckInput(const string &name, string &xml)
 {
    Logger& log = Logger::InstanceRef();
    QDSXML::FileType type;
@@ -104,13 +104,30 @@ void CheckInput(string &name)
 
    if (type == QDSXML::SIMPLE) {
       log.cout() << "SimpleXML-Input format" << endl;
-      log.cout() << "Converting to XML file... " << name + ".qdi" << endl;
+      log.cout() << "Converting to XML... " << endl;
       log.flush();
-      QDSXML::Convert(name, name + ".qdi");
-      name = name + ".qdi";
+      QDSXML::Parse(name, xml);
    }
-   if (type == QDSXML::XML)
+
+   if (type == QDSXML::XML){
       log.cout() << "XML-Input format" << endl;
+      fstream infile;
+      infile.open(name.c_str(), fstream::in);
+
+      char* buf = (char*) malloc(QDNG_INPUT_BUFFER);
+      size_t size = 0;
+
+      /* Read clean XML input */
+      while (! infile.eof() ){
+         if (size > 0) buf = (char*) realloc(buf, size + QDNG_INPUT_BUFFER);
+
+         infile.read(buf+size, QDNG_INPUT_BUFFER);
+
+         size += infile.gcount();
+      }
+      xml = buf;
+      free(buf);
+   }
 
    if (type == QDSXML::UNKNOWN) {
       throw(EIncompatible("Undefined format of input file"));
@@ -123,26 +140,10 @@ void CheckInput(string &name)
 void RunProgrammes(const string& name, const string& dir)
 {
    /* Check for input format */
-   string fname = name;
-   CheckInput(fname);
+   string buf;
+   CheckInput(name, buf);
 
-   fstream infile;
-   infile.open(fname.c_str(), fstream::in);
-
-   char* buf = (char*) malloc(QDNG_INPUT_BUFFER);
-   size_t size = 0;
-
-   /* Read clean XML input */
-   while (! infile.eof() ){
-      if (size > 0) buf = (char*) realloc(buf, size + QDNG_INPUT_BUFFER);
-
-      infile.read(buf+size, QDNG_INPUT_BUFFER);
-
-      size += infile.gcount();
-   }
-
-   CmdHandler::RunXML(buf, size,  dir);
-   free(buf);
+   CmdHandler::RunXML(buf.c_str(), buf.size(),  dir);
 }
 
 /**
