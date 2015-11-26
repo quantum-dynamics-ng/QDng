@@ -156,7 +156,7 @@ namespace QDLIB
     WaveFunction* psi_t_b = wfbuffer.Get(0)->NewInstance();
 
     log.cout() << endl;
-    log.Header("Calculate Two-point correclation function", Logger::SubSection);
+    log.Header("Calculate Two-point correlation function", Logger::SubSection);
     log.flush();
 
     for (int t1=0; t1 < master_clock_.Steps(); t1++){
