@@ -13,9 +13,10 @@ namespace QDLIB {
    {
       Suffix(BINARY_WF_SUFFIX);
 
+      ParamContainer& gp = GlobalParams::Instance();
+
 #if defined(HAVE_LIBZ)  || defined (HAVE_LIBBZ2)
       /* Compression options from global params */
-      ParamContainer& gp = GlobalParams::Instance();
       
       bool compress;
       gp.GetValue("compress", compress, FILEWF_COMPRESSION);
@@ -44,6 +45,20 @@ namespace QDLIB {
          }
       }
 #endif
+
+      /* Get output format from global params */
+      if (gp.isPresent("wf_format")) {
+	  string sfmt;
+	  gp.GetValue("wf_format", sfmt);
+
+	  if (sfmt == "binary") {
+	      FormatOut(binary);
+	  } else if (sfmt == "stream") {
+	      FormatOut(stream);
+	  } else {
+	      throw(EParamProblem("Unrecognized file wave function file format: ", sfmt));
+	  }
+      }
    }
    
    
@@ -225,11 +240,11 @@ namespace QDLIB {
          if (wfm->States() < 1)
             throw ( EParamProblem("Writing WaveFunction: Invalid number of states", wfm->States()) );
 
-         if (Format() == autodetect)   /* We have to take this decision. */
-            Format(stream);
+         if (FormatOut() == autodetect)   /* We have to take this decision. */
+            FormatOut(stream);
 
          int counter = Counter();
-         if (Format() == binary) {
+         if (FormatOut() == binary) {
             string basename = Name();
 
             for (int i=wfm->MPIrank(); i < wfm->States(); i+=wfm->MPIsize()){
@@ -249,7 +264,7 @@ namespace QDLIB {
                p.SetValue("CLASS", wfm->Name() );
                WriteMeta(p);
             }
-         } else if (Format() == stream){
+         } else if (FormatOut() == stream){
 
             WriteMeta(data, true, false); /* This is the Multistate header */
 

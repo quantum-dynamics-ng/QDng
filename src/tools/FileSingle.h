@@ -197,6 +197,7 @@ namespace QDLIB
          FileSingleHeaderPm MetaData;
 
          StorageType _type;
+         StorageType _type_out;
 
          string _name;
          string _suffix;
@@ -327,6 +328,10 @@ namespace QDLIB
          void Format(const StorageType type);
          StorageType Format() const { return _type; }
 
+         void FormatOut(const StorageType type);
+         StorageType FormatOut() const { return _type_out; }
+
+
          void DetectFormat();
 
          void Name(const string &name);
@@ -403,7 +408,7 @@ namespace QDLIB
     */
    template<class C>
    FileSingle<C>::FileSingle() :
-     _type(autodetect), _sequence(false), _sequence_init(false),
+     _type(autodetect), _type_out(autodetect), _sequence(false), _sequence_init(false),
      _counter(0), _increment(1), _sin(NULL), _our_in_stream(false), _intro_read(false),
      _sout(NULL), _our_out_stream(false), _intro_written(false),
      _buffer(NULL), _buffer_size(0),
@@ -426,6 +431,17 @@ namespace QDLIB
    void FileSingle<C>::Format(const StorageType type)
    {
       _type = type;
+   }
+
+   /**
+    * Set disk storage format.
+    *
+    * \param type Disk storage format
+    */
+   template<class C>
+   void FileSingle<C>::FormatOut(const StorageType type)
+   {
+      _type_out = type;
    }
 
    /**
@@ -1445,9 +1461,9 @@ namespace QDLIB
    template<class C>
    void FileSingle<C>::WriteMeta(C* data, bool more_files_follow, bool ingore_data)
    {
-      if (autodetect) _type = stream;
+      if (_type_out == autodetect) _type_out = stream;
 
-      switch (_type){
+      switch (_type_out){
          case stream:
          {
             WriteIntroToStream();
@@ -1477,7 +1493,7 @@ namespace QDLIB
    template<class C>
    void FileSingle<C>::WriteData(C* data)
    {
-         switch (_type){
+         switch (_type_out){
             case stream:
                {
                   // Data is written in WriteMeta(),
@@ -1489,6 +1505,7 @@ namespace QDLIB
                }
                break;
             case binary:
+		WriteDataToRaw(data);
                break;
             default:
                throw (EIOError("Failed to write data file (format not determined)."));
@@ -1511,7 +1528,7 @@ namespace QDLIB
       if (data->strides() > 1)
          throw(EIncompatible("Strided data handling not implemented"));
 
-      switch (_type) {
+      switch (_type_out) {
          case binary:
             if (data->strides() == 1)
                WriteSingleFileToRaw(data);

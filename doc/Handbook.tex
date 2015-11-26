@@ -27,7 +27,7 @@
 
 \chapter{Input Format}
 \section{Input files}
-The native QDng input format is XML but there is simplified version which allows
+The native QDng input format is XML but there is a simplified version which allows
 for easier typing:
 \begin{verbatim}
  qndg { attr1=value1 attr2="More_Complex/Value"
@@ -36,7 +36,7 @@ for easier typing:
    }
 }
 \end{verbatim}
-is equivalent to 
+which is equivalent to 
 \begin{verbatim}
 <qdng attr1="value1" attr2="More_Complex/Value"
    <prog1>
@@ -44,8 +44,8 @@ is equivalent to
    </prog1>
 </qdng>
 \end{verbatim}
-Values containing only letters, numbers, and the characters \verb|.-_:| need not to
-be quoted.
+Values containing only letters, numbers, and the characters \verb|.-_:,| need not to
+be quoted in the simplified format.
 
 \section{Operator References}
 To save memory and initialization time it is possible to define access keys to operators
@@ -134,8 +134,15 @@ for $delay = 1 5 {
 \chapter{Data Format}
 
 \section{Raw Data with Additional Meta-Data}
+raw data file + .meta file in text format.
+\subsection{Wave functions}
+
+\subsection{Operators}
+
 \section{Protobuf format}
-Not implemented yet.
+Single file containing data and meta data.
+MATLAB interface for creation and reading provided.
+
 
 \chapter{Main Programms}
 
@@ -163,8 +170,9 @@ Global options can be given in several locations:
  \option{tmpdir}{Path for on-disk buffer files.}
 \end{options}
 
-\subsubsection{Compression}
+\subsubsection{Wave Function File Format}
 \begin{options}
+ \option{wf\_format}{Wave function output format: binary of stream  [stream]}
  \option{compress}{Turn on/off wave function compression [false].}
  \option{comptol}{Tolerance value for seting values to zero.}
  \option{complevel}{Compression level like defined in zlib/bzip2 (1=fast, 9=best but slow).}
@@ -202,7 +210,7 @@ Wave function propagation.
 \end{options}
 
 A \verb|propagator| and \verb|wf| section is needed to define the problem. Optional the initial condition can
-be modified with in the \verb|filterinit| section. For analyzing or midifieng the results before and after each time step
+be modified with in the \verb|filterinit| section. For analyzing or modifying the results before and after each time step
 the \verb|filterpre| and \verb|filterpost| sections can be used. For details see sec. \ref{sec:Filters}.
 
 \subsubsection*{Examples}
@@ -384,6 +392,9 @@ Every filter can also take some options:
 \option{int}{Accumulate values [false].}
 \end{options}
 
+
+\section{Correlation functions}
+Calculate multi-moint correlation functions
 
 \section{Optimal Control Theory}
 The OCT programm supports Multi Target OCT with various methods:
