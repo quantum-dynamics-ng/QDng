@@ -188,6 +188,7 @@ namespace QDLIB
 	      break;
 	}
 
+	master_clock_.TimeStep(t1*wcycle_);
 	for (int t2=t1; t2 < Nt; t2++){
 	  WaveFunction* bra = wfbuffer.Get(t2);
 	  *psi_t_b = bra;
@@ -203,6 +204,7 @@ namespace QDLIB
 
 	  for (int i=0; i < wcycle_; i++) /* propgate wcycle steps forward */
 	    U_->Apply(psi_t_k);
+	    ++master_clock_;
 	}
     }
 
@@ -317,7 +319,7 @@ namespace QDLIB
 
     /* Run initial time series, if not already present */
     if (wfbuffer.Size() == 1){
-	log.cout() << "Run initial propagation\n";
+	log.cout() << "\nRun initial propagation U(t1,0)|psi>\n"; log.flush();
 	WaveFunction* psi_t = Psi->NewInstance();
 
 	if (ket_[0] != NULL) {
@@ -331,8 +333,10 @@ namespace QDLIB
 	}
 
 	/* fill wfbuffer with time series */
+	master_clock_.Begin();
 	for (int i=1; i < master_clock_.Steps(); i++){
 	    U_->Apply(psi_t);
+	    ++master_clock_;
 	    if (i % wcycle_ == 0) wfbuffer.Add(psi_t);
 	}
 
