@@ -297,9 +297,16 @@ namespace QDLIB
 
     /* Get defintion for bra */
     bra_first_op_ = ReadKetBra("bra", bra_);
+    for (int i=0; i < bra_.size(); i++) {
+	if (bra_[i] != NULL) bra_[i]->Init(Psi);
+    }
+
 
     /* Get defintion for ket */
     ket_first_op_ = ReadKetBra("ket", ket_);
+    for (int i=0; i < ket_.size(); i++) {
+	if (ket_[i] != NULL) ket_[i]->Init(Psi);
+    }
 
     if (bra_.size() == 0){ /* no bra means: <psi|U+ */
 	num_u_ = num_u_+1;
