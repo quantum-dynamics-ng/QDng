@@ -156,7 +156,7 @@ namespace QDLIB
     CreateMetaData(1, cfun.Params());
 
     file.Format(FileSingle<Cfunc>::binary);
-    file.Name("Cfun_1");
+    file.Name(dir_ + "Cfun_1");
     file.Suffix(".cf");
     file.WriteSingleFileToRaw(&cfun);
   }
@@ -217,7 +217,7 @@ namespace QDLIB
     CreateMetaData(2, cfun.Params());
 
     file.Format(FileSingle<Cfunc>::binary);
-    file.Name("Cfun_2");
+    file.Name("dir_ + Cfun_2");
     file.Suffix(".cf");
     file.WriteSingleFileToRaw(&cfun);
   }
@@ -260,6 +260,7 @@ namespace QDLIB
       Psi = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
 
+      wfbuffer.Init(Psi);
       wfbuffer.Add(Psi);
     } else { /* Get propgation from file */
 	/* Get parameters for propagation */
