@@ -258,7 +258,6 @@ namespace QDLIB
       Psi = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
 
-      wfbuffer.Init(Psi);
       wfbuffer.Add(Psi);
     } else { /* Get propgation from file */
 	/* Get parameters for propagation */
