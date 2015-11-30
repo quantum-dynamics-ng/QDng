@@ -215,7 +215,7 @@ namespace QDLIB
     CreateMetaData(2, cfun.Params());
 
     file.Format(FileSingle<Cfunc>::binary);
-    file.Name("dir_ + Cfun_2");
+    file.Name(dir_ + "Cfun_2");
     file.Suffix(".cf");
     file.WriteSingleFileToRaw(&cfun);
   }
