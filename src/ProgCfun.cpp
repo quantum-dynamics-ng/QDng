@@ -179,8 +179,7 @@ namespace QDLIB
     log.flush();
 
     for (int t1=0; t1 < Nt; t1++){
-	WaveFunction* ket = wfbuffer.Get(t1);
-	*psi_t_k = ket;
+	*psi_t_k = wfbuffer.Get(t1);
 	for (int i=ket_first_op_; i < ket_.size(); i++){
 	    if (ket_[i] != NULL){
 		ket_[i]->Apply(psi_t_k);
@@ -190,8 +189,7 @@ namespace QDLIB
 
 	master_clock_.TimeStep(t1*wcycle_);
 	for (int t2=t1; t2 < Nt; t2++){
-	  WaveFunction* bra = wfbuffer.Get(t2);
-	  *psi_t_b = bra;
+	  *psi_t_b = wfbuffer.Get(t2);
 	  for (int i=ket_first_op_; i < ket_.size(); i++){
 	      if (ket_[i] != NULL){
 		  ket_[i]->Apply(psi_t_b);
@@ -327,7 +325,12 @@ namespace QDLIB
 	    /* apply operator list before propagating */
 	    *psi_t = Psi;
 	    for (size_t i=0; i < ket_.size(); i++) {
+		if (ket_[i] == NULL) {
+		    ket_first_op_++;
+		    break;
+		}
 		ket_[i]->Apply(psi_t);
+		ket_first_op_++;
 	    }
 	} else {
 	  *psi_t = Psi;
