@@ -71,6 +71,15 @@ namespace QDLIB
 	 O = sum;
       } else if (name == "Multistate" || name == "DMultistate") { /* Matrix of operators */
 	 log.cout() << "Multistate operator:\n";
+
+	 bool unity; pm.GetValue("unity", unity);
+	 if (unity) log.cout() << "default diagonal : 1\n";
+	 else log.cout() << "default diagonal : 0\n";
+
+	 bool nonhermitian; pm.GetValue("nonhermitian", nonhermitian);
+	 if (nonhermitian) log.cout() << "default offdiagonal : 0\n";
+	 else log.cout() << "default offdiagonal : Hij = Hji+ \n";
+
 	 log.IndentInc();
 	 child = Onode->NextChild();
 	 child->AdjustElementNode();
@@ -252,20 +261,6 @@ namespace QDLIB
       while (WFNode->EndNode()){
          double coeff=0;
 
-         pm_child = WFNode->Attributes();
-         if (pm_child.isPresent("coeff")){
-            pm_child.GetValue("coeff", coeff);
-
-         } else if (pm_child.isPresent("coeff2")){
-            pm_child.GetValue("coeff2", coeff);
-            coeff = sqrt(coeff);
-         }
-         if(coeff != 0){
-            log.cout().precision(8);
-            log.cout() << fixed << "Coefficient = " << coeff << endl;
-            log.cout() << fixed << "Coefficient^2 = " << coeff*coeff << endl;
-         }
-
          wfadd = LoadWaveFunctionChain( WFNode, seqnum );
 
          if(coeff != 0)
@@ -397,21 +392,38 @@ namespace QDLIB
             log.coutdbg() << "Norm : " << WF->Norm() <<endl;
          }
          
-         if (pm.isPresent("phase")){
-            double phase;
-            pm.GetValue("phase", phase);
-            log.cout() << "Apply phase factor: " << phase << " pi\n";
-            *WF *= cexpI(phase * M_PI);
-         }
-	 
 	 if ( name.length() == 1 ) log.cout() << WF->Params() << endl;
 	 log.cout() << pm << "------------------\n" << endl;
-      }
+      }  /* end - load a specific wf */
 
       pm.GetValue( "normalize", onoff);
       if ( onoff) {
          log.cout() << "Normalizing...\n";
          WF->Normalize();
+      }
+
+      if (pm.isPresent("phase")){
+         double phase;
+         pm.GetValue("phase", phase);
+         log.cout() << "Apply phase factor: " << phase << " pi\n";
+         *WF *= cexpI(phase * M_PI);
+      }
+
+      double coeff=0;
+
+      if (pm.isPresent("coeff")){
+         pm.GetValue("coeff", coeff);
+
+      } else if (pm.isPresent("coeff2")){
+         pm.GetValue("coeff2", coeff);
+         coeff = sqrt(coeff);
+      }
+
+      if(coeff != 0){
+         log.cout().precision(8);
+         log.cout() << fixed << "Coefficient = " << coeff << endl;
+         log.cout() << fixed << "Coefficient^2 = " << coeff*coeff << endl;
+         MultElements((cVec*) WF, coeff);
       }
 
       /* Add to global container */

@@ -1025,9 +1025,11 @@ multiple electronic states.
 
 The following options apply to all modules.
 \begin{options}
- \option{name}{Name of the wave function module. Needs not to be given if the \code{CLASS} option in the meta data is present.}
+ \option{name}{Name of the wave function module. Needs not to be given if the \code{CLASS} option in the meta data is present or the pbuf file format is used.}
  \option{normalize}{Normalizes the the subsections [false].}
  \option{phase}{Applies a phase factor $e^{i\phi}$ to the subsection (in units of $\pi$).}
+ \option{coeff}{The coefficient $c_n$ [1.0]}
+ \option{coeff2}{The squared coefficient $c^2_n$ [1.0]}
 \end{options}
 
 \section{Wave function from file}
@@ -1037,13 +1039,8 @@ The only mandatory option here is \verb|file| which gives the base name of the w
 \section{Linear combination}
 The name of the module is \verb|LC|.
 \begin{equation}
- \Psi = \sum_n c_n \phi_n
+ \Psi = \sum_n \phi_n
 \end{equation}
-
-\begin{options}
- \option{coeff}{The coefficient $c_n$ [1.0]}
- \option{coeff2}{The squared coefficient $c^2_n$ [1.0]}
-\end{options}
 
 \subsubsection*{Example}
 \begin{verbatim}
