@@ -729,6 +729,14 @@ The other options are defined in the meta data.
  \option{max<dim>}{$x_{max}$ in dim.}
 \end{options}
 
+The following modifier options are recognized in the input file:
+\begin{options}
+ \option{setzero}{Set the minimum to zero. [false]}
+ \option{offset}{Define a constatnt offset value which is added to the potential. [0]}
+ \option{scale}{Scale factor which is multiplied to potential[1]}
+\end{options}
+The operations are carried out in the order given above.
+
 \subsubsection*{Example}
 \begin{verbatim}
 <Vpot name="GridPotential" file="pot"/>

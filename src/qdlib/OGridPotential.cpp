@@ -38,6 +38,15 @@ namespace QDLIB
 	 
 	 bool set_zero;
 	 _params.GetValue("setzero", set_zero);
+
+	 double offset = 0;
+	 _params.GetValue("offset", offset);
+
+	 double scale = 1.;
+	 if (_params.isPresent("scale"))
+	   _params.GetValue("scale", scale);
+
+
 	 *( (FileOGrid*) File()) >> (OGridSystem*) this; /* Read potential */
 	 
 	 /* Put grid minimum to zero */
@@ -48,6 +57,21 @@ namespace QDLIB
 	    }
 	 }
 	 
+	 /* Apply offset */
+	 if (offset != 0) {
+	   for (lint i=0; i < size(); i++){
+	      (*this)[i] += offset;
+	   }
+	 }
+
+	 /* Apply scale factor */
+	 if (scale != 1) {
+	   for (lint i=0; i < size(); i++){
+	      (*this)[i] *= scale;
+	   }
+	 }
+
+
 	 _init = false;
 	 return;
       }
