@@ -81,6 +81,19 @@ namespace QDLIB
     if ( attr.isPresent("wcycle") ) {
 	attr.GetValue("wcycle", wcycle_);
     }
+
+    log.Header("Correlation function parameters", Logger::Section);
+
+    log.IndentInc();
+    log.cout() << "Number of steps: " <<  master_clock_.Steps() << endl;
+    log.cout().precision(2);
+    log.cout() << "Time step: " << fixed << master_clock_.Dt() << endl;
+    log.cout() << "Write cycles: " << wcycle_ << endl;
+    log.cout() << "Overall time: " << fixed << master_clock_.Steps() * master_clock_.Dt() << endl;
+    log.cout() << "Directory for output: " << dir_ << endl;
+    log.flush();
+
+    log.IndentDec();
   }
 
   int ProgCfun::ReadKetBra(const string& name, vector<Operator*>& kb )
