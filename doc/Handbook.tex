@@ -378,18 +378,22 @@ qdng {
 Filter lists are evaluated from top to bottom.
 
 \subsubsection*{Sections}
+Modes of operation:
 \begin{options}
 \option{expec}{Apply operator and show expectation value.}
 \option{apply}{Just apply the operator.}
 \option{expeconly}{Only show the expectation value. Don't modify the wave function.}
 \option{normalize}{Normalize the wave function. No further options needed.}
+\option{rho}{Extract electronic populations and coherences. Wave function needs to be of Multistate.}
 \end{options}
 
 Every filter can also take some options:
 \begin{options}
 \option{header}{Text to appear in coloumn header [operator name].}
-\option{value}{Represenation of the expectation value to plot (real$|$imag$|$complex) .}
+\option{value}{Represenation of the expectation value to plot (real$|$imag$|$complex$|$abs) [real] .}
 \option{int}{Accumulate values [false].}
+\option{ms}{Specifiy which el. state to act on. Mandatory if \code{rho} is selected as a 
+mode of operation. Takes exactly two values which specify the bra and the ket state (\code{ms=i,j}).}
 \end{options}
 
 
