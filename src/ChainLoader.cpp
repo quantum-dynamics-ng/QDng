@@ -207,7 +207,7 @@ namespace QDLIB
          pm.GetArray("statemap", statemap);
       }
 
-      if (statemap.size() > wfin->States())
+      if (statemap.size() > uint(wfin->States()))
 	throw(EParamProblem("More states in statemap than input states available"));
 
 
@@ -221,7 +221,6 @@ namespace QDLIB
       if (statemap.size() > 1) {
 	WFMultistate *wfout = new WFMultistate();
 	for (size_t i=0; i < statemap.size(); i++){
-	   double cf = 1;
 	   if (statemap[i] >= wfin->States() || statemap[i] < 0)
 	      throw (EParamProblem("Multimap: state index is invalid"));
 
@@ -253,7 +252,6 @@ namespace QDLIB
    
    WaveFunction* ChainLoader::LoadWFLC_( XmlNode *WFNode, ParamContainer& pm,  int seqnum)
    {
-      Logger& log = Logger::InstanceRef();
       WaveFunction *wfadd;
       WaveFunction *WF = NULL;
       ParamContainer pm_child;

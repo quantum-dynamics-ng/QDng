@@ -151,7 +151,7 @@ namespace QDLIB
     for (int t=0; t < master_clock_.Steps()/wcycle_; t++){
 	WaveFunction* ket = wfbuffer.Get(t);
 	*psi_t = ket;
-	for (int i=ket_first_op_; i < ket_.size(); i++){
+	for (uint i=ket_first_op_; i < ket_.size(); i++){
 	    if (ket_[i] != NULL){
 		ket_[i]->Apply(psi_t);
 	    } else
@@ -193,7 +193,7 @@ namespace QDLIB
 
     for (int t1=0; t1 < Nt; t1++){
 	*psi_t_k = wfbuffer.Get(t1);
-	for (int i=ket_first_op_; i < ket_.size(); i++){
+	for (uint i=ket_first_op_; i < ket_.size(); i++){
 	    if (ket_[i] != NULL){
 		ket_[i]->Apply(psi_t_k);
 	    } else
@@ -203,7 +203,7 @@ namespace QDLIB
 	master_clock_.TimeStep(t1*wcycle_);
 	for (int t2=t1; t2 < Nt; t2++){
 	  *psi_t_b = wfbuffer.Get(t2);
-	  for (int i=ket_first_op_; i < ket_.size(); i++){
+	  for (uint i=ket_first_op_; i < ket_.size(); i++){
 	      if (ket_[i] != NULL){
 		  ket_[i]->Apply(psi_t_b);
 	      } else
@@ -292,7 +292,7 @@ namespace QDLIB
 	/* Read propagation */
 	wfbuffer.ReadFromFiles(read_dir_);
 
-	if (wfbuffer.Size() < Nt/wcycle ) master_clock_.Steps(wfbuffer.Size());
+	if (wfbuffer.Size() < uint(Nt/wcycle) ) master_clock_.Steps(wfbuffer.Size());
 	if (wfbuffer.Size() < 1 )
 	  throw (EParamProblem("Wave function buffer is empty"));
 
@@ -310,14 +310,14 @@ namespace QDLIB
 
     /* Get defintion for bra */
     bra_first_op_ = ReadKetBra("bra", bra_);
-    for (int i=0; i < bra_.size(); i++) {
+    for (uint i=0; i < bra_.size(); i++) {
 	if (bra_[i] != NULL) bra_[i]->Init(Psi);
     }
 
 
     /* Get defintion for ket */
     ket_first_op_ = ReadKetBra("ket", ket_);
-    for (int i=0; i < ket_.size(); i++) {
+    for (uint i=0; i < ket_.size(); i++) {
 	if (ket_[i] != NULL) ket_[i]->Init(Psi);
     }
 
