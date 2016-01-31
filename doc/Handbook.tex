@@ -839,7 +839,18 @@ filterpost {
 }
 \end{verbatim}
 
-\subsection{Momentum Operator}
+\subsection{Nabla Operator (GridNabla)}
+Nabla operator:
+\begin{equation}
+ \nabla  \equiv \sum_n \frac{\partial}{\partial x_n}
+\end{equation}
+
+\begin{options}
+ \option{dim}{If the operator acts only on the given dimension. Default is to sum up over all.}
+ \option{factor}{Prefactor [1]}
+\end{options}
+
+\subsection{Momentum Operator (GridMomentum)}
 Momentum operator:
 \begin{equation}
  \hat p = \sum_n -i \frac{\partial}{\partial x_n}
@@ -847,6 +858,7 @@ Momentum operator:
 
 \begin{options}
  \option{dim}{If the operator acts only on the given dimension. Default is to sum up over all.}
+  \option{factor}{Prefactor [1]}
 \end{options}
 
 \subsection{Position Operator}
@@ -856,6 +868,7 @@ Momentum operator:
 
 \begin{options}
  \option{dim}{If the operator acts only on the given dimension. Default is to sum up over all.}
+  \option{scale}{Prefactor [1]}
 \end{options}
 
 \subsubsection*{Example}

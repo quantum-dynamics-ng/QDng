@@ -6,11 +6,11 @@ namespace QDLIB {
    QDNG_OPERATOR_NEW_INSTANCE_FUNCTION(OGridPosition)
    
    OGridPosition::OGridPosition()
-   : OGridSystem(), _name("OGridPosition"), _dim(-1)
+   : OGridSystem(), _name("OGridPosition"), _dim(-1), _scale(1.0)
    {
    }
    
-   OGridPosition::OGridPosition(int dim) : _name("OGridPosition"), _dim(dim) {}
+   OGridPosition::OGridPosition(int dim) : _name("OGridPosition"), _dim(dim), _scale(1.0) {}
    
    OGridPosition::~OGridPosition()
    {
@@ -26,6 +26,10 @@ namespace QDLIB {
          if (_dim < 0)
             throw ( EParamProblem("Invalid dimension chosen for position operator: ", _dim)  );
       }
+
+      if (_params.isPresent("scale")){
+         _params.GetValue("scale", _scale);
+      }
    }
 
    /** Init a single dimension */
@@ -37,7 +41,7 @@ namespace QDLIB {
       
       /* setup x */
       for (int n=0; n < GridSystem::DimSize(dim); n++){
-         xspace1[n] = GridSystem::Xmin(dim) + GridSystem::Dx(dim) * n;
+         xspace1[n] =( GridSystem::Xmin(dim) + GridSystem::Dx(dim) * n) * _scale;
       }
          
       view.ActiveDim(dim);

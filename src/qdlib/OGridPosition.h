@@ -18,6 +18,7 @@ namespace QDLIB {
       private:
          string _name;
          int _dim;         /* The dimension to operate on */
+         double _scale;	   /* pre-factor */
          void _InitDim(dVecView &view, const int dim);
       public:
          OGridPosition();
