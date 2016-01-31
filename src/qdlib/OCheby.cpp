@@ -375,18 +375,41 @@ namespace QDLIB
       ket2->Retire();
       buf->Retire();
 
+      dcomplex Emax(H->Emax());
+      dcomplex Emin(H->Emin());
+      double v;
+
+      /* Manual overide for Emax/Emin values */
+      if (_params.isPresent("Emax")){
+         _params.GetValue("Emax", v);
+         Emax.real(v);
+      }
+      if (_params.isPresent("Emax_im")){
+         _params.GetValue("Emax_im", v);
+         Emax.imag(v);
+      }
+      if (_params.isPresent("Emin")){
+         _params.GetValue("Emin", v);
+         Emin.real(v);
+      }
+      if (_params.isPresent("Emin_im")){
+         _params.GetValue("Emin_im", v);
+         Emin.imag(v);
+      }
+
+
       /* Energy range & offset */
       if (!imaginary_time){
-         _offset._real = (H->Emax() + H->Emin()).real() / 2; /* [-i:i] */
-         _offset._imag = (H->Emax() + H->Emin()).imag(); /* [-1:0] */
+         _offset._real = (Emax + Emin).real() / 2; /* [-i:i] */
+         _offset._imag = (Emax + Emin).imag(); /* [-1:0] */
       } else {
-         _offset = H->Emin() - cabs(H->Emin())*0.05; /* */
+         _offset = Emin - cabs(Emin)*0.05; /* */
       }
 
       if (_offset.imag() != 0 || fabs(OPropagator::Exponent().imag()) == 0)
-         _scaling = cabs(H->Emax() - H->Emin())*1.05;
+         _scaling = cabs(Emax - Emin)*1.05;
       else
-         _scaling = cabs(H->Emax() - H->Emin()) / 2;
+         _scaling = cabs(Emax - Emin) / 2;
 
       /* This is an estimate for the recursion depth */
       if (_order <= 0)
