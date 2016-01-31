@@ -74,7 +74,7 @@ namespace QDLIB
          double lnorm(0);
          dcomplex* wf = Psi->begin(s);
 #ifdef _OPENMP
-#pragma omp parallel for private(lnorm)
+#pragma omp parallel for reduction(+:lnorm)
 #endif
          for (int j = 0; j < size; j++) {
             lnorm += (conj(wf[j]) * wf[j]).real();
@@ -114,26 +114,26 @@ namespace QDLIB
 
 
       for (int i = 2; i < _order; i++) {
-         dcomplex accnorm(0);
+	 double accnorm(0);
          dcomplex coeff = _coeff[i] * cexp(OPropagator::Exponent() * _offset);
          H->Apply(buf, ket1);
-         int s, j;
+         int s;
          int rank = Psi->MPIrank();
          int msize = Psi->MPIsize();
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(s,j,k0,k1,k2,bf,psi)
+#pragma omp parallel for schedule(static) default(shared) private(s,k0,k1,k2,bf,psi) reduction(+:accnorm)
 #endif
          for (s = rank; s < strides; s += msize) {
-            k2 = ket2->begin(s);
+            int j=0;
             bf = buf->begin(s);
             k0 = ket0->begin(s);
             k1 = ket1->begin(s);
+            k2 = ket2->begin(s);
             psi = Psi->begin(s);
 #ifdef HAVE_SSE2
             m128dc vk2, vbf, vk0, vk1, vpsi, v_o(_offset), v_exp2(exp2), v_coeff(coeff);
-            m128dc vnorm(accnorm);
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(j,vk2, vbf, vk0, vk1, vpsi)
+#pragma omp parallel for schedule(static) default(shared) private(j, vk0, vk1, vk2, vbf, vpsi) reduction(+:accnorm)
 #endif
             for(j=0; j< size; j++) {
                vbf = bf[j];
@@ -142,12 +142,12 @@ namespace QDLIB
                vpsi = psi[j];
 
                vbf = vbf - vk1 * v_o;
-               vbf *= (1/_scaling);
+               vbf *= (1./_scaling);
                vbf *= v_exp2;
                vk2 = vk0 + vbf;
                vk0 = vk2;
                vpsi += vk2 * v_coeff;
-               vnorm += vpsi.conj() * vpsi;
+               accnorm = accnorm + dcomplex(vpsi.conj() * vpsi).real();
 
                vbf.Store(bf[j]);
                vk0.Store(k0[j]);
@@ -155,11 +155,10 @@ namespace QDLIB
                vk2.Store(k2[j]);
                vpsi.Store(psi[j]);
             }
-            vnorm.Store(accnorm);
          }
 #else
-#ifdef _OPENMP    
-#pragma omp parallel for schedule(static) default(shared) private(j)
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static) default(shared) private(j) reduction(+:accnorm)
 #endif
             for (j = 0; j < size; j++) {
                bf[j] = (bf[j] - _offset * k1[j]) / _scaling; /* Offset + Scaling */
@@ -167,21 +166,22 @@ namespace QDLIB
                k2[j] = bf[j] + k0[j];
                k0[j] = k2[j];
                psi[j] += k2[j] * coeff;
-               accnorm += conj(psi[j]) * psi[j];
+               accnorm = accnorm + (conj(psi[j]) * psi[j]).real();
             }
-
          }
 #endif
 
          /* Check for convergence */
-         double nconv = abs(norm - accnorm.real()) / norm;
+         double nconv = abs(norm - accnorm) / norm;
 
          if (nconv  < _prec && _offset.imag() == 0)
             break;
 
-         /* Convergence only make sense for norm preserving propagations*/
-         if (i == _order -1 && nconv  > _prec && _offset.imag() == 0)
+         /* Convergence only make sense for norm preserving propagations */
+         if (i == _order -1 && nconv  > _prec && H->Hermitian()){
             cout << "Warning: Chebychev series not converged: " << scientific << nconv << " > " << _prec  << endl;
+            cout << Psi->Norm() << " " << norm << " " << accnorm << endl;
+         }
 
 
          swap = ket1;
@@ -221,14 +221,14 @@ namespace QDLIB
 
 
       for (int i = 2; i < _order; i++) {
-         dcomplex accnorm(0);
+         double accnorm(0);
          dcomplex coeff = _coeff[i] * cexp(OPropagator::Exponent() * _offset);
          H->Apply(buf, ket1);
          int s, j;
          int rank = Psi->MPIrank();
          int msize = Psi->MPIsize();
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(s,j,k0,k1,k2,bf,psi)
+#pragma omp parallel for schedule(static) default(shared) private(s,j,k0,k1,k2,bf,psi) reduction(+:accnorm)
 #endif
          for (s = rank; s < strides; s += msize) {
             k2 = ket2->begin(s);
@@ -238,9 +238,8 @@ namespace QDLIB
             psi = Psi->begin(s);
 #ifdef HAVE_SSE2
             m128dc vk2, vbf, vk0, vk1, vpsi, v_o(_offset), v_exp2(exp2), v_coeff(coeff);
-            m128dc vnorm(accnorm);
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(j,vk2, vbf, vk0, vk1, vpsi)
+#pragma omp parallel for schedule(static) default(shared) private(j,vk2, vbf, vk0, vk1, vpsi) reduction(+:accnorm)
 #endif
             for(j=0; j< size; j++) {
                vbf = bf[j];
@@ -254,7 +253,7 @@ namespace QDLIB
                vk2 = vbf - vk0;
                vk0 = vk2;
                vpsi += vk2 * v_coeff;
-               vnorm += vpsi.conj() * vpsi;
+               accnorm = accnorm + dcomplex(vpsi.conj() * vpsi).real();
 
                vbf.Store(bf[j]);
                vk0.Store(k0[j]);
@@ -262,11 +261,10 @@ namespace QDLIB
                vk2.Store(k2[j]);
                vpsi.Store(psi[j]);
             }
-            vnorm.Store(accnorm);
          }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for schedule(static) default(shared) private(j)
+#pragma omp parallel for schedule(static) default(shared) private(j) reduction(+:accnorm)
 #endif
             for (j = 0; j < size; j++) {
                bf[j] = (bf[j] - _offset * k1[j]) / _scaling; /* Offset + Scaling */
@@ -274,17 +272,17 @@ namespace QDLIB
                k2[j] = bf[j] - k0[j]; // Here must be a minus for the imag_time polynomials
                k0[j] = k2[j];
                psi[j] += k2[j] * coeff;
-               accnorm += conj(psi[j]) * psi[j];
+               accnorm = accnorm + (conj(psi[j]) * psi[j]).real();
             }
 
          }
 #endif
 
          /* Check for convergence */
-         if (abs(accnorm.real()-norm_last)/norm_last < _prec)
+         if (abs(accnorm - norm_last)/norm_last < _prec)
             break;
 
-         norm_last = accnorm.real();
+         norm_last = accnorm;
 
          swap = ket1;
          ket1 = ket0;
@@ -377,18 +375,41 @@ namespace QDLIB
       ket2->Retire();
       buf->Retire();
 
+      dcomplex Emax(H->Emax());
+      dcomplex Emin(H->Emin());
+      double v;
+
+      /* Manual overide for Emax/Emin values */
+      if (_params.isPresent("Emax")){
+         _params.GetValue("Emax", v);
+         Emax.real(v);
+      }
+      if (_params.isPresent("Emax_im")){
+         _params.GetValue("Emax_im", v);
+         Emax.imag(v);
+      }
+      if (_params.isPresent("Emin")){
+         _params.GetValue("Emin", v);
+         Emin.real(v);
+      }
+      if (_params.isPresent("Emin_im")){
+         _params.GetValue("Emin_im", v);
+         Emin.imag(v);
+      }
+
+
       /* Energy range & offset */
       if (!imaginary_time){
-         _offset._real = (H->Emax() + H->Emin()).real() / 2; /* [-i:i] */
-         _offset._imag = (H->Emax() + H->Emin()).imag(); /* [-1:0] */
+         _offset._real = (Emax + Emin).real() / 2; /* [-i:i] */
+         _offset._imag = (Emax + Emin).imag(); /* [-1:0] */
       } else {
-         _offset = H->Emin() - cabs(H->Emin())*0.05; /* */
+         _offset = Emin - cabs(Emin)*0.05; /* */
       }
 
       if (_offset.imag() != 0 || fabs(OPropagator::Exponent().imag()) == 0)
-         _scaling = cabs(H->Emax() - H->Emin())*1.05;
+         _scaling = cabs(Emax - Emin)*1.05;
       else
-         _scaling = cabs(H->Emax() - H->Emin()) / 2;
+         _scaling = cabs(Emax - Emin) / 2;
 
       /* This is an estimate for the recursion depth */
       if (_order <= 0)

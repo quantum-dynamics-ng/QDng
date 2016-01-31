@@ -18,7 +18,7 @@ namespace QDLIB
 
   ProgCfun::ProgCfun (XmlNode& CfunNode) :
       CfunNode_(CfunNode), ContentNodes_(NULL), dir_(""), fname_(QD_CFUN_FNAME),
-      stepsint_(0), U_(NULL), H_(NULL), ket_first_op_(0), bra_first_op_(0), num_u_(0)
+      stepsint_(0), U_(NULL), H_(NULL), ket_first_op_(0), bra_first_op_(0), num_u_(0), wcycle_(1)
   {
   }
 
@@ -51,6 +51,10 @@ namespace QDLIB
 	attr.GetValue("read", read_dir_);
     }
 
+    if ( attr.isPresent("write") ) { /* dump base line propgation to directory */
+	attr.GetValue("write", write_dir_);
+    }
+
     double dt;
     int steps;
     string s;
@@ -73,6 +77,23 @@ namespace QDLIB
 
     master_clock_.Dt(dt);
     master_clock_.Steps(steps);
+
+    if ( attr.isPresent("wcycle") ) {
+	attr.GetValue("wcycle", wcycle_);
+    }
+
+    log.Header("Correlation function parameters", Logger::Section);
+
+    log.IndentInc();
+    log.cout() << "Number of steps: " <<  master_clock_.Steps() << endl;
+    log.cout().precision(2);
+    log.cout() << "Time step: " << fixed << master_clock_.Dt() << endl;
+    log.cout() << "Write cycles: " << wcycle_ << endl;
+    log.cout() << "Overall time: " << fixed << master_clock_.Steps() * master_clock_.Dt() << endl;
+    log.cout() << "Directory for output: " << dir_ << endl;
+    log.flush();
+
+    log.IndentDec();
   }
 
   int ProgCfun::ReadKetBra(const string& name, vector<Operator*>& kb )
@@ -107,20 +128,30 @@ namespace QDLIB
     return first_op;
   }
 
+  void ProgCfun::CreateMetaData(int dims, ParamContainer &pm)
+  {
+    pm.SetValue("CLASS", "Cfun");
+    pm.SetValue("Nt", master_clock_.Steps()/wcycle_);
+    pm.SetValue("dt", master_clock_.Dt() * wcycle_);
+    pm.SetValue("dim", dims);
+  }
+
+  /** Calculate single-point correlation function. */
   void ProgCfun::RunC1 ()
   {
     Logger& log = Logger::InstanceRef();
 
-    Cfunc cfun(master_clock_.Steps()); /* Correlation function */
+    Cfunc cfun(master_clock_.Steps()/wcycle_); /* Correlation function */
+    cfun.cVec::operator=(dcomplex(0)); /* set zero */
     WaveFunction* psi_t = wfbuffer.Get(0)->NewInstance();
 
     log.Header("Calculate One-point correclation function", Logger::SubSection);
     log.flush();
 
-    for (int t=0; t < master_clock_.Steps(); t++){
+    for (int t=0; t < master_clock_.Steps()/wcycle_; t++){
 	WaveFunction* ket = wfbuffer.Get(t);
 	*psi_t = ket;
-	for (int i=ket_first_op_; i < ket_.size(); i++){
+	for (uint i=ket_first_op_; i < ket_.size(); i++){
 	    if (ket_[i] != NULL){
 		ket_[i]->Apply(psi_t);
 	    } else
@@ -135,23 +166,24 @@ namespace QDLIB
     log.cout() << "Write correlation function\n";
     /* Write correlation function to file */
     FileSingle<Cfunc> file;
-    cfun.Params().SetValue("CLASS", "Cfun");
-    cfun.Params().SetValue("Nt", master_clock_.Steps());
-    cfun.Params().SetValue("dim", 1);
+    CreateMetaData(1, cfun.Params());
 
     file.Format(FileSingle<Cfunc>::binary);
-    file.Name("Cfun_1");
+    file.Name(dir_ + "Cfun_1");
     file.Suffix(".cf");
     file.WriteSingleFileToRaw(&cfun);
   }
 
 
+  /** Calculate two-point correlation function. */
   void ProgCfun::RunC2 ()
   {
     Logger& log = Logger::InstanceRef();
 
-    int Nt = master_clock_.Steps();
+    int Nt = master_clock_.Steps()/wcycle_;
     Cfunc cfun(Nt*Nt); /* Correlation function */
+    cfun.cVec::operator=(dcomplex(0)); /* set zero */
+
     WaveFunction* psi_t_k = wfbuffer.Get(0)->NewInstance();
     WaveFunction* psi_t_b = wfbuffer.Get(0)->NewInstance();
 
@@ -159,20 +191,19 @@ namespace QDLIB
     log.Header("Calculate Two-point correlation function", Logger::SubSection);
     log.flush();
 
-    for (int t1=0; t1 < master_clock_.Steps(); t1++){
-	WaveFunction* ket = wfbuffer.Get(t1);
-	*psi_t_k = ket;
-	for (int i=ket_first_op_; i < ket_.size(); i++){
+    for (int t1=0; t1 < Nt; t1++){
+	*psi_t_k = wfbuffer.Get(t1);
+	for (uint i=ket_first_op_; i < ket_.size(); i++){
 	    if (ket_[i] != NULL){
 		ket_[i]->Apply(psi_t_k);
 	    } else
 	      break;
 	}
 
-	for (int t2=t1; t2 < master_clock_.Steps(); t2++){
-	  WaveFunction* bra = wfbuffer.Get(t2);
-	  *psi_t_b = bra;
-	  for (int i=ket_first_op_; i < ket_.size(); i++){
+	master_clock_.TimeStep(t1*wcycle_);
+	for (int t2=t1; t2 < Nt; t2++){
+	  *psi_t_b = wfbuffer.Get(t2);
+	  for (uint i=ket_first_op_; i < ket_.size(); i++){
 	      if (ket_[i] != NULL){
 		  ket_[i]->Apply(psi_t_b);
 	      } else
@@ -182,7 +213,9 @@ namespace QDLIB
 
 	  if (t2-t1 > stepsint_ && stepsint_ > 0) break;
 
-	  U_->Apply(psi_t_k);
+	  for (int i=0; i < wcycle_; i++) /* propgate wcycle steps forward */
+	    U_->Apply(psi_t_k);
+	    ++master_clock_;
 	}
     }
 
@@ -192,12 +225,10 @@ namespace QDLIB
     log.cout() << "Write correlation function\n";
     /* Write correlation function to file */
     FileSingle<Cfunc> file;
-    cfun.Params().SetValue("CLASS", "Cfun");
-    cfun.Params().SetValue("Nt", master_clock_.Steps());
-    cfun.Params().SetValue("dim", 2);
+    CreateMetaData(2, cfun.Params());
 
     file.Format(FileSingle<Cfunc>::binary);
-    file.Name("Cfun_2");
+    file.Name(dir_ + "Cfun_2");
     file.Suffix(".cf");
     file.WriteSingleFileToRaw(&cfun);
   }
@@ -254,13 +285,14 @@ namespace QDLIB
 	propagation_meta.GetValue("wcycle", wcycle);
 	propagation_meta.GetValue("dt", dt);
 
-	master_clock_.Dt(double(wcycle) * dt);
-	master_clock_.Steps(Nt/wcycle);
+	master_clock_.Dt(dt);
+	master_clock_.Steps(Nt);
+	wcycle_ = wcycle;		/* use wcycle from propagation */
 
 	/* Read propagation */
 	wfbuffer.ReadFromFiles(read_dir_);
 
-	if (wfbuffer.Size() < Nt/wcycle ) master_clock_.Steps(wfbuffer.Size());
+	if (wfbuffer.Size() < uint(Nt/wcycle) ) master_clock_.Steps(wfbuffer.Size());
 	if (wfbuffer.Size() < 1 )
 	  throw (EParamProblem("Wave function buffer is empty"));
 
@@ -278,9 +310,16 @@ namespace QDLIB
 
     /* Get defintion for bra */
     bra_first_op_ = ReadKetBra("bra", bra_);
+    for (uint i=0; i < bra_.size(); i++) {
+	if (bra_[i] != NULL) bra_[i]->Init(Psi);
+    }
+
 
     /* Get defintion for ket */
     ket_first_op_ = ReadKetBra("ket", ket_);
+    for (uint i=0; i < ket_.size(); i++) {
+	if (ket_[i] != NULL) ket_[i]->Init(Psi);
+    }
 
     if (bra_.size() == 0){ /* no bra means: <psi|U+ */
 	num_u_ = num_u_+1;
@@ -291,28 +330,54 @@ namespace QDLIB
 
     /* Run initial time series, if not already present */
     if (wfbuffer.Size() == 1){
-	log.cout() << "Run initial propagation\n";
+	log.cout() << "\nRun initial propagation U(t1,0)|psi>\n"; log.flush();
 	WaveFunction* psi_t = Psi->NewInstance();
 
 	if (ket_[0] != NULL) {
 	    /* apply operator list before propagating */
 	    *psi_t = Psi;
 	    for (size_t i=0; i < ket_.size(); i++) {
+		if (ket_[i] == NULL) {
+		    ket_first_op_++;
+		    break;
+		}
 		ket_[i]->Apply(psi_t);
+		ket_first_op_++;
 	    }
 	} else {
 	  *psi_t = Psi;
 	}
 
 	/* fill wfbuffer with time series */
+	master_clock_.Begin();
 	for (int i=1; i < master_clock_.Steps(); i++){
 	    U_->Apply(psi_t);
-	    wfbuffer.Add(psi_t);
+	    ++master_clock_;
+	    if (i % wcycle_ == 0) wfbuffer.Add(psi_t);
 	}
 
 	DELETE_WF(psi_t);
+
+	/* Dump series to files */
+	if (! write_dir_.empty() ){
+	  FS::CreateDir(write_dir_);
+
+	  /* Write propagation meta file*/
+	  ParamContainer p;
+	  p.SetValue("CLASS", "Propagation");
+	  p.SetValue("Nt", master_clock_.Steps());
+	  p.SetValue("dt", master_clock_.Dt());
+	  p.SetValue("WFBaseName", "WF");
+	  p.SetValue("Wcycle", wcycle_);
+
+	  if (!p.WriteToFile(write_dir_ + "/Propagation" + METAFILE_SUFFIX))
+	     EIOError("Can not write meta file");
+
+	  wfbuffer.SaveToFiles(write_dir_ + "/WF");
+	}
     }
 
+    /* Calculate correlation function */
     switch(num_u_ - 1) {
       case 1:
 	  RunC1();

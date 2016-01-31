@@ -24,16 +24,30 @@ namespace QDLIB
    * \li dt       time step for propagator [required]
    * \li steps    number of time steps [required]
    * \li stepsint maximum number of intermediate time steps (optional)
+   * \li wcycle   write cycle. The time step in C(t) will be dt*wcycle [1]
    * \li read     read the baseline propagation (first U) from directory given by 'read' instead (optional)
    * \li fname    file name for correlation function
    */
   class ProgCfun {
     private:
+      /** Dummy class for usage with FileSingle */
+      class Cfunc : public cVec {
+	    string name_;
+	    ParamContainer pm_;
+	  public:
+	    Cfunc() : name_("Cfunc") {}
+	    Cfunc(size_t N) : cVec(N), name_("Cfunc") {  }
+
+	    ParamContainer& Params() { return pm_; }
+	    const string& Name() { return name_; };
+      };
+
       XmlNode &CfunNode_;
       XmlNode *ContentNodes_;
       string dir_;
       string fname_;
       string read_dir_;
+      string write_dir_;
 
       int stepsint_;
 
@@ -48,9 +62,11 @@ namespace QDLIB
       WFBuffer wfbuffer;
 
       QDClock master_clock_;
+      int wcycle_;
 
       void InitParams_();
       int ReadKetBra(const string& name, vector<Operator*>& kb );
+      void CreateMetaData(int dims, ParamContainer &pm);
       void RunC1();
       void RunC2();
     public:
@@ -61,16 +77,6 @@ namespace QDLIB
 
       void Run();
 
-      class Cfunc : public cVec {
-	  string name_;
-	  ParamContainer pm_;
-	public:
-	  Cfunc() : name_("Cfunc") {}
-	  Cfunc(size_t N) : cVec(N), name_("Cfunc") {  }
-
-	  ParamContainer& Params() { return pm_; }
-	  const string& Name() { return name_; };
-      };
   };
 
 } /* namespace QDLIB */

@@ -43,6 +43,7 @@ namespace QDLIB
       _matrix[row][col] = O;
       
       if (O->isTimeDep()) _isTimedependent = true;
+      if (!O->Hermitian()) Operator::_hermitian = false;
       
       if ( (_matrix[row][col] != NULL && _matrix[col][row] != NULL) && row != col )
 	_hermitian = false;

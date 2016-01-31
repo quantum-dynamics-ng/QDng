@@ -148,9 +148,9 @@ namespace QDLIB
 
       dcomplex* psi = wf->begin(0);
 
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
+//#ifdef _OPENMP
+//#pragma omp parallel for
+//#endif
       for (int rep=0; rep < _grid.NumOthers(); rep++){
          int base = _grid.IndexBase(rep);
 
@@ -211,9 +211,9 @@ namespace QDLIB
 
       dcomplex* psi = wf->begin(0);
 
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
+//#ifdef _OPENMP
+//#pragma omp parallel for
+//#endif
       for (int rep=0; rep < _grid.NumOthers(); rep++){
          int base = _grid.IndexBase(rep);
 
@@ -255,9 +255,9 @@ namespace QDLIB
       dcomplex* psi = wf->begin(0);
       dcomplex* dpsi = dwf->begin(0);
 
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
+//#ifdef _OPENMP
+//#pragma omp parallel for
+//#endif
       for (int rep=0; rep < _grid.NumOthers(); rep++){
          int base = _grid.IndexBase(rep);
 

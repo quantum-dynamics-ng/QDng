@@ -44,7 +44,7 @@ namespace QDLIB
 	  */
 	 void Hermitian(bool hermit) {_hermitian = hermit;}
 	 
-	 bool Hermitian() {return _hermitian;}
+	 bool Hermitian() {return _hermitian & Operator::_hermitian;}
 	 
          /**
           * Set behavior for missing diagonal elements.
@@ -54,7 +54,7 @@ namespace QDLIB
           */
          void Unity(bool unity) {_unity= unity;}
 	 
-         bool Unity() {return _hermitian;}
+         bool Unity() {return _unity;}
          
          /**
           * Initialize content operators with Init(Wavefunction*).

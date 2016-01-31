@@ -25,24 +25,25 @@ namespace QDLIB
       private:
          typedef enum
          {
-            expec, apply, expeconly, normalize
+            expec, apply, expeconly, normalize, rho
          } _FilterAction;
 
          typedef enum
          {
-            real, imag, complex
+            real, imag, complex, abs
          } _FilterValue;
 
          struct filter
          {
             Operator* op;           /* Operator to use*/
+            int ms[2];		    /* Multistate row/col to act on */
             _FilterAction action;   /* action for corresponding operator */
             _FilterValue  value;    /* Representation of number */
             dcomplex sum;           /* Accumulated value */
             bool integrate;         /* Use time integrated/accumulated value */
             string label;           /* User defined label for expec table*/
 
-            filter() : op(NULL), action(expeconly), value(real), sum(0), integrate(false) {}
+            filter() : op(NULL), action(expeconly), value(real), sum(0), integrate(false) { ms[0] = -1; ms[1] = -1; }
          };
 
          bool _renorm;
@@ -67,6 +68,7 @@ namespace QDLIB
 
          QDClock *_clock;
 
+         void _write_value(int i);
          void _destroy();
       public:
          FiltersList();
@@ -78,7 +80,7 @@ namespace QDLIB
 
          void UseRenormalizedValues(bool renorm) { _renorm = renorm; }
 
-         void Add(const Operator* O, const string& header, const string& faction, const string& val, bool integrate = false);
+         void Add(const Operator* O, const string& header, const string& faction, const string& val, const vector<int>& states, bool integrate = false);
 
          void PrepareOutput();
 

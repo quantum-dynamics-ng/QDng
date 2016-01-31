@@ -47,10 +47,10 @@ namespace QDLIB {
     * \param O       The Operator to use
     * \param header  Coloumn header to use. Defaults to the operator name (if string is empty)
     * \param faction One of apply, expec, expeconly, normalize. [expeconly]
-    * \param val     What part of the expectation should be plotted: real, imag, complex [real]
+    * \param val     What part of the expectation should be plotted: real, imag, complex, abs [real]
     * \param int     Integrate/sum up over time [false]
     */
-   void FiltersList::Add(const Operator* O, const string& header, const string& faction, const string& val, bool integrate)
+   void FiltersList::Add(const Operator* O, const string& header, const string& faction, const string& val, const vector<int>& states, bool integrate)
    {
       string action, value;
 
@@ -76,6 +76,8 @@ namespace QDLIB {
          _filter[_size].value = imag;
       else if (value == "complex")
          _filter[_size].value = complex;
+      else if (value == "abs")
+         _filter[_size].value = abs;
       else
          throw EParamProblem ("Value type not known: ", value);
 
@@ -99,6 +101,11 @@ namespace QDLIB {
          _filter[_size].action = expeconly;
          _writefile = true;
       }
+      else if (action == "rho")
+      {
+         _filter[_size].action = rho;
+         _writefile = true;
+      }
       else
       {
          string errormsg("Unknown filter action provided: ");
@@ -106,6 +113,12 @@ namespace QDLIB {
          throw EParamProblem(errormsg.c_str());
       }
 
+      if (states.size() == 2){
+	  _filter[_size].ms[0] = states[0];
+	  _filter[_size].ms[1] = states[1];
+      } else if (states.size() == 1 || states.size() > 2) {
+	  throw(EParamProblem("Invalid state defintion. states needs exactly 2 values."));
+      }
       _size++;
    }
 
@@ -189,17 +202,24 @@ namespace QDLIB {
          if (attr.isPresent("int"))
             attr.GetValue("int", integrate);
 
+         vector<int> states;
+         if (attr.isPresent("ms"))
+            attr.GetArray("ms", states);
+
+         if (attr.isPresent("header"))
+            attr.GetValue("header", _filter[_size].label);
+
          Operator* O=NULL;
-         if (faction != "normalize")
+         if (faction != "normalize" && faction != "rho")
          {
             _filter[_size].op = ChainLoader::LoadOperatorChain(filters); /* Load operator */
             ParamContainer attr = filters->Attributes(); /* Set header label */
-            if (attr.isPresent("header"))
-               attr.GetValue("header", _filter[_size].label);
-            else _filter[_size].label = _filter[_size].op->Name();
+            if (!attr.isPresent("header")) _filter[_size].label = _filter[_size].op->Name();
+         } else if (faction == "rho"){
+             if (!attr.isPresent("header")) _filter[_size].label = "rho";
          }
 
-         Add(O, header, faction, value, integrate);
+         Add(O, header, faction, value, states, integrate);
 
          filters->NextNode();
       }
@@ -207,6 +227,27 @@ namespace QDLIB {
       PrepareOutput();
    }
    
+   /*
+    * Write value to file for filter i, consdering the choice of value type.
+    */
+   void FiltersList::_write_value(int i)
+   {
+     switch (_filter[i].value) {
+         case imag:
+            _ofile << _filter[i].sum.imag() << "\t";
+            break;
+         case complex:
+            _ofile << _filter[i].sum << "\t";
+            break;
+         case abs:
+            _ofile << cabs(_filter[i].sum) << "\t";
+            break;
+         default:
+            _ofile << _filter[i].sum.real() << "\t";
+            break;
+      }
+   }
+
    /**
     * Apply the filter list and print expection values
     */
@@ -218,12 +259,22 @@ namespace QDLIB {
       if (! _initalized){
          _ofile << "time \t";
 	 for(int i=0; i < _size; i++){
-	    if (_filter[i].action != normalize){
+	    if (_filter[i].action != normalize && _filter[i].action != rho){
 	       _filter[i].op->Clock(_clock);
 	       GlobalOpList::Instance().Init(_filter[i].op, Psi);
 	    }
-	    if (_writefile && (_filter[i].action == expec || _filter[i].action == expeconly) && _filter[i].action != normalize)
+	    if (_writefile && (_filter[i].action == expec || _filter[i].action == expeconly ||  _filter[i].action == rho) && _filter[i].action != normalize)
 	       _ofile << _filter[i].label << "\t";
+
+	    /* validity of "states" defintion */
+	    if (_filter[i].ms[0] > -1 || _filter[i].ms[1] > -1){
+		WFMultistate* psi  = dynamic_cast<WFMultistate*>(Psi);
+		if ( psi == NULL )
+		    throw(EIncompatible("Wavefunction not a multistate type, but 'states' directive in filter defined: ", Psi->Name()));
+
+		if (psi->States() <= lint(_filter[i].ms[0]) || psi->States() <= lint(_filter[i].ms[1]))
+		    throw(EParamProblem("Invalid state number in 'states' directive in filter defined."));
+	    }
 	 }
 	 if (_writefile)
 	    _ofile << endl;
@@ -235,8 +286,10 @@ namespace QDLIB {
       
       /* Apply filters */
       for(int i=0; i < _size; i++){
-	 if (_filter[i].action == expec || _filter[i].action == expeconly){
-
+	 switch (_filter[i].action ){
+	   case expec:
+	   case expeconly:
+	   {
 	    dcomplex matel = _filter[i].op->MatrixElement(Psi,Psi);
 
 	    /* Renormalize expectation value */
@@ -248,25 +301,34 @@ namespace QDLIB {
 	    else
 	       _filter[i].sum = matel;
 
-            switch (_filter[i].value) {
-               case imag:
-                  _ofile << _filter[i].sum.imag() << "\t";
-                  break;
-               case complex:
-                  _ofile << _filter[i].sum << "\t";
-                  break;
-               default:
-                  _ofile << _filter[i].sum.real() << "\t";
-                  break;
-            }
-	 }
+	    _write_value(i);
 
-	 if (_filter[i].action == apply || _filter[i].action == expec){
-	    _filter[i].op->Apply(Psi);
-	 }
+	    if (_filter[i].action == expec)
+	      _filter[i].op->Apply(Psi);
+	  }
+	   break;
+	   case apply:
+	     {
+	       _filter[i].op->Apply(Psi);
+	     }
+	     break;
 
-	 if (_filter[i].action == normalize)
-	    Psi->Normalize();
+	   case normalize:
+	     Psi->Normalize();
+	    break;
+	   case rho:
+	     {
+	       WFMultistate* psi = dynamic_cast<WFMultistate*>(Psi);
+	       dcomplex rho =  *(psi->State(_filter[i].ms[0])) * psi->State(_filter[i].ms[1]);
+		if (_filter[i].integrate)
+		   _filter[i].sum += rho * _clock->Dt();
+		else
+		   _filter[i].sum = rho;
+
+		_write_value(i);
+	     }
+	     break;
+	 }
       }
       
       if (_writefile) _ofile << endl;
