@@ -113,7 +113,6 @@ namespace QDLIB {
          throw EParamProblem(errormsg.c_str());
       }
 
-      cout << states.size() << endl;
       if (states.size() == 2){
 	  _filter[_size].ms[0] = states[0];
 	  _filter[_size].ms[1] = states[1];
