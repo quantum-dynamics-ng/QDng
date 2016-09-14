@@ -203,12 +203,22 @@ namespace QDLIB
 	master_clock_.TimeStep(t1*wcycle_);
 	for (int t2=t1; t2 < Nt; t2++){
 	  *psi_t_b = wfbuffer.Get(t2);
-	  for (uint i=ket_first_op_; i < ket_.size(); i++){
-	      if (ket_[i] != NULL){
-		  ket_[i]->Apply(psi_t_b);
-	      } else
-		break;
+	  if (bra_.size() != 0) { // use bra definition
+	    for (uint i=bra_first_op_; i < bra_.size(); i++){
+	        if (bra_[i] != NULL){
+		    bra_[i]->Apply(psi_t_b);
+	        } else
+		  break;
+	    }
+	  } else { // re-use ket defintion
+	    for (uint i=ket_first_op_; i < ket_.size(); i++){
+	        if (ket_[i] != NULL){
+	  	    ket_[i]->Apply(psi_t_b);
+	        } else
+		  break;
+	    }
 	  }
+
 	  cfun[t1*Nt+t2] = *psi_t_b * psi_t_k;
 
 	  if (t2-t1 > stepsint_ && stepsint_ > 0) break;
