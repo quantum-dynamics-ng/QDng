@@ -398,7 +398,94 @@ mode of operation. Takes exactly two values which specify the bra and the ket st
 
 
 \section{Correlation functions}
-Calculate multi-moint correlation functions
+\begin{options}
+\option{dt}{time step for propagator [required]}
+\option{steps}{number of time steps [required]}
+\option{stepsint}{ maximum number of intermediate time steps (optional)}
+\option{wcycle}{write cycle. The time step in C(t) will be dt*wcycle [1]}
+\option{read}{read the baseline propagation (first U) from directory given by 'read' instead (optional)}
+\option{fname}{file name for correlation function}
+\end{options}
+
+Necessary sections in the input:
+\begin{itemize}
+ \option{propagator}{}
+ \option{ket}{The sequence of operators on the ket side}
+ \option{bra}{The sequence of operators on the bra side}
+ \option{target}{A target operators if \code{ttype=operator}.}
+\end{itemize}
+
+\subsubsection*{Examples}
+Correlation function for a transient absorption experiment.
+Delivers:
+\begin{equation*}
+\langle \Psi_1\rvert U^\dagger(t,t_0)\mu U(t,t_1)\mu^\dagger U(t_1,t_0)\lvert\Psi_1\rangle
+\end{equation*}
+\begin{verbatim}
+cfunc {dt="5" steps=600 stepsint=300 wcycle="4" dir="Ctt"
+      propagator {name="Arnoldi"
+         hamiltonian {name="Multistate"
+            m0.0 { name="Sum"
+               T { name=GridNablaSq mass=3650 key=T }
+               V { name="GridPotential" file="pot_S0" }
+            }
+            m1.1 { name="Sum"
+               T { name=GridNablaSq mass=3650 key=T }
+               V { name="GridPotential" file="pot_S0" }
+            }
+         }
+      }
+      ket {
+        U {}
+        probe { name=Multistate unity=false
+                m0.1 { name=GridPotential file=mu }
+             }
+        U {}
+      }
+      wf { name=Multistate states=2
+          wf1 { file="efs-S0/ef_0" }
+      }
+   }
+
+\end{verbatim}
+
+Same but with two different $\mu$.
+Delivers:
+\begin{equation*}
+\langle \Psi_1\rvert U^\dagger(t,t_0)\mu_2 U(t,t_1)\mu_1^\dagger U(t_1,t_0)\lvert\Psi_1\rangle
+\end{equation*}
+\begin{verbatim}
+cfunc {dt="5" steps=600 stepsint=300 wcycle="4" dir="Ctt"
+      propagator {name="Arnoldi"
+         hamiltonian {name="Multistate"
+            m0.0 { name="Sum"
+               T { name=GridNablaSq mass=3650 key=T }
+               V { name="GridPotential" file="pot_S0" }
+            }
+            m1.1 { name="Sum"
+               T { name=GridNablaSq mass=3650 key=T }
+               V { name="GridPotential" file="pot_S0" }
+            }
+         }
+      }
+      ket {
+        U {}
+        probe { name=Multistate unity=false
+                m0.1 { name=GridPotential file=mu1 }
+             }
+        U {}
+      }
+      bra {
+        U {}
+        probe { name=Multistate unity=false
+                m0.1 { name=GridPotential file=mu2 }
+             }      
+      wf { name=Multistate states=2
+          wf1 { file="efs-S0/ef_0" }
+      }
+   }
+
+\end{verbatim}
 
 \section{Optimal Control Theory}
 The OCT programm supports Multi Target OCT with various methods:
@@ -430,7 +517,7 @@ is looking for laserfields in the Hamiltonian. If you want some of them to be fi
 the included in the optimization labeling has to be used.
 In that case the active fields have to marked with an attribute \verb|label=OptLaser|.
 
-Needed sections in the input:
+Necessary sections in the input:
 \begin{itemize}
  \option{propagator}{}
  \option{wfi<index>}{One or more initial wave functions.}
