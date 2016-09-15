@@ -147,7 +147,7 @@ namespace QDLIB {
       // Write data
       os.write(reinterpret_cast<char*>(begin(0)), sizeBytes());
 
-      // dump gridsystem parameters, so the get written to the meta data
+      // dump gridsystem parameters, so they get written to the meta data
       grid_sys.DumpParams(_params);
    }
 

@@ -23,6 +23,7 @@ namespace QDLIB {
    WFGridCartesian::WFGridCartesian(GridSystem& grid)
       : WFGridSystem(grid), _name("WFGridCartesian")
    {
+     grid_sys.DumpParams(_params);
    }
    
    WFGridCartesian::~WFGridCartesian()

@@ -22,7 +22,6 @@ namespace QDLIB {
       gp.GetValue("compress", compress, FILEWF_COMPRESSION);
 
       if ( compress ) {
-
          if ( gp.isPresent("comptol") )
             gp.GetValue("comptol", _compTolerance);
 
