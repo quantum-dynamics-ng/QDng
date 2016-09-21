@@ -5,6 +5,7 @@
 #include "qdlib/OProduct.h"
 #include "qdlib/OProjection.h"
 #include "qdlib/OScalar.h"
+#include "qdlib/ONormalize.h"
 
 #include "qdlib/OArnoldi.h"
 #include "qdlib/OGridNabla.h"
@@ -69,6 +70,7 @@ namespace QDLIB
    QDNG_OPERATOR_INSTANCE_FUNCTION(OProduct)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OProjection)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OScalar)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(ONormalize)
 
    /* Leave this here because we have an individual Constructor */
    Operator* INT_Alias_OGridMomentum()

@@ -35,7 +35,7 @@ namespace QDLIB
          virtual dcomplex Emin() { return 0; }
          virtual dcomplex Emax() { return 1; }
 
-         virtual void UpdateTime();
+         virtual void UpdateTime() {};
 
          virtual void Apply(WaveFunction *destPsi, WaveFunction *sourcePsi)
          {
