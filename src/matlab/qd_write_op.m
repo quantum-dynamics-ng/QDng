@@ -43,6 +43,10 @@ stream = [stream typecast(uint32(numel(header_buf)), 'uint8') header_buf payload
 
 % write to file
 fd = fopen([name '.op'], 'w');
+
+if fd < 0
+    error(['Can not open ' name '.op for writing.']);
+end
 fwrite(fd, stream);
 fclose(fd);
 

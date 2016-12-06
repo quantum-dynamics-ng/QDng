@@ -16,7 +16,7 @@ end
 line = fgetl(fd);
 
 while ischar(line)
-    kv = regexp(line, '\s+=\s+', 'split')
+    kv = regexp(line, '\s+=\s+', 'split');
     params.(kv{1}) = kv{2};
     line = fgetl(fd);
 end

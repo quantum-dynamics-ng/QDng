@@ -28,7 +28,7 @@ while more_files_follow ~= 0
     if nargin == 3
         [data{state}, meta{state}] = qd_decode_WF(fd, payload, header.class, decode_fcn);
     else
-        [data{state}, meta{state}] = qd_decode_WF(fd, payload, header.class);
+        [data{state}, meta{state}] = qd_decode_WF(fd, payload, header);
     end
     
     state = state + 1;

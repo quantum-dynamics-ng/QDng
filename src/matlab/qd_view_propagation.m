@@ -42,7 +42,7 @@ pmeta.Wcycle = str2double(pmeta.Wcycle);
 for i=0:ceil(pmeta.Nt/pmeta.Wcycle)
     opts.index = i;
     qd_view_wf(path, opts);
-    fprintf('t = %.2f\n', pmeta.Wcycle*pmeta.dt*i);
+    fprintf('t = %.2f (%.2f fs)\n', pmeta.Wcycle*pmeta.dt*i, pmeta.Wcycle*pmeta.dt*i/41.34);
     if opts.pause > 0
         pause(opts.pause);
     else

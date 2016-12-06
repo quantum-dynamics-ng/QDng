@@ -59,14 +59,14 @@ if iscell(data)
         hold all
         for i=1:length(data)
             y = prepare_data(data{i}, opts);
-            plot_wf(X, y, meta{i}.dims);
+            plot_wf(X, y, meta{i});
         end
         hold off
     else
         for i=1:length(data)
             subplot(length(data),1,length(data)-i+1);
              y = prepare_data(data{i}, opts);
-             plot_wf(X, y, meta{i}.dims);
+             plot_wf(X, y, meta{i});
              title(['state ' num2str(i)'])
         end
              
@@ -74,7 +74,7 @@ if iscell(data)
 else
     X = prepare_axis(meta);
     y = prepare_data(data, opts);
-    plot_wf(X, y, meta.dims);
+    plot_wf(X, y, meta);
 end
 
 
@@ -103,12 +103,15 @@ end
         end
     end
 
-    function plot_wf(x, y, d)
-        switch (d)
+    function plot_wf(x, y, meta)
+        switch (meta.dims)
             case 1
                 plot(x, abs(y));
             case 2
-                surf(x{1}, x{2}, abs(y), 'LineStyle', 'None');
+                surf(x{1}, x{2}, abs(y), 'LineStyle', 'None'); view([0 90])
+                colorbar();
+                xlim([meta.dim(1).xmin meta.dim(1).xmax]);
+                ylim([meta.dim(2).xmin meta.dim(2).xmax]);
             otherwise
                 error('Multi-dim view not implemented yet. Choose dimensions with opts.dims');
         end

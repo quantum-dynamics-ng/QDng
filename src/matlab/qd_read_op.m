@@ -32,4 +32,3 @@ elseif strcmp ('Laser', header.class)
 else
     error(['Unknown class: ' header.class' '\nprovide a decode fuction!']);   
 end
-    

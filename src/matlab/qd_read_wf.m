@@ -7,6 +7,11 @@ function [data, meta, header] = qd_read_wf(fname, decode_fcn)
 % 
 
 fd = fopen([fname '.wf']);
+
+if fd < 0
+    error(['Failed to open wave function file: ' fname '.wf']);
+end
+
 [payload, header] = qd_read_stream(fd);
 
 if nargin == 2

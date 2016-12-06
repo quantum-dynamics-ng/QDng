@@ -16,7 +16,8 @@ if iscell(data)
     end 
     header = pblib_set (header, 'class', 'WFMultistate');
     header = pblib_set (header, 'more_files_follow', 1);
-    header = pblib_set (header, 'payload_size', 4); % state count
+    header = pblib_set (header, 'payload_size', 4); % field length state count (int32)
+    header = pblib_set (header, 'compression', 0);
 else
     if nargin > 3
         payload = qd_encode_WF(data, meta, encode_fcn);
