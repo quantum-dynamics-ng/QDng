@@ -125,6 +125,7 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(OProduct)
       QDNG_STRING_TO_INSTANCE_PTR(OProjection)
       QDNG_STRING_TO_INSTANCE_PTR(OScalar)
+      QDNG_STRING_TO_INSTANCE_PTR(ONormalize)
 
       /* This is an alias */
       if (name == "INT_OGridMomentum") return &INT_Alias_OGridMomentum;
