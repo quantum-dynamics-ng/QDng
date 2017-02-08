@@ -49,7 +49,7 @@ for i=1:length(data);
     header = pblib_set (header, 'payload_size', numel(payload));
     header_buf = pblib_generic_serialize_to_string(header);
     
-    %        msd_size                                     msg        enc_data
+    %        msg_size                                     msg        enc_data
     pl = [pl typecast(uint32(numel(header_buf)), 'uint8') header_buf payload];
 end
 
