@@ -1,0 +1,20 @@
+qdng {
+   eigen { dt=20 steps=1000 dir=efs_g Nef=20 conv="1e-9"
+      propagator { name=Cheby
+         hamiltonian { name=Sum
+            T { name=GridNablaSq mass="1763.2" }
+            V { name="GridPotential" file="pot_Vg" }
+         }
+      }
+      wf { file=wfguess }	
+   }
+   eigen { dt=20 steps=1000 dir=efs_e Nef=20 conv="1e-9"
+      propagator { name=Cheby
+         hamiltonian { name=Sum
+            T { name=GridNablaSq mass="1763.2" }
+            V { name="GridPotential" file="pot_Ve" }
+         }
+      }
+      wf { file=wfguess }
+   }
+}

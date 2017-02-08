@@ -1,0 +1,21 @@
+qdng {
+   propa { dt=5 steps=300 wcycle=5 dir=propa nfile=norm
+      propagator { name=Cheby
+	 hamiltonian { name=Multistate
+	    m0.0 { name=Sum
+               T { name=GridNablaSq mass="1763.2" key=T }
+               V { name="GridPotential" file="pot_Vg" }
+	    }
+            m1.1 { name=Sum
+               T { ref=T }
+               V { name="GridPotential" file="pot_Ve" }
+	    }
+	   m1.0 { name=GridDipole file="mu" laser="Et" }
+	 }
+      }
+      wf { name=Multistate states=2
+	 wf0 { file="efs_g/ef_0" }
+      }
+   }
+}
+
