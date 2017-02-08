@@ -1,3 +1,5 @@
+
+
 pkgdocdir = $(datadir)/doc/qdng
 dist_pkgdoc_DATA = Handbook.tex qdng.bib \ 
 	tutorial/example_1_qd_setup_input.m \
@@ -8,25 +10,20 @@ dist_pkgdoc_DATA = Handbook.tex qdng.bib \
         tutorial/propa.qds 
 
 
-#if HAVE_PDFLATEX
-#MANNAME = Handbook
-#docfiles += $(MANNAME).pdf
-#MANTEXSRC = $(MANNAME).tex
-#iMANPDF = $(MANNAME).pdf
+if HAVE_PDFLATEX
+ MANNAME = Handbook
+ dist_pkgdoc_DATA += $(MANNAME).pdf
+# docfiles += $(MANNAME).pdf
+ MANTEXSRC = $(MANNAME).tex
+ MANPDF = $(MANNAME).pdf
 
-#CLEANFILES = $(MANNAME).log $(MANNAME).out $(MANNAME).aux \
-#             $(MANNAME).toc $(MANNAME).bbl $(MANNAME).blg
+ CLEANFILES = $(MANNAME).log $(MANNAME).out $(MANNAME).aux \
+             $(MANNAME).toc $(MANNAME).bbl $(MANNAME).blg
 
-#$(MANPDF): $(srcdir)/$(MANTEXSRC)
-#	$(PDFLATEX) $(srcdir)/$(MANNAME).tex
-#	bibtex $(srcdir)/$(MANNAME) 
-#	$(PDFLATEX) $(srcdir)/$(MANNAME).tex
-#	$(PDFLATEX) $(srcdir)/$(MANNAME).tex
-#endif
+ $(MANPDF): $(srcdir)/$(MANTEXSRC)
+	$(PDFLATEX) $(srcdir)/$(MANNAME).tex
+	BIBINPUTS=$(srcdir) bibtex $(MANNAME) 
+	$(PDFLATEX) $(srcdir)/$(MANNAME).tex
+	$(PDFLATEX) $(srcdir)/$(MANNAME).tex
+endif
 
-#dist_doc_DATA = $(docfiles)
-
-#pkgdocdir = $(docdir)
-#dist_pkgdoc_DATA = $(docfiles)
-
-#dist_pkgdata_DATA = $(docfiles)
