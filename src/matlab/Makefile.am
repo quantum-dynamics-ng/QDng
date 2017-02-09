@@ -63,4 +63,16 @@ dist_pkgdata_DATA = get_global_params.m \
  	qd_write_cmd.m \
  	qd_write_op.m \
  	qd_write_wf.m
- 	
+	qd_cfun_TA_spectrum.m \
+        qd_decode_WF.m \
+        qd_encode_WF.m \
+        qdlib_read_params.m \
+        qd_view_efs.m \
+        qlib_zlib_compress.m \
+        qd_cmd_clear_objects.m \
+        qd_decode_WFMultistate.m \
+        qd_encode_WFMultistate.m \
+        qd_read_Ctt.m \
+        qd_view_propagation.m \
+        qlib_zlib_decompress.m
+
