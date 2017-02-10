@@ -20,6 +20,7 @@ fi
 
 
 AM_PROG_LIBTOOL
+LT_INIT 
 
 dnl Check for standard functions
 AC_CHECK_HEADERS([fcntl.h],,AC_MSG_ERROR(fcntl.h not found))
@@ -251,9 +252,16 @@ AC_ARG_WITH([cppunit],
 
 AM_CONDITIONAL([CPPUNIT], [test "x$with_cppunit" != "xno"])
 
+dnl Check for presence of pdfLaTeX
+AC_CHECK_PROG(PDFLATEX, pdflatex, pdflatex)
+if test -z "$PDFLATEX"; then
+  AC_MSG_WARN([Unable to create PDF version of the user manual.])
+fi
+
+AM_CONDITIONAL([HAVE_PDFLATEX], test -n "$PDFLATEX")
 
 AC_CONFIG_FILES(
-		[Makefile scripts/Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
+		[Makefile doc/Makefile scripts/Makefile src/Makefile src/qdlib/Makefile src/tools/Makefile 
 		 src/fft/Makefile src/math/Makefile src/modules/Makefile
 		 src/tests/Makefile src/slatec/Makefile src/linalg/Makefile
 		 src/lib/Makefile tests/Makefile src/simpleXml/Makefile
@@ -270,6 +278,5 @@ AC_CONFIG_FILES(
                  tests/TGO-IR-Freq.qdi tests/TGO-IR-Krotov.qdi tests/TGO-IR-Rabitz.qdi
                  tests/TGO-IR-Krotov-Projection.qdi tests/TGO-UV-Krotov.qdi tests/TLO-Cheby.qdi ])
 
-     
 AC_OUTPUT
 

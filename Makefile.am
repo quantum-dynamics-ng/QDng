@@ -3,5 +3,5 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
 
-SUBDIRS =  src tests
+SUBDIRS =  doc src tests scripts
 

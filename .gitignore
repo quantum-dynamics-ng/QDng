@@ -2,8 +2,12 @@
 *.o
 *.lo
 .*
+*.aux
+*.bbl
+*.log
+*.blg
+*.synctex.gz
 debug/
-doc/
 Makefile.in
 qdng.kde*
 configure
@@ -21,3 +25,4 @@ ylwrap
 QDng.git.kdev4
 QDng.kdevelop.pcs
 QDng.kdevses
+

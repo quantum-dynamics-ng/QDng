@@ -8,6 +8,9 @@ function [data, meta, header] = qd_read_op(fname,decode_fcn)
 
 fd = fopen([fname '.op']);
 
+if fd < 0
+    error('qdng:qd_read_op:file_not_found', [fname '.op not found']);
+end
 
 %
 % handle the answer
@@ -22,6 +25,7 @@ end
 
 if nargin == 2
     [data, meta] = decode_fcn(payload,  header.class);
+    meta.class = header.class(2:end);
     return;
 end
 
@@ -30,5 +34,8 @@ if strncmp('OGrid', header.class, 5)
 elseif strcmp ('Laser', header.class)
     [data, meta] = qd_decode_Laser(payload);
 else
-    error(['Unknown class: ' header.class' '\nprovide a decode fuction!']);   
+    error('qdng:qd_read_op:unknown_class',['Unknown class: ' header.class' '\nprovide a decode fuction!']);   
 end
+
+meta.class = header.class(2:end);
+
