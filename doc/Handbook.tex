@@ -25,6 +25,21 @@
 
 \tableofcontents
 
+\chapter{Introduction}
+Main purpose of the program is to solve
+the time dependent Schr\"odinger equation
+\begin{align}
+-i\hbar \partial_t \Psi = \hat H \Psi
+\end{align}
+This is done by time stepping
+\begin{align}
+\Psi(t+\Delta t) = \hat U(t) \Psi(t) = \exp\left(-i\hat H \Delta t \right) \Psi(t)
+\end{align}
+Different numerical realizations of the propagator
+$\hat U$ are available. 
+
+
+
 \chapter{Input Format}
 \section{Input files}
 The native QDng input format is XML but there is a simplified version which allows
@@ -102,7 +117,11 @@ qdng {
 \end{verbatim}
 
 \section{Variables and Loops}
-TODO
+The simplified XML format allows for some extra
+features like loops and the definition of basics
+variables.
+
+A loop over a range of numbers is defined as follows
 \begin{verbatim}
 for $loopvar = <begin> <end> [step]
 {
@@ -110,12 +129,15 @@ for $loopvar = <begin> <end> [step]
 }
 \end{verbatim}
 
+Variable definitions in the source code,
+inserting of variables, and formatted insert:
 \begin{verbatim}
 $a = "1234"
 $(a)
 $(a) %.2f
 \end{verbatim}
 
+Example:
 \begin{verbatim}
 for $delay = 1 5 {
    propa { dt="2" steps="2000" wcycle="2000" dir="propa" ~ $(delay) 
@@ -132,16 +154,35 @@ for $delay = 1 5 {
 
 
 \chapter{Data Format}
+All data that is represented on a numerical grid
+or numerical matrices is stored in form of binary files.
+Two different formats are available. Any one of them
+comes with meta data describing the content of the
+binary arrays. The meta data assures that the data,
+which is read in, is compatible with each other.
+The following conventions are used: wave function
+files have the ending .wf and numerical
+representations of operators have the ending .op 
 
 \section{Raw Data with Additional Meta-Data}
-raw data file + .meta file in text format.
+This format is mainly for compatibility purposes.
+A single file stores a raw array of data
+and has to be accompanied by a text file (ending .meta)
+containing meta data in the form key $=$ value.
+Files in this format can be always be read. Output
+in this format requires the \texttt{wf\_format}
+option to be set.
+
 \subsection{Wave functions}
+Data is stored as double precision complex numbers.
 
 \subsection{Operators}
+Data is stored as double precision numbers
 
 \section{Protobuf format}
 Single file containing data and meta data.
-MATLAB interface for creation and reading provided.
+This format is more versatile than the raw data format. This is the default file format.
+A MATLAB interface for creation and reading is provided.
 
 
 \chapter{Main Programms}
