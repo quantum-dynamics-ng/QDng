@@ -136,7 +136,50 @@ namespace QDLIB
     pm.SetValue("dim", dims);
   }
 
-  /** Calculate single-point correlation function. */
+  WaveFunction* ProgCfun::InitializeKetBra(bool bra)
+  {
+    WaveFunction* psi_t = Psi0->NewInstance();
+    int first_op = ket_first_op_;
+    vector<Operator*>* ops = &ket_;
+
+    if (bra) {
+      first_op = bra_first_op_;
+      ops = &bra_;
+    }
+
+    if ((*ops)[0] != NULL) {
+      /* apply operator list before propagating */
+      *psi_t = Psi0;
+      for (size_t i=0; i < ops->size(); i++) {
+         if ((*ops)[i] == NULL) {
+             first_op++;
+             break;
+         }
+         (*ops)[i]->Apply(psi_t);
+         first_op++;
+      }
+    } else {
+      *psi_t = Psi0;
+    }
+
+    if (bra) {
+      bra_first_op_ = first_op;
+    }
+
+    return psi_t;
+  }
+
+  /**
+   * Calculate single-point correlation function.
+   *
+   *  Case a
+   *           /---\
+   *  mu_s(t)  |   | U+(t,t0)
+   *  U(t,t0)  |   |
+   *  t0       |   | t0
+   *  [mu_0b]  |   | [mu_0k]
+   *
+   * */
   void ProgCfun::RunC1 ()
   {
     Logger& log = Logger::InstanceRef();
@@ -144,13 +187,21 @@ namespace QDLIB
     Cfunc cfun(master_clock_.Steps()/wcycle_); /* Correlation function */
     cfun.cVec::operator=(dcomplex(0)); /* set zero */
     WaveFunction* psi_t = wfbuffer.Get(0)->NewInstance();
+    WaveFunction* bra = NULL;
 
-    log.Header("Calculate One-point correclation function", Logger::SubSection);
+    log.Header("Calculate One-point correlation function", Logger::SubSection);
     log.flush();
 
+    if (bra_.size() > 0 ){
+	bra = InitializeKetBra(true);
+    }
+
+    master_clock_.Begin();
     for (int t=0; t < master_clock_.Steps()/wcycle_; t++){
 	WaveFunction* ket = wfbuffer.Get(t);
 	*psi_t = ket;
+
+	master_clock_.TimeStep(t * wcycle_); // make sure time dependent ops are in sync
 	for (uint i=ket_first_op_; i < ket_.size(); i++){
 	    if (ket_[i] != NULL){
 		ket_[i]->Apply(psi_t);
@@ -158,7 +209,15 @@ namespace QDLIB
 	      break;
 	}
 
-	cfun[t] = *ket * psi_t;
+	if ( bra == NULL) {
+	    cfun[t] = *ket * psi_t;
+	} else {
+	    for (int tb=0; tb < wcycle_; tb++) {
+		U_->Apply(bra);
+		++master_clock_;
+	    }
+	    cfun[t] = *bra * psi_t;
+	}
     }
 
     DELETE_WF(psi_t);
@@ -175,7 +234,18 @@ namespace QDLIB
   }
 
 
-  /** Calculate two-point correlation function. */
+  /**
+   * Calculate two-point correlation function.
+   *
+   *  Case a                   Case b
+   *           /---\                    /---\
+   *  mu_s(t)  |   | U+(t,t0)  m_s(t)   |   |
+   *  U(t,t1)  |   |           U(t,t0)  |   | U+(t,t1)
+   *  mu_1(t1) |   |                    |   | mu_1(t1)
+   *  U(t1,t0) |   |                    |   | U+(t1,t0)
+   *  t0       |   | t0             t0  |   | t0
+   *  [mu_0k]  |   | [mu_0b]    [mu_0b] |   | [mu_0k]
+   * */
   void ProgCfun::RunC2 ()
   {
     Logger& log = Logger::InstanceRef();
@@ -185,47 +255,89 @@ namespace QDLIB
     cfun.cVec::operator=(dcomplex(0)); /* set zero */
 
     WaveFunction* psi_t_k = wfbuffer.Get(0)->NewInstance();
+    WaveFunction* psi_t_s = wfbuffer.Get(0)->NewInstance();
     WaveFunction* psi_t_b = wfbuffer.Get(0)->NewInstance();
+    WaveFunction* bra = NULL;
+
+    if (bra_.size() > 0 ){
+	bra = InitializeKetBra(true);
+    }
 
     log.cout() << endl;
     log.Header("Calculate Two-point correlation function", Logger::SubSection);
     log.flush();
 
+
+    // figure out which variant to use
+    uint nUket = 0; uint first_ket = 0;
+    for (uint i=0; i < ket_.size(); i++){
+	if ( ket_[i] == NULL ) {
+	    nUket++;
+	    if (nUket == 1) first_ket = nUket+1;
+	}
+    }
+
+    uint nUbra = 0; uint first_bra = 0;
+    if (bra != NULL)
+	for (uint i=0; i < bra_.size(); i++){
+	    if ( bra_[i] == NULL ) {
+		nUbra++;
+		if (nUket == 1) first_bra = nUbra+1;
+	    }
+	}
+
+    bool twoket = false; // two  U on ket or two U on bra
+    if (nUket == 2 && nUbra <= 1 )
+	twoket = true;
+    else if (nUket == 1 && nUbra == 2)
+	//twoket = false;
+	throw(EParamProblem("Two propagators on ket not implemented yet!"));
+    else
+	throw(EParamProblem("Wrong number of propagators in ket/bra defintions!"));
+
+    master_clock_.Begin();
     for (int t1=0; t1 < Nt; t1++){
-	*psi_t_k = wfbuffer.Get(t1);
-	for (uint i=ket_first_op_; i < ket_.size(); i++){
+	*psi_t_k = wfbuffer.Get(t1); // U|Psi0>
+	//cout << *psi_t_k;
+	for (uint i=first_ket; i < ket_.size(); i++){ // O1 U|Psi0>
 	    if (ket_[i] != NULL){
 		ket_[i]->Apply(psi_t_k);
 	    } else
 	      break;
 	}
+	//cout << *psi_t_k << endl;
+	// Propagate independent bra side
+	if (bra != NULL){
+	    for (int i=0; i < wcycle_; i++) {
+		U_->Apply(bra);
+		++master_clock_;
+	    }
+	    *psi_t_b = bra;
+	}
 
 	master_clock_.TimeStep(t1*wcycle_);
 	for (int t2=t1; t2 < Nt; t2++){
-	  *psi_t_b = wfbuffer.Get(t2);
-	  if (bra_.size() != 0) { // use bra definition
-	    for (uint i=bra_first_op_; i < bra_.size(); i++){
-	        if (bra_[i] != NULL){
-		    bra_[i]->Apply(psi_t_b);
-	        } else
+	    if (bra == NULL) {	// Two ops on the ket side, no definition for bra side
+		*psi_t_b = wfbuffer.Get(t2);
+	    }
+
+	    // Signal interaction on ket
+	    *psi_t_s = psi_t_k;
+	    for (uint i=first_ket+2; i < ket_.size(); i++){
+		if (ket_[i] != NULL){
+		    ket_[i]->Apply(psi_t_s);
+		} else
 		  break;
 	    }
-	  } else { // re-use ket defintion
-	    for (uint i=ket_first_op_; i < ket_.size(); i++){
-	        if (ket_[i] != NULL){
-	  	    ket_[i]->Apply(psi_t_b);
-	        } else
-		  break;
-	    }
-	  }
 
-	  cfun[t1*Nt+t2] = *psi_t_b * psi_t_k;
-
+          cfun[t1*Nt+t2] = *psi_t_b * psi_t_s;
 	  if (t2-t1 > stepsint_ && stepsint_ > 0) break;
 
-	  for (int i=0; i < wcycle_; i++) /* propgate wcycle steps forward */
+	  for (int i=0; i < wcycle_; i++){ // U O1 U|Psi0> /* propagate wcycle steps forward */
 	    U_->Apply(psi_t_k);
+	    if (bra != NULL) U_->Apply(psi_t_b);
 	    ++master_clock_;
+	  }
 	}
     }
 
@@ -271,17 +383,15 @@ namespace QDLIB
 
     /* Load the initial Wavefunction */
 
-    WaveFunction *Psi;
-
     if (read_dir_.empty()) { /* propagate baseline */
       section = ContentNodes_->FindNode( "wf" );
       if (section == NULL)
 	   throw ( EParamProblem ("No inital wave function found") );
 
-      Psi = ChainLoader::LoadWaveFunctionChain( section );
+      Psi0 = ChainLoader::LoadWaveFunctionChain( section );
       delete section;
 
-      wfbuffer.Add(Psi);
+      wfbuffer.Add(Psi0);
     } else { /* Get propgation from file */
 	/* Get parameters for propagation */
 	ParamContainer propagation_meta;
@@ -306,7 +416,7 @@ namespace QDLIB
 	if (wfbuffer.Size() < 1 )
 	  throw (EParamProblem("Wave function buffer is empty"));
 
-	Psi = wfbuffer[0];
+	Psi0 = wfbuffer[0];
     }
 
     log.IndentDec();
@@ -314,26 +424,31 @@ namespace QDLIB
 
     /* Let the Propagator do it's initalisation */
     U_->Clock( &master_clock_ );
-    U_->Init(Psi);
+    U_->Init(Psi0);
     H_ = U_->Hamiltonian();
     H_->UpdateTime();
 
     /* Get defintion for bra */
     bra_first_op_ = ReadKetBra("bra", bra_);
     for (uint i=0; i < bra_.size(); i++) {
-	if (bra_[i] != NULL) bra_[i]->Init(Psi);
+	if (bra_[i] != NULL) bra_[i]->Init(Psi0);
     }
-
 
     /* Get defintion for ket */
     ket_first_op_ = ReadKetBra("ket", ket_);
     for (uint i=0; i < ket_.size(); i++) {
-	if (ket_[i] != NULL) ket_[i]->Init(Psi);
+       if (ket_[i] != NULL) ket_[i]->Init(Psi0);
     }
 
     if (bra_.size() == 0){ /* no bra means: <psi|U+ */
 	num_u_ = num_u_+1;
+    } else {
+	if (bra_.back() != NULL)
+	    throw (EParamProblem("Last operator in bra definition has to be a propagator"));
     }
+
+    if (ket_.back() == NULL)
+	throw (EParamProblem("Last operator in bra definition has to be the signal mode operator"));
 
     if (wfbuffer.Size() > 1 && (ket_[0] != NULL || bra_[0] != NULL))
       throw (EParamProblem("Pre-propagated time series requires a propagator as first element int the ket and bra definitions."));
@@ -341,25 +456,12 @@ namespace QDLIB
     /* Run initial time series, if not already present */
     if (wfbuffer.Size() == 1){
 	log.cout() << "\nRun initial propagation U(t1,0)|psi>\n"; log.flush();
-	WaveFunction* psi_t = Psi->NewInstance();
 
-	if (ket_[0] != NULL) {
-	    /* apply operator list before propagating */
-	    *psi_t = Psi;
-	    for (size_t i=0; i < ket_.size(); i++) {
-		if (ket_[i] == NULL) {
-		    ket_first_op_++;
-		    break;
-		}
-		ket_[i]->Apply(psi_t);
-		ket_first_op_++;
-	    }
-	} else {
-	  *psi_t = Psi;
-	}
+	WaveFunction* psi_t = InitializeKetBra(false);
 
 	/* fill wfbuffer with time series */
 	master_clock_.Begin();
+	wfbuffer.Set(0, psi_t);
 	for (int i=1; i < master_clock_.Steps(); i++){
 	    U_->Apply(psi_t);
 	    ++master_clock_;
@@ -401,7 +503,7 @@ namespace QDLIB
 
     /* Do */
 
-
+    DELETE_WF(Psi0);
 
   }
 

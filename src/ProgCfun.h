@@ -53,6 +53,7 @@ namespace QDLIB
 
       OPropagator* U_;
       Operator* H_;
+      WaveFunction* Psi0;
       vector<Operator*> ket_;
       int ket_first_op_;
       vector<Operator*> bra_;
@@ -67,6 +68,7 @@ namespace QDLIB
       void InitParams_();
       int ReadKetBra(const string& name, vector<Operator*>& kb );
       void CreateMetaData(int dims, ParamContainer &pm);
+      WaveFunction* InitializeKetBra(bool bra = false);
       void RunC1();
       void RunC2();
     public:
