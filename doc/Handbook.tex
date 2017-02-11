@@ -4,6 +4,21 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 
+%
+%  QM macros
+%
+\newcommand{\da}{^\dagger}
+
+\newcommand{\ddx}[1]{{\partial_{#1}}}
+\newcommand{\dddx}[1]{{\partial^2_{#1}}}
+\newcommand{\dfdx}[2]{\dfrac{\partial#1}{\partial#2}}
+
+\newcommand{\br}[1]{\langle #1 \vert}
+\newcommand{\ke}[1]{\vert #1  \rangle}
+\newcommand{\bk}[2]{\langle #1  \vert #2  \rangle}
+
+\DeclareMathOperator{\Tr}{Tr}
+
 %% Macros
 \newcommand{\option}[2]{\item \texttt{#1}\\ #2}
 \newcommand{\code}[1]{\texttt{#1}}
@@ -439,6 +454,22 @@ mode of operation. Takes exactly two values which specify the bra and the ket st
 
 
 \section{Correlation functions}
+One- and two-point correlation functions are supported for
+spectroscopy \cite{Mukamel}. Loop diagrams in
+Hilbert space \cite{Rahav10aamop}. 
+\begin{align}
+C(t) = \br{\Psi_0}\hat O_b \hat U\da(t,0) \hat O_p \hat U(t,0) \hat O_k \ke{\Psi_0}
+\end{align}
+\begin{align}
+C(t,t_1) = \br{\Psi_0}\hat O_b \hat U\da(t,0)
+\hat O_p \hat U(t,t_1) \hat O_1 \hat U(t_1,0) \hat O_k \ke{\Psi_0}\\
+C(t_2,t) = \br{\Psi_0}\hat O_b \hat U\da(t_2,0)
+  \hat O_2 \hat U\da(t,t_2) \hat O_p \hat U(t,0) \hat O_k \ke{\Psi_0}
+\end{align}
+where $\hat O_p$ defines the probe and $\hat U(t_i,t_j)=e^{-i \hat H(t_i-t_j)}$
+is the system's propagator bringing the system from time $t_j$ to time $t_j$.
+The specification of $\hat O_{k/b}$ is optional.
+
 \begin{options}
 \option{dt}{time step for propagator [required]}
 \option{steps}{number of time steps [required]}
@@ -450,11 +481,17 @@ mode of operation. Takes exactly two values which specify the bra and the ket st
 
 Necessary sections in the input:
 \begin{itemize}
- \option{propagator}{}
+ \option{propagator}{Propagator with the system Hamiltonian}
+ \option{wf}{Initial wave function}
  \option{ket}{The sequence of operators on the ket side}
- \option{bra}{The sequence of operators on the bra side}
- \option{target}{A target operators if \code{ttype=operator}.}
+ \option{bra}{The sequence of operators on the bra side (optional)}
 \end{itemize}
+The \code{ket} and \code{bra} section define a sequence of operators of interactions
+and propagators. Operators are define in the usual way, while propagators
+are represented by an empty \code{U\{\}} section.
+The last element on the ket side must the probe operator. If the bra side
+is defined explicitly, its last element must be a propagator.
+If the \code{bra} section is omitted it is assumed to be $\br{\Psi}\hat O_k \hat U\da(t,0)$.
 
 \subsubsection*{Examples}
 Correlation function for a transient absorption experiment.
