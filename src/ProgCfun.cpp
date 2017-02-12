@@ -282,30 +282,30 @@ namespace QDLIB
 	for (uint i=0; i < bra_.size(); i++){
 	    if ( bra_[i] == NULL ) {
 		nUbra++;
-		if (nUket == 1) first_bra = nUbra+1;
+		if (nUbra == 1) first_bra = nUbra+1;
 	    }
 	}
 
-    bool twoket = false; // two  U on ket or two U on bra
+    bool lhsint = false; // case a = true, b = false
     if (nUket == 2 && nUbra <= 1 )
-	twoket = true;
+	lhsint = true;
     else if (nUket == 1 && nUbra == 2)
-	//twoket = false;
-	throw(EParamProblem("Two propagators on ket not implemented yet!"));
+	lhsint = false;
+	//throw(EParamProblem("Two propagators on ket not implemented yet!"));
     else
 	throw(EParamProblem("Wrong number of propagators in ket/bra defintions!"));
 
     master_clock_.Begin();
     for (int t1=0; t1 < Nt; t1++){
-	*psi_t_k = wfbuffer.Get(t1); // U|Psi0>
-	//cout << *psi_t_k;
-	for (uint i=first_ket; i < ket_.size(); i++){ // O1 U|Psi0>
-	    if (ket_[i] != NULL){
-		ket_[i]->Apply(psi_t_k);
-	    } else
-	      break;
+	if (lhsint) {
+	    *psi_t_k = wfbuffer.Get(t1); // U|Psi0>
+	    for (uint i=first_ket; i < ket_.size(); i++){ // O1 U|Psi0>
+		if (ket_[i] != NULL){
+		    ket_[i]->Apply(psi_t_k);
+		} else
+		  break;
+	    }
 	}
-	//cout << *psi_t_k << endl;
 	// Propagate independent bra side
 	if (bra != NULL){
 	    for (int i=0; i < wcycle_; i++) {
@@ -315,26 +315,47 @@ namespace QDLIB
 	    *psi_t_b = bra;
 	}
 
+	if (!lhsint) {
+	    for (uint i=first_bra; i < bra_.size(); i++){ // O1 U|Psi0>
+		if (bra_[i] != NULL){
+		    bra_[i]->Apply(psi_t_b);
+		} else
+		  break;
+	    }
+	}
+
 	master_clock_.TimeStep(t1*wcycle_);
 	for (int t2=t1; t2 < Nt; t2++){
 	    if (bra == NULL) {	// Two ops on the ket side, no definition for bra side
 		*psi_t_b = wfbuffer.Get(t2);
 	    }
 
+	    if (!lhsint) {
+		*psi_t_k = wfbuffer.Get(t2);
+	    }
+
 	    // Signal interaction on ket
 	    *psi_t_s = psi_t_k;
-	    for (uint i=first_ket+2; i < ket_.size(); i++){
+	    int ketsigop = first_ket+2;
+	    if (!lhsint)
+		ketsigop = first_ket;
+
+	    for (uint i=ketsigop; i < ket_.size(); i++){
 		if (ket_[i] != NULL){
 		    ket_[i]->Apply(psi_t_s);
 		} else
 		  break;
 	    }
 
-          cfun[t1*Nt+t2] = *psi_t_b * psi_t_s;
+	    if (lhsint)
+		cfun[t1*Nt+t2] = *psi_t_b * psi_t_s;
+	    else
+		cfun[t2*Nt+t1] = *psi_t_b * psi_t_s;
+
 	  if (t2-t1 > stepsint_ && stepsint_ > 0) break;
 
 	  for (int i=0; i < wcycle_; i++){ // U O1 U|Psi0> /* propagate wcycle steps forward */
-	    U_->Apply(psi_t_k);
+	    if (lhsint) U_->Apply(psi_t_k);
 	    if (bra != NULL) U_->Apply(psi_t_b);
 	    ++master_clock_;
 	  }
