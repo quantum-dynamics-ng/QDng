@@ -59,7 +59,7 @@ void FileSingleTest::Raw_Test()
    DataClass data_out(true);
    FileSingle<DataClass> file_out;
 
-   file_out.Format(FileSingle<DataClass>::binary);
+   file_out.FormatOut(FileSingle<DataClass>::binary);
    file_out.Name("DataClassTestFile");
    file_out.Suffix(".raw");
 
@@ -99,7 +99,7 @@ void FileSingleTest::Compression_Test_ZLIB()
    DataClass data_out(true);
    FileSingle<DataClass> file_out;
 
-   file_out.Format(FileSingle<DataClass>::binary);
+   file_out.FormatOut(FileSingle<DataClass>::binary);
    file_out.Name("DataClassTestFileC");
    file_out.Suffix(".raw");
    file_out.Compression(FileSingle<DataClass>::ZLIB);
@@ -161,7 +161,7 @@ void FileSingleTest::Compression_Test_BZIP()
    DataClass data_out(true);
    FileSingle<DataClass> file_out;
 
-   file_out.Format(FileSingle<DataClass>::binary);
+   file_out.FormatOut(FileSingle<DataClass>::binary);
    file_out.Name("DataClassTestFileC");
    file_out.Suffix(".raw");
    file_out.Compression(FileSingle<DataClass>::BZIP);
