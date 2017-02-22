@@ -5,7 +5,7 @@
 \usepackage{hyperref}
 
 %
-%  QM macros
+%  QM macrosnext week
 %
 \newcommand{\da}{^\dagger}
 
@@ -33,7 +33,7 @@
 }
 
 
-\title{QDng Docomentation}
+\title{QDng Documentation}
 \author{Markus Kowalewski}
 \begin{document}
 \maketitle
@@ -199,8 +199,12 @@ Single file containing data and meta data.
 This format is more versatile than the raw data format. This is the default file format.
 A MATLAB interface for creation and reading is provided.
 
+\subsection{Data formats}
+\subsubsection{Numerical grids}
+\subsubsection{Numerical matrices}
+\subsubsection{Multistate wave functions}
 
-\chapter{Main Programms}
+\chapter{Main Programs}
 
 \begin{verbatim}
 qdng [ -d output directory] [-p cpus] <input file> [var1=val1] ... [varN=valN] 
@@ -221,7 +225,7 @@ Global options can be given in several locations:
 
 \subsubsection{Buffers}
 \begin{options}
- \option{MaxBufferSize}{Buffer size for wave function buffers. Used for example in SIL and OCT. The value is in bytes but
+ \option{MaxBufferSize}{Buffer size for wave function buffers. Used for example in SIL, Arnoldi propagators and OCT. The value is in bytes but
  can suffixed by K,M or G.}
  \option{tmpdir}{Path for on-disk buffer files.}
 \end{options}
@@ -325,7 +329,8 @@ See \cite{Ezer86} for the basic method.
 \option{steps}{Maximum number of time steps [10000].}
 \option{conv}{Convergence criteria for im-propagation [$10^{-5}$ if diag=true, $10^{-8}$ if diag=false].}
 \option{Nef}{Number of efs to calculate [20].}
-\option{start}{Continue an aborted ef calculation.}
+\option{start}{Continue an aborted ef calculation. Give the index of the last
+obtained eigenfunction.}
 \end{options}
 
 \subsubsection*{Autocorrelation}
@@ -431,7 +436,9 @@ qdng {
 
 \subsection{Defining Filter Lists}
 \label{sec:Filters}
-Filter lists are evaluated from top to bottom.
+Filter lists can be used e.g., within the propagation program
+for data analysis.
+They are evaluated from top to bottom.
 
 \subsubsection*{Sections}
 Modes of operation:
@@ -687,8 +694,9 @@ The Chebychev propagator \cite{Ezer84} needs a subsection \verb|hamiltonian|.
 Suitable and very efficient for long time steps. Non-hermitian Hamiltonians are supported.
 \begin{options}
  \option{order}{desired max order of recursion, if left empty it's chosen automatically.}
- \option{scaling}{The scaling of the Hamiltonian. Can only be used in combination with order.}
- \option{prec}{The lower limit precission for the series convergence on the norm: $prec < 1-\langle psi|psi \rangle$}
+ \option{scaling}{The scaling of the Hamiltonian. %Can only be used in combination with order.
+ }
+ \option{prec}{The lower limit precission for the series convergence on the norm: $prec < 1-\langle \psi|\psi \rangle$}
 \end{options}
 
 \subsubsection*{Example}
@@ -702,7 +710,7 @@ Suitable and very efficient for long time steps. Non-hermitian Hamiltonians are 
 \end{verbatim}
 
 \subsection{Short Iterative Lanczos}
-The SIL propagator \cite{needed} needs a subsection \verb|hamiltonian|.
+The SIL propagator \cite{Tannor,Leforestier91} needs a subsection \verb|hamiltonian|.
 Suitable for short time steps or combination with time dependent Hamiltonians.
 Non-hermitian Hamiltonians are not supported.
 \begin{options}
@@ -795,7 +803,7 @@ The name of the operator is simply \verb|Multistate|. The matrix elements are gi
 
 
 \subsubsection*{Example}
-Two electronic states coupled a laser field.
+Two electronic states coupled by a laser field.
 \begin{verbatim}
  <hamiltonian name="Multistate">
    <m0.0 name="Sum">
@@ -832,9 +840,17 @@ Kinetic energy operator for cartesian or cartesian-like coordinates.
  Tkin { name="GridNablaSq" mass="1728.4" }
 \end{verbatim}
 
+Or for a 2D system:
+\begin{verbatim}
+ Tkin { name="GridNablaSq" mass="1728.4,3600.4" }
+\end{verbatim}
+
+
 \subsection{Perfect Matched Layer (GridPML)}
 Use a cartesian type kinetic energy operator with a perfect matched layer (PML) \cite{Nissen10} as
 absorbing boundary conditions.
+
+\textbf{Expression}
 
 \begin{options}
  \option{dim}{Number of dimensions [\# given in mass]}
@@ -932,7 +948,8 @@ This operator can be used for infrared exciatations as as for
 the laser coupling between two electronic states.
 
 \begin{options}
- \option{file}{Read from fiven binary file.}
+ \option{laser}{File with laser field}
+ \option{file}{File with dipole operator}
  \option{gen}{Indicates that laser should be generated. See sec. \ref{sec:LaserFields} for details.}
 \end{options}
 
@@ -967,7 +984,10 @@ Simple IR interaction
 </hamiltonian>
 \end{verbatim}
 
-\subsection{Two-Photon Raman Laser Interaction (GridRaman)}
+\subsection{Off-Resonant Two-Photon Raman Laser Interaction (GridRaman)}
+\begin{equation}
+V_r = E_1(t) \alpha E_2(t)
+\end{equation}
 
 \subsection{Flux Operator}
 Propabilty flux through a surface/hyper surface. The formulation
@@ -1295,6 +1315,9 @@ wf { name=Multimap statemap=3,0,1 coeffs=0.2,0.3,0.4
   wf { file=WF }
 }
 \end{verbatim}
+
+
+\chapter{MATLAB interface}
 
 \bibliographystyle{acm}
 \bibliography{qdng}
