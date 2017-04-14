@@ -268,13 +268,13 @@ namespace QDLIB
     log.flush();
 
 
-    // figure out which variant to use
+    // find the first operators after the first U in ket and bra
     uint nUket = 0; uint first_ket = 0;
     for (uint i=0; i < ket_.size(); i++){
 	if ( ket_[i] == NULL ) {
 	    nUket++;
-	    if (nUket == 1) first_ket = nUket+1;
-	}
+	} else
+	    if (nUket == 1) first_ket = i;
     }
 
     uint nUbra = 0; uint first_bra = 0;
@@ -282,21 +282,22 @@ namespace QDLIB
 	for (uint i=0; i < bra_.size(); i++){
 	    if ( bra_[i] == NULL ) {
 		nUbra++;
-		if (nUbra == 1) first_bra = nUbra+1;
-	    }
+	    } else
+		if (nUbra == 1) first_bra = i;
 	}
 
+    // figure out which variant to use
     bool lhsint = false; // case a = true, b = false
     if (nUket == 2 && nUbra <= 1 )
 	lhsint = true;
     else if (nUket == 1 && nUbra == 2)
 	lhsint = false;
-	//throw(EParamProblem("Two propagators on ket not implemented yet!"));
     else
-	throw(EParamProblem("Wrong number of propagators in ket/bra defintions!"));
+	throw(EParamProblem("Wrong number of propagators in ket/bra definitions!"));
 
     master_clock_.Begin();
     for (int t1=0; t1 < Nt; t1++){
+	master_clock_.TimeStep(t1*wcycle_);
 	if (lhsint) {
 	    *psi_t_k = wfbuffer.Get(t1); // U|Psi0>
 	    for (uint i=first_ket; i < ket_.size(); i++){ // O1 U|Psi0>
@@ -306,17 +307,20 @@ namespace QDLIB
 		  break;
 	    }
 	}
+
 	// Propagate independent bra side
 	if (bra != NULL){
+	    int step = master_clock_.TimeStep();
 	    for (int i=0; i < wcycle_; i++) {
 		U_->Apply(bra);
 		++master_clock_;
 	    }
 	    *psi_t_b = bra;
+	    master_clock_.TimeStep(step); // restore time step
 	}
 
 	if (!lhsint) {
-	    for (uint i=first_bra; i < bra_.size(); i++){ // O1 U|Psi0>
+	    for (uint i=first_bra; i < bra_.size(); i++){ //  <Psi0|U+ O1
 		if (bra_[i] != NULL){
 		    bra_[i]->Apply(psi_t_b);
 		} else
@@ -355,7 +359,9 @@ namespace QDLIB
 	  if (t2-t1 > stepsint_ && stepsint_ > 0) break;
 
 	  for (int i=0; i < wcycle_; i++){ // U O1 U|Psi0> /* propagate wcycle steps forward */
-	    if (lhsint) U_->Apply(psi_t_k);
+	    if (lhsint) {
+		U_->Apply(psi_t_k);
+	    }
 	    if (bra != NULL) U_->Apply(psi_t_b);
 	    ++master_clock_;
 	  }
