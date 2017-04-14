@@ -40,4 +40,9 @@
  * Faber propagator
  * basic operation types for density matrices
 
+* Build in Systems
+  * NaI potentials and NACs
+  * CHD kinetic Hamiltonian
+  * CI type WFs
+
 
