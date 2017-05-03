@@ -19,7 +19,10 @@ namespace QDLIB {
    {
       _params = params;
       
-      _params.GetValue("value",_value);
+      _params.GetValue("value",_value._real);
+
+      if (_params.isPresent("im"))
+	  _params.GetValue("im",_value._imag);
    }
    
    void OScalar::Init(WaveFunction * Psi)

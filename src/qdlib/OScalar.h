@@ -9,7 +9,8 @@ namespace QDLIB {
     * Simple scalar value.
     * 
     * options 
-    * \li val  The value
+    * \li value  The value
+    * \li im   Imaginary part
     *   @author Markus Kowalewski <markus.kowalewski@cup.uni-muenchen.de>
     * 
     * \todo remove buffer, this not needed for scalar operator!?
@@ -19,7 +20,7 @@ namespace QDLIB {
       private:
          string _name;
          WaveFunction* _buf;
-         double _value;
+         dcomplex _value;
          
       public:
          OScalar();
