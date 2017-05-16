@@ -48,6 +48,7 @@ dist_pkgdata_DATA = get_global_params.m \
  	qd_encode_OGridSystem.m \
  	qd_encode_WFGridCartesian.m \
  	qd_encode_WFLevel.m \
+ 	qd_encode_WF.m \
  	qd_get_global_params.m \
  	qd_get_socket.m \
  	qd_get_stream_intro.m \
