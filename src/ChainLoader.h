@@ -86,7 +86,12 @@ namespace QDLIB
 	 }
          n = nops;
          delete[] sop;
-         return package;
+         if (nops == 0) {
+            delete package;
+            return NULL;
+         } else {
+            return package;
+         }
       }
       
       /* Crawl trough Multistate operator*/
@@ -103,11 +108,6 @@ namespace QDLIB
                   res = FindOperatorType<C>(ms->State(i,j), sop, max, label, index+nops);
 		  if (res != NULL){
 		     package->Add(res, i, j);
-		     if (ms->State(i,j) != ms->State(j,i)){  /* The operator/matrix element you're looking for must hermitian e.g. the same object */
-		        stringstream ss;
-		        ss << "(" << i << ", " << j << ")";
-		        throw (EParamProblem("Non-hermitian Multistate element found at ", ss.str()));
-		     }
                      for (int k=0; k < max; k++){
                         found[index+nops+k] = sop[index+nops+k];
                         if (nops+k >= n){
@@ -116,19 +116,47 @@ namespace QDLIB
                         }
                      }
                      nops += max;
+		     if (ms->State(i,j) != ms->State(j,i) && ms->State(j,i) != NULL) {
+                        cout << "Look for NH counterpart: " << ms->State(i,j) << " " << ms->State(j,i) << endl;
+                        cout << "Label: " << *label << endl;
+                        max=n;
+                        res = FindOperatorType<C>(ms->State(j,i), sop, max, label, index+nops);
+		        if (res != NULL){
+                           cout << "Found an j,i" << ms->State(j,i)->Name()  << endl;
+		           package->Add(res, j, i);
+                           for (int k=0; k < max; k++){
+                              found[index+nops+k] = sop[index+nops+k];
+                              if (nops+k >= n){
+                                 delete[] sop;
+                                 return package;
+                              }
+                           }
+                           nops += max;
+                        }
+		     }
 		  }
                   /* Abort if limit is reached prematurely */
                   if (nops > n){
                      n = nops;
                      delete[] sop;
-                     return package;
+                     if (nops == 0) {
+                        delete package;
+                        return NULL;
+                     } else {
+                        return package;
+                     }
                   }
 	       }
 	    }
 	 }
          n = nops;
          delete[] sop;
-         return package;
+         if (nops == 0) {
+            delete package;
+            return NULL;
+         } else {
+            return package;
+         }
       }
       
       n = 0;
