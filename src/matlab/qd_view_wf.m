@@ -72,46 +72,63 @@ if iscell(data)
              
     end
 else
-    X = prepare_axis(meta);
-    y = prepare_data(data, opts);
-    plot_wf(X, y, meta);
+    if isfield(opts, 'dims')
+        dims = length(opts.dims);
+    else
+        dims = meta.dims;
+    end
+    
+    X = prepare_axis(meta, opts);
+    y = prepare_data(data, meta, opts);
+    plot_wf(X, y, meta, opts);
 end
 
 
 end
 
     % prepare data
-    function y = prepare_data(data, opts)
-        if isfield(opts, 'dims')
-            y = qd_int(data, opts.dims);
+    function y = prepare_data(data, meta, opts)
+        if nargin > 2 && isfield(opts, 'dims')
+            y = qd_int(data, setdiff(double(1:meta.dims),opts.dims));
         else
             y = data;
         end
     end
 
 
-    function X = prepare_axis(meta)
-        switch (meta.dims)
+    function X = prepare_axis(meta, opts)
+        if nargin > 1 && isfield(opts, 'dims')
+            dims = opts.dims;
+        else
+            dims = 1:meta.dims;
+        end
+        
+        switch (length(dims))
             case 1
-                X = linspace(meta.dim.xmin, meta.dim.xmax, meta.dim.size);
+                X = linspace(meta.dim(dims).xmin, meta.dim(dims).xmax, meta.dim(dims).size);
             case 2
-                x = linspace(meta.dim(1).xmin, meta.dim(1).xmax, meta.dim(1).size);
-                y = linspace(meta.dim(2).xmin, meta.dim(2).xmax, meta.dim(2).size);
+                x = linspace(meta.dim(dims(1)).xmin, meta.dim(dims(1)).xmax, meta.dim(dims(1)).size);
+                y = linspace(meta.dim(dims(2)).xmin, meta.dim(dims(2)).xmax, meta.dim(dims(2)).size);
                 [X{1}, X{2}] = ndgrid(x,y);
             otherwise
-                error('Multi-dim view not implemented yet. Choose dimensions with opts.dims');
+                error('Multi-dim view not implemented yet. Choose dimensions with opts.dims');             
         end
     end
 
-    function plot_wf(x, y, meta)
-        switch (meta.dims)
+    function plot_wf(x, y, meta, opts)
+        if nargin > 3 && isfield(opts, 'dims')
+            dims = opts.dims;
+        else
+            dims = 1:meta.dims;
+        end    
+        switch (length(dims))
             case 1
                 plot(x, abs(y));
             case 2
                 surf(x{1}, x{2}, abs(y), 'LineStyle', 'None'); view([0 90])
                 colorbar();
-                xlim([meta.dim(1).xmin meta.dim(1).xmax]);
-                ylim([meta.dim(2).xmin meta.dim(2).xmax]);
+                xlim([meta.dim(dims(1)).xmin meta.dim(dims(1)).xmax]);
+                ylim([meta.dim(dims(2)).xmin meta.dim(dims(2)).xmax]);
             otherwise
                 error('Multi-dim view not implemented yet. Choose dimensions with opts.dims');
         end

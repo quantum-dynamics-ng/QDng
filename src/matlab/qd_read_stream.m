@@ -15,9 +15,9 @@ if strcmp(char(reshape(buffer,1,4)),'QDng') == false
     resp = pb_read_QDLIB__Response(buffer);
     
     if resp.response == 1
-        error(resp.msg);
+        error('qdng:qd_read_stream', resp.msg);
     else
-        error('Unknown error');
+        error('qdng:qd_read_stream', 'Unknown error');
     end
 end
 

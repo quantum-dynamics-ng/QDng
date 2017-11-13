@@ -31,11 +31,14 @@ end
 
 if strncmp('OGrid', header.class, 5)
     [data, meta] = qd_decode_OGridSystem(payload);
+    meta.class = header.class(2:end);
 elseif strcmp ('Laser', header.class)
-    [data, meta] = qd_decode_Laser(payload);
+    [data, dt] = qd_decode_Laser(payload);
+    meta.dt = dt;    
+    meta.class = header.class;
 else
     error('qdng:qd_read_op:unknown_class',['Unknown class: ' header.class' '\nprovide a decode fuction!']);   
 end
 
-meta.class = header.class(2:end);
+
 

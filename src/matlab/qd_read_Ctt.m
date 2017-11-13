@@ -1,6 +1,6 @@
 function [Ctt, Nt, dt] = qd_read_Ctt(fname)
 %
-% [Ctt, Nt, dt] = qd_read_Ctt(dir)
+% [Ctt, Nt, dt] = qd_read_Ctt(fname)
 %   
 % Read a correlation function
 % 
