@@ -10,9 +10,8 @@ if CPPUNIT
   OPT_DIRS+=tests
 endif
 
-AM_CXXFLAGS = $(DEVEL_FLAGS) $(OPT_FLAGS) -std=c++98 -DQDNG_BUILD_DATE="\"`date`\"" -DQDNG_BUILD_HOST="\"`uname -n`\"" \
-	      -DQDNG_BUILD_MACH="\"`uname -m`\"" -DQDNG_REV="\"`git rev-list --max-count=1 HEAD`\"" \
-	      -Wno-long-long -DQD_SYS_MOD_PATH='"$(libdir)/qdng/"'
+AM_CXXFLAGS += $(DEVEL_FLAGS) $(OPT_FLAGS) $(CXXFLAGS_GLOB) -DQDNG_BUILD_DATE="\"`date`\"" -DQDNG_BUILD_HOST="\"`uname -n`\"" \
+	      -DQDNG_BUILD_MACH="\"`uname -m`\"" -DQDNG_REV="\"`git rev-list --max-count=1 HEAD`\""
 
 if HAVEOPENMP
   AM_CXXFLAGS += $(OPENMP_CXXFLAGS)

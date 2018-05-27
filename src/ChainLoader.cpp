@@ -17,10 +17,10 @@
 
 namespace QDLIB
 {
-   
+
    /**
     * Recursive method to load an operator chain.
-    * 
+    *
     * Should recognize special collective operators (OSum, OGridSum, OMultistate)
     *
     * \param Onode       The XML node conataining the operator definition
@@ -32,15 +32,15 @@ namespace QDLIB
       ModuleLoader<Operator>* mods = ModuleLoader<Operator>::Instance();
       Logger& log = Logger::InstanceRef();
       GlobalOpList& OpList = GlobalOpList::Instance();
-      
+
       ParamContainer pm;
       string name, key, ref, label;
       Operator *O=NULL;
       XmlNode *child;
-      
+
       pm = Onode->Attributes();
       pm.GetValue( "name", name );
-      
+
       if (pm.isPresent("ref")) {
          pm.GetValue("ref", ref);
 	 log.cout() << "Reference to " << ref << endl << endl;
@@ -64,10 +64,10 @@ namespace QDLIB
 	    sum->Add( gsub );
 	    child->NextNode();
 	 }
-	 
+
 	 log.flush();
 	 log.IndentDec();
-	 
+
 	 O = sum;
       } else if (name == "Multistate" || name == "DMultistate") { /* Matrix of operators */
 	 log.cout() << "Multistate operator:\n";
@@ -87,36 +87,36 @@ namespace QDLIB
 	 OMultistate *matrix = NULL;
          if (name == "Multistate") matrix = new OMultistate();
          if (name == "DMultistate") matrix = new ODMultistate();
-	 
+
 	 matrix->Init(pm);
 	 while (child->EndNode()){
 	    string name;
 	    stringstream ss_row, ss_col;
 	    int row, col;
-	    
+
 	    name = child->Name();
 	    ss_row << name.substr(1, name.find('.')-1);
 	    ss_col << name.substr(name.find('.')+1);
 	    ss_row >> row;
 	    ss_col >> col;
-	    
+
 	    log.cout() << "H(" << row << "," << col << ")\n";
-	    
+
 	    osub = LoadOperatorChain( child, persist );
 	    if (osub == NULL)
 	       throw ( EParamProblem("Can't load operator") );
-	    
-	    
+
+
 	    matrix->Add(osub, row, col);
 	    child->NextNode();
          }
          O = matrix;
-	 
+
 	 log.flush();
 	 log.IndentDec();
-      } else { 
+      } else {
 	 O = mods->Load( name );
-         
+
          if (dynamic_cast<OList*>(O) != NULL){ /* Sum/Product operator and propagators */
             log.cout() << O->Name()<<endl;
             log.IndentInc();
@@ -127,7 +127,7 @@ namespace QDLIB
 
             if (child != NULL){ /* Check if sub operators are given */
                child->AdjustElementNode();
-         
+
                Operator *osub;
                OList *list = dynamic_cast<OList*>(O);
 
@@ -144,13 +144,13 @@ namespace QDLIB
             log.flush();
             log.IndentDec();
          } else {
-         
+
             log.cout() << pm << "---------------\n";
             O->Init(pm);
             log.flush();
          }
       }
-      
+
       /* Register & prepare to exit */
       OpList.Add(key, O, persist);
 
@@ -249,7 +249,7 @@ namespace QDLIB
 	  return wfout;
       }
    }
-   
+
    WaveFunction* ChainLoader::LoadWFLC_( XmlNode *WFNode, ParamContainer& pm,  int seqnum)
    {
       WaveFunction *wfadd;
@@ -281,32 +281,32 @@ namespace QDLIB
 
    /**
     * Load all wave functions from the input.
-    * 
+    *
     * This method also recognizes Multistate, LC (Linear combination).
     * Works infinetly recursive.
-    * 
+    *
     * \li Special Parameter:
     * \li normalize:  Works on every level (default false)
-    * 
+    *
     * \li coeff   Coefficient in LC
     * \li coeff2  Coefficient squared  in LC
     * \li phase   Apply a phase factor (in units of pi)
-    * 
+    *
     */
    WaveFunction * ChainLoader::LoadWaveFunctionChain( XmlNode * WFNode, int seqnum)
    {
       ModuleLoader<WaveFunction>* mods = ModuleLoader<WaveFunction>::Instance();
       Logger& log = Logger::InstanceRef();
-      
+
       ParamContainer pm;
       string name, key;
       WaveFunction *WF=NULL;
       XmlNode *child;
       bool onoff;
-      
+
       pm = WFNode->Attributes();
       pm.GetValue( "name", name );
-      
+
       if (pm.isPresent("key"))      /* Check for a key to store in the Global WF container */
          pm.GetValue("key", key);
 
@@ -315,17 +315,17 @@ namespace QDLIB
 	 log.IndentInc();
 	 child = WFNode->NextChild();
 	 child->AdjustElementNode();
-         
+
 	 WF = LoadWFMultistate_( child, pm, seqnum);
 
-         
+
          /* Print norm */
          if (log.Debug()){
             log.coutdbg().precision(8);
             log.coutdbg() << fixed;
             log.coutdbg() << "Norm : " << WF->Norm() <<endl;
          }
-         
+
 	 log.IndentDec();
       } else if (name== "Multimap") { /* Load a Multistate wave function and remap the states */
          log.cout() << "Re-map multi state wave function" << endl;
@@ -357,19 +357,19 @@ namespace QDLIB
 
       } else { /* load a specific wf */
 	 string fname;
-	 
-	 if ( name.length() != 1 ){ /* modules name is given */
+
+	 if ( ! name.empty() ){ /* modules name is given */
 	    WF = mods->Load( name );
 	    if (WF == NULL)
 	       throw ( EParamProblem("WaveFunction module loading failed") );
 	 }
-	    
+
 	 if (!pm.isPresent("file"))
 	    throw ( EParamProblem("No file for loading wave function given") );
-	 
+
 	 /* load wf */
 	 FileWF file;
-         
+
 	 pm.GetValue( "file", fname );
          file.Suffix(BINARY_WF_SUFFIX);
          file.Name(fname);
@@ -377,20 +377,20 @@ namespace QDLIB
             file.ActivateSequence();
             file.Counter(seqnum);
          }
-	 
-	 if ( name.length() != 1 ) /* modules name is given */
+
+	 if ( ! name.empty() ) /* modules name is given */
             file >> WF;
 	 else                      /* Load by meta */
 	    file >> &WF;
-	 
+
          /* Print norm */
          if (log.Debug()){
             log.coutdbg().precision(8);
             log.coutdbg() << fixed;
             log.coutdbg() << "Norm : " << WF->Norm() <<endl;
          }
-         
-	 if ( name.length() == 1 ) log.cout() << WF->Params() << endl;
+
+	 if ( name.empty() ) log.cout() << WF->Params() << endl;
 	 log.cout() << pm << "------------------\n" << endl;
       }  /* end - load a specific wf */
 
@@ -432,11 +432,11 @@ namespace QDLIB
 
       return WF;
    }
-   
-   
+
+
    /**
     * Load a propagator module and depending operators.
-    * 
+    *
     * \param Unode   The XmlNode containing the parameters.
     * \param persist Make the Propagator persistent in the GlobalOpList.
     * \return The pre-initialized propagator (still need a Init(WF) )
@@ -451,7 +451,7 @@ namespace QDLIB
 
       return U;
    }
-   
-   
+
+
 
 }

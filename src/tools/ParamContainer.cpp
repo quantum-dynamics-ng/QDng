@@ -130,7 +130,7 @@ namespace QDLIB {
 	 return true;
       }
       else {
-	 value[0] = '\0';
+	 value.clear();
 	 return false;
       }
    }

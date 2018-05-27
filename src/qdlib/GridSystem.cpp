@@ -81,7 +81,7 @@ namespace QDLIB {
 
       grid_sys.set_dims(dims);
    }
-   
+
    /**
     * Number of dimensions.
     */
@@ -89,10 +89,10 @@ namespace QDLIB {
    {
       return grid_sys.dims();
    }
-         
+
    /**
     * Number of dimensions.
-    * 
+    *
     * Must be set by implementing class.
     */
    void GridSystem::Dim(int dims)
@@ -109,7 +109,7 @@ namespace QDLIB {
 
       grid_sys.set_dims(dims);
    }
-         
+
    const int* GridSystem::DimSizes()
    {
       for (size_t i=0; i < grid_sys.dims(); i++)
@@ -117,10 +117,10 @@ namespace QDLIB {
 
       return dimsizes_;
    }
-   
+
    /**
     * Sizes of dimensions.
-    * 
+    *
     * \param dim Number of dimension (take care of MAX_DIMS!)
     * \return Number of points in this direction
     */
@@ -128,10 +128,10 @@ namespace QDLIB {
    {
       return grid_sys.dim(dim).size();
    }
-   
+
    /**
     * Set the size of a dimension/coordinate.
-    * 
+    *
     * \param dim Number of dimension
     * \param size Number of points in this direction
     */
@@ -139,7 +139,7 @@ namespace QDLIB {
    {
       grid_sys.mutable_dim(dim)->set_size(size);
    }
-   
+
    /**
     * Absolute number of grid points.
     */
@@ -163,7 +163,7 @@ namespace QDLIB {
    {
       return grid_sys.dim(dim).xmin();
    }
-   
+
    /**
     * Set Xmin value.
     * \param dim Number of dimension
@@ -174,7 +174,7 @@ namespace QDLIB {
       grid_sys.mutable_dim(dim)->set_xmin(xmin);
       _dx[dim] = (grid_sys.dim(dim).xmax() - xmin)/(double(grid_sys.dim(dim).size()-1)); /* Update dx value */
    }
-   
+
    /**
     * Xmax value.
     * \param dim Number of dimension
@@ -184,7 +184,7 @@ namespace QDLIB {
    {
       return grid_sys.dim(dim).xmax();
    }
-   
+
    /**
     * Set Xmax value.
     * \param dim Number of dimension
@@ -206,7 +206,7 @@ namespace QDLIB {
       return ( grid_sys.dim(dim).xmax() - grid_sys.dim(dim).xmin())/(double(grid_sys.dim(dim).size()-1));
       //return _dx[dim];
    }
-   
+
    /**
     * Initialize all grid parameters from arrays.
     */
@@ -230,7 +230,7 @@ namespace QDLIB {
    void GridSystem::operator =(GridSystem &G)
    {
       grid_sys = G.grid_sys;
-      
+
       for (int i=0; i < MAX_DIMS; i++)
       {
        _dx[i] = G._dx[i];
@@ -245,7 +245,7 @@ namespace QDLIB {
    bool GridSystem::operator ==( GridSystem & G ) const
    {
       bool equal = true;
-      
+
       if ( grid_sys.dims() != G.grid_sys.dims() ) return false;
 
       for (size_t i=0; i < grid_sys.dims(); i++)
@@ -265,7 +265,7 @@ namespace QDLIB {
      if ( *this == G ) return false;
       else return true;
    }
-   
+
    /**
     * Create Stripe informations.
     */

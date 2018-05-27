@@ -71,7 +71,7 @@ namespace QDLIB
          FileSingleHeaderPm() : _has_params(false) {}
 
 
-         void Clear()
+         void ClearAll()
          {
             FileSingleHeader::Clear();
             clear_params();
@@ -101,7 +101,6 @@ namespace QDLIB
             stringstream ss;
             _params.Write(ss, true);
             FileSingleHeader::set_meta_data(ss.str());
-
             string classname;
             pm.GetValue("CLASS", classname);
             FileSingleHeader::set_class_(classname);
@@ -147,20 +146,20 @@ namespace QDLIB
     * This is a template class which can handle all general
     * classes which support a basic interface, with at least
     * the following methods:
-    * 
+    *
     * - T* C.begin()
     * - size_t C.sizeByte()
     * - ParamContainer& C.GetParams()
     * - C.Init(ParamContainer)
     * - string& C.Name()
     * - strides()
-    * 
+    *
     * Basic support for strided vectors.
-    * 
+    *
     * The class needs a base name and file suffix.
     * In the case of binary or ASCII files a meta will be created
     * carrying the information about its content.
-    * 
+    *
     * \todo implement ASCII+HDF5
     */
    template<class C>
@@ -403,7 +402,7 @@ namespace QDLIB
 
    /**
     * Default constructor.
-    * 
+    *
     * Default type is binary.
     */
    template<class C>
@@ -424,7 +423,7 @@ namespace QDLIB
 
    /**
     * Set disk storage format.
-    * 
+    *
     * \param type Disk storage format
     */
    template<class C>
@@ -464,7 +463,7 @@ namespace QDLIB
 
    /**
     * Set the file name suffix.
-    * 
+    *
     * Is appended to all file names.
     */
    template<class C>
@@ -474,7 +473,7 @@ namespace QDLIB
    }
    /**
     * Get the file name suffix.
-    * 
+    *
     * Is appended to all file names.
     */
    template<class C>
@@ -484,10 +483,10 @@ namespace QDLIB
    }
    /**
     * Ignore meta data information.
-    * 
+    *
     * This holds for reading and writing.
     * Warning: For reading this means that the target object have to already be initialized (incl. correct size)
-    * 
+    *
     * \param drop if true, meta data will be ignored.
     */
    template<class C>
@@ -508,11 +507,11 @@ namespace QDLIB
 
    /**
     * Turns on writing an interpretion of counters in file name.
-    * 
+    *
     * Appends a counter number to the file name.
     * This makes it possible to read write whole a whole set of file
     * without thinking about the file numbers.
-    * 
+    *
     * If switch between reading and the writing the counter will not be reseted.
     */
    template<class C>
@@ -524,13 +523,13 @@ namespace QDLIB
 
    /**
     * Turns on writing an interpretion of counters in file name.
-    * 
+    *
     * Appends a counter number to the file name.
     * This makes it possible to read write whole a whole set of file
     * without thinking about the file numbers.
-    * 
+    *
     * If switch between reading and the writing the counter will not be reseted.
-    * 
+    *
     * \param increment The counters increment value
     */
    template<class C>
@@ -1078,7 +1077,7 @@ namespace QDLIB
       _sin->read(reinterpret_cast<char*>(buf), mlen);
 
       // Parse header
-      MetaData.Clear();
+      MetaData.ClearAll();
       if (!MetaData.ParseFromArray(reinterpret_cast<const void*>(buf), mlen)){
          delete[] buf;
          throw(EIOError("Error reading meta data from stream"));
@@ -1213,7 +1212,6 @@ namespace QDLIB
    {
       string name;
       BuildMetaFileName(name);
-
       ParamContainer pm;
       if (!pm.ReadFromFile(name)){
          // Retry stripping by stripping a sequence index
@@ -1517,9 +1515,9 @@ namespace QDLIB
 
    /**
     * File writer method.
-    * 
+    *
     * \param data Data to save.
-    * 
+    *
     */
    template<class C>
    void FileSingle<C>::WriteFile(C *data)
@@ -1546,9 +1544,9 @@ namespace QDLIB
 
    /**
     * File reader method.
-    * 
+    *
     * \param data Data to save.
-    * 
+    *
     * \todo Add a check to meta data, for right class name
     */
    template<class C>

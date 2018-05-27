@@ -1,7 +1,7 @@
 INCLUDES = -I$(top_srcdir)/src -I/usr/include/libxml2 -I$(FFTW_INCLUDE) $(all_includes)
 METASOURCES = AUTO
 
-AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long -DQD_SYS_MOD_PATH='"$(libdir)/qdng/"'
+AM_CXXFLAGS += -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 
 
 noinst_LTLIBRARIES = libModuleLoader.la
@@ -38,8 +38,8 @@ libqd-OSIL.la
 
 
 libqd_OCheby_la_SOURCES = mod-OCheby.cpp $(top_builddir)/src/qdlib/OCheby.cpp \
-							$(top_builddir)/src/linalg/Bessel.cpp 			
-libqd_OCheby_la_LIBADD = $(top_builddir)/src/slatec/libslatecmin.la		
+							$(top_builddir)/src/linalg/Bessel.cpp
+libqd_OCheby_la_LIBADD = $(top_builddir)/src/slatec/libslatecmin.la
 libqd_OCheby_la_LDFLAGS = -module
 
 libqd_OFlux_la_SOURCES = mod-OFlux.cpp $(top_builddir)/src/qdlib/OFlux.cpp

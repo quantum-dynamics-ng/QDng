@@ -4,7 +4,7 @@ METASOURCES = AUTO
 # protobuf related stuff
 %.pb.cc %.pb.h: %.proto
 	$(PROTOC) --proto_path=$(srcdir) --cpp_out=$(builddir) $^
-	
+
 BUILT_SOURCES = GridSystem.pb.cc GridSystem.pb.h
 
 MOSTLYCLEANFILES = GridSystem.pb.cc GridSystem.pb.h
@@ -37,8 +37,9 @@ qdlib_HEADERS = Conversion.h FileWF.h GridSystem.h Kspace.h Laser.h \
 
 noinst_HEADERS = cfd_table_1.h cfd_table_2.h
 
+CXXFLAGS_GLOB = -std=c++98 -Wno-long-long -DQD_SYS_MOD_PATH='"$(libdir)/qdng/"'
 AM_CPPFLAGS = -DQD_SYS_MOD_PATH='"$(libdir)/qdng"'
-AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-longi -DQD_SYS_MOD_PATH='"$(libdir)/qdng/"'
+AM_CXXFLAGS += -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS)
 
 libqd_la_LDFLAGS = -module
 

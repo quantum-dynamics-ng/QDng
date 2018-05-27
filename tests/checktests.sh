@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 CheckTGE-im-Energy()
@@ -20,7 +20,7 @@ CheckTGE-im-Energy()
    a=`grep '7[[:space:]]*0.0485' ${1}-im/energy.dat`
    test -n "$a" || return 1
    a=`grep '8[[:space:]]*0.0535' ${1}-im/energy.dat`
-   test -n "$a" || return 1   
+   test -n "$a" || return 1
    a=`grep '9[[:space:]]*0.058' ${1}-im/energy.dat`
    test -n "$a" || return 1
 
@@ -54,13 +54,13 @@ CheckTGE()
    fi
 
    a=`grep -r 'Initial Norm & energy: 1.000000e+00.*1.205115e-02' TGE-$1.log`
-   if [ -z "$a" ]; then 
+   if [ -z "$a" ]; then
       echo -e "\r\t\t\t\t\t\t\t\t\t[FAILED]"
       return 0
    fi
 
    success=0;
-   
+
    echo -ne "\r\t\t\t\t\t\t\t(Imag)"
    CheckTGE-im-Energy TGE-$1
    if [ $? == 0 ]; then
@@ -68,7 +68,7 @@ CheckTGE()
    else
         echo -e "\r\t\t\t\t\t\t\t\t\t[FAILED]"
    fi
-   
+
    echo -ne "\r\t\t\t\t\t\t\t(AC)"
    CheckTGE-ac-Energy TGE-$1
    if [ $? == 0 ]; then
@@ -86,14 +86,14 @@ CheckT()
       echo -e "\r\t\t\t\t\t\t\t\t\t[skiped]"
       return 0
    fi
-   
+
    exp=`echo "$2" | sed "s/[[:space:]]/[[:space:]]*/g"`
    a=`grep -r "$exp" $1.log`
-   if [ -z "$a" ]; then 
+   if [ -z "$a" ]; then
       echo -e "\r\t\t\t\t\t\t\t\t\t[FAILED]"
       return 0
    fi
-   
+
    echo -e "\r\t\t\t\t\t\t\t\t\t[OK]"
 }
 
@@ -104,14 +104,14 @@ CheckT-Expec()
       echo -e "\r\t\t\t\t\t\t\t\t\t[skiped]"
       return 0
    fi
-   
+
    exp=`echo "$2" | sed "s/[[:space:]]/[[:space:]]*/g"`
    a=`grep -r "$exp" $1/expec_post.dat`
-   if [ -z "$a" ]; then 
+   if [ -z "$a" ]; then
       echo -e "\r\t\t\t\t\t\t\t\t\t[FAILED]"
       return 0
    fi
-   
+
    echo -e "\r\t\t\t\t\t\t\t\t\t[OK]"
 }
 
@@ -142,7 +142,7 @@ CheckT TGP-NIP-Cheby       "999    9990.0          0.095927        0.00003431   
 CheckT-Expec TGP-Expec          "20000   -0.0036293699[0-9]* 3.19511585[0-9]*    0.999999949[0-9]*   0.00186665497[0-9]* 0.00184349374[0-9]*"
 CheckT-Expec TGP-Expec-SP               "20000   -0.1930887[0-9]*   2.90370197[0-9]*     0.99992436[0-9]*    0.0056769416[0-9]*  0.00885100[0-9]*"
 CheckT-Expec TGP-Expec-HOFD             "20000 -0.19310[0-9]*  2.903701[0-9]* 0.999924[0-9]*   0.00567694[0-9]* 0.00885100[0-9]*"
-CheckT-Expec TGP-Gmat               "20000   -0.1930887[0-9]*   2.9037019[0-9]*     0.99992436[0-9]*    0.00567694[0-9]*  0.008851007[0-9]*"	
+CheckT-Expec TGP-Gmat               "20000   -0.1930887[0-9]*   2.9037019[0-9]*     0.99992436[0-9]*    0.00567694[0-9]*  0.008851007[0-9]*"
 CheckT-Expec TGP-Kick           "20000   -0.81968278[0-9]*   3.23866603[0-9]*     0.99999811[0-9]*    0.00195512887[0-9]*  0.00203859515[0-9]*"
 CheckT-Expec TGPL-IR-Pulse-Cheby                "67500   -0.7771795[0-9]*   3.3924123[0-9]*     0.68396254[0-9]*    0.3160245[0-9]*    1.168923[0-9]*e-05 0.002541139[0-9]*  0.0035009752[0-9]*"
 CheckT-Expec TGPL-IR-Pulse-GSPO         "67500	-0.9119311777	3.39065341	0.6748559675	0.3251328889	9.140715502e-06	0.002579467065	0.003529714442"
@@ -170,10 +170,10 @@ CheckT-Expec TGO-IR-Freq "67500   -0.07038699[0-9]*  3.273401771     0.000425382
 
 CheckT TGO-IR-Krotov "7               1.00000000      1.00000000      0.99999246      0.00000000              0.9999924[0-9]              0.03603239"
 CheckT-Expec TGO-IR-Krotov "67500   -0.06947785[0-9]*  3.273269064     0.0004316602[0-9]* 0.9995603049    4.42313[0-9]*e-09 0.005404982106  0.005659550024"
-			    
+
 CheckT TGO-IR-Rabitz "8               1.00000000      1.00000000      0.98651573      0.17732921              0.80918652              0.03017470"
 CheckT-Expec TGO-IR-Rabitz "67500   -0.57903274[0-9]*   3.27341463[0-9]*     0.01357943[0-9]*   0.986410971[0-9]*    5.6214[0-9]*e-08 0.00535866425[0-9]*  0.0056088512[0-9]*"
-			        
+
 CheckT TLO-Cheby "4		1.00000000	1.00000000	1.00000000	0.00000000		1.00000000		0.27266223"
 CheckT-Expec TLO-Cheby "314.5   5.878[0-9]*e-11 0.9999999991"
 

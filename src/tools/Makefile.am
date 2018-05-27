@@ -6,7 +6,7 @@ noinst_LTLIBRARIES = libtools.la
 # protobuf related stuff
 %.pb.cc %.pb.h: %.proto
 	$(PROTOC) --proto_path=$(srcdir) --cpp_out=$(builddir) $^
-	
+
 BUILT_SOURCES = FileSingleHeader.pb.cc FileSingleHeader.pb.h
 
 MOSTLYCLEANFILES = FileSingleHeader.pb.cc FileSingleHeader.pb.h
@@ -20,7 +20,7 @@ libtools_la_SOURCES = Exception.cpp Getopt.cpp Logger.cpp \
 
 nodist_libtools_la_SOURCES = FileSingleHeader.pb.cc FileSingleHeader.pb.h
 
-AM_CXXFLAGS = -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long
+AM_CXXFLAGS += -fPIC $(DEVEL_FLAGS) $(OPT_FLAGS) -Wno-long-long
 toolsdir = $(pkgincludedir)/tools
 tools_HEADERS = Exception.h FileSingleDefs.h FileSingle.h fstools.h Getopt.h \
 	GlobalParams.h helpers.h Logger.h ParamContainer.h QDClock.h \
