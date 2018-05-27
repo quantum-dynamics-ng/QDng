@@ -8,7 +8,7 @@
 
 
 namespace QDLIB {
-   
+
    /**
     * Translate a enum into textual representation.
     */
@@ -61,8 +61,8 @@ namespace QDLIB {
    {
       _it = _param_map.begin();
    }
-   
-   
+
+
    /**
    * Constructor including Initialisation.
    *
@@ -73,7 +73,7 @@ namespace QDLIB {
          _param_map = params;
 	 _it = _param_map.begin();
    }
-   
+
    /**
     * Return the actual parameter set.
     */
@@ -81,7 +81,7 @@ namespace QDLIB {
    {
       return _param_map;
    }
-   
+
    /**
    * Replaces old parameter set.
    *
@@ -91,17 +91,17 @@ namespace QDLIB {
    {
          _param_map = params;
    }
-   
+
    /**
     * Get a string (Null terminated C-string.
-    * 
+    *
     * No size checking is done! Use this variant with care.
-    * 
+    *
     * \param name  Name of parameter
     * \param value Refernze to value
-    * 
+    *
     * \return true if value exist
-    * 
+    *
     */
    bool ParamContainer::GetValue(const string name, char *value)
    {
@@ -110,17 +110,17 @@ namespace QDLIB {
 	 return true;
       }
       else {
-	 value = '\0';
+	 value[0] = '\0';
 	 return false;
       }
    }
-   
-   /** 
+
+   /**
    * Get a string.
-   * 
+   *
    * \param name  Name of parameter
    * \param value Refernze to value
-   * 
+   *
    * \return true if value exist
    */
    bool ParamContainer::GetValue(const string name, string &value)
@@ -130,15 +130,15 @@ namespace QDLIB {
 	 return true;
       }
       else {
-	 value = '\0';
+	 value[0] = '\0';
 	 return false;
       }
    }
-   
-   
-   /** 
+
+
+   /**
    * Get an integer value.
-   * 
+   *
    * \param name  Name of parameter
    * \param value Referenze to value
    */
@@ -151,7 +151,7 @@ namespace QDLIB {
       else {
          value = 0;
          return false;
-      }	
+      }
    }
 
    /**
@@ -172,10 +172,10 @@ namespace QDLIB {
       }
    }
 
-   
-   /** 
+
+   /**
    * Get an long int value.
-   * 
+   *
    * \param name  Name of parameter
    * \param value Referenze to value
    */
@@ -189,11 +189,11 @@ namespace QDLIB {
          value = 0;
          return false;
       }
-   }	
+   }
 
-   /** 
+   /**
     * Get an size_t value.
-    * 
+    *
     * \param name  Name of parameter
     * \param value Referenze to value
     */
@@ -207,12 +207,12 @@ namespace QDLIB {
          value = 0;
          return false;
       }
-   }    
+   }
 
-   
-   /** 
+
+   /**
    * Get an long int value.
-   * 
+   *
    * \param name  Name of parameter
    * \param value Referenze to value
    */
@@ -226,14 +226,14 @@ namespace QDLIB {
          value = 0;
          return false;
       }
-   
+
    }
-   
-   /** 
+
+   /**
     * Get a boolean value.
-    * 
+    *
     * If the value is not written correct ("true") then result will be the default value.
-    * 
+    *
     * \param name  Name of parameter
     * \param value Referenze to value
     * \param def   Set the default value for the case key is not found
@@ -385,15 +385,15 @@ namespace QDLIB {
    {
      _it = _param_map.begin();
    }
-   
+
    /**
     * Get the next key, value pair in the list.
-    * 
+    *
     * \param name    Entry name/key
     * \param value   Value of the entry
-    * 
+    *
     * \return  false if end of list.
-    * 
+    *
     * \see ResetPosition
     */
    bool ParamContainer::GetNextValue(string &name, string &value)
@@ -405,12 +405,12 @@ namespace QDLIB {
 	 return true;
       }
       return false;
-      
+
    }
-      
+
    /**
     * Check if a value is in the container.
-    * 
+    *
     * \return true if value is there.
     */
    bool ParamContainer::isPresent(const string &name)
@@ -420,10 +420,10 @@ namespace QDLIB {
       else
 	 return false;
    }
-   
+
    /**
     * Check if a value is in the container.
-    * 
+    *
     * \return true if value is there.
     */
    bool ParamContainer::isPresent(const char *name)
@@ -466,7 +466,7 @@ namespace QDLIB {
 
       return t_undef;
    }
-   
+
    /**
     * Remove all parameters from the container.
     */
@@ -475,14 +475,14 @@ namespace QDLIB {
       _param_map.clear();
       _type_map.clear();
    }
-   
-   
+
+
    /**
     * Set a string value (Null terminated C-string).
-    * 
+    *
     * If the the name exists, the value is simply replaced,
     * if not a new entry will be added.
-    * 
+    *
     * \param name Name of parameter
     * \param value Referenze to value
     */
@@ -491,13 +491,13 @@ namespace QDLIB {
       _type_map[name] = type;
       _param_map[name] = string(value);
    }
-   
+
    /**
     * Set a string value.
-    * 
+    *
     * If the the name exists, the value is simply replaced,
     * if not a new entry will be added.
-    * 
+    *
     * \param name Name of parameter
     * \param value Referenze to value
     */
@@ -507,20 +507,20 @@ namespace QDLIB {
      _param_map[name] = value;
 
    }
-	
+
    /**
     * Set an integer value.
-    * 
+    *
     * If the the name exists, the value is simply replaced,
     * if not a new entry will be added.
-    * 
+    *
     * \param name Name of parameter
     * \param value Referenze to value
     */
    void ParamContainer::SetValue(const string name, const int &value)
    {
      stringstream ss;
-     
+
      ss << value;
      ss >> _param_map[name];
 
@@ -529,17 +529,17 @@ namespace QDLIB {
 
    /**
     * Set a long int value.
-    * 
+    *
     * If the the name exists, the value is simply replaced,
     * if not a new entry will be added.
-    * 
+    *
     * \param name Name of parameter
     * \param value Referenze to value
     */
    void ParamContainer::SetValue(const string name, const long int &value)
    {
      stringstream ss;
-     
+
      ss << value;
      ss >> _param_map[name];
 
@@ -548,39 +548,39 @@ namespace QDLIB {
 
    /**
     * Set a size_t  value.
-    * 
+    *
     * If the the name exists, the value is simply replaced,
     * if not a new entry will be added.
-    * 
+    *
     * \param name Name of parameter
     * \param value Referenze to value
     */
    void ParamContainer::SetValue(const string name, const size_t &value)
    {
      stringstream ss;
-     
+
      ss << value;
      ss >> _param_map[name];
 
      _type_map[name] = t_size_t;
    }
 
-   
+
    /**
     * Set a double value.
-    * 
+    *
     * If the the name exists, the value is simply replaced,
     * if not a new entry will be added.
-    * 
+    *
     * \param name  Name of parameter
     * \param value Referenze to value
-    * 
+    *
     * TODO: check for number of digits (formating)
     */
    void ParamContainer::SetValue(const string name, const double &value)
    {
      stringstream ss;
-     
+
      ss << value;
      ss >> _param_map[name];
 
@@ -589,10 +589,10 @@ namespace QDLIB {
 
    /**
     * Set a bool value.
-    * 
+    *
     * If the the name exists, the value is simply replaced,
     * if not a new entry will be added.
-    * 
+    *
     * \param name Name of parameter
     * \param value Referenze to value
     */
@@ -603,7 +603,7 @@ namespace QDLIB {
 
       _type_map[name] = t_bool;
    }
-   
+
    /**
     * Creates a sequence of values in one one entry.
     */
@@ -674,7 +674,7 @@ namespace QDLIB {
 
       _param_map = params._param_map;
       _type_map = params._type_map;
-      
+
       _it = _param_map.begin();
       return *this;
    }
@@ -688,7 +688,7 @@ namespace QDLIB {
    {
 
       string_map addpmap = params._param_map;
-      
+
       for (string_map::iterator it = addpmap.begin(); it != addpmap.end(); it++)
       {
          _param_map[it->first] = it->second;
@@ -705,7 +705,7 @@ namespace QDLIB {
 
       return *this;
    }
-   
+
    /**
     * Parse from string buffer.
     */
@@ -859,11 +859,11 @@ namespace QDLIB {
    std::ostream& operator<<(std::ostream &s, ParamContainer &p)
    {
       string key, value;
-      
+
       p.Write(s, true);
 
       return s;
    }
-   
-   
+
+
 } /* namespace QDLIB */
