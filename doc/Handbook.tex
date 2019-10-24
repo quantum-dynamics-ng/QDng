@@ -51,7 +51,7 @@ This is done by time stepping
 \Psi(t+\Delta t) = \hat U(t) \Psi(t) = \exp\left(-i\hat H \Delta t \right) \Psi(t)
 \end{align}
 Different numerical realizations of the propagator
-$\hat U$ are available. 
+$\hat U$ are available.
 
 
 
@@ -66,7 +66,7 @@ for easier typing:
    }
 }
 \end{verbatim}
-which is equivalent to 
+which is equivalent to
 \begin{verbatim}
 <qdng attr1="value1" attr2="More_Complex/Value"
    <prog1>
@@ -95,7 +95,7 @@ hamiltonian { name=Multistate
       Tkin {ref=T}
       Vpot {name=GridPotential file=potA}
    }
-} 
+}
 \end{verbatim}
 
 Operators can also be defined globaly in an extra \verb|opdefs| section to make them
@@ -155,7 +155,7 @@ $(a) %.2f
 Example:
 \begin{verbatim}
 for $delay = 1 5 {
-   propa { dt="2" steps="2000" wcycle="2000" dir="propa" ~ $(delay) 
+   propa { dt="2" steps="2000" wcycle="2000" dir="propa" ~ $(delay)
       propagator { name="Cheby"
          hamiltonian { name="Sum"
             A { name="HermitianMatrix" file="LevelH2mat"}
@@ -164,7 +164,7 @@ for $delay = 1 5 {
       }
       wf { name="Level" file="Level_ef_0"}
    }
-} 
+}
 \end{verbatim}
 
 
@@ -177,7 +177,7 @@ binary arrays. The meta data assures that the data,
 which is read in, is compatible with each other.
 The following conventions are used: wave function
 files have the ending .wf and numerical
-representations of operators have the ending .op 
+representations of operators have the ending .op
 
 \section{Raw Data with Additional Meta-Data}
 This format is mainly for compatibility purposes.
@@ -207,7 +207,7 @@ A MATLAB interface for creation and reading is provided.
 \chapter{Main Programs}
 
 \begin{verbatim}
-qdng [ -d output directory] [-p cpus] <input file> [var1=val1] ... [varN=valN] 
+qdng [ -d output directory] [-p cpus] <input file> [var1=val1] ... [varN=valN]
 \end{verbatim}
 
 \subsection{Global Options}
@@ -221,12 +221,12 @@ Global options can be given in several locations:
 \begin{options}
  \option{debug}{Print more information.}
  \option{modpath}{Search path for dynamic loadable modules.}
-\end{options} 
+\end{options}
 
 \subsubsection{Buffers}
 \begin{options}
  \option{MaxBufferSize}{Buffer size for wave function buffers. Used for example in SIL, Arnoldi propagators and OCT. The value is in bytes but
- can suffixed by K,M or G.}
+ can suffixed by K, M or G.}
  \option{tmpdir}{Path for on-disk buffer files.}
 \end{options}
 
@@ -285,7 +285,7 @@ A simple propagation of super position in a 2D system:
         <wf name="GridCartesian" file="ef_0"/>
         <wf name="GridCartesian" file="ef_1"/>
    </wf>
-</propa> 
+</propa>
 \end{verbatim}
 
 Propagation of a 1D System. The eigenfunction is given a momentum of -5 au before starting the
@@ -307,7 +307,7 @@ propagation. The position and momentum expetation values are evaluated after eve
                 <expeconly name="GridMomentum"/>
                 <expeconly name="GridPosition"/>
         </filterpost>
-</propa> 
+</propa>
 \end{verbatim}
 
 
@@ -403,32 +403,32 @@ qdng {
                       }
                    }
           }
-} 
+}
 \end{verbatim}
 
 Cut out one half of the grid and analyze the results:
 \begin{verbatim}
-qdng {                                                                                                                                       
-   opdefs {                                                                                                                                  
-      opdef { name=GridGMat dims=2 gmat="gm" coup=true key=T }                                      
-      opdef { name=GridPotential file="pot-clip-0.2" key=V }                                        
-      opdef { name=Gobbler dims=2 rp0="0" order=50 residue=true key=GR }                                                                     
-      opdef { name=GridPosition dim=0 key=x0 }                                                                                               
-      opdef { name=GridPosition dim=1 key=x1 }                                                                                               
-      opdef { name=GridMomentum dim=0 key=p0 }                                                                                               
-      opdef { name=GridMomentum dim=1 key=p1 }                                                                                               
-   }                                                                                                                                         
-   filter { path="propa_0.7" dir="0.7" fname="expec_right"                                         
-      filterdef {                                                                                                                  
-	    expec { ref=GR header="fraction" }                                                                              
-	    normalize {}                                                                                                    
-	    expeconly { ref=x0 header="<x0>"}                                                                               
-	    expeconly { ref=x1 header="<x1>"}                                                                               
-	    expeconly { ref=p0 header="<p0>"}                                                                               
-	    expeconly { ref=p1 header="<p1>"}                                                                               
-	    expeconly { ref=T header=T}                                                                                     
-	    expeconly { ref=V header=V}                                                                                     
-      }                                                                                                                  
+qdng {
+   opdefs {
+      opdef { name=GridGMat dims=2 gmat="gm" coup=true key=T }
+      opdef { name=GridPotential file="pot-clip-0.2" key=V }
+      opdef { name=Gobbler dims=2 rp0="0" order=50 residue=true key=GR }
+      opdef { name=GridPosition dim=0 key=x0 }
+      opdef { name=GridPosition dim=1 key=x1 }
+      opdef { name=GridMomentum dim=0 key=p0 }
+      opdef { name=GridMomentum dim=1 key=p1 }
+   }
+   filter { path="propa_0.7" dir="0.7" fname="expec_right"
+      filterdef {
+	    expec { ref=GR header="fraction" }
+	    normalize {}
+	    expeconly { ref=x0 header="<x0>"}
+	    expeconly { ref=x1 header="<x1>"}
+	    expeconly { ref=p0 header="<p0>"}
+	    expeconly { ref=p1 header="<p1>"}
+	    expeconly { ref=T header=T}
+	    expeconly { ref=V header=V}
+      }
    }
 }
 \end{verbatim}
@@ -455,7 +455,7 @@ Every filter can also take some options:
 \option{header}{Text to appear in coloumn header [operator name].}
 \option{value}{Represenation of the expectation value to plot (real$|$imag$|$complex$|$abs) [real] .}
 \option{int}{Accumulate values [false].}
-\option{ms}{Specifiy which el. state to act on. Mandatory if \code{rho} is selected as a 
+\option{ms}{Specifiy which el. state to act on. Mandatory if \code{rho} is selected as a
 mode of operation. Takes exactly two values which specify the bra and the ket state (\code{ms=i,j}).}
 \end{options}
 
@@ -463,7 +463,7 @@ mode of operation. Takes exactly two values which specify the bra and the ket st
 \section{Correlation functions}
 One- and two-point correlation functions are supported for
 spectroscopy \cite{Mukamel}. Loop diagrams in
-Hilbert space \cite{Rahav10aamop}. 
+Hilbert space \cite{Rahav10aamop}.
 \begin{align}
 C(t) = \br{\Psi_0}\hat O_b \hat U\da(t,0) \hat O_p \hat U(t,0) \hat O_k \ke{\Psi_0}
 \end{align}
@@ -564,7 +564,7 @@ cfunc {dt="5" steps=600 stepsint=300 wcycle="4" dir="Ctt"
         U {}
         probe { name=Multistate unity=false
                 m0.1 { name=GridPotential file=mu2 }
-             }      
+             }
       wf { name=Multistate states=2
           wf1 { file="efs-S0/ef_0" }
       }
@@ -624,7 +624,7 @@ oct {alpha="1" dt="10" steps="3000" shape="shape" iterations="30" writel="true"
         }
         wfi0 {name="GridCartesian" file="ef_0" normalize="true"}
         wft0 {name="GridCartesian" file="ef_1" normalize="true"}
-} 
+}
 \end{verbatim}
 
 
@@ -686,7 +686,7 @@ propa {dt="4" steps="4"
 %         <wf name="Multistate" states="2" normalize="true">
 %                 <wf0 name="GridCartesian" file="ef_4"/>
 %         </wf>
-% </propa> 
+% </propa>
 % \end{verbatim}
 
 \subsection{Cheby}
@@ -869,7 +869,7 @@ absorbing boundary conditions.
 \end{options}
 
 \subsection{Kinetic Energy in the G-Matrix Represenation (GridGmat)}
-Kintec Hamiltonian in G-matrix represenation \cite{Stare03}. With kinetic 
+Kintec Hamiltonian in G-matrix represenation \cite{Stare03}. With kinetic
 couplings:
 \begin{equation}
  T_{kin} = -\frac{\hbar^2}{2} \sum_r^N \sum_s^N \frac{\partial}{\partial q_r} G_{rs}(q) \frac{\partial}{\partial q_s}
@@ -889,7 +889,7 @@ The base name for the fiels is defined via \verb|gmat|. Constant elements are gi
 Mixed definitions of position dependent and constant elements are possible.
 
 \begin{options}
-\option{dims}{Number of internal coordiantes.} 
+\option{dims}{Number of internal coordiantes.}
 \option{gmat}{G-matrix element base file name.}
 \option{coup}{Turn on/off kinetic coupling [true].}
 \option{G}{Constant G-matrix elements (given as lower triangular lin. matrix).}
@@ -1060,7 +1060,7 @@ Momentum operator:
 \subsubsection*{Example}
 \begin{verbatim}
 filterpost {
-  expeconly { name=Multistate states=2 unity=false 
+  expeconly { name=Multistate states=2 unity=false
     m0.0 { name=GridPosition }
   }
 }
@@ -1079,7 +1079,7 @@ Add momentum $k$ to a wave function
 
 \subsubsection*{Example}
 Modifiy the inital condition in 2D propagation:
-\begin{verbatim} 
+\begin{verbatim}
 filterinit {
             apply { name=GridKick k="-60.8,10" }
            }
@@ -1161,7 +1161,7 @@ propa {dt="1" steps="8000" dir="propa2" wcycle="1000" nfile="norm"
        hamiltonian {name="HermitianMatrix" file="Hmat"}
    }
    wf {name="Level" file="wfvec"}
-} 
+}
 \end{verbatim}
 
 
@@ -1187,7 +1187,7 @@ propa { dt="0.5" steps="629" wcycle="4096" dir="TLPL-GSPO" spectrum="spectrum.da
           expeconly { name="Projection" files="Level_ef" start="0" }
           expeconly { name="Projection" files="Level_ef" start="1" }
         }
-} 
+}
 \end{verbatim}
 
 \section{Laser Fields}
@@ -1195,7 +1195,7 @@ propa { dt="0.5" steps="629" wcycle="4096" dir="TLPL-GSPO" spectrum="spectrum.da
 \subsection{On the fly generation.}
 Operators which include laser fields can generate the field on the fly if the option gen is used.
 \begin{equation}
-E(t) = E_{max} e^{-(t-t_0)^2/2\sigma^2} \cos(\omega_0 (t-t_0)+ b(t-t_0)^2+\phi) 
+E(t) = E_{max} e^{-(t-t_0)^2/2\sigma^2} \cos(\omega_0 (t-t_0)+ b(t-t_0)^2+\phi)
 \end{equation}
 A single Gaussian pulse is generated with \verb|gen=gauss|. A double pulse can be created with
 \verb|gen=gauss2|.
@@ -1225,7 +1225,7 @@ phi = 0;
 b = 0.0;
 sigma=500/8;
 
-plot(t, Emax * exp(-(t-t0).^2/2/sigma^2) .* cos(w0*(t-t0) + phi + b*(t-t0).^2)); 
+plot(t, Emax * exp(-(t-t0).^2/2/sigma^2) .* cos(w0*(t-t0) + phi + b*(t-t0).^2));
 \end{verbatim}
 
 
@@ -1283,7 +1283,7 @@ Define a superposition of two electronic states:
 
 \section{Remapping of electronic states}
 In the protobuf file format multi state wave functions are written into a single file,
-instead of one file per state. With the \verb|Multimap| module single states of an input 
+instead of one file per state. With the \verb|Multimap| module single states of an input
 can be picked or reordered.
 
 \begin{options}
