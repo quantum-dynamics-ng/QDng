@@ -8,7 +8,7 @@ extern int line_num;
 %}
 
 %%
-^[ \t]*[#].*              yylval.sval=strdup(yytext);  return COMMENT;
+[#].*$                    yylval.sval=strdup(yytext);  return COMMENT;
 for                       yylval.sval=strdup(yytext);  return FOR;
 $[a-zA-Z0-9_]+            {
 		             yylval.sval=strdup(yytext+1);
