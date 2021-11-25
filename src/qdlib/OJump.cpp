@@ -74,7 +74,7 @@ namespace QDLIB {
        // decide jump
        double rnd = drand48();
 
-       for (int i=Size()-1; i >= 0; i--){
+       for (int i=0; i < Size(); i++){
           if (csum[i] > rnd) {
 	    Logger& log = Logger::InstanceRef();
 	    log.coutdbg() << "Apply jump operator " << i << " at t = " << clock->Time() << endl;
