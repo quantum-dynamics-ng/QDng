@@ -34,6 +34,7 @@
 #include "qdlib/OFlux.h"
 
 #include "qdlib/OGridHOFD.h"
+#include "qdlib/OJump.h"
 #endif
 
 /* Wavefunction list */
@@ -99,6 +100,7 @@ namespace QDLIB
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNabla)
 
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridHOFD)
+   QDNG_OPERATOR_INSTANCE_FUNCTION(OJump)
 
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridNAC)
    QDNG_OPERATOR_INSTANCE_FUNCTION(OGridKick)
@@ -146,6 +148,7 @@ namespace QDLIB
       QDNG_STRING_TO_INSTANCE_PTR(OGridRaman)
       QDNG_STRING_TO_INSTANCE_PTR(OGridPosition)
       QDNG_STRING_TO_INSTANCE_PTR(OGridHOFD)
+      QDNG_STRING_TO_INSTANCE_PTR(OJump)
 
       QDNG_STRING_TO_INSTANCE_PTR(OGridNabla)
       QDNG_STRING_TO_INSTANCE_PTR(OGridNAC)
