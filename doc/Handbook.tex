@@ -226,7 +226,7 @@ Global options can be given in several locations:
 \subsubsection{Buffers}
 \begin{options}
  \option{MaxBufferSize}{Buffer size for wave function buffers. Used for example in SIL, Arnoldi propagators and OCT. The value is in bytes but
- can suffixed by K, M or G.}
+ can be suffixed by K, M or G.}
  \option{tmpdir}{Path for on-disk buffer files.}
 \end{options}
 
@@ -780,6 +780,51 @@ or
 \option{step}{Step size trough the sequence [1].}
 \option{inv}{Apply the inverse projection operator 1-P like in eq. \ref{eq:InvProj} [false]}
 \end{options}
+
+\subsection{Jump}
+Random jump operator for statistical quantum jump calculations in spirit of the
+Lindblad equation.
+The jump operator applies the provided operators at random times and is supposed
+to be used in the \code{filterpost} section.
+
+The jump propability is caclulated as
+\begin{equation}
+  P = \Delta t \langle \Psi \vert L^\dagger L \vert \Psi \rangle\,,
+\end{equation}
+and the provided Lindblad operators are applied, when $P$ is larger
+than the drawn random number. For a full setup corresponding
+non-Hermitian terms, in the form of $-iL^\dagger L$, in the Hamiltonian are also required.
+
+Note: the operator also normalizes the wave function at each application.
+
+\begin{options}
+\option{seed}{Seed for the random number generator. Positive 48 bit integer [0].}
+\option{max\_pjump}{Maximum accepted jump propability [0.5].}
+\end{options}
+
+\subsubsection*{Example}
+\begin{verbatim}
+qdng {
+  propa { steps=1000 dt=0.1
+    propagator { name=Arnoldi
+      hamiltonian { name=Sum
+        H0 { name=HermitianMatrix file=H0 }
+        Hi { name=Product
+          i { name=Scalar value=0 im=-1 }
+          L1 { name=HermitianMatrix file=LdaggerL }
+        }
+      }
+    }
+    wf { file=psi }
+    filterpost {
+      apply { name=Jump seed=2 max_pjump=0.1
+        L1 { name=HermitianMatrix file=L }
+      }
+    }
+  }
+}
+\end{verbatim}
+
 
 \section{Multiple electronic states}
 It's possible to combine several electronic states as tensor product. The corresponding multistate
