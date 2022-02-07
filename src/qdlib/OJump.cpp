@@ -62,12 +62,12 @@ namespace QDLIB {
        // calculate Pjump for all operators
        for (int i=0; i < Size(); i++) {
           Get(i)->Apply(buf, Psi);
-	  double pjump = clock->Dt() * (*buf * buf).real();
-	  csum[i] = pjump + ( (i > 0) ? csum[i-1] : 0.0 );
+	        double pjump = clock->Dt() * (*buf * buf).real();
+	        csum[i] = pjump + ( (i > 0) ? csum[i-1] : 0.0 );
        }
 
-       if (*csum.end() >= _max_pjump)
-	 throw EOverflow("OJump::Apply: jump propability greater than max_pjump");
+       if (csum.back() >= _max_pjump)
+	        throw EOverflow("OJump::Apply: jump propability greater than max_pjump");
 
        DELETE_WF(buf);
 
