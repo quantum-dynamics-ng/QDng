@@ -5,8 +5,8 @@
 #include "qdlib/WFBuffer.h"
 
 #define ARNOLDI_DEF_ORDER 20
-#define ARNOLDI_UNDERRUN 1e-10
-#define ARNOLDI_CONV 1e-8
+#define ARNOLDI_UNDERRUN 1e-11
+#define ARNOLDI_CONV 1e-12
 
 namespace QDLIB {
 
@@ -38,7 +38,7 @@ namespace QDLIB {
             cVec _expHD;       /* Exponential vector */
             cMat _ZL;          /* Ritz eigenvectors */
             cMat _ZR;          /* Ritz eigenvectors */
-            
+
             void InitBuffers();
             void Propagate(WaveFunction* Psi);
         public:
