@@ -14,6 +14,7 @@ in with pkgs; stdenv.mkDerivation {
     "--enable-openmp"
     "--with-blas=-lblas"
     "--with-lapack=-llapack"
+    "--disable-gccopt"
   ];
 
   enableParallelBuilding = true;

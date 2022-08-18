@@ -118,9 +118,12 @@ namespace QDLIB
 
          /* Estimate the error of the next L-vector */
          dcomplex err = pow(clock->Dt(), it-2) * _tHA(1,0) * PsiNorm;
-         for (int i=1; i < it - 1; i++){
+         for (int i=1; i < it - 2; i++){
             err *=  _tHA(i+1,i) / double(i);
          }
+
+         if (cabs(err) > PsiNorm)
+           cout << "Warning: Lanczos expansion becomes unstable: " << cabs(err) << endl;
 
          if (cabs(err) < _conv) break;
       }
@@ -180,6 +183,11 @@ namespace QDLIB
 
       /* Build linear combination from Lanczos vectors */
       *Psi *= _vect[0];
+
+      /* Check last cofficient for convergence */
+      double last = (_vect[_order-1].conj() * _vect[_order-1]).real();
+      if ( last > _conv )
+        cout << "Warning: Arnoldi series expansion is not converged: " << last <<  " > " << _conv << endl;
 
       for (int i = 1; i < _order; i++) {
          AddElements((cVec*) Psi, (cVec*) _Lzb[i], _vect[i]);
