@@ -62,18 +62,20 @@ namespace QDLIB
     *
     * This couples a ParamContiener object to the meta_data entry.
     */
-   class FileSingleHeaderPm : public FileSingleHeader
+   class FileSingleHeaderPm
    {
       private:
          ParamContainer _params;
          bool _has_params;
       public:
+         FileSingleHeader header;
+
          FileSingleHeaderPm() : _has_params(false) {}
 
 
          void ClearAll()
          {
-            FileSingleHeader::Clear();
+            header.Clear();
             clear_params();
          }
 
@@ -86,8 +88,8 @@ namespace QDLIB
 
          const ParamContainer& params()
          {
-            if (!_has_params && has_meta_data()){
-               _params.Parse(meta_data());
+            if (!_has_params && header.has_meta_data()){
+               _params.Parse(header.meta_data());
                _has_params = true;
             }
 
@@ -100,17 +102,17 @@ namespace QDLIB
 
             stringstream ss;
             _params.Write(ss, true);
-            FileSingleHeader::set_meta_data(ss.str());
+            header.set_meta_data(ss.str());
             string classname;
             pm.GetValue("CLASS", classname);
-            FileSingleHeader::set_class_(classname);
+            header.set_class_(classname);
 
          }
 
          void set_meta_data(const ::std::string& value)
          {
             _params.Parse(value);
-            FileSingleHeader::set_meta_data(value);
+            header.set_meta_data(value);
          }
 
          void set_meta_data(const char* value)
@@ -788,11 +790,11 @@ namespace QDLIB
       file.close();
 
       /* Check what we got */
-      if (strncmp(lastbytes, ZLIB_MAGIC, ZLIB_MLEN ) == 0) MetaData.set_compression(FileSingleHeader_Compression_ZLIB);
-      else if (strncmp(lastbytes, BZIP_MAGIC, ZLIB_MLEN ) == 0) MetaData.set_compression(FileSingleHeader_Compression_BZIP);
-      else MetaData.set_compression(FileSingleHeader_Compression_UNCOMPRESSED); /* If no magic applies it can only be uncompressed */
+      if (strncmp(lastbytes, ZLIB_MAGIC, ZLIB_MLEN ) == 0) MetaData.header.set_compression(FileSingleHeader_Compression_ZLIB);
+      else if (strncmp(lastbytes, BZIP_MAGIC, ZLIB_MLEN ) == 0) MetaData.header.set_compression(FileSingleHeader_Compression_BZIP);
+      else MetaData.header.set_compression(FileSingleHeader_Compression_UNCOMPRESSED); /* If no magic applies it can only be uncompressed */
 
-      return MetaData.compression();
+      return MetaData.header.compression();
    }
 
 
@@ -816,39 +818,39 @@ namespace QDLIB
    {
       string s;
 
-      MetaData.set_class_(data->Name());
+      MetaData.header.set_class_(data->Name());
 
       BuildDataFileName(s);
-      MetaData.set_name(s);
+      MetaData.header.set_name(s);
 
       ParamContainer pm = data->Params();
       pm.Write(s);
       MetaData.set_meta_data(s);
-      MetaData.set_more_files_follow(more_files_follow);
+      MetaData.header.set_more_files_follow(more_files_follow);
 //      MetaData.set_s  set_sequence_number(_counter); /* !? */
 
       if (ignore_data)
-         MetaData.set_payload_size(0);
+         MetaData.header.set_payload_size(0);
       else
-         MetaData.set_payload_size(payload_size);
+         MetaData.header.set_payload_size(payload_size);
 
       switch (_compMethod){
          case BZIP:
          case ZLIB:
-            MetaData.set_compression(FileSingleHeader_Compression_ZLIB);
+            MetaData.header.set_compression(FileSingleHeader_Compression_ZLIB);
             break;
          case UNCOMPRESSED:
-            MetaData.set_compression(FileSingleHeader_Compression_UNCOMPRESSED);
+            MetaData.header.set_compression(FileSingleHeader_Compression_UNCOMPRESSED);
             break;
          case INVALID:
             throw (EIOError("Can't write meta data to stream since compression is INVALID"));
       }
 
-      uint32_t size = MetaData.ByteSize();
+      uint32_t size = MetaData.header.ByteSizeLong();
       /* Put message length in front */
       _sout->write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
 
-      if(!MetaData.SerializeToOstream(_sout))
+      if(!MetaData.header.SerializeToOstream(_sout))
          throw(EIOError("Can't write meta data to stream"));
    }
 
@@ -1078,7 +1080,7 @@ namespace QDLIB
 
       // Parse header
       MetaData.ClearAll();
-      if (!MetaData.ParseFromArray(reinterpret_cast<const void*>(buf), mlen)){
+      if (!MetaData.header.ParseFromArray(reinterpret_cast<const void*>(buf), mlen)){
          delete[] buf;
          throw(EIOError("Error reading meta data from stream"));
       }
@@ -1141,23 +1143,23 @@ namespace QDLIB
    {
 
 
-      if (MetaData.payload_size() > 0){
+      if (MetaData.header.payload_size() > 0){
 
-         switch(MetaData.compression())
+         switch(MetaData.header.compression())
          {
             case FileSingleHeader_Compression_UNCOMPRESSED:
                data->DeSerialize(*_sin);
                break;
             case FileSingleHeader_Compression_BZIP:
             case FileSingleHeader_Compression_ZLIB:
-               char* inbuf = new char[MetaData.payload_size()];
+               char* inbuf = new char[MetaData.header.payload_size()];
 
-               _sin->read(inbuf, MetaData.payload_size());
+               _sin->read(inbuf, MetaData.header.payload_size());
 
-               if ( (size_t) _sin->gcount() != MetaData.payload_size() )
+               if ( (size_t) _sin->gcount() != MetaData.header.payload_size() )
                   throw(EIOError("Reading from stream failed"));
 
-               ArrayInputStream arrin(inbuf, MetaData.payload_size());
+               ArrayInputStream arrin(inbuf, MetaData.header.payload_size());
                GzipInputStream gzip(&arrin);
                stringstream outbuf;
 
@@ -1176,7 +1178,7 @@ namespace QDLIB
          }
       }
 
-      if (! MetaData.more_files_follow()) {
+      if (! MetaData.header.more_files_follow()) {
          _intro_read = false;
 
          /* Close */
@@ -1250,15 +1252,15 @@ namespace QDLIB
          throw(EIOError("Can not open binary file for reading", s));
       }
 
-      if (MetaData.compression() != FileSingleHeader_Compression_UNCOMPRESSED){
+      if (MetaData.header.compression() != FileSingleHeader_Compression_UNCOMPRESSED){
          file.seekg(0, ios::end);
          size_t size = file.tellg();
-         MetaData.set_payload_size(size);
+         MetaData.header.set_payload_size(size);
          file.seekg(0);
       }
 
 
-      switch(MetaData.compression()) {
+      switch(MetaData.header.compression()) {
          case FileSingleHeader_Compression_UNCOMPRESSED:
             file.read((char*) data->begin(0), data->sizeBytes());
 
@@ -1267,10 +1269,10 @@ namespace QDLIB
 
             break;
          case FileSingleHeader_Compression_ZLIB:
-            _DecompressZLIB(&file, MetaData.payload_size(), data);
+            _DecompressZLIB(&file, MetaData.header.payload_size(), data);
             break;
          case FileSingleHeader_Compression_BZIP:
-            _DecompressBZIP(&file, MetaData.payload_size(), data);
+            _DecompressBZIP(&file, MetaData.header.payload_size(), data);
             break;
          default:
             break;
@@ -1301,7 +1303,7 @@ namespace QDLIB
    {
       ParamContainer pm = data->Params();
       MetaData.set_params(pm);
-      MetaData.set_class_(data->Name());
+      MetaData.header.set_class_(data->Name());
 
       pm.SetValue("CLASS", data->Name());
       pm.WriteToFile(_name + METAFILE_SUFFIX);
@@ -1475,7 +1477,7 @@ namespace QDLIB
             // write payload to stream
             WriteDataToStream(payload.str());
 
-            if (!MetaData.more_files_follow()) FinalizeOutStream();
+            if (!MetaData.header.more_files_follow()) FinalizeOutStream();
             break;
          }
          case binary:
@@ -1497,7 +1499,7 @@ namespace QDLIB
                   // Data is written in WriteMeta(),
                   // since meta data and payload can't be separated in a stream
 
-                  if (!MetaData.more_files_follow()){
+                  if (!MetaData.header.more_files_follow()){
                      FinalizeOutStream();
                   }
                }

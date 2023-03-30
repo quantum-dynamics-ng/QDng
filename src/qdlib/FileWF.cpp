@@ -17,7 +17,7 @@ namespace QDLIB {
 
 #if defined(HAVE_LIBZ)  || defined (HAVE_LIBBZ2)
       /* Compression options from global params */
-      
+
       bool compress;
       gp.GetValue("compress", compress, FILEWF_COMPRESSION);
 
@@ -59,15 +59,15 @@ namespace QDLIB {
 	  }
       }
    }
-   
-   
+
+
    FileWF::~FileWF()
    {}
 
 
    /**
     * Create WF Instance based on meta file information.
-    * 
+    *
     * Reads also the full data from files.
     * This method works recursive for Multistate WFs.
     */
@@ -75,10 +75,10 @@ namespace QDLIB {
    {
       string basename = Name();
       WaveFunction *wf;
-      
+
       FileSingleHeaderPm meta = ReadMeta();
       ParamContainer p = meta.params();
-      string classname = meta.class_();
+      string classname = meta.header.class_();
 
       if (classname.size() <= 1)
          throw (EParamProblem("No CLASS information found. LoadWaveFunctionByMeta failed."));
@@ -117,7 +117,7 @@ namespace QDLIB {
             int counter = Counter();
 
             unsigned int i=0;
-            while (GetMeta().more_files_follow()) { /* Try to get all WFs in list */
+            while (GetMeta().header.more_files_follow()) { /* Try to get all WFs in list */
                Counter(counter);
                wfm->Add( LoadWaveFunctionByMeta(), i);
                i++;
@@ -133,7 +133,7 @@ namespace QDLIB {
 
          WaveFunction* tmp_data = wf;
 
-         FileSingleHeader_Compression compress = meta.compression();
+         FileSingleHeader_Compression compress = meta.header.compression();
          if (compress != FileSingleHeader_Compression_UNCOMPRESSED){
             tmp_data = ModuleLoader<WaveFunction>::Instance()->Load(classname);
          }
@@ -145,18 +145,18 @@ namespace QDLIB {
             DELETE_WF(tmp_data);
          }
       }
-      
+
       Name(basename); /* We modfied the name => switch back to original */
       return wf;
    }
 
    /**
     * Read WF from File.
-    * 
+    *
     * This method can handle multistate WFs
-    * 
+    *
     * \param data WF instance of correct type
-    * 
+    *
     */
    void FileWF::ReadWaveFunction(WaveFunction * data)
    {
@@ -195,7 +195,7 @@ namespace QDLIB {
             ReadDataFromStream(data);  // Do a dummy read
 
             unsigned int i=0;
-            while (GetMeta().more_files_follow()) {
+            while (GetMeta().header.more_files_follow()) {
                Counter(counter);
                ReadWaveFunction(wfm->State(i));
                i++;
@@ -208,7 +208,7 @@ namespace QDLIB {
       } else { /* Load Single WaveFunction */
          WaveFunction* tmp_data = data;
 
-         FileSingleHeader_Compression compress = ReadMeta().compression();
+         FileSingleHeader_Compression compress = ReadMeta().header.compression();
          if (compress != FileSingleHeader_Compression_UNCOMPRESSED){
             tmp_data = data->NewInstance();
          }
@@ -220,13 +220,13 @@ namespace QDLIB {
             DELETE_WF(tmp_data);
          }
       }
-     
+
    }
 
 
    /**
     * Write WaveFunction to file.
-    * 
+    *
     * This method can write multistate WFs.
     */
    void FileWF::WriteWaveFunction(WaveFunction * data, bool more_files_follow)
@@ -292,23 +292,23 @@ namespace QDLIB {
             DELETE_WF(tmp_data);
       }
    }
-   
+
    /**
     * Streamoperator for file reading.
-    * 
+    *
     * \see ReadFile
     */
    void operator>>(FileWF &file,  WaveFunction *data)
    {
       if (data == NULL)
          throw EIncompatible("Can't WF read into NULL pointer");
-	       
+
       file.ReadWaveFunction(data);
    }
 
    /**
     * Stream operator for reading with a not instanciated WaveFunction.
-    * 
+    *
     * \see LoadWaveFunctionByMeta
     */
    void operator >>(FileWF & file, WaveFunction ** data)

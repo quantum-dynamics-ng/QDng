@@ -11,13 +11,13 @@ namespace QDLIB {
 
    void GridSystemHeaderPm::InitFromParamContainer(ParamContainer& pm)
    {
-      Clear();
+      header.Clear();
 
       /* Get all the params from the ParamContainer */
       int dims;
       pm.GetValue( "dims", dims);
 
-      set_dims(dims);
+      header.set_dims(dims);
       if ( dims <= 0 ) throw ( EParamProblem("Zero number of dimension defined") );
 
       int i = 0;
@@ -28,7 +28,7 @@ namespace QDLIB {
       string s = string("N") + string(c);
 
       while (pm.isPresent(s) && i < dims) {
-         dim_description_t* dimd = add_dim();
+        GridSystemHeader::dim_description_t* dimd = header.add_dim();
 
          pm.GetValue(string("N") + string(c), n);
 
@@ -53,22 +53,22 @@ namespace QDLIB {
 
    void GridSystemHeaderPm::DumpParams(ParamContainer& pm)
    {
-      int d = dims();
+      int d = header.dims();
       pm.SetValue( "dims", d);
 
       for (int i=0; i < d; i++){
          char c[256];
          sprintf(c, "%d", i);
-         int tmp = dim(i).size();
-         pm.SetValue("xmin" + string(c), dim(i).xmin());
-         pm.SetValue("xmax" + string(c), dim(i).xmax());
+         int tmp = header.dim(i).size();
+         pm.SetValue("xmin" + string(c), header.dim(i).xmin());
+         pm.SetValue("xmax" + string(c), header.dim(i).xmax());
          pm.SetValue("N" + string(c), tmp);
       }
    }
 
    GridSystem::GridSystem()
    {
-      grid_sys.set_dims(0);
+      grid_sys.header.set_dims(0);
       for (int i=0; i < MAX_DIMS; i++){
 	 _dx[i] = 0;
       }
@@ -77,9 +77,9 @@ namespace QDLIB {
    GridSystem::GridSystem(int dims)
    {
       for (int i=0; i < dims; i++)
-         grid_sys.add_dim();
+         grid_sys.header.add_dim();
 
-      grid_sys.set_dims(dims);
+      grid_sys.header.set_dims(dims);
    }
 
    /**
@@ -87,7 +87,7 @@ namespace QDLIB {
     */
    int GridSystem::Dim() const
    {
-      return grid_sys.dims();
+      return grid_sys.header.dims();
    }
 
    /**
@@ -103,17 +103,17 @@ namespace QDLIB {
       if (dims < 0)
          throw(EParamProblem("GridSystem: Number of Dimensions is negative"));
 
-      grid_sys.mutable_dim()->Clear();
+      grid_sys.header.mutable_dim()->Clear();
       for (int i=0; i < dims; i++)
-         grid_sys.add_dim();
+         grid_sys.header.add_dim();
 
-      grid_sys.set_dims(dims);
+      grid_sys.header.set_dims(dims);
    }
 
    const int* GridSystem::DimSizes()
    {
-      for (size_t i=0; i < grid_sys.dims(); i++)
-       dimsizes_[i] = grid_sys.dim(i).size();
+      for (size_t i=0; i < grid_sys.header.dims(); i++)
+       dimsizes_[i] = grid_sys.header.dim(i).size();
 
       return dimsizes_;
    }
@@ -126,7 +126,7 @@ namespace QDLIB {
     */
    int GridSystem::DimSize(int dim) const
    {
-      return grid_sys.dim(dim).size();
+      return grid_sys.header.dim(dim).size();
    }
 
    /**
@@ -137,7 +137,7 @@ namespace QDLIB {
     */
    void GridSystem::DimSize(int dim, uint32_t size)
    {
-      grid_sys.mutable_dim(dim)->set_size(size);
+      grid_sys.header.mutable_dim(dim)->set_size(size);
    }
 
    /**
@@ -145,11 +145,11 @@ namespace QDLIB {
     */
    int GridSystem::Size() const
    {
-      if (grid_sys.dims() == 0) return 0;
+      if (grid_sys.header.dims() == 0) return 0;
 
       int size=1;
-      for (size_t i=0; i < grid_sys.dims(); i++)
-	 size *= grid_sys.dim(i).size();
+      for (size_t i=0; i < grid_sys.header.dims(); i++)
+	 size *= grid_sys.header.dim(i).size();
 
       return size;
    }
@@ -161,7 +161,7 @@ namespace QDLIB {
     */
    double GridSystem::Xmin(int dim) const
    {
-      return grid_sys.dim(dim).xmin();
+      return grid_sys.header.dim(dim).xmin();
    }
 
    /**
@@ -171,8 +171,8 @@ namespace QDLIB {
     */
    void GridSystem::Xmin(int dim, double xmin)
    {
-      grid_sys.mutable_dim(dim)->set_xmin(xmin);
-      _dx[dim] = (grid_sys.dim(dim).xmax() - xmin)/(double(grid_sys.dim(dim).size()-1)); /* Update dx value */
+      grid_sys.header.mutable_dim(dim)->set_xmin(xmin);
+      _dx[dim] = (grid_sys.header.dim(dim).xmax() - xmin)/(double(grid_sys.header.dim(dim).size()-1)); /* Update dx value */
    }
 
    /**
@@ -182,7 +182,7 @@ namespace QDLIB {
     */
    double GridSystem::Xmax(int dim) const
    {
-      return grid_sys.dim(dim).xmax();
+      return grid_sys.header.dim(dim).xmax();
    }
 
    /**
@@ -192,8 +192,8 @@ namespace QDLIB {
     */
    void GridSystem::Xmax(int dim, double xmax)
    {
-      grid_sys.mutable_dim(dim)->set_xmax(xmax);
-      _dx[dim] = (xmax - grid_sys.dim(dim).xmin())/(double(grid_sys.dim(dim).size()-1));    /* Update dx value */
+      grid_sys.header.mutable_dim(dim)->set_xmax(xmax);
+      _dx[dim] = (xmax - grid_sys.header.dim(dim).xmin())/(double(grid_sys.header.dim(dim).size()-1));    /* Update dx value */
    }
 
    /**
@@ -203,7 +203,7 @@ namespace QDLIB {
     */
    double GridSystem::Dx (int dim) const
    {
-      return ( grid_sys.dim(dim).xmax() - grid_sys.dim(dim).xmin())/(double(grid_sys.dim(dim).size()-1));
+      return ( grid_sys.header.dim(dim).xmax() - grid_sys.header.dim(dim).xmin())/(double(grid_sys.header.dim(dim).size()-1));
       //return _dx[dim];
    }
 
@@ -246,13 +246,13 @@ namespace QDLIB {
    {
       bool equal = true;
 
-      if ( grid_sys.dims() != G.grid_sys.dims() ) return false;
+      if ( grid_sys.header.dims() != G.grid_sys.header.dims() ) return false;
 
-      for (size_t i=0; i < grid_sys.dims(); i++)
+      for (size_t i=0; i < grid_sys.header.dims(); i++)
       {
-         if ( grid_sys.dim(i).size() != G.grid_sys.dim(i).size() ) equal = false;
-         if ( fabs(grid_sys.dim(i).xmin() - G.grid_sys.dim(i).xmin()) > GRID_EPS) equal = false;
-         if ( fabs(grid_sys.dim(i).xmax() - G.grid_sys.dim(i).xmax()) > GRID_EPS) equal = false;
+         if ( grid_sys.header.dim(i).size() != G.grid_sys.header.dim(i).size() ) equal = false;
+         if ( fabs(grid_sys.header.dim(i).xmin() - G.grid_sys.header.dim(i).xmin()) > GRID_EPS) equal = false;
+         if ( fabs(grid_sys.header.dim(i).xmax() - G.grid_sys.header.dim(i).xmax()) > GRID_EPS) equal = false;
       }
       return equal;
    }
@@ -271,7 +271,7 @@ namespace QDLIB {
     */
    void GridSystem::_BuildInfo()
    {
-      for (size_t dim=0; dim < grid_sys.dims(); dim++){
+      for (size_t dim=0; dim < grid_sys.header.dims(); dim++){
          _lothers[dim] = 1;
          _nothers[dim] = 1;
 
@@ -279,13 +279,13 @@ namespace QDLIB {
          if (dim>0)
          {
             for(size_t i=0; i < dim; i++)
-               _lothers[dim] *= grid_sys.dim(i).size();
+               _lothers[dim] *= grid_sys.header.dim(i).size();
          }
 
          /* Determine how many times one x_i value is present */
-         for(size_t i=0; i < grid_sys.dims(); i++)
+         for(size_t i=0; i < grid_sys.header.dims(); i++)
          {
-            if (i != dim) _nothers[dim] *= grid_sys.dim(i).size();
+            if (i != dim) _nothers[dim] *= grid_sys.header.dim(i).size();
          }
       }
    }
@@ -298,8 +298,8 @@ namespace QDLIB {
    {
       int nothers = 1;
 
-      for(size_t i=0; i < grid_sys.dims(); i++)
-         if (i != dim1 && i != dim2) nothers *= grid_sys.dim(i).size();
+      for(size_t i=0; i < grid_sys.header.dims(); i++)
+         if (i != dim1 && i != dim2) nothers *= grid_sys.header.dim(i).size();
 
       return nothers;
    }
@@ -308,11 +308,11 @@ namespace QDLIB {
    {
       int lothers = Size();
 
-      for(size_t i=0; i < grid_sys.dims(); i++){
+      for(size_t i=0; i < grid_sys.header.dims(); i++){
          int ltmp = 1;
          if (i != dim1 || i != dim2) {
             for(size_t j=0; j < i ; j++)
-               ltmp *= grid_sys.dim(j).size();
+               ltmp *= grid_sys.header.dim(j).size();
          }
          if (ltmp < lothers) lothers = ltmp;
       }

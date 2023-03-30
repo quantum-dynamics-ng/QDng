@@ -8,16 +8,17 @@
 namespace QDLIB
 {
 
-   class GridSystemHeaderPm : public GridSystemHeader
+   class GridSystemHeaderPm
    {
       public:
+         GridSystemHeader header;
          void InitFromParamContainer(ParamContainer& pm);
          void DumpParams(ParamContainer& pm);
    };
 
    /**
     * Simple container class for the usual grid system parameters.
-    * 
+    *
     * The fastest varing dimension in the array has the lowest number.
     *	@author Markus Kowalewski
     */
@@ -73,7 +74,7 @@ namespace QDLIB
          /**
           *  Activate a dimension for index mapping.
           */
-         void ActiveDim(int dim) { _active = dim;  _numactive = grid_sys.dim(dim).size(); }
+         void ActiveDim(int dim) { _active = dim;  _numactive = grid_sys.header.dim(dim).size(); }
 
          /**
           * Number of replica points for one index in activated dimension.

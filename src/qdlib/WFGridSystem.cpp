@@ -5,11 +5,11 @@
 #include "tools/ZCopyStream.h"
 
 namespace QDLIB {
-         
+
    WFGridSystem::WFGridSystem() :
 	 _isKspace(false),  _fft(NULL)
    {}
-	    
+
 
    WFGridSystem::WFGridSystem(const GridSystem& grid) :
             WaveFunction(grid.Size()), GridSystem(grid), _isKspace(false),  _fft(NULL)
@@ -20,7 +20,7 @@ namespace QDLIB {
    {
       if (_fft != NULL) delete _fft;
    }
-   
+
    void WFGridSystem::CheckFFT()
    {
       /* Make sure the space buffer has the right size */
@@ -40,7 +40,7 @@ namespace QDLIB {
             _fft = new FFT(*((GridSystem*) this), *((cVec*) this), *GetSpaceBuffer());
       }
    }
-   
+
    /**
     * Return a reference to internal FFT object.
     */
@@ -56,10 +56,10 @@ namespace QDLIB {
          throw(EParamProblem("Dims not initialized or to large"));
    }
 
-   
+
    /**
     * Copy own content.
-    * 
+    *
     * Should be used by derived classes to transfers the information correctly.
     */
    void WFGridSystem::operator =(WFGridSystem *G)
@@ -87,14 +87,14 @@ namespace QDLIB {
    {
       WaveFunction* res = NewInstance();
       int size = cVec::size();
- 
+
       CheckFFT();
-      
+
       _fft->forward();
       IsKspace(true);
-      
+
       const double thr = VecMax(*this) * tolerance; /* This is the cut-off criteria */
-      
+
       int i;
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) default(shared) private(i)
@@ -105,7 +105,7 @@ namespace QDLIB {
             (*res)[i]._real = 0;
          else
             (*res)[i]._real = (*this)[i].real() / double(size);
-         
+
          if ( abs((*this)[i].imag()) < thr )
             (*res)[i]._imag = 0;
          else
@@ -129,19 +129,19 @@ namespace QDLIB {
       CheckFFT();
       _fft->backward();
       IsKspace(false);
-      
+
    }
-   
+
 
    void WFGridSystem::Serialize (std::ostream& os)
    {
       // Write header
-      grid_sys.set_data_size(sizeBytes());
+      grid_sys.header.set_data_size(sizeBytes());
 
-      uint32_t size = grid_sys.ByteSize();
+      uint32_t size = grid_sys.header.ByteSizeLong();
       os.write(reinterpret_cast<char*>(&size), sizeof(size));
 
-      if (! grid_sys.SerializeToOstream(&os) )
+      if (! grid_sys.header.SerializeToOstream(&os) )
          throw(EIOError("Can't write WF to stream"));
 
       // Write data
@@ -160,14 +160,14 @@ namespace QDLIB {
 
       char* buf = new char[size];
       is.read(buf, size);
-      if (! grid_sys.ParseFromArray(buf, size) )
+      if (! grid_sys.header.ParseFromArray(buf, size) )
          throw(EIOError("Can't read WF from stream"));
 
       delete[] buf;
 
       // Read data
       newsize(GridSystem::Size());
-      grid_sys.set_data_size(GridSystem::Size() * sizeof(*begin(0)));
+      grid_sys.header.set_data_size(GridSystem::Size() * sizeof(*begin(0)));
 
       is.read(reinterpret_cast<char*>(begin(0)), sizeBytes());
    }

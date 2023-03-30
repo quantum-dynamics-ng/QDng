@@ -59,12 +59,12 @@ namespace QDLIB {
    void OGridSystem::Serialize (std::ostream& os)
    {
       // Write header
-      grid_sys.set_data_size(sizeBytes());
+      grid_sys.header.set_data_size(sizeBytes());
 
-      uint32_t size = grid_sys.ByteSize();
+      uint32_t size = grid_sys.header.ByteSizeLong();
       os.write(reinterpret_cast<char*>(&size), sizeof(size));
 
-      if (! grid_sys.SerializeToOstream(&os) )
+      if (! grid_sys.header.SerializeToOstream(&os) )
          throw(EIOError("Can't write Operator to stream"));
 
       // Write data
@@ -80,13 +80,13 @@ namespace QDLIB {
 
       char* buf = new char[size];
       is.read(buf, size);
-      if (! grid_sys.ParseFromArray(buf, size) )
+      if (! grid_sys.header.ParseFromArray(buf, size) )
          throw(EIOError("Can't read WF from stream"));
 
       delete[] buf;
 
       newsize(GridSystem::Size());
-      grid_sys.set_data_size(GridSystem::Size() * sizeof(*begin(0)));
+      grid_sys.header.set_data_size(GridSystem::Size() * sizeof(*begin(0)));
 
       is.read(reinterpret_cast<char*>(begin(0)), sizeBytes());
    }

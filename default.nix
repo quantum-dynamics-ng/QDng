@@ -2,7 +2,6 @@
 let
   version = "dev";
   pkgs = import <nixpkgs> {};
-  protobuf = pkgs.protobuf3_11;
 
 in with pkgs; stdenv.mkDerivation {
   pname = "qdng";
