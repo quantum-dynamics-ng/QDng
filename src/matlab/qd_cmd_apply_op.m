@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function op_wf = qd_cmd_apply_op(data, meta, class, op, encode_fcn, decode_fcn)
 %
 % expec = qd_cmd_apply_op(data, meta, class, op) 

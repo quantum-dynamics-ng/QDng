@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function qd_cmd_xml(xml)
 %
 % qd_cmd_xml(xml)

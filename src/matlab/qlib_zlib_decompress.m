@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function decomp_out = qlib_zlib_decompress(data)
 %
 % decomp_out = qlib_zlib_decompress(data)

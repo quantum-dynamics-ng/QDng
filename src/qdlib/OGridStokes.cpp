@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+//
+// SPDX-License-Identifier: gpl-3-only
+
 #include "OGridStokes.h"
 #include "math/math_functions.h"
 

@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 Tkin = '<A name="GridNablaSq" mass="1763.2,1763.2" key="T"/>';
 qd_cmd_load_op(Tkin);
 

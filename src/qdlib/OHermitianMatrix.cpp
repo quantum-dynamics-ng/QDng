@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+//
+// SPDX-License-Identifier: gpl-3-only
+
 #include "OHermitianMatrix.h"
 #include "WFLevel.h"
 #include "tools/Exception.h"

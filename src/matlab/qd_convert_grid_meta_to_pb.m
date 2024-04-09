@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function meta_pb = qd_convert_grid_meta_to_pb(data, meta)
 %
 % meta_pb = qd_convert_grid_meta_to_pb(meta)

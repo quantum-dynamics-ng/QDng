@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+//
+// SPDX-License-Identifier: gpl-3-only
+
 #include "OGridNablaSq.h"
 #include "WFGridSystem.h"
 #include "tools/helpers.h"

@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function expec = qd_cmd_expec(data, meta, class, op, encode_fcn)
 %
 % expec = qd_cmd_expec(data, meta, class, op) 

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+//
+// SPDX-License-Identifier: gpl-3-only
+
 _cfc[HOFD_MAXORDER/2+0][0] = 1;
 _cfc[HOFD_MAXORDER/2+0][1] = -2;
 _cfc[HOFD_MAXORDER/2+1][0] = -8.33333333333333333e-2;

@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function [data, dt] = qd_decode_Laser(pl)
 %
 % [data, dt] = qd_decode_Laser(payload)

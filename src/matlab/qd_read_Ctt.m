@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function [Ctt, Nt, dt] = qd_read_Ctt(fname)
 %
 % [Ctt, Nt, dt] = qd_read_Ctt(fname)

@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function stream = qd_wf_to_stream(data, meta, encode_fcn)
 %
 % Encode a WF to stream format

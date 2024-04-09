@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 Markus Kowalewski, Regina de Vivie-Riedle
+%
+% SPDX-License-Identifier: gpl-3-only
+
 function [data, meta, header] = qd_read_wf(fname, decode_fcn)
 %
 % [data, meta, header] = qd_read_wf(fname)
