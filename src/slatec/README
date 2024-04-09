@@ -1,0 +1,5 @@
+Routines for Bessel function calculation.
+
+The Fortran code in this directory has been taken from
+the SLATEC common mathematical library (https://www.netlib.org/slatec/).
+
