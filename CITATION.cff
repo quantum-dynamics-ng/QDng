@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+title: 'QDng: A Grid Based Molecular Quantum Dynamics Package'
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - orcid: 'https://orcid.org/0000-0002-2288-2548'
+    given-names: 'Markus'
+    family-names: Kowalewski
+    email: markus.kowalewski@fysik.su.se
+    name-particle: Markus
+    affiliation: 'Stockholm University, Sweden'
+  - given-names: Regina
+    family-names: de Vivie-Riedle
+    affiliation: 'Ludwig Maximilians University, Munich, Germany'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.10944496
+repository-code: 'https://github.com/quantum-dynamics-ng/QDng'
+url: 'https://github.com/quantum-dynamics-ng/QDng'
+abstract: >-
+  General purpose program package for molecular quantum
+  dynamics
+keywords:
+  - quantum Dynamics
+  - molecules
+  - light-matter interaction
+  - time propagation
+  - eingenfunctions
+  - optimal control theory
+license: GPL-3.0-only
+
