@@ -18,7 +18,7 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.10944496
 repository-code: 'https://github.com/quantum-dynamics-ng/QDng'
-url: 'https://github.com/quantum-dynamics-ng/QDng'
+url: 'https://doi.org/10.5281/zenodo.10944496'
 abstract: >-
   General purpose program package for molecular quantum
   dynamics
