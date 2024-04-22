@@ -34,6 +34,8 @@ This is not need for the release tarball (call configure direcltly).
 
 QDng is packaged with [NixOS-QChem](https://github.com/Nix-QChem/NixOS-QChem) and can be used directly through the overlay or the flake.
 
+[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
+
 ## Citation
 
 Cite as:
