@@ -14,5 +14,9 @@
       qdng = callPackage ./package.nix { protobuf = pkgs.protobuf3_21; };
       default = self.packages.x86_64-linux.qdng;
     };
+
+    hydraJobs.x86_64-linux = {
+      inherit (self.packages.x86_64-linux) qdng;
+    };
   };
 }
