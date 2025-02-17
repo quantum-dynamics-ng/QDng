@@ -1,0 +1,16 @@
+name: Build Package
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ master ]
+
+
+jobs:
+  build-flake:
+    name: Build the flake
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: nix build .
