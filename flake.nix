@@ -2,7 +2,7 @@
   description = "Quantum dynamics program package";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-23.11";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.11";
   };
 
   outputs = { self, nixpkgs }: {
