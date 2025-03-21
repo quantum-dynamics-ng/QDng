@@ -13,11 +13,16 @@ Features:
 * Composable matrix Hamiltionians and operators
 * Time dependent laser fields
 
+## Running under the program Nix
+
+QDng is packaged with [NixOS-QChem](https://github.com/Nix-QChem/NixOS-QChem) and can be used directly through the overlay or the flake.
+
+[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 ## Building
 
 The following depencies is required:
- * google protobuf
+ * google protobuf (<= 3.21)
  * libxml2
  * lapack
  * blas
@@ -30,11 +35,6 @@ The following depencies is required:
 Use ./genbs to generate the build system (configure) after a fresh git clone.
 This is not need for the release tarball (call configure direcltly).
 
-## Running under the program Nix
-
-QDng is packaged with [NixOS-QChem](https://github.com/Nix-QChem/NixOS-QChem) and can be used directly through the overlay or the flake.
-
-[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 ## Citation
 
