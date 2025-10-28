@@ -1,0 +1,44 @@
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "type": "SoftwareSourceCode",
+    "applicationCategory": "Chemistry",
+    "codeRepository": "https://github.com/quantum-dynamics-ng/QDng",
+    "contributor": [
+        {
+            "id": "https://orcid.org/0000-0002-2288-2548",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Department of Physics, Stockholm University"
+            },
+            "email": "markus.kowalewski@fysik.su.se",
+            "familyName": "Kowalewski",
+            "givenName": "Markus"
+        },
+        {
+            "id": "_:contributor_2",
+            "type": "Person",
+            "familyName": "de Vivie-Riedle",
+            "givenName": "Regina"
+        }
+    ],
+    "dateCreated": "2008-10-27",
+    "dateModified": "2024-04-08",
+    "datePublished": "2024-04-08",
+    "description": "C++ Molecular Quantum Dynamics Software",
+    "downloadUrl": "https://zenodo.org/records/10944497/files/QDng-1.0.0.tar.gz",
+    "identifier": "DOI:10.5281/zenodo.10944496",
+    "keywords": [
+        "quantum dynamics",
+        "quantum chemistry",
+        "computational chemistry"
+    ],
+    "license": "https://spdx.org/licenses/GPL-3.0-only",
+    "name": "QDng",
+    "operatingSystem": "Linux",
+    "programmingLanguage": "C++",
+    "softwareRequirements": "https://nixos.org/",
+    "version": "1.0.0",
+    "developmentStatus": "active",
+    "issueTracker": "https://github.com/quantum-dynamics-ng/QDng/issues"
+}
