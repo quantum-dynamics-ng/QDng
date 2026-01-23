@@ -2,7 +2,7 @@
   description = "Quantum dynamics program package";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.11";
   };
 
   outputs = { self, nixpkgs }: {
@@ -11,7 +11,7 @@
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
       inherit (pkgs) lib callPackage;
     in {
-      qdng = callPackage ./package.nix { protobuf = pkgs.protobuf3_21; };
+      qdng = callPackage ./package.nix { protobuf = pkgs.protobuf_21; };
       default = self.packages.x86_64-linux.qdng;
     };
 
