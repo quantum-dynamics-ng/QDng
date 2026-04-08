@@ -1,6 +1,7 @@
 { lib, stdenv, fetchurl, requireFile, gfortran, fftw, protobuf
 , blas, lapack
-, automake, autoconf, libtool, zlib, bzip2, libxml2, flex, bison
+, automake, autoconf, libtool, zlib, bzip2, libxml2, flex, bison,
+  autoreconfHook
 } :
 
 stdenv.mkDerivation rec {
@@ -18,13 +19,9 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  preConfigure = ''
-    ./genbs
-  '';
-
   buildInputs = [ fftw protobuf blas lapack
                   bzip2 zlib libxml2 flex bison ];
-  nativeBuildInputs = [ automake autoconf libtool gfortran ];
+  nativeBuildInputs = [ autoreconfHook gfortran ];
 
   meta = with lib; {
     description = "Quantum dynamics program package";
