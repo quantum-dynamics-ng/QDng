@@ -1,10 +1,20 @@
-{ lib, stdenv, fetchurl, requireFile, gfortran, fftw, protobuf
-, blas, lapack
-, automake, autoconf, libtool, zlib, bzip2, libxml2, flex, bison,
-  autoreconfHook
-} :
+{
+  lib,
+  stdenv,
+  autoreconfHook,
+  gfortran,
+  fftw,
+  protobuf,
+  blas,
+  lapack,
+  zlib,
+  bzip2,
+  libxml2,
+  flex,
+  bison,
+}:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "qdng";
   version = "1.0.0";
 
@@ -19,15 +29,28 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  buildInputs = [ fftw protobuf blas lapack
-                  bzip2 zlib libxml2 flex bison ];
-  nativeBuildInputs = [ autoreconfHook gfortran ];
+  nativeBuildInputs = [
+    autoreconfHook
+    gfortran
+    flex
+    bison
+  ];
 
-  meta = with lib; {
-    description = "Quantum dynamics program package";
-    platforms = platforms.linux;
-    maintainer = [ maintainers.markuskowa ];
-    license = licenses.gpl3Only;
+  buildInputs = [
+    fftw
+    protobuf
+    blas
+    lapack
+    bzip2
+    zlib
+    libxml2
+  ];
+
+  meta = {
+    description = "Molecular wavepacket dynamics package";
+    homepage = "https://github.com/quantum-dynamics-ng/QDng";
+    platforms = lib.platforms.linux;
+    maintainer = [ lib.maintainers.markuskowa ];
+    license = lib.licenses.gpl3Only;
   };
-}
-
+})
