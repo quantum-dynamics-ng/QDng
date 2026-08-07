@@ -11,7 +11,7 @@
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
       inherit (pkgs) lib callPackage;
     in {
-      qdng = callPackage ./package.nix { protobuf = pkgs.protobuf_21; };
+      qdng = callPackage ./package.nix { };
       default = self.packages.x86_64-linux.qdng;
       handbook = callPackage ./handbook.nix { qdng = self.packages.x86_64-linux.qdng ;};
     };
