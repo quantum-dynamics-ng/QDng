@@ -617,11 +617,10 @@ namespace QDLIB
       U->BuildLZB(_PsiInitial);
       U->DiagLZB();
 
-      _Nef = U->Size();
+      _Nef = U->Size(); // actual size of converged LZB basis
 
       /* Get results */
       WFBuffer* wfs = U->Basis();
-      _Nef = wfs->Size();
       _Energies_raw.newsize(_Nef);
       cVec evals(_Nef);
       evals = *(U->Evals());
