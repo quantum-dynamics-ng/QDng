@@ -237,6 +237,12 @@ int main(int argc, char **argv)
       /* Get the number of openmp threads */
       if (cmdline.GetOption('p')) {
          cmdline.GetOption( 'p', procs);
+      } else {
+        char *omp_num_threads = getenv("OMP_NUM_THREADS");
+          if (omp_num_threads != NULL) {
+          int num_threads = strtol(omp_num_threads, NULL, 10);
+          if (num_threads > 0) procs = num_threads;
+        }
       }
       omp_set_num_threads(procs);
 #endif
